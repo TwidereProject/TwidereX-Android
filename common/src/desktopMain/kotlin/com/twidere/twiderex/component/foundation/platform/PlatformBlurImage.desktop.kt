@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.foundation
+package com.twidere.twiderex.component.foundation.platform
 
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable

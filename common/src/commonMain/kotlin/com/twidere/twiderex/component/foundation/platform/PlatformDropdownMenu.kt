@@ -18,49 +18,36 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.foundation
+package com.twidere.twiderex.component.foundation.platform
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material.MenuDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpOffset
-
+import androidx.compose.ui.unit.dp
+// TODO FIXME 2021.11.4: default values like modifier is not working on expect composable functions
+// issue tracker: https://issuetracker.google.com/issues/196413692
 @Composable
-actual fun PlatformDropdownMenu(
+expect fun PlatformDropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    focusable: Boolean,
-    modifier: Modifier,
-    offset: DpOffset,
+    focusable: Boolean = true,
+    modifier: Modifier = Modifier,
+    offset: DpOffset = DpOffset(0.dp, 0.dp),
     content: @Composable (ColumnScope.() -> Unit)
-) {
-    androidx.compose.material.DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = onDismissRequest,
-        modifier = modifier,
-        offset = offset,
-        content = content,
-    )
-}
+)
 
 @Composable
-actual fun PlatformDropdownMenuItem(
+expect fun PlatformDropdownMenuItem(
     onClick: () -> Unit,
-    modifier: Modifier,
-    enabled: Boolean,
-    contentPadding: PaddingValues,
-    interactionSource: MutableInteractionSource,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    contentPadding: PaddingValues = MenuDefaults.DropdownMenuItemContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable (RowScope.() -> Unit)
-) {
-    androidx.compose.material.DropdownMenuItem(
-        onClick = onClick,
-        modifier = modifier,
-        enabled = enabled,
-        contentPadding = contentPadding,
-        interactionSource = interactionSource,
-        content = content,
-    )
-}
+)

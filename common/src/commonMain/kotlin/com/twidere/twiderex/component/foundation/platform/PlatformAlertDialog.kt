@@ -18,27 +18,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.foundation
+package com.twidere.twiderex.component.foundation.platform
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.DefaultAlpha
-import androidx.compose.ui.layout.ContentScale
-import dev.icerock.moko.resources.FileResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 
-// TODO FIXME 2021.11.4: default values like modifier is not working on expect composable functions
-// issue tracker: https://issuetracker.google.com/issues/196413692
 @Composable
-expect fun PlatformBlurImage(
-    resource: FileResource,
-    contentDescription: String?,
+expect fun PlatformAlertDialog(
+    onDismissRequest: () -> Unit,
+    confirmButton: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    alignment: Alignment = Alignment.Center,
-    contentScale: ContentScale = ContentScale.Fit,
-    alpha: Float = DefaultAlpha,
-    colorFilter: ColorFilter? = null,
-    blurRadius: Float = 25f,
-    bitmapScale: Float = 1f
+    dismissButton: @Composable (() -> Unit)? = null,
+    title: @Composable (() -> Unit)? = null,
+    text: @Composable (() -> Unit)? = null,
+    shape: Shape? = null,
+    backgroundColor: Color? = null,
+    contentColor: Color? = null,
 )

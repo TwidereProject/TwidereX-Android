@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.foundation
+package com.twidere.twiderex.component.foundation.platform
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.ColumnScope
@@ -40,7 +40,6 @@ actual fun PlatformDropdownMenu(
     androidx.compose.material.DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
-        focusable = focusable,
         modifier = modifier,
         offset = offset,
         content = content,

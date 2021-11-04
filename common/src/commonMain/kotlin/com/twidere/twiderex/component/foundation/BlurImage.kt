@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
+import com.twidere.twiderex.component.foundation.platform.PlatformBlurImage
 import dev.icerock.moko.resources.FileResource
 
 @Composable

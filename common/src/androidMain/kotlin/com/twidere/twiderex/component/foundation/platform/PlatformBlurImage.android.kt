@@ -20,7 +20,7 @@
  */
 @file:Suppress("DEPRECATION")
 // for migration: https://developer.android.com/guide/topics/renderscript/migrate
-package com.twidere.twiderex.component.foundation
+package com.twidere.twiderex.component.foundation.platform
 
 import android.content.Context
 import android.graphics.Bitmap

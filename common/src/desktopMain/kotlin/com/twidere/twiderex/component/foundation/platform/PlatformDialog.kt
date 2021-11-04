@@ -18,22 +18,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.foundation
+package com.twidere.twiderex.component.foundation.platform
 
 import androidx.compose.runtime.Composable
+import com.twidere.twiderex.component.foundation.DialogProperties
 
 @Composable
-actual fun Dialog(
+actual fun PlatformDialog(
     onDismissRequest: () -> Unit,
     properties: DialogProperties,
     content: @Composable (() -> Unit)
 ) {
     androidx.compose.ui.window.Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = androidx.compose.ui.window.DialogProperties(
-            dismissOnBackPress = properties.dismissOnBackPress,
-            dismissOnClickOutside = properties.dismissOnClickOutside
-        ),
-        content = content,
+        onCloseRequest = onDismissRequest,
+        content = {
+            content.invoke()
+        }
     )
 }

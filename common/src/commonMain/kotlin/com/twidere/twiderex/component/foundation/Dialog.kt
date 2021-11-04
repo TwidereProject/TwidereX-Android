@@ -21,13 +21,20 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.runtime.Composable
+import com.twidere.twiderex.component.foundation.platform.PlatformDialog
 
 @Composable
-expect fun Dialog(
+fun Dialog(
     onDismissRequest: () -> Unit,
     properties: DialogProperties = DialogProperties(),
     content: @Composable (() -> Unit)
-)
+) {
+    PlatformDialog(
+        onDismissRequest = onDismissRequest,
+        properties = properties,
+        content = content
+    )
+}
 
 data class DialogProperties(
     val dismissOnBackPress: Boolean = true,
