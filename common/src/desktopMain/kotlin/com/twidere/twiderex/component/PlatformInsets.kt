@@ -22,6 +22,8 @@ package com.twidere.twiderex.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 actual fun Modifier.topInsetsPadding(): Modifier = this
 actual fun Modifier.bottomInsetsPadding(): Modifier = this
@@ -41,4 +43,23 @@ actual fun PlatformInsets(
 ) {
     // TODO: implementation
     content.invoke()
+}
+
+@Composable
+actual fun ImeVisibleWithInsets(
+    filter: ((Boolean) -> Boolean)?,
+    collectIme: ((Boolean) -> Unit)?
+) {
+}
+
+@Composable
+actual fun ImeHeightWithInsets(
+    filter: ((Int) -> Boolean)?,
+    collectIme: ((Int) -> Unit)?
+) {
+}
+
+@Composable
+actual fun ImeBottomInsets(): Dp {
+    return 0.dp
 }

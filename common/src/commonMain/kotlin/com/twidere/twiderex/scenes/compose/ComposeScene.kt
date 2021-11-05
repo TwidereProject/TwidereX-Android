@@ -20,11 +20,6 @@
  */
 package com.twidere.twiderex.scenes.compose
 
-// import android.Manifest
-// import androidx.activity.compose.BackHandler
-// import androidx.activity.compose.rememberLauncherForActivityResult
-// import androidx.activity.result.contract.ActivityResultContracts
-// import com.google.accompanist.insets.LocalWindowInsets
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -100,6 +95,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.MR
+import com.twidere.twiderex.component.ImeBottomInsets
+import com.twidere.twiderex.component.ImeHeightWithInsets
+import com.twidere.twiderex.component.ImeVisibleWithInsets
 import com.twidere.twiderex.component.foundation.AlertDialog
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.CheckboxItem
@@ -150,6 +148,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.BackHandler
 import org.koin.core.parameter.parametersOf
+import kotlin.math.max
 
 @Composable
 fun DraftComposeScene(
@@ -414,13 +413,14 @@ private fun ComposeBody(
                 }
                 Divider()
                 var showEmoji by remember { mutableStateOf(false) }
-                // val ime = LocalWindowInsets.current.ime
-                // LaunchedEffect(ime) {
-                //     snapshotFlow { ime.isVisible }
-                //         .distinctUntilChanged()
-                //         .filter { it && showEmoji }
-                //         .collect { showEmoji = false }
-                // }
+                ImeVisibleWithInsets(
+                    filter = {
+                        it && showEmoji
+                    },
+                    collectIme = {
+                        showEmoji = false
+                    }
+                )
                 LaunchedEffect(showEmoji) {
                     if (showEmoji) {
                         keyboardController?.hide()
@@ -479,22 +479,21 @@ fun EmojiPanel(
     showEmoji: Boolean,
 ) {
     val items by viewModel.emojis.observeAsState(initial = emptyList())
-    // val ime = LocalWindowInsets.current.ime
-    // val navigation = LocalWindowInsets.current.navigationBars
+
     var height by remember { mutableStateOf(0) }
-    // LaunchedEffect(ime) {
-    //     snapshotFlow { ime.bottom }
-    //         .distinctUntilChanged()
-    //         .filter { it > 0 }
-    //         .collect { height = max(height, it) }
-    // }
+    ImeHeightWithInsets(
+        filter = {
+            it > 0
+        },
+        collectIme = {
+            height = max(height, it)
+        }
+
+    )
     val targetHeight = with(LocalDensity.current) {
         height.toDp()
     }
-    val bottom = with(LocalDensity.current) {
-        5.dp
-        // ime.bottom.coerceAtLeast(navigation.bottom).toDp()
-    }
+    val bottom = ImeBottomInsets()
     var visibility by remember { mutableStateOf(false) }
     LaunchedEffect(showEmoji, bottom) {
         if (bottom == targetHeight || showEmoji) {
