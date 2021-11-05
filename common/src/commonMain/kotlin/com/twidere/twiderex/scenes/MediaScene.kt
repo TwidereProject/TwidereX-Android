@@ -102,6 +102,7 @@ import com.twidere.twiderex.utils.video.CustomVideoControl
 import com.twidere.twiderex.utils.video.VideoController
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import kotlinx.coroutines.launch
+import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.swiper.Swiper
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
@@ -327,7 +328,9 @@ private fun StatusMediaInfo(
                     onClick = {
                         scope.launch {
                             callback.invoke()
-                            viewModel.saveFile(currentMedia)
+                            viewModel.saveFile(currentMedia, target = {
+                                FilePicker.createFile(it)?.path
+                            })
                         }
                     }
                 ) {

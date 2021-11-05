@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.mock.paging
 
-import androidx.paging.CombinedLoadStates
 import androidx.paging.DifferCallback
 import androidx.paging.NullPaddedList
 import androidx.paging.PagingData
@@ -74,7 +73,6 @@ internal suspend fun <T : Any> PagingData<T>.collectDataForTest(): List<T> {
         override suspend fun presentNewList(
             previousList: NullPaddedList<T>,
             newList: NullPaddedList<T>,
-            newCombinedLoadStates: CombinedLoadStates,
             lastAccessedIndex: Int,
             onListPresentable: () -> Unit
         ): Int? {

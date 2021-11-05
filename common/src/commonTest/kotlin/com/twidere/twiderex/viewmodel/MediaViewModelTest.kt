@@ -76,9 +76,11 @@ internal class MediaViewModelTest : AccountViewModelTestBase() {
         viewModel.saveFile(
             mockk {
                 every { mediaUrl }.returns("123")
-            },
-            "target",
-        )
+                every { fileName }.returns("target")
+            }
+        ) {
+            it
+        }
         verify(exactly = 1) {
             mediaAction.download(
                 "123",
