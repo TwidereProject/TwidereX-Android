@@ -55,18 +55,6 @@ fun DependencyHandlerScope.kspApi() {
     implementation("com.google.devtools.ksp:symbol-processing-api", Versions.ksp)
 }
 
-fun DependencyHandlerScope.compose() {
-    implementation("androidx.compose.ui:ui", Versions.compose)
-    implementation("androidx.compose.ui:ui-tooling", Versions.compose)
-    androidTestImplementation("androidx.compose.ui:ui-test", Versions.compose)
-    implementation("androidx.compose.foundation:foundation", Versions.compose)
-    implementation("androidx.compose.animation:animation", Versions.compose)
-    implementation("androidx.compose.material:material", Versions.compose)
-    implementation("androidx.compose.material:material-icons-core", Versions.compose)
-    implementation("androidx.compose.material:material-icons-extended", Versions.compose)
-    implementation("androidx.constraintlayout:constraintlayout-compose", Versions.constraintLayout)
-}
-
 fun DependencyHandlerScope.paging() {
     implementation("androidx.paging:paging-common", Versions.paging)
     implementation("androidx.paging:paging-compose", Versions.paging_compose)

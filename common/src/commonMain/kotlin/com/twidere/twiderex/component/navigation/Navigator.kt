@@ -20,9 +20,9 @@
  */
 package com.twidere.twiderex.component.navigation
 
-import android.webkit.CookieManager
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.twidere.twiderex.kmp.RemoteNavigator
+import com.twidere.twiderex.kmp.clearCookie
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonStatusType
@@ -136,8 +136,7 @@ class Navigator(
     }
 
     override suspend fun twitterSignInWeb(target: String): String {
-        CookieManager.getInstance().removeAllCookies {
-        }
+        clearCookie()
         return navController.navigateForResult(
             RootRoute.SignIn.Web.Twitter(target)
         ).toString()

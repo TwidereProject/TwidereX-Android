@@ -20,11 +20,6 @@
  */
 package com.twidere.twiderex.scenes.compose
 
-import android.Manifest
-import android.annotation.SuppressLint
-import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -99,8 +94,10 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.LocalWindowInsets
 import com.twidere.twiderex.MR
+import com.twidere.twiderex.component.ImeBottomInsets
+import com.twidere.twiderex.component.ImeHeightWithInsets
+import com.twidere.twiderex.component.ImeVisibleWithInsets
 import com.twidere.twiderex.component.foundation.AlertDialog
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.CheckboxItem
@@ -124,6 +121,7 @@ import com.twidere.twiderex.extensions.icon
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.stringName
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.kmp.RequestLocationPermission
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
@@ -146,9 +144,9 @@ import com.twitter.twittertext.TwitterTextConfiguration
 import com.twitter.twittertext.TwitterTextParser
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.BackHandler
 import org.koin.core.parameter.parametersOf
 import kotlin.math.max
 
@@ -415,13 +413,14 @@ private fun ComposeBody(
                 }
                 Divider()
                 var showEmoji by remember { mutableStateOf(false) }
-                val ime = LocalWindowInsets.current.ime
-                LaunchedEffect(ime) {
-                    snapshotFlow { ime.isVisible }
-                        .distinctUntilChanged()
-                        .filter { it && showEmoji }
-                        .collect { showEmoji = false }
-                }
+                ImeVisibleWithInsets(
+                    filter = {
+                        it && showEmoji
+                    },
+                    collectIme = {
+                        showEmoji = false
+                    }
+                )
                 LaunchedEffect(showEmoji) {
                     if (showEmoji) {
                         keyboardController?.hide()
@@ -480,21 +479,21 @@ fun EmojiPanel(
     showEmoji: Boolean,
 ) {
     val items by viewModel.emojis.observeAsState(initial = emptyList())
-    val ime = LocalWindowInsets.current.ime
-    val navigation = LocalWindowInsets.current.navigationBars
+
     var height by remember { mutableStateOf(0) }
-    LaunchedEffect(ime) {
-        snapshotFlow { ime.bottom }
-            .distinctUntilChanged()
-            .filter { it > 0 }
-            .collect { height = max(height, it) }
-    }
+    ImeHeightWithInsets(
+        filter = {
+            it > 0
+        },
+        collectIme = {
+            height = max(height, it)
+        }
+
+    )
     val targetHeight = with(LocalDensity.current) {
         height.toDp()
     }
-    val bottom = with(LocalDensity.current) {
-        ime.bottom.coerceAtLeast(navigation.bottom).toDp()
-    }
+    val bottom = ImeBottomInsets()
     var visibility by remember { mutableStateOf(false) }
     LaunchedEffect(showEmoji, bottom) {
         if (bottom == targetHeight || showEmoji) {
@@ -1118,7 +1117,6 @@ private object ComposeVoteDefaults {
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-@SuppressLint("MissingPermission")
 @Composable
 private fun ComposeActions(
     viewModel: ComposeViewModel,
@@ -1142,14 +1140,7 @@ private fun ComposeActions(
     }
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = {
-            if (it.all { it.value }) {
-                viewModel.trackingLocation()
-            }
-        },
-    )
+
     val draftCount = viewModel.draftCount.observeAsState(0)
     val insertMode by viewModel.mediaInsertMode.observeAsState(initial = ComposeViewModel.MediaInsertMode.All)
     Box {
@@ -1238,29 +1229,36 @@ private fun ComposeActions(
                 }
             }
             if (allowLocation) {
-                IconButton(
-                    onClick = {
-                        if (locationEnabled) {
-                            viewModel.disableLocation()
-                        } else {
-                            val permissions = arrayOf(
-                                Manifest.permission.ACCESS_COARSE_LOCATION,
-                                Manifest.permission.ACCESS_FINE_LOCATION
-                            )
-                            permissionLauncher.launch(permissions)
-                        }
+                var requestPermission by remember {
+                    mutableStateOf(false)
+                }
+                RequestLocationPermission(
+                    onPermissionGrantt = {
+                        viewModel.trackingLocation()
                     },
+                    request = requestPermission,
                 ) {
-                    Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
-                        contentDescription = stringResource(
-                            res = if (locationEnabled) {
-                                com.twidere.twiderex.MR.strings.accessibility_scene_compose_location_disable
+                    IconButton(
+                        onClick = {
+                            if (locationEnabled) {
+                                viewModel.disableLocation()
+                                requestPermission = false
                             } else {
-                                com.twidere.twiderex.MR.strings.accessibility_scene_compose_location_enable
+                                requestPermission = true
                             }
+                        },
+                    ) {
+                        Icon(
+                            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
+                            contentDescription = stringResource(
+                                res = if (locationEnabled) {
+                                    com.twidere.twiderex.MR.strings.accessibility_scene_compose_location_disable
+                                } else {
+                                    com.twidere.twiderex.MR.strings.accessibility_scene_compose_location_enable
+                                }
+                            )
                         )
-                    )
+                    }
                 }
             }
             IconButton(

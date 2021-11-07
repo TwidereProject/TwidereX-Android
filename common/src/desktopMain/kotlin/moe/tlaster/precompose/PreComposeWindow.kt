@@ -82,17 +82,17 @@ fun PreComposeWindow(
                 holder.lifecycle.currentState = Lifecycle.State.Destroyed
                 onCloseRequest.invoke()
             },
-            state,
-            visible,
-            title,
-            icon,
-            undecorated,
-            resizable,
-            enabled,
-            focusable,
-            alwaysOnTop,
-            onPreviewKeyEvent,
-            onKeyEvent,
+            state = state,
+            visible = visible,
+            title = title,
+            icon = icon,
+            undecorated = undecorated,
+            resizable = resizable,
+            enabled = enabled,
+            focusable = focusable,
+            alwaysOnTop = alwaysOnTop,
+            onPreviewKeyEvent = onPreviewKeyEvent,
+            onKeyEvent = onKeyEvent,
             content = {
                 content.invoke(this)
             },

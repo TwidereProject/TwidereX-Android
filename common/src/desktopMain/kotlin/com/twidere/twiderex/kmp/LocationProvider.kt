@@ -20,9 +20,19 @@
  */
 package com.twidere.twiderex.kmp
 
+import androidx.compose.runtime.Composable
 import com.twidere.twiderex.model.kmp.Location
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+
+@Composable
+actual fun RequestLocationPermission(
+    onPermissionGrantt: () -> Unit,
+    request: Boolean,
+    content: @Composable () -> Unit,
+) {
+    content.invoke()
+}
 
 // TODO: implementation
 actual class LocationProvider {
@@ -34,4 +44,7 @@ actual class LocationProvider {
 
     actual fun disable() {
     }
+
+    actual val locationEnabled: Flow<Boolean>
+        get() = flowOf(false)
 }

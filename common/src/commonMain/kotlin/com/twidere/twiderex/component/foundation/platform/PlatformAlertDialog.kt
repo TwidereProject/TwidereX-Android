@@ -18,36 +18,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.foundation
+package com.twidere.twiderex.component.foundation.platform
 
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-actual fun AlertDialog(
+expect fun PlatformAlertDialog(
     onDismissRequest: () -> Unit,
     confirmButton: @Composable () -> Unit,
-    modifier: Modifier,
-    dismissButton: @Composable (() -> Unit)?,
-    title: @Composable (() -> Unit)?,
-    text: @Composable (() -> Unit)?,
-    shape: Shape,
-    backgroundColor: Color,
-    contentColor: Color,
-) {
-    androidx.compose.material.AlertDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = confirmButton,
-        modifier = modifier,
-        dismissButton = dismissButton,
-        title = title,
-        text = text,
-        shape = shape,
-        backgroundColor = backgroundColor,
-        contentColor = contentColor,
-    )
-}
+    modifier: Modifier = Modifier,
+    dismissButton: @Composable (() -> Unit)? = null,
+    title: @Composable (() -> Unit)? = null,
+    text: @Composable (() -> Unit)? = null,
+    shape: Shape? = null,
+    backgroundColor: Color? = null,
+    contentColor: Color? = null,
+)

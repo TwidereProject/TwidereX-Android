@@ -20,35 +20,13 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
-import com.twidere.twiderex.component.painterResource
-import dev.icerock.moko.resources.FileResource
 
 @Composable
-actual fun BlurImage(
-    resource: FileResource,
-    contentDescription: String?,
-    modifier: Modifier,
-    alignment: Alignment,
-    contentScale: ContentScale,
-    alpha: Float,
-    colorFilter: ColorFilter?,
-    blurRadius: Float,
-    bitmapScale: Float,
-) {
-    // TODO: blue effect
-    Image(
-        painter = painterResource(res = resource),
-        contentDescription = contentDescription,
-        modifier = modifier,
-        alignment = alignment,
-        contentScale = contentScale,
-        alpha = alpha,
-        colorFilter = colorFilter
-    )
+actual fun getLocalView(): LocalView {
+    return LocalView()
+}
+
+actual class LocalView actual constructor() {
+    actual fun performHapticFeedback() {}
 }

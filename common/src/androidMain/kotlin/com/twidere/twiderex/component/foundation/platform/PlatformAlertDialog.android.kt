@@ -18,24 +18,26 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.foundation
+package com.twidere.twiderex.component.foundation.platform
 
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 
 @Composable
-actual fun AlertDialog(
+actual fun PlatformAlertDialog(
     onDismissRequest: () -> Unit,
     confirmButton: @Composable () -> Unit,
     modifier: Modifier,
     dismissButton: @Composable (() -> Unit)?,
     title: @Composable (() -> Unit)?,
     text: @Composable (() -> Unit)?,
-    shape: Shape,
-    backgroundColor: Color,
-    contentColor: Color,
+    shape: Shape?,
+    backgroundColor: Color?,
+    contentColor: Color?,
 ) {
     androidx.compose.material.AlertDialog(
         onDismissRequest = onDismissRequest,
@@ -44,8 +46,10 @@ actual fun AlertDialog(
         dismissButton = dismissButton,
         title = title,
         text = text,
-        shape = shape,
-        backgroundColor = backgroundColor,
-        contentColor = contentColor,
+        shape = shape ?: MaterialTheme.shapes.medium,
+        backgroundColor = backgroundColor ?: MaterialTheme.colors.surface,
+        contentColor = contentColor ?: contentColorFor(
+            backgroundColor ?: MaterialTheme.colors.surface
+        ),
     )
 }

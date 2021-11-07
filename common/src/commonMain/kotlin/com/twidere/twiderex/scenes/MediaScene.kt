@@ -63,11 +63,6 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.HorizontalPagerIndicator
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
 import com.mxalbert.zoomable.Zoomable
 import com.twidere.twiderex.component.bottomInsetsHeight
 import com.twidere.twiderex.component.bottomInsetsPadding
@@ -75,7 +70,10 @@ import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
+import com.twidere.twiderex.component.foundation.Pager
+import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.VideoPlayer
+import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.LikeButton
@@ -89,9 +87,7 @@ import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.component.topInsetsPadding
 import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.hideControls
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.extensions.showControls
 import com.twidere.twiderex.kmp.LocalPlatformWindow
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
@@ -106,6 +102,7 @@ import com.twidere.twiderex.utils.video.CustomVideoControl
 import com.twidere.twiderex.utils.video.VideoController
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import kotlinx.coroutines.launch
+import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.swiper.Swiper
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
@@ -149,7 +146,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
     val window = LocalPlatformWindow.current
@@ -183,12 +180,12 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (status.media.size > 1) {
-                    HorizontalPagerIndicator(
-                        pagerState = pagerState,
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .align(Alignment.CenterHorizontally),
-                    )
+                    // HorizontalPagerIndicator(
+                    //     pagerState = pagerState,
+                    //     modifier = Modifier
+                    //         .padding(16.dp)
+                    //         .align(Alignment.CenterHorizontally),
+                    // )
                     AnimatedVisibility(
                         visible = !(controlVisibility && swiperState.progress == 0f),
                         enter = expandVertically(),
@@ -331,7 +328,9 @@ private fun StatusMediaInfo(
                     onClick = {
                         scope.launch {
                             callback.invoke()
-                            viewModel.saveFile(currentMedia)
+                            viewModel.saveFile(currentMedia, target = {
+                                FilePicker.createFile(it)?.path
+                            })
                         }
                     }
                 ) {
@@ -367,7 +366,6 @@ private object StatusMediaInfoDefaults {
     val NameSpacing = 8.dp
 }
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun RawMediaScene(url: String, type: MediaType) {
     TwidereDialog(
@@ -394,7 +392,6 @@ data class MediaData(
     val type: MediaType,
 )
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MediaView(
     modifier: Modifier = Modifier,
@@ -416,9 +413,9 @@ fun MediaView(
         modifier = modifier,
         state = swiperState,
     ) {
-        HorizontalPager(
+        Pager(
             state = pagerState,
-        ) { page ->
+        ) {
             val data = media[page]
             when (data.type) {
                 MediaType.photo ->

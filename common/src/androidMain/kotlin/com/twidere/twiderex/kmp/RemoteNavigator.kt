@@ -57,6 +57,9 @@ actual class RemoteNavigator(private val context: Context) {
     actual fun launchOAuthUri(uri: String) {
         CustomTabsIntent.Builder()
             .setShareState(CustomTabsIntent.SHARE_STATE_OFF)
-            .build().launchUrl(context, Uri.parse(uri))
+            .build().run {
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                launchUrl(context, Uri.parse(uri))
+            }
     }
 }

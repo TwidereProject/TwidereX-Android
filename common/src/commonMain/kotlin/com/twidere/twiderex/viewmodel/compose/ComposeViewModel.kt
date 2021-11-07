@@ -249,7 +249,13 @@ open class ComposeViewModel(
     val canSaveDraft = textFieldValue
         .combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
         .asStateIn(viewModelScope, false)
-    val locationEnabled = MutableStateFlow(false)
+    val locationEnabled by lazy {
+        locationProvider.locationEnabled.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            false
+        )
+    }
     val enableThreadMode = MutableStateFlow(composeType == ComposeType.Thread)
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -395,12 +401,10 @@ open class ComposeViewModel(
     }
 
     fun trackingLocation() {
-        locationEnabled.value = true
         locationProvider.enable()
     }
 
     fun disableLocation() {
-        locationEnabled.value = false
         locationProvider.disable()
     }
 

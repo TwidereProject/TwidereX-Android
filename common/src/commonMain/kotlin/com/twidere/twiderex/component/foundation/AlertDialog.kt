@@ -20,22 +20,33 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import com.twidere.twiderex.component.foundation.platform.PlatformAlertDialog
 
 @Composable
-expect fun AlertDialog(
+fun AlertDialog(
     onDismissRequest: () -> Unit,
     confirmButton: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     dismissButton: @Composable (() -> Unit)? = null,
     title: @Composable (() -> Unit)? = null,
     text: @Composable (() -> Unit)? = null,
-    shape: Shape = MaterialTheme.shapes.medium,
-    backgroundColor: Color = MaterialTheme.colors.surface,
-    contentColor: Color = contentColorFor(backgroundColor),
-)
+    shape: Shape? = null,
+    backgroundColor: Color? = null,
+    contentColor: Color? = null,
+) {
+    PlatformAlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = confirmButton,
+        modifier = modifier,
+        dismissButton = dismissButton,
+        title = title,
+        text = text,
+        shape = shape,
+        backgroundColor = backgroundColor,
+        contentColor = contentColor
+    )
+}

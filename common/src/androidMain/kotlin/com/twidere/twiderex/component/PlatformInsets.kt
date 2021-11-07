@@ -30,11 +30,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.zIndex
 import androidx.core.view.WindowInsetsControllerCompat
@@ -46,6 +48,9 @@ import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.navigationBarsWidth
 import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.insets.statusBarsPadding
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 
 val LocalWindowInsetsController =
     staticCompositionLocalOf<WindowInsetsControllerCompat> { error("No WindowInsetsControllerCompat") }
@@ -147,6 +152,49 @@ actual fun PlatformInsets(
                 Modifier
             }.align(Alignment.BottomCenter)
         )
+    }
+}
+
+@Composable
+actual fun ImeVisibleWithInsets(
+    filter: ((Boolean) -> Boolean)?,
+    collectIme: ((Boolean) -> Unit)?
+) {
+    val ime = LocalWindowInsets.current.ime
+    LaunchedEffect(ime) {
+        snapshotFlow { ime.isVisible }
+            .distinctUntilChanged()
+            .filter { filter?.invoke(it) ?: false }
+            .collect {
+                collectIme?.invoke(it)
+            }
+    }
+}
+
+@Composable
+actual fun ImeHeightWithInsets(
+    filter: ((Int) -> Boolean)?,
+    collectIme: ((Int) -> Unit)?
+) {
+    val ime = LocalWindowInsets.current.ime
+
+    LaunchedEffect(ime) {
+        snapshotFlow { ime.bottom }
+            .distinctUntilChanged()
+            .filter { filter?.invoke(it) ?: false }
+            .collect {
+                collectIme?.invoke(it)
+            }
+    }
+}
+
+@Composable
+actual fun ImeBottomInsets(): Dp {
+    val navigation = LocalWindowInsets.current.navigationBars
+    val ime = LocalWindowInsets.current.ime
+    ime.bottom.coerceAtLeast(navigation.bottom)
+    return with(LocalDensity.current) {
+        ime.bottom.coerceAtLeast(navigation.bottom).toDp()
     }
 }
 

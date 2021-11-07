@@ -23,6 +23,7 @@ package com.twidere.twiderex.component
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 
 data class NativeInsetsControl(
     val extendToTop: Boolean = false,
@@ -55,3 +56,18 @@ internal expect fun PlatformInsets(
     color: NativeInsetsColor = NativeInsetsColor(),
     content: @Composable () -> Unit,
 )
+
+@Composable
+expect fun ImeVisibleWithInsets(
+    filter: ((Boolean) -> Boolean)? = null,
+    collectIme: ((Boolean) -> Unit)? = null
+)
+
+@Composable
+expect fun ImeHeightWithInsets(
+    filter: ((Int) -> Boolean)? = null,
+    collectIme: ((Int) -> Unit)? = null
+)
+
+@Composable
+expect fun ImeBottomInsets(): Dp

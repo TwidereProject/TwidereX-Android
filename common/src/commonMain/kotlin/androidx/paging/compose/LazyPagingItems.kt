@@ -300,4 +300,6 @@ public fun <T : Any> LazyListScope.itemsIndexed(
     }
 }
 
-private data class PagingPlaceholderKey(private val index: Int)
+expect class PagingPlaceholderKey(index: Int) {
+    val index: Int
+}

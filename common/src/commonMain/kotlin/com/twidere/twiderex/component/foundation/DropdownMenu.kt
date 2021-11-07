@@ -30,23 +30,45 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.component.foundation.platform.PlatformDropdownMenu
+import com.twidere.twiderex.component.foundation.platform.PlatformDropdownMenuItem
 
+// TODO FIXME 2021.11.4: default values like modifier is not working on expect composable functions
+// issue tracker: https://issuetracker.google.com/issues/196413692
 @Composable
-expect fun DropdownMenu(
+fun DropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     focusable: Boolean = true,
     modifier: Modifier = Modifier,
     offset: DpOffset = DpOffset(0.dp, 0.dp),
     content: @Composable (ColumnScope.() -> Unit)
-)
+) {
+    PlatformDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+        focusable = focusable,
+        modifier = modifier,
+        offset = offset,
+        content = content,
+    )
+}
 
 @Composable
-expect fun DropdownMenuItem(
+fun DropdownMenuItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     contentPadding: PaddingValues = MenuDefaults.DropdownMenuItemContentPadding,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable (RowScope.() -> Unit)
-)
+) {
+    PlatformDropdownMenuItem(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        contentPadding = contentPadding,
+        interactionSource = interactionSource,
+        content = content,
+    )
+}

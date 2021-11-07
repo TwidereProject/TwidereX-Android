@@ -71,9 +71,7 @@ import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
-import com.twidere.twiderex.ui.LocalActivity
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
-import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.utils.IsActiveNetworkMeteredLiveData
 import com.twidere.twiderex.utils.LocalPlatformResolver
@@ -172,11 +170,13 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
         val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
         CompositionLocalProvider(
             LocalInAppNotification provides inAppNotification,
-            LocalWindow provides window,
+            /**
+             * todo use LocalPlatformWindow
+             */
+            // LocalWindow provides window,
             LocalWindowInsetsController provides windowInsetsControllerCompat,
             LocalActiveAccount provides account,
             LocalStatusActions provides statusActions,
-            LocalActivity provides this,
             LocalActiveAccountViewModel provides accountViewModel,
             LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
             LocalPlatformResolver provides platformResolver,
@@ -199,9 +199,9 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
     }
 
     private fun onDeeplink(it: Uri) {
-        if (CustomTabSignInChannel.canHandle(it)) {
+        if (CustomTabSignInChannel.canHandle(it.toString())) {
             lifecycleScope.launchWhenResumed {
-                CustomTabSignInChannel.send(it)
+                CustomTabSignInChannel.send(it.toString())
             }
         } else {
             navController.navigate(it.toString())

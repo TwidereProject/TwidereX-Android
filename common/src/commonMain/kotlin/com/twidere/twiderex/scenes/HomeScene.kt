@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.scenes
 
-import androidx.activity.compose.BackHandler
+// import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDp
@@ -102,6 +102,7 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.BackHandler
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable

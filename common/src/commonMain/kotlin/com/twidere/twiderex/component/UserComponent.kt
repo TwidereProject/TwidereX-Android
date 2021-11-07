@@ -54,6 +54,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
@@ -76,14 +77,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.pagerTabIndicatorOffset
-import com.google.accompanist.pager.rememberPagerState
 import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.HorizontalDivider
 import com.twidere.twiderex.component.foundation.NetworkImage
+import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
+import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusImageList
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.component.navigation.LocalNavigator
@@ -171,9 +171,8 @@ fun UserComponent(
                         backgroundColor = MaterialTheme.colors.surface.withElevation(),
                         indicator = { tabPositions ->
                             TabRowDefaults.Indicator(
-                                modifier = Modifier.pagerTabIndicatorOffset(
-                                    pagerState,
-                                    tabPositions
+                                modifier = Modifier.tabIndicatorOffset(
+                                    tabPositions[pagerState.currentPage]
                                 ),
                                 color = MaterialTheme.colors.primary,
                             )
@@ -184,7 +183,8 @@ fun UserComponent(
                                 selected = pagerState.currentPage == index,
                                 onClick = {
                                     scope.launch {
-                                        pagerState.animateScrollToPage(index)
+                                        pagerState.currentPage = index
+                                        // pagerState.animateScrollToPage(index)
                                     }
                                 },
                                 content = {
@@ -197,10 +197,10 @@ fun UserComponent(
                             )
                         }
                     }
-                    HorizontalPager(
+                    Pager(
                         modifier = Modifier.weight(1f),
                         state = pagerState,
-                    ) { page ->
+                    ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.TopCenter,
@@ -321,7 +321,7 @@ private fun UserStatusTimelineFilter(
             }
             DropdownMenu(
                 expanded = showDropdown,
-                onDismissRequest = { showDropdown = false }
+                onDismissRequest = { showDropdown = false },
             ) {
                 DropdownMenuItem(
                     onClick = {

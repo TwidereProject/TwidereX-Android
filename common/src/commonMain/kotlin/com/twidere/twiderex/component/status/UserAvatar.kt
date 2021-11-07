@@ -24,6 +24,7 @@ import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -70,6 +71,7 @@ fun UserAvatar(
             Image(
                 painter = icon,
                 contentDescription = user.platformType.name,
+                modifier = Modifier.size(24.dp)
             )
         }
     }
