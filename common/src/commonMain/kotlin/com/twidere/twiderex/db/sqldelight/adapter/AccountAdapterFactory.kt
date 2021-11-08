@@ -18,16 +18,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.di.modules
+package com.twidere.twiderex.db.sqldelight.adapter
 
-import com.twidere.twiderex.dataprovider.DataProvider
-import com.twidere.twiderex.model.AccountPreferencesFactory
-import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.repository.AccountRepository
-import org.koin.dsl.module
+import com.squareup.sqldelight.EnumColumnAdapter
+import com.twidere.twiderex.model.AmUser
+import com.twidere.twiderex.model.TwidereAccount
+import com.twidere.twiderex.sqldelight.table.DbAccount
 
-internal actual val platformModule = module {
-    single { AccountPreferencesFactory() }
-    single { AccountRepository(get<DataProvider>().realAppDatabase.accountQueries, get()) }
-    single { InAppNotification() }
+internal object AccountAdapterFactory {
+    fun create() = DbAccount.Adapter(
+        accountKeyAdapter = MicroBlogKeyColumnAdapter(),
+        accountAdapter = JsonColumnAdapter(TwidereAccount.serializer()),
+        typeAdapter = EnumColumnAdapter(),
+        credentials_typeAdapter = EnumColumnAdapter(),
+        userAdapter = JsonColumnAdapter(AmUser.serializer()),
+    )
 }

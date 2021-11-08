@@ -20,25 +20,23 @@
  */
 package com.twidere.twiderex
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.kmp.LocalRemoteNavigator
+import com.twidere.twiderex.navigation.Router
+import moe.tlaster.precompose.navigation.NavController
 
+private val navController = NavController()
 @Composable
 fun App() {
     CompositionLocalProvider(
         LocalResLoader provides get(),
         LocalRemoteNavigator provides get(),
     ) {
-        MaterialTheme {
-            Scaffold {
-                Text("Twidere X!")
-            }
-        }
+        Router(
+            navController = navController
+        )
     }
 }

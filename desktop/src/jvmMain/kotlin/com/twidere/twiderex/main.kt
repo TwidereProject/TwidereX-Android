@@ -52,7 +52,7 @@ fun main() {
             ) {
                 FilePicker.init(window)
                 CompositionLocalProvider(
-                    LocalPlatformWindow provides PlatformWindow()
+                    LocalPlatformWindow provides PlatformWindow(),
                 ) {
                     App()
                 }
