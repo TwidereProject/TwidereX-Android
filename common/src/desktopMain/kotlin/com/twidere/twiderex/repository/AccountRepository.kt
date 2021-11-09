@@ -41,6 +41,7 @@ actual class AccountRepository(
     private val accountQueries: AccountQueries,
     private val preferencesFactory: AccountPreferencesFactory,
 ) {
+    private val preferencesCache = linkedMapOf<MicroBlogKey, AccountPreferences>()
     private val _accounts = MutableStateFlow(getAccounts())
     private val _activeAccount = MutableStateFlow(
         getCurrentAccount()
@@ -50,7 +51,6 @@ actual class AccountRepository(
     actual val accounts: Flow<List<AccountDetails>>
         get() = _accounts
 
-    private val preferencesCache = linkedMapOf<MicroBlogKey, AccountPreferences>()
     actual fun updateAccount(user: UiUser) {
         findByAccountKey(user.userKey)?.copy(
             user = user.toAmUser()

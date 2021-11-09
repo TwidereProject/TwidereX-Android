@@ -39,7 +39,7 @@ actual class AccountPreferencesFactory {
                 scope = scope
             ) {
                 File(
-                    get<StorageProvider>().appFiles.dataStoreFile(accountKey.toString()),
+                    get<StorageProvider>().appFiles.dataStoreFile("$accountKey.preferences_pb"),
                 )
             },
             scope = scope
