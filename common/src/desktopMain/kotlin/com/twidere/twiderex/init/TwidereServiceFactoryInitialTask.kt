@@ -18,20 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.di.modules
+package com.twidere.twiderex.init
 
-import com.twidere.twiderex.dataprovider.DataProvider
 import com.twidere.twiderex.di.ext.get
-import com.twidere.twiderex.http.TwidereHttpConfigProvider
-import com.twidere.twiderex.model.AccountPreferencesFactory
-import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.preferences.PreferencesHolder
-import com.twidere.twiderex.repository.AccountRepository
-import org.koin.dsl.module
+import com.twidere.twiderex.http.TwidereServiceFactory
 
-internal actual val platformModule = module {
-    single { AccountPreferencesFactory() }
-    single { AccountRepository(get<DataProvider>().realAppDatabase.accountQueries, get()) }
-    single { InAppNotification() }
-    single { TwidereHttpConfigProvider(get<PreferencesHolder>().miscPreferences) }
+class TwidereServiceFactoryInitialTask : InitialTask {
+    override fun execute() {
+        TwidereServiceFactory.initiate(get())
+    }
 }
