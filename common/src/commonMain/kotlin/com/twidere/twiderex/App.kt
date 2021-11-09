@@ -20,20 +20,14 @@
  */
 package com.twidere.twiderex
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.kmp.LocalRemoteNavigator
-import java.io.File
 
 @Composable
 fun App() {
@@ -43,19 +37,8 @@ fun App() {
     ) {
         MaterialTheme {
             Scaffold {
-                // Text("Twidere X!")
-                ImageTest()
+                Text("Twidere X!")
             }
         }
-    }
-}
-
-@Composable
-private fun ImageTest() {
-    Column {
-        NetworkImage(data = File("/Users/mimao/Library/Application Support/TwidereX/mediaCaches/a41ba1abc4cb48ad4d32d4cea572774"), modifier = Modifier.width(300.dp).height(300.dp))
-        NetworkImage(data = "/Users/mimao/Library/Application Support/TwidereX/mediaCaches/0d773a484fb911b6da361e2bff0c261e", modifier = Modifier.width(300.dp).height(300.dp))
-        NetworkImage(data = "https://i.pinimg.com/750x/a1/0b/46/a10b460d9b4f6030d67cf98ec1580d82.jpg", modifier = Modifier.width(300.dp).height(300.dp))
-        NetworkImage(data = "https://cdn.hswstatic.com/gif/10-breathtaking-views-1-orig.jpg", modifier = Modifier.width(300.dp).height(300.dp))
     }
 }
