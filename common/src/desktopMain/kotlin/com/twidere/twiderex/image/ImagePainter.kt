@@ -26,6 +26,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.toPainter // this import might warn unused in ide, don't delete it
 import com.twidere.twiderex.component.foundation.NetworkImageState
 import com.twidere.twiderex.component.image.ImageEffects
 import kotlinx.coroutines.CoroutineScope
@@ -120,11 +121,12 @@ internal class ImagePainter(
                         ImageEffectsFilter.applyBlurFilter(image, it.blurRadius.toInt(), it.bitmapScale)
                     } ?: image
                 }?.let {
-                    // painter.value = it.asPainter()
+                    painter.value = it.toPainter()
                 }
             }
         } catch (e: Throwable) {
             error = e
+            e.printStackTrace()
         } finally {
             try {
                 input?.close()

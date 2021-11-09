@@ -27,6 +27,7 @@ import com.twidere.twiderex.model.AccountPreferencesFactory
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.utils.PlatformResolver
 import org.koin.dsl.module
 
 internal actual val platformModule = module {
@@ -34,4 +35,5 @@ internal actual val platformModule = module {
     single { AccountRepository(get<DataProvider>().realAppDatabase.accountQueries, get()) }
     single { InAppNotification() }
     single { TwidereHttpConfigProvider(get<PreferencesHolder>().miscPreferences) }
+    single { PlatformResolver(get()) }
 }

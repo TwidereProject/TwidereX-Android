@@ -32,6 +32,7 @@ import com.twidere.twiderex.kmp.LocalRemoteNavigator
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
+import com.twidere.twiderex.utils.LocalPlatformResolver
 import moe.tlaster.precompose.navigation.NavController
 
 private val navController = NavController()
@@ -46,6 +47,8 @@ fun App() {
         LocalActiveAccount provides account,
         LocalActiveAccountViewModel provides accountViewModel,
         LocalStatusActions provides get<StatusActions>(),
+        LocalPlatformResolver provides get(),
+        LocalRemoteNavigator provides get(),
     ) {
         Router(
             navController = navController

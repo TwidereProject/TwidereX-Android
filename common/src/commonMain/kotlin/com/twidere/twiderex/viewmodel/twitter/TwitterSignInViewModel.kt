@@ -133,7 +133,6 @@ class TwitterSignInViewModel(
             }
         } catch (e: Throwable) {
             inAppNotification.notifyError(e)
-            println("Desktop==> OAuth error:e")
             e.printStackTrace()
         }
         loading.value = false
