@@ -50,7 +50,6 @@ fun NetworkImage(
     effects: ImageEffects.Builder.() -> Unit = { crossFade(true) },
     placeholder: @Composable (() -> Unit)? = null,
 ) {
-    println("Network Image===>$data")
     val state = remember {
         mutableStateOf(NetworkImageState.LOADING)
     }

@@ -47,6 +47,9 @@ import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.preferences.LocalHttpConfig
+import com.twidere.twiderex.preferences.model.DisplayPreferences
+import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
+import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.utils.video.VideoController
 import com.twidere.twiderex.utils.video.VideoPool
 import kotlinx.coroutines.Job
@@ -217,13 +220,11 @@ private fun VideoController.prepared() {
 }
 
 @Composable
-private fun getPlayInitial() = true
-// TODO waiting for LocalVideoPlayback migration
-// when (LocalVideoPlayback.current) {
-//     DisplayPreferences.AutoPlayback.Auto -> !LocalIsActiveNetworkMetered.current
-//     DisplayPreferences.AutoPlayback.Always -> true
-//     DisplayPreferences.AutoPlayback.Off -> false
-// }
+private fun getPlayInitial() = when (LocalVideoPlayback.current) {
+    DisplayPreferences.AutoPlayback.Auto -> !LocalIsActiveNetworkMetered.current
+    DisplayPreferences.AutoPlayback.Always -> true
+    DisplayPreferences.AutoPlayback.Off -> false
+}
 
 interface PlayerCallBack {
     fun isReady(ready: Boolean)
