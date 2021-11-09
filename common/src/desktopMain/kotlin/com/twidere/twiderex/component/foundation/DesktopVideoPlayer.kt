@@ -42,6 +42,8 @@ actual class NativePlayerView actual constructor(
 
     actual var playerProgressCallBack: PlayerProgressCallBack? = null
 
+    private var currentVolume: Float = 1f
+
     var desktopPlayer = (
         if (isMacOS()) {
             CallbackMediaPlayerComponent()
@@ -65,6 +67,15 @@ actual class NativePlayerView actual constructor(
                     super.timeChanged(mediaPlayer, newTime)
                     playerProgressCallBack?.onTimeChanged(newTime)
                 }
+
+                override fun volumeChanged(mediaPlayer: MediaPlayer?, volume: Float) {
+                    // set volume might only works when video is playing
+                    // while playing callback is not accurate, and when video start to playing
+                    // the player automatically set volume to 1.0
+                    if (volume != currentVolume) mediaPlayer?.let {
+                        setVolume(currentVolume, it)
+                    }
+                }
             })
             media().prepare(url)
         }
@@ -83,6 +94,15 @@ actual class NativePlayerView actual constructor(
     actual fun contentPosition(): Long = desktopPlayer.mediaPlayer().status().time()
 
     actual fun setVolume(volume: Float) {
+        this.currentVolume = volume
+        setVolume(currentVolume, desktopPlayer.mediaPlayer())
+    }
+
+    private fun setVolume(volume: Float, mediaPlayer: MediaPlayer) {
+        mediaPlayer.audio().setVolume(
+            // range 0-100
+            (volume * 100).toInt()
+        )
     }
 
     actual fun release() {
