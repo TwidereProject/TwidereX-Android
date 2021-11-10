@@ -56,8 +56,8 @@ private const val ImageSuffix = ".jpg"
 enum class MediaLibraryType(
     val extensions: List<String>,
 ) {
-    Video(listOf(".mp4")),
-    Image(listOf(".jpg", ".png")),
+    Video(listOf("mp4")),
+    Image(listOf("jpg", "png")),
 }
 
 @OptIn(ExperimentalMaterialApi::class)
