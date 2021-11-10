@@ -117,6 +117,7 @@ internal class ImagePainter(
                 it.inputStream()
             } ?: httpConnection(url).let {
                 connection = it
+                it.setRequestProperty("Accept", "image/*")
                 it.connect()
                 mimeType = it.contentType
                 imageCache.store(url.toString(), it.inputStream)?.inputStream() ?: it.inputStream
