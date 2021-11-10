@@ -25,7 +25,6 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiList
 import kotlinx.coroutines.flow.Flow
 
-// TODO OPERATION
 interface ListsDao {
     fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiList>
     fun findWithListKeyWithFlow(listKey: MicroBlogKey, accountKey: MicroBlogKey): Flow<UiList?>

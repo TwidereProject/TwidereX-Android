@@ -24,7 +24,6 @@ import androidx.paging.PagingSource
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMEvent
 
-// TODO OPERATION
 interface DirectMessageEventDao {
     fun getPagingSource(
         accountKey: MicroBlogKey,
