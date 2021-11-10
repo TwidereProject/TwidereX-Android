@@ -24,7 +24,6 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import kotlinx.coroutines.flow.Flow
 
-// TODO OPERATION
 interface StatusDao {
     suspend fun insertAll(listOf: List<UiStatus>, accountKey: MicroBlogKey)
     suspend fun findWithStatusKey(statusKey: MicroBlogKey, accountKey: MicroBlogKey): UiStatus?

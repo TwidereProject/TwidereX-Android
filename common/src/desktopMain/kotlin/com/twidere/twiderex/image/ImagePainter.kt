@@ -26,6 +26,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.toPainter
 import com.twidere.twiderex.component.foundation.NetworkImageState
 import com.twidere.twiderex.component.image.ImageEffects
 import kotlinx.coroutines.CoroutineScope
@@ -46,6 +47,7 @@ import javax.imageio.ImageIO
 internal class ImagePainter(
     private val request: Any,
     private val parentScope: CoroutineScope,
+    private val imageCache: ImageCache,
     private val imageEffects: ImageEffects,
     private val httpConnection: (URL) -> HttpURLConnection = { it.openConnection() as HttpURLConnection },
     private val onImageStateChanged: (NetworkImageState) -> Unit
@@ -104,23 +106,32 @@ internal class ImagePainter(
         }
     }
 
-    private fun networkRequest(url: URL) {
+    private suspend fun networkRequest(url: URL) {
         var connection: HttpURLConnection? = null
         var input: InputStream? = null
         var error: Throwable? = null
         try {
-            connection = httpConnection(url)
-            connection.connect()
-            input = connection.inputStream
-            if (connection.contentType == "image/gif") {
-                painter.value = GifPainter(Codec.makeFromData(Data.makeFromBytes(input.readAllBytes())), parentScope)
-            } else {
-                ImageIO.read(input)?.let { image ->
-                    imageEffects.blur?.let {
-                        ImageEffectsFilter.applyBlurFilter(image, it.blurRadius.toInt(), it.bitmapScale)
-                    } ?: image
-                }?.let {
-                    // painter.value = it.asPainter()
+            var mimeType = ""
+            input = imageCache.fetch(url.toString())?.let {
+                mimeType = it.toURI().toURL().openConnection().contentType
+                it.inputStream()
+            } ?: httpConnection(url).let {
+                connection = it
+                it.connect()
+                mimeType = it.contentType
+                imageCache.store(url.toString(), it.inputStream)?.inputStream() ?: it.inputStream
+            }
+            input?.let { inputStream ->
+                if (mimeType == "image/gif") {
+                    painter.value = GifPainter(Codec.makeFromData(Data.makeFromBytes(inputStream.readAllBytes())), parentScope)
+                } else {
+                    ImageIO.read(inputStream)?.let { image ->
+                        imageEffects.blur?.let {
+                            ImageEffectsFilter.applyBlurFilter(image, it.blurRadius.toInt(), it.bitmapScale)
+                        } ?: image
+                    }?.let {
+                        painter.value = it.toPainter()
+                    }
                 }
             }
         } catch (e: Throwable) {
@@ -136,7 +147,7 @@ internal class ImagePainter(
         if (error != null) throw error
     }
 
-    private fun execute() {
+    private suspend fun execute() {
         val data = when (request) {
             is URL -> {
                 request.toString()
