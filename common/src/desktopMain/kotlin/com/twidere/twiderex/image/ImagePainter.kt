@@ -36,13 +36,14 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.Codec
 import org.jetbrains.skia.Data
+import java.io.File
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import javax.imageio.ImageIO
 
 /**
- * current support http/https only
+ * current support http/https/file/filepath only
  */
 internal class ImagePainter(
     private val request: Any,
@@ -106,13 +107,49 @@ internal class ImagePainter(
         }
     }
 
+    private fun generatePainter(inputStream: InputStream, mimeType: String) {
+        var error: Throwable? = null
+        try {
+            if (mimeType == "image/gif") {
+                painter.value = GifPainter(Codec.makeFromData(Data.makeFromBytes(inputStream.readAllBytes())), parentScope)
+            } else {
+                ImageIO.read(inputStream)?.let { image ->
+                    imageEffects.blur?.let {
+                        ImageEffectsFilter.applyBlurFilter(image, it.blurRadius.toInt(), it.bitmapScale)
+                    } ?: image
+                }?.let {
+                    painter.value = it.toPainter()
+                }
+            }
+        } catch (e: Throwable) {
+            error = e
+        } finally {
+            try {
+                inputStream.close()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        if (error != null) throw error
+    }
+
+    private fun fileRequest(file: File) {
+        try {
+            val connection = file.toURI().toURL().openConnection()
+            val mimeType = connection.contentType
+            val input = file.inputStream()
+            generatePainter(input, mimeType)
+        } catch (e: Throwable) {
+            throw e
+        }
+    }
+
     private suspend fun networkRequest(url: URL) {
         var connection: HttpURLConnection? = null
-        var input: InputStream? = null
         var error: Throwable? = null
         try {
             var mimeType = ""
-            input = imageCache.fetch(url.toString())?.let {
+            val input = imageCache.fetch(url.toString())?.let {
                 mimeType = it.toURI().toURL().openConnection().contentType
                 it.inputStream()
             } ?: httpConnection(url).let {
@@ -122,24 +159,14 @@ internal class ImagePainter(
                 mimeType = it.contentType
                 imageCache.store(url.toString(), it.inputStream)?.inputStream() ?: it.inputStream
             }
-            input?.let { inputStream ->
-                if (mimeType == "image/gif") {
-                    painter.value = GifPainter(Codec.makeFromData(Data.makeFromBytes(inputStream.readAllBytes())), parentScope)
-                } else {
-                    ImageIO.read(inputStream)?.let { image ->
-                        imageEffects.blur?.let {
-                            ImageEffectsFilter.applyBlurFilter(image, it.blurRadius.toInt(), it.bitmapScale)
-                        } ?: image
-                    }?.let {
-                        painter.value = it.toPainter()
-                    }
-                }
-            }
+            generatePainter(
+                inputStream = input,
+                mimeType = mimeType
+            )
         } catch (e: Throwable) {
             error = e
         } finally {
             try {
-                input?.close()
                 connection?.disconnect()
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -149,22 +176,33 @@ internal class ImagePainter(
     }
 
     private suspend fun execute() {
-        val data = when (request) {
-            is URL -> {
-                request.toString()
+        when (request) {
+            is URL, is String -> {
+                request.toString().also {
+                }.request()
             }
-            is String -> {
-                request
+
+            is File -> {
+                fileRequest(request)
             }
             else -> {
                 throw NotImplementedError()
             }
         }
-        checkRequestValid(data)
-        networkRequest(URL(data))
     }
 
-    private fun checkRequestValid(data: String) {
-        if (!data.startsWith("http")) throw NotImplementedError()
+    private suspend fun String.request() {
+        try {
+            when {
+                isHttpRequest() -> networkRequest(URL(this))
+                isFileRequest() -> fileRequest(File(this))
+            }
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
     }
+
+    private fun String.isHttpRequest() = startsWith("http")
+
+    private fun String.isFileRequest() = File(this).exists()
 }
