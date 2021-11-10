@@ -126,7 +126,6 @@ internal class ImagePainter(
             }
         } catch (e: Throwable) {
             error = e
-            e.printStackTrace()
         } finally {
             try {
                 input?.close()

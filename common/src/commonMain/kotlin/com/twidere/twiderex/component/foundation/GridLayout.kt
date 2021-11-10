@@ -56,6 +56,7 @@ private fun gridLayoutMeasurePolicy(
     MeasurePolicy { measurables, constraints ->
         val columns = ceil(sqrt(measurables.size.toDouble()))
         val rows = ceil((measurables.size.toDouble() / columns))
+        val infinityWidth = ((Constraints.Infinity - spacing * (columns - 1)) / columns).toInt()
         val itemWidth =
             ((constraints.maxWidth.toDouble() - spacing * (columns - 1)) / columns).toInt()
         val itemHeight = if (constraints.maxHeight != Constraints.Infinity) {
@@ -64,7 +65,7 @@ private fun gridLayoutMeasurePolicy(
             itemWidth
         }
         val placeables = measurables.map { measurable ->
-            measurable.measure(if (itemWidth == Constraints.Infinity) Constraints.fixed(0, 0) else Constraints.fixed(width = itemWidth, height = itemHeight))
+            measurable.measure(if (itemWidth >= infinityWidth) Constraints.fixed(0, 0) else Constraints.fixed(width = itemWidth, height = itemHeight))
         }
 
         layout(
