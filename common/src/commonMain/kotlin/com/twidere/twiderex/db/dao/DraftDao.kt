@@ -23,7 +23,6 @@ package com.twidere.twiderex.db.dao
 import com.twidere.twiderex.model.ui.UiDraft
 import kotlinx.coroutines.flow.Flow
 
-// TODO OPERATION
 interface DraftDao {
     fun getAll(): Flow<List<UiDraft>>
     fun getDraftCount(): Flow<Long>
