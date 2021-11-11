@@ -31,6 +31,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -71,21 +72,19 @@ class UserViewModel(
         }
     }
 
-    private fun collectUser() = viewModelScope.launch {
-        combine(account, refreshFlow) { account, _ ->
-            refreshing.value = true
-            runCatching {
-                repository.lookupUserById(
-                    userKey.id,
-                    accountKey = account.accountKey,
-                    lookupService = account.service as LookupService,
-                )
-            }.onFailure {
-                inAppNotification.notifyError(it)
-            }
-            refreshing.value = false
+    private fun collectUser() = combine(account, refreshFlow) { account, _ ->
+        refreshing.value = true
+        runCatching {
+            repository.lookupUserById(
+                userKey.id,
+                accountKey = account.accountKey,
+                lookupService = account.service as LookupService,
+            )
+        }.onFailure {
+            inAppNotification.notifyError(it)
         }
-    }
+        refreshing.value = false
+    }.launchIn(viewModelScope)
 
     fun follow() = viewModelScope.launch {
         loadingRelationship.compareAndSet(expect = false, update = true)

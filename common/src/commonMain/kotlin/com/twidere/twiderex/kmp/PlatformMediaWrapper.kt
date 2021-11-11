@@ -21,29 +21,12 @@
 package com.twidere.twiderex.kmp
 
 import androidx.compose.runtime.Composable
-import com.twidere.twiderex.model.kmp.Location
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import com.twidere.twiderex.model.ui.UiMediaInsert
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
-actual fun RequestLocationPermission(
-    onPermissionGrantt: () -> Unit,
-    content: @Composable (launchRequest: () -> Unit) -> Unit,
-) {
-    content.invoke {}
-}
-
-// TODO: implementation
-actual class LocationProvider {
-    actual val location: Flow<Location?>
-        get() = flowOf(null)
-
-    actual fun enable() {
-    }
-
-    actual fun disable() {
-    }
-
-    actual val locationEnabled: Flow<Boolean>
-        get() = flowOf(false)
-}
+expect fun PlatformMediaWrapper(
+    scope: CoroutineScope,
+    onResult: (List<UiMediaInsert>) -> Unit,
+    content: @Composable (launchCamera: () -> Unit, launchVideo: () -> Unit) -> Unit
+)

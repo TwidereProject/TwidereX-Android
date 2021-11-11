@@ -1229,22 +1229,17 @@ private fun ComposeActions(
                 }
             }
             if (allowLocation) {
-                var requestPermission by remember {
-                    mutableStateOf(false)
-                }
                 RequestLocationPermission(
                     onPermissionGrantt = {
                         viewModel.trackingLocation()
                     },
-                    request = requestPermission,
-                ) {
+                ) { launchRequest ->
                     IconButton(
                         onClick = {
                             if (locationEnabled) {
                                 viewModel.disableLocation()
-                                requestPermission = false
                             } else {
-                                requestPermission = true
+                                launchRequest.invoke()
                             }
                         },
                     ) {

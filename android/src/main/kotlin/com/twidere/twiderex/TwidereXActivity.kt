@@ -170,10 +170,6 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
         val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
         CompositionLocalProvider(
             LocalInAppNotification provides inAppNotification,
-            /**
-             * todo use LocalPlatformWindow
-             */
-            // LocalWindow provides window,
             LocalWindowInsetsController provides windowInsetsControllerCompat,
             LocalActiveAccount provides account,
             LocalStatusActions provides statusActions,
