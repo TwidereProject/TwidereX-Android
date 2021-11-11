@@ -28,10 +28,9 @@ import kotlinx.coroutines.flow.flowOf
 @Composable
 actual fun RequestLocationPermission(
     onPermissionGrantt: () -> Unit,
-    request: Boolean,
-    content: @Composable () -> Unit,
+    content: @Composable (launchRequest: () -> Unit) -> Unit,
 ) {
-    content.invoke()
+    content.invoke {}
 }
 
 // TODO: implementation
