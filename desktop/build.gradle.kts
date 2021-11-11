@@ -32,9 +32,29 @@ compose {
             mainClass = "com.twidere.twiderex.MainKt"
             nativeDistributions {
                 targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
-                packageName = Package.id
+                packageName = "TwidereX"
                 packageVersion = Package.versionName.split("-").firstOrNull()
+                modules("java.sql") // https://github.com/JetBrains/compose-jb/issues/381
+                macOS {
+                    infoPlist {
+                        extraKeysRawXml = extraInfoPlistKeys
+                    }
+                }
             }
         }
     }
 }
+val deeplinkScheme = "twiderex"
+
+val extraInfoPlistKeys = """
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLName</key>
+      <string>TwidereXDeeplink</string>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>$deeplinkScheme</string>
+      </array>
+    </dict>
+  </array>"""

@@ -35,9 +35,8 @@ import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import moe.tlaster.precompose.navigation.NavController
 
-private val navController = NavController()
 @Composable
-fun App() {
+fun App(navController: NavController = NavController()) {
     val accountViewModel =
         com.twidere.twiderex.di.ext.getViewModel<com.twidere.twiderex.viewmodel.ActiveAccountViewModel>()
     val account by accountViewModel.account.observeAsState(null)
