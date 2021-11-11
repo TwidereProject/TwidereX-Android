@@ -61,7 +61,7 @@ import moe.tlaster.precompose.ui.LocalLifecycleOwner
 
 @Composable
 fun VideoPlayer(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.fillMaxSize(), // must set video player size
     url: String,
     volume: Float = 1f,
     customControl: VideoController? = null,

@@ -139,6 +139,8 @@ actual fun PlatformView(
     nativePLayerView: NativePlayerView,
     update: (NativePlayerView) -> Unit
 ) {
+    // TODO FIXME 2021.11.11, SwingPanel is shown above all composables
+    // see:https://github.com/JetBrains/compose-jb/issues/221 and https://github.com/JetBrains/compose-jb/issues/1087
     SwingPanel(
         factory = {
             if (isMacOS()) {
