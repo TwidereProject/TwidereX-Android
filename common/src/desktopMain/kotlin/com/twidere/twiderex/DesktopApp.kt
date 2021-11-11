@@ -52,7 +52,6 @@ fun DesktopApp() {
     val scope = MainScope()
     try {
         Desktop.getDesktop().setOpenURIHandler { event ->
-            println("onEvent:${event.uri}")
             onDeeplink(url = event.uri.toString(), navController = navController, scope = scope)
         }
     } catch (e: UnsupportedOperationException) {

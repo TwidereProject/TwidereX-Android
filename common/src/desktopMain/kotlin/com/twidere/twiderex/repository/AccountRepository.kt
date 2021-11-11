@@ -33,7 +33,6 @@ import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.sqldelight.table.AccountQueries
-import com.twidere.twiderex.sqldelight.table.DbAccount
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -61,6 +60,8 @@ actual class AccountRepository(
 
     actual fun updateAccount(detail: AccountDetails) {
         accountQueries.insert(detail.toDbAccount())
+        _activeAccount.value = getCurrentAccount()
+        _accounts.value = getAccounts()
     }
 
     actual fun getAccounts(): List<AccountDetails> {
@@ -98,18 +99,20 @@ actual class AccountRepository(
         lastActive: Long
     ) {
         val account = TwidereAccount(displayKey.toString(), "ACCOUNT_TYPE")
-        accountQueries.insert(
-            DbAccount(
-                accountKey = accountKey,
-                account = account,
-                type = type,
-                credentials_type = credentials_type,
-                credentials_json = credentials_json,
-                extras_json = extras_json,
-                user = user,
-                lastActive = lastActive
-            )
+        val detail = AccountDetails(
+            account = account,
+            type = type,
+            accountKey = accountKey,
+            credentials_type = credentials_type,
+            credentials_json = credentials_json,
+            extras_json = extras_json,
+            user = user,
+            lastActive = lastActive,
+            preferences = getAccountPreferences(accountKey)
         )
+        updateAccount(detail)
+        setCurrentAccount(detail)
+        _accounts.value = getAccounts()
     }
 
     actual fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences {
@@ -124,7 +127,9 @@ actual class AccountRepository(
 
     actual fun delete(detail: AccountDetails) {
         accountQueries.delete(detail.accountKey)
-        preferencesCache.remove(detail.accountKey)
+        preferencesCache.remove(detail.accountKey)?.close()
+        _activeAccount.value = getCurrentAccount()
+        _accounts.value = getAccounts()
     }
 
     actual fun getFirstByType(type: PlatformType): AccountDetails? {
