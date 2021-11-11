@@ -50,7 +50,6 @@ actual class RemoteNavigator(private val context: Context) {
     actual fun shareText(content: String, fromBackground: Boolean) {
         context.shareText(
             content = content,
-            fromOutsideOfActivity = fromBackground
         )
     }
 

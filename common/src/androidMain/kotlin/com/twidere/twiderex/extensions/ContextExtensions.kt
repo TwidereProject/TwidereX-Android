@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.extensions
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -34,7 +35,7 @@ fun Context.checkAnySelfPermissionsGranted(vararg permissions: String): Boolean 
     return permissions.any { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
 }
 
-fun Context.shareText(content: String, fromOutsideOfActivity: Boolean = false) {
+fun Context.shareText(content: String) {
     startActivity(
         Intent().apply {
             action = Intent.ACTION_SEND
@@ -42,7 +43,7 @@ fun Context.shareText(content: String, fromOutsideOfActivity: Boolean = false) {
             type = "text/plain"
         }.let {
             Intent.createChooser(it, null).apply {
-                if (fromOutsideOfActivity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (this !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
         }
     )
