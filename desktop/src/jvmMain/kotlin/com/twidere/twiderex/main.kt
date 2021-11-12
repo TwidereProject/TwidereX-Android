@@ -23,6 +23,6 @@ package com.twidere.twiderex
 import androidx.compose.ui.ExperimentalComposeUiApi
 
 @ExperimentalComposeUiApi
-fun main() {
-    DesktopApp()
+fun main(args: Array<String>) {
+    runDesktopApp(args)
 }
