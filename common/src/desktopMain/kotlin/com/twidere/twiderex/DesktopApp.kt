@@ -34,6 +34,7 @@ import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
 import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.utils.OperatingSystem
+import com.twidere.twiderex.utils.WindowsRegistry
 import com.twidere.twiderex.utils.currentOperatingSystem
 import it.sauronsoftware.junique.AlreadyLockedException
 import it.sauronsoftware.junique.JUnique
@@ -54,11 +55,16 @@ private const val lockId = "b5b887ec-7fc0-45c9-b32d-47f37cb02f9f"
 fun runDesktopApp(
     args: Array<String>,
 ) {
-    if (currentOperatingSystem == OperatingSystem.Linux) {
-        ensureDesktopEntry()
-        ensureSingleAppInstance(args)
-    } else {
-        startDesktopApp()
+    when (currentOperatingSystem) {
+        OperatingSystem.Windows -> {
+            ensureWindowsRegistry()
+            ensureSingleAppInstance(args)
+        }
+        OperatingSystem.Linux -> {
+            ensureDesktopEntry()
+            ensureSingleAppInstance(args)
+        }
+        else -> startDesktopApp()
     }
 }
 
@@ -86,12 +92,20 @@ private fun ensureDesktopEntry() {
     if (!entryFile.exists()) {
         entryFile.createNewFile()
     }
-    entryFile.writeText("[Desktop Entry]\n" +
-        "Type=Application\n" +
-        "Name=Twidere X\n" +
-        "Exec=\"${File("").absolutePath + "/bin/Twidere X\" %u"}\n" +
-        "Terminal=false\n" +
-        "MimeType=x-scheme-handler/${twidereXSchema};")
+    entryFile.writeText(
+        "[Desktop Entry]\n" +
+            "Type=Application\n" +
+            "Name=Twidere X\n" +
+            "Exec=\"${File("").absolutePath + "/bin/Twidere X\" %u"}\n" +
+            "Terminal=false\n" +
+            "MimeType=x-scheme-handler/$twidereXSchema;"
+    )
+}
+
+private fun ensureWindowsRegistry() {
+    val protocol = WindowsRegistry.readRegistry("HKCR\\TwidereX", "URL Protocol")
+    if (protocol?.contains(twidereXSchema) == true) return
+    WindowsRegistry.registryUrlProtocol(twidereXSchema)
 }
 
 private fun startDesktopApp() {
