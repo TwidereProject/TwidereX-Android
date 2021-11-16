@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.utils
 
+import java.awt.Desktop
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -53,12 +54,15 @@ object WindowsRegistry {
             regFile.writeText(reg)
         }
         try {
-            // if process is not working use Desktop open file
-            // Desktop.getDesktop().open(regFile)
             val process = ProcessBuilder("cmd", "/c", "regedit", "/s", regFile.canonicalPath).start()
             process.waitFor()
         } catch (e: Throwable) {
-            e.printStackTrace()
+            try {
+                // if process is not working use Desktop open file
+                Desktop.getDesktop().open(regFile)
+            } catch (e: Throwable) {
+                e.printStackTrace()
+            }
         }
     }
 
