@@ -51,6 +51,7 @@ import java.io.File
 private val navController = NavController()
 private val mainScope = MainScope()
 private const val lockId = "b5b887ec-7fc0-45c9-b32d-47f37cb02f9f"
+private const val entryFileName = "twiderex.desktop"
 
 fun runDesktopApp(
     args: Array<String>,
@@ -62,6 +63,7 @@ fun runDesktopApp(
         }
         OperatingSystem.Linux -> {
             ensureDesktopEntry()
+            ensureMimeInfo()
             ensureSingleAppInstance(args)
         }
         else -> startDesktopApp()
@@ -88,18 +90,32 @@ private fun ensureSingleAppInstance(args: Array<String>) {
 }
 
 private fun ensureDesktopEntry() {
-    val entryFile = File("${System.getProperty("user.home")}/.local/share/applications/twiderex.desktop")
+    val entryFile = File("${System.getProperty("user.home")}/.local/share/applications/$entryFileName")
     if (!entryFile.exists()) {
         entryFile.createNewFile()
     }
     entryFile.writeText(
-        "[Desktop Entry]\n" +
-            "Type=Application\n" +
-            "Name=Twidere X\n" +
-            "Exec=\"${File("").absolutePath + "/bin/Twidere X\" %u"}\n" +
-            "Terminal=false\n" +
+        "[Desktop Entry]${System.lineSeparator()}" +
+            "Type=Application${System.lineSeparator()}" +
+            "Name=Twidere X${System.lineSeparator()}" +
+            "Exec=\"${File("").absolutePath + "/bin/Twidere X\" %u"}${System.lineSeparator()}" +
+            "Terminal=false${System.lineSeparator()}" +
             "MimeType=x-scheme-handler/$twidereXSchema;"
     )
+}
+
+private fun ensureMimeInfo() {
+    val file = File("${System.getProperty("user.home")}/.local/share/applications/mimeinfo.cache")
+    if (!file.exists()) {
+        file.createNewFile()
+    }
+    val text = file.readText()
+    if (text.isEmpty() || text.isBlank()) {
+        file.writeText("[MIME Cache]${System.lineSeparator()}")
+    }
+    if (!file.readText().contains("x-scheme-handler/$twidereXSchema=$entryFileName;")) {
+        file.appendText("${System.lineSeparator()}x-scheme-handler/$twidereXSchema=$entryFileName;")
+    }
 }
 
 private fun ensureWindowsRegistry() {
