@@ -21,6 +21,7 @@
 package com.twidere.twiderex.scenes.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,6 +46,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -97,40 +99,43 @@ fun MiscScene() {
                 mutableStateOf<(value: String) -> Unit>({})
             }
 
-            if (showProxyTypeDialog.value) {
-                ProxyTypeSelectDialog(
-                    onDismissRequest = { showProxyTypeDialog.value = false },
-                    onSelect = {
-                        viewModel.setProxyType(it.name)
-                    },
-                    value = proxyTypeValue
-                )
-            }
-            if (showProxyInputDialog.value) {
-                ProxyInputDialog(
-                    title = inputTitle.value,
-                    value = inputValue.value,
-                    onValueChanged = inputChanged.value,
-                    onDismissRequest = {
-                        showProxyInputDialog.value = false
-                    }
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .verticalScroll(
-                        rememberScrollState()
+            Box(contentAlignment = Alignment.Center) {
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(
+                            rememberScrollState()
+                        )
+                ) {
+                    NitterPreference(viewModel)
+                    ProxyPreference(
+                        viewModel = viewModel,
+                        showProxyInputDialog = showProxyInputDialog,
+                        showProxyTypeDialog = showProxyTypeDialog,
+                        inputTitle = inputTitle,
+                        inputValue = inputValue,
+                        inputChanged = inputChanged
                     )
-            ) {
-                NitterPreference(viewModel)
-                ProxyPreference(
-                    viewModel = viewModel,
-                    showProxyInputDialog = showProxyInputDialog,
-                    showProxyTypeDialog = showProxyTypeDialog,
-                    inputTitle = inputTitle,
-                    inputValue = inputValue,
-                    inputChanged = inputChanged
-                )
+                }
+
+                if (showProxyTypeDialog.value) {
+                    ProxyTypeSelectDialog(
+                        onDismissRequest = { showProxyTypeDialog.value = false },
+                        onSelect = {
+                            viewModel.setProxyType(it.name)
+                        },
+                        value = proxyTypeValue
+                    )
+                }
+                if (showProxyInputDialog.value) {
+                    ProxyInputDialog(
+                        title = inputTitle.value,
+                        value = inputValue.value,
+                        onValueChanged = inputChanged.value,
+                        onDismissRequest = {
+                            showProxyInputDialog.value = false
+                        }
+                    )
+                }
             }
         }
     }
