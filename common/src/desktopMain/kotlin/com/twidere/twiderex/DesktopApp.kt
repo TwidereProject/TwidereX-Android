@@ -29,10 +29,14 @@ import com.twidere.twiderex.init.Initializer
 import com.twidere.twiderex.init.TwidereServiceFactoryInitialTask
 import com.twidere.twiderex.kmp.LocalPlatformWindow
 import com.twidere.twiderex.kmp.PlatformWindow
+import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
 import com.twidere.twiderex.utils.CustomTabSignInChannel
-import kotlinx.coroutines.CoroutineScope
+import com.twidere.twiderex.utils.OperatingSystem
+import com.twidere.twiderex.utils.currentOperatingSystem
+import it.sauronsoftware.junique.AlreadyLockedException
+import it.sauronsoftware.junique.JUnique
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
@@ -41,18 +45,80 @@ import moe.tlaster.precompose.navigation.NavController
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import java.awt.Desktop
+import java.io.File
 
-fun DesktopApp() {
+private val navController = NavController()
+private val mainScope = MainScope()
+private const val lockId = "b5b887ec-7fc0-45c9-b32d-47f37cb02f9f"
+private const val entryFileName = "twiderex.desktop"
+
+fun runDesktopApp(
+    args: Array<String>,
+) {
+    if (currentOperatingSystem == OperatingSystem.Linux) {
+        ensureDesktopEntry()
+        ensureMimeInfo()
+        ensureSingleAppInstance(args)
+    } else {
+        startDesktopApp()
+    }
+}
+
+private fun ensureSingleAppInstance(args: Array<String>) {
+    val start = try {
+        JUnique.acquireLock(lockId) {
+            onDeeplink(it)
+            null
+        }
+        true
+    } catch (e: AlreadyLockedException) {
+        false
+    }
+    if (start) {
+        startDesktopApp()
+    } else {
+        args.forEach {
+            JUnique.sendMessage(lockId, it)
+        }
+    }
+}
+
+private fun ensureDesktopEntry() {
+    val entryFile = File("${System.getProperty("user.home")}/.local/share/applications/${entryFileName}")
+    if (!entryFile.exists()) {
+        entryFile.createNewFile()
+    }
+    entryFile.writeText("[Desktop Entry]${System.lineSeparator()}" +
+        "Type=Application${System.lineSeparator()}" +
+        "Name=Twidere X${System.lineSeparator()}" +
+        "Exec=\"${File("").absolutePath + "/bin/Twidere X\" %u"}${System.lineSeparator()}" +
+        "Terminal=false${System.lineSeparator()}" +
+        "MimeType=x-scheme-handler/${twidereXSchema};")
+}
+
+private fun ensureMimeInfo() {
+    val file = File("${System.getProperty("user.home")}/.local/share/applications/mimeinfo.cache")
+    if (!file.exists()) {
+        file.createNewFile()
+    }
+    val text = file.readText()
+    if (text.isEmpty() || text.isBlank()) {
+        file.writeText("[MIME Cache]${System.lineSeparator()}")
+    }
+    if (!file.readText().contains("x-scheme-handler/${twidereXSchema}=${entryFileName};")) {
+        file.appendText("${System.lineSeparator()}x-scheme-handler/${twidereXSchema}=${entryFileName};")
+    }
+}
+
+private fun startDesktopApp() {
     startKoin {
         printLogger()
         setupModules()
     }
     val preferencesHolder = get<PreferencesHolder>()
-    val navController = NavController()
-    val scope = MainScope()
     try {
         Desktop.getDesktop().setOpenURIHandler { event ->
-            onDeeplink(url = event.uri.toString(), navController = navController, scope = scope)
+            onDeeplink(url = event.uri.toString())
         }
     } catch (e: UnsupportedOperationException) {
         e.printStackTrace()
@@ -80,9 +146,9 @@ fun DesktopApp() {
     }
 }
 
-private fun onDeeplink(url: String, navController: NavController, scope: CoroutineScope) {
+private fun onDeeplink(url: String) {
     if (CustomTabSignInChannel.canHandle(url)) {
-        scope.launch {
+        mainScope.launch {
             CustomTabSignInChannel.send(url)
         }
     } else {
