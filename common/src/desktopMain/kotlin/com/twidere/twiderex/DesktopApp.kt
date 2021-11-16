@@ -34,6 +34,7 @@ import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
 import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.utils.OperatingSystem
+import com.twidere.twiderex.utils.WindowsRegistry
 import com.twidere.twiderex.utils.currentOperatingSystem
 import it.sauronsoftware.junique.AlreadyLockedException
 import it.sauronsoftware.junique.JUnique
@@ -55,12 +56,17 @@ private const val entryFileName = "twiderex.desktop"
 fun runDesktopApp(
     args: Array<String>,
 ) {
-    if (currentOperatingSystem == OperatingSystem.Linux) {
-        ensureDesktopEntry()
-        ensureMimeInfo()
-        ensureSingleAppInstance(args)
-    } else {
-        startDesktopApp()
+    when (currentOperatingSystem) {
+        OperatingSystem.Windows -> {
+            ensureWindowsRegistry()
+            ensureSingleAppInstance(args)
+        }
+        OperatingSystem.Linux -> {
+            ensureDesktopEntry()
+            ensureMimeInfo()
+            ensureSingleAppInstance(args)
+        }
+        else -> startDesktopApp()
     }
 }
 
@@ -84,16 +90,18 @@ private fun ensureSingleAppInstance(args: Array<String>) {
 }
 
 private fun ensureDesktopEntry() {
-    val entryFile = File("${System.getProperty("user.home")}/.local/share/applications/${entryFileName}")
+    val entryFile = File("${System.getProperty("user.home")}/.local/share/applications/$entryFileName")
     if (!entryFile.exists()) {
         entryFile.createNewFile()
     }
-    entryFile.writeText("[Desktop Entry]${System.lineSeparator()}" +
-        "Type=Application${System.lineSeparator()}" +
-        "Name=Twidere X${System.lineSeparator()}" +
-        "Exec=\"${File("").absolutePath + "/bin/Twidere X\" %u"}${System.lineSeparator()}" +
-        "Terminal=false${System.lineSeparator()}" +
-        "MimeType=x-scheme-handler/${twidereXSchema};")
+    entryFile.writeText(
+        "[Desktop Entry]${System.lineSeparator()}" +
+            "Type=Application${System.lineSeparator()}" +
+            "Name=Twidere X${System.lineSeparator()}" +
+            "Exec=\"${File("").absolutePath + "/bin/Twidere X\" %u"}${System.lineSeparator()}" +
+            "Terminal=false${System.lineSeparator()}" +
+            "MimeType=x-scheme-handler/$twidereXSchema;"
+    )
 }
 
 private fun ensureMimeInfo() {
@@ -105,9 +113,15 @@ private fun ensureMimeInfo() {
     if (text.isEmpty() || text.isBlank()) {
         file.writeText("[MIME Cache]${System.lineSeparator()}")
     }
-    if (!file.readText().contains("x-scheme-handler/${twidereXSchema}=${entryFileName};")) {
-        file.appendText("${System.lineSeparator()}x-scheme-handler/${twidereXSchema}=${entryFileName};")
+    if (!file.readText().contains("x-scheme-handler/$twidereXSchema=$entryFileName;")) {
+        file.appendText("${System.lineSeparator()}x-scheme-handler/$twidereXSchema=$entryFileName;")
     }
+}
+
+private fun ensureWindowsRegistry() {
+    val protocol = WindowsRegistry.readRegistry("HKCR\\TwidereX", "URL Protocol")
+    if (protocol?.contains(twidereXSchema) == true) return
+    WindowsRegistry.registryUrlProtocol(twidereXSchema)
 }
 
 private fun startDesktopApp() {
