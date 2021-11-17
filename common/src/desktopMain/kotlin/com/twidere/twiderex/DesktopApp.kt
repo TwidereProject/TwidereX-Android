@@ -35,6 +35,7 @@ import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
 import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.utils.OperatingSystem
+import com.twidere.twiderex.utils.WindowsDatastoreModifier
 import com.twidere.twiderex.utils.WindowsRegistry
 import com.twidere.twiderex.utils.currentOperatingSystem
 import it.sauronsoftware.junique.AlreadyLockedException
@@ -59,6 +60,7 @@ fun runDesktopApp(
 ) {
     when (currentOperatingSystem) {
         OperatingSystem.Windows -> {
+            ensureWindowsDatastore()
             ensureWindowsRegistry()
             ensureSingleAppInstance(args)
         }
@@ -69,6 +71,10 @@ fun runDesktopApp(
         }
         else -> startDesktopApp()
     }
+}
+
+fun ensureWindowsDatastore() {
+    WindowsDatastoreModifier.ensureWindowsDatastore()
 }
 
 private fun ensureSingleAppInstance(args: Array<String>) {
