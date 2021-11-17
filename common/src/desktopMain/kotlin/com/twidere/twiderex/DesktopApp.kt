@@ -21,6 +21,7 @@
 package com.twidere.twiderex
 
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.window.application
 import com.twidere.twiderex.di.ext.get
@@ -138,6 +139,9 @@ private fun startDesktopApp() {
         e.printStackTrace()
     }
     application {
+        LaunchedEffect(Unit) {
+            preferencesHolder.warmup()
+        }
         Initializer.withScope(rememberCoroutineScope())
             .add(TwidereServiceFactoryInitialTask())
             .execute()
