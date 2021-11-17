@@ -35,6 +35,7 @@ compose {
                 packageName = Package.name
                 packageVersion = Package.versionName.split("-").firstOrNull()
                 modules("java.sql") // https://github.com/JetBrains/compose-jb/issues/381
+                modules("jdk.unsupported")
                 macOS {
                     bundleID = Package.id
                     infoPlist {
