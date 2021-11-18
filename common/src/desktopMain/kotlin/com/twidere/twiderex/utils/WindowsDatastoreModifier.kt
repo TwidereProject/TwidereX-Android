@@ -33,7 +33,6 @@ object WindowsDatastoreModifier {
         writeData.parameterTypes.forEach {
             println("${it.name}")
         }
-
         val unCloseableStream = "androidx.datastore.core.SingleProcessDataStore\$UncloseableOutputStream"
         writeData.setBody(
             """
@@ -41,7 +40,6 @@ object WindowsDatastoreModifier {
           java.io.File file = getFile();
           this.createParentDirectories(file);
           java.io.File scratchFile = new java.io.File(file.getAbsolutePath() + ".temp");
-    
           try {
              java.io.Closeable var3 = (java.io.Closeable)(new java.io.FileOutputStream(scratchFile));
              boolean var4 = false;
@@ -60,10 +58,13 @@ object WindowsDatastoreModifier {
              } finally {
                 kotlin.io.CloseableKt.closeFinally(var3, var14);
              }
-             file.delete();
+             java.io.File bakFile = new java.io.File(file.getAbsolutePath() + ".bak");
+             file.renameTo(bakFile);
              if (!scratchFile.renameTo(file)) {
+                bakFile.renameTo(file);
                 throw (Throwable)(new java.io.IOException("Unable to rename " + scratchFile + '.' + "This likely means that there are multiple instances of DataStore " + "for this file. Ensure that you are only creating a single instance of " + "datastore for this file."));
              }
+             bakFile.delete();
           } catch (java.io.IOException var13) {
              if (scratchFile.exists()) {
                 scratchFile.delete();
