@@ -57,7 +57,7 @@ enum class MediaLibraryType(
     val extensions: List<String>,
 ) {
     Video(listOf("mp4")),
-    Image(listOf("jpg", "png")),
+    Image(listOf("jpg", "png", "jpeg")),
 }
 
 @OptIn(ExperimentalMaterialApi::class)
