@@ -25,6 +25,7 @@ import com.squareup.sqldelight.Query
 import com.squareup.sqldelight.Transacter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicLong
 
 internal class OffsetQueryPagingSource<RowType : Any>(
     private val queryProvider: (limit: Long, offset: Long) -> Query<RowType>,
@@ -35,33 +36,83 @@ internal class OffsetQueryPagingSource<RowType : Any>(
 
     override val jumpingSupported get() = true
 
+    private val itemCount: AtomicLong = AtomicLong(-1)
+
     override suspend fun load(
         params: LoadParams<Int>
     ): LoadResult<Int, RowType> = withContext(dispatcher) {
-        try {
-            val key = params.key ?: 0
-            transacter.transactionWithResult {
-                val count = countQuery.executeAsOne()
-                if (count != 0L && key.toLong() >= count) throw IndexOutOfBoundsException()
+        val tempCount = itemCount.get()
+        // if itemCount is < 0, then it is initial load
+        if (tempCount < 0) {
+            initialLoad(params)
+        } else {
+            // otherwise, it is a subsequent load
+            loadFromDb(params, tempCount)
+        }
+    }
 
-                val loadSize = if (key < 0) params.loadSize + key else params.loadSize
+    private fun initialLoad(params: LoadParams<Int>): LoadResult<Int, RowType> {
+        return transacter.transactionWithResult {
+            val tempCount = countQuery.executeAsOne()
+            itemCount.set(tempCount)
+            loadFromDb(params, tempCount)
+        }
+    }
 
-                val data = queryProvider(loadSize.toLong(), maxOf(0, key).toLong())
-                    .also { currentQuery = it }
-                    .executeAsList()
+    private fun loadFromDb(params: LoadParams<Int>, tempCount: Long): LoadResult<Int, RowType> {
+        val key = params.key ?: 0
+        val limit: Int = getLimit(params, key)
+        val offset: Int = getOffset(params, key, tempCount)
+        return queryDatabase(offset, limit, tempCount)
+    }
 
-                LoadResult.Page(
-                    data = data,
-                    // allow one, and only one negative prevKey in a paging set. This is done for
-                    // misaligned prepend queries to avoid duplicates.
-                    prevKey = if (key <= 0) null else key - params.loadSize,
-                    nextKey = if (key + params.loadSize >= count) null else key + params.loadSize,
-                    itemsBefore = maxOf(0, key),
-                    itemsAfter = maxOf(0, (count - (key + params.loadSize))).toInt()
-                )
-            }
+    private fun getLimit(params: LoadParams<Int>, key: Int): Int {
+        return when (params) {
+            is LoadParams.Prepend ->
+                if (key < params.loadSize) key else params.loadSize
+            else -> params.loadSize
+        }
+    }
+
+    private fun getOffset(params: LoadParams<Int>, key: Int, itemCount: Long): Int {
+        return when (params) {
+            is LoadParams.Prepend ->
+                if (key < params.loadSize) 0 else (key - params.loadSize)
+            is LoadParams.Append -> key
+            is LoadParams.Refresh ->
+                if (key >= itemCount) {
+                    maxOf(0, itemCount - params.loadSize)
+                } else {
+                    key
+                }.toInt()
+        }
+    }
+
+    private fun queryDatabase(
+        offset: Int,
+        limit: Int,
+        itemCount: Long,
+    ): LoadResult<Int, RowType> {
+        return try {
+            val data = queryProvider(limit.toLong(), offset.toLong())
+                .also { currentQuery = it }
+                .executeAsList()
+            val nextPosToLoad = offset + data.size
+            val nextKey =
+                if (data.isEmpty() || data.size < limit || nextPosToLoad >= itemCount) {
+                    null
+                } else {
+                    nextPosToLoad
+                }
+            val prevKey = if (offset <= 0 || data.isEmpty()) null else offset
+            LoadResult.Page(
+                data = data,
+                prevKey = prevKey,
+                nextKey = nextKey,
+                itemsBefore = offset,
+                itemsAfter = maxOf(0, itemCount - nextPosToLoad).toInt()
+            )
         } catch (e: Exception) {
-            if (e is IndexOutOfBoundsException) throw e
             LoadResult.Error(e)
         }
     }
