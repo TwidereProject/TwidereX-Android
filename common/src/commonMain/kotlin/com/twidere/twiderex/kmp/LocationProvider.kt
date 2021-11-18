@@ -27,8 +27,7 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 expect fun RequestLocationPermission(
     onPermissionGrantt: () -> Unit,
-    request: Boolean = false,
-    content: @Composable () -> Unit,
+    content: @Composable (launchRequest: () -> Unit) -> Unit,
 )
 
 expect class LocationProvider {

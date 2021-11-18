@@ -30,6 +30,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresPermission
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import com.twidere.twiderex.extensions.launchAppSetting
 import com.twidere.twiderex.model.kmp.Location
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,26 +41,32 @@ import kotlinx.coroutines.flow.asSharedFlow
 @Composable
 actual fun RequestLocationPermission(
     onPermissionGrantt: () -> Unit,
-    request: Boolean,
-    content: @Composable () -> Unit,
+    content: @Composable (launchRequest: () -> Unit) -> Unit,
 ) {
+    val context = LocalContext.current
+
     @SuppressLint("MissingPermission")
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = {
             if (it.all { it.value }) {
                 onPermissionGrantt()
+            } else {
+                context.launchAppSetting()
             }
         },
     )
-    content.invoke()
-    if (request) {
-        val permissions = arrayOf(
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
-        permissionLauncher.launch(permissions)
+
+    val launchLocationRequest = remember {
+        {
+            val permissions = arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            permissionLauncher.launch(permissions)
+        }
     }
+    content.invoke(launchLocationRequest)
 }
 
 actual class LocationProvider(
