@@ -110,7 +110,6 @@ actual class AccountRepository(
             preferences = getAccountPreferences(accountKey)
         )
         setCurrentAccount(detail)
-        println("Desktop ===> addAccount is not null:${_activeAccount.value != null}")
     }
 
     actual fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences {

@@ -113,9 +113,25 @@ internal class OffsetQueryPagingSource<RowType : Any>(
                 itemsAfter = maxOf(0, itemCount - nextPosToLoad).toInt()
             )
         } catch (e: Exception) {
+            e.printStackTrace()
             LoadResult.Error(e)
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, RowType>) = state.anchorPosition
+    /**
+     *  It is unknown whether anchorPosition represents the item at the top of the screen or item at
+     *  the bottom of the screen. To ensure the number of items loaded is enough to fill up the
+     *  screen, half of loadSize is loaded before the anchorPosition and the other half is
+     *  loaded after the anchorPosition -- anchorPosition becomes the middle item.
+     *
+     *  To prevent a negative key, key = 0 when the number of items available before anchorPosition
+     *  is less than the requested amount of initialLoadSize / 2.
+     */
+    override fun getRefreshKey(state: PagingState<Int, RowType>): Int? {
+        val initialLoadSize = state.config.initialLoadSize
+        return when (state.anchorPosition) {
+            null -> null
+            else -> maxOf(0, state.anchorPosition!! - (initialLoadSize / 2))
+        }
+    }
 }

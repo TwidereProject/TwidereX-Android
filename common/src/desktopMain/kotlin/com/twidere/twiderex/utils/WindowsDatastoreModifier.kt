@@ -27,12 +27,6 @@ object WindowsDatastoreModifier {
         val pool = ClassPool.getDefault()
         val dataStore = pool.getCtClass("androidx.datastore.core.SingleProcessDataStore")
         val writeData = dataStore.getDeclaredMethod("writeData\$datastore_core")
-        dataStore.declaredClasses.forEach {
-            println("constructor:${it.name} $")
-        }
-        writeData.parameterTypes.forEach {
-            println("${it.name}")
-        }
         val unCloseableStream = "androidx.datastore.core.SingleProcessDataStore\$UncloseableOutputStream"
         writeData.setBody(
             """
