@@ -22,6 +22,7 @@ package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import java.net.URI
@@ -74,10 +75,10 @@ data class UiMedia(
                 url = null,
                 belongToKey = MicroBlogKey.Empty,
                 mediaUrl = null,
-                previewUrl = "", // painterResource(res = R.drawable.featured_graphics),
+                previewUrl = painterResource(res = com.twidere.twiderex.MR.files.ic_display_media_preview),
                 type = MediaType.photo,
-                width = 0, // painterResource(res = R.drawable.featured_graphics).intrinsicSize.width.toLong(),
-                height = 0, // painterResource(res = R.drawable.featured_graphics).intrinsicSize.height.toLong(),
+                width = 0,
+                height = 0,
                 pageUrl = null,
                 altText = "",
                 order = 0,
