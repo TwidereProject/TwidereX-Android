@@ -47,7 +47,9 @@ internal class OffsetQueryPagingSource<RowType : Any>(
             initialLoad(params)
         } else {
             // otherwise, it is a subsequent load
-            loadFromDb(params, tempCount)
+            transacter.transactionWithResult {
+                loadFromDb(params, tempCount)
+            }
         }
     }
 
