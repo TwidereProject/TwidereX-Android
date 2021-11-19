@@ -77,6 +77,7 @@ fun TimelineComponent(
             }
         }
         LaunchedEffect(Unit) {
+            // TODO FIXME 20211119: listState.isScrollInProgress is always false on desktop - https://github.com/JetBrains/compose-jb/issues/1423
             snapshotFlow { listState.isScrollInProgress }
                 .distinctUntilChanged()
                 .filter { !it }
