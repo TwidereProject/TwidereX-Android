@@ -95,6 +95,7 @@ class ReorderableColumnState(
 
     internal fun drop() {
         if (offsetY.roundToInt() == 0) {
+            cancel()
             return
         }
         val newOffset =
