@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.kmp
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -34,7 +35,7 @@ actual class RemoteNavigator(private val context: Context) {
                 Intent.ACTION_VIEW,
                 Uri.parse(deeplink)
             ).apply {
-                if (fromBackground) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (this !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
         )
     }
@@ -43,7 +44,6 @@ actual class RemoteNavigator(private val context: Context) {
         context.shareMedia(
             uri = Uri.parse(filePath),
             mimeType = mimeType,
-            fromOutsideOfActivity = fromBackground
         )
     }
 
