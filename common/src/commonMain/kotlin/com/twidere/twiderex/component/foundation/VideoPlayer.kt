@@ -43,8 +43,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
-import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.MR
+import com.twidere.twiderex.component.foundation.platform.PlatformPlayerView
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.preferences.LocalHttpConfig
 import com.twidere.twiderex.preferences.model.DisplayPreferences
@@ -69,48 +69,42 @@ fun VideoPlayer(
     keepScreenOn: Boolean = false,
     thumb: @Composable (() -> Unit)? = null,
 ) {
-    var playing by remember { mutableStateOf(false) }
-    var shouldShowThumb by remember { mutableStateOf(false) }
+    val state = rememberVideoPlayerState(url = url, volume = volume)
     val playInitial = getPlayInitial()
-    var autoPlay by remember(url) { mutableStateOf(playInitial) }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val resLoder = LocalResLoader.current
     val httpConfig = LocalHttpConfig.current
-    // var mediaPrepared by remember { mutableStateOf(false) }
 
     Box {
         if (playInitial) {
-
-            val nativePlayerView = remember(url) {
-                NativePlayerView(
+            val platformPlayerView = remember(url) {
+                PlatformPlayerView(
                     url = url,
-                    autoPlay = autoPlay,
                     httpConfig = httpConfig,
                     zOrderMediaOverlay = zOrderMediaOverlay,
                     keepScreenOn = keepScreenOn,
                 ).apply {
                     playerCallBack = object : PlayerCallBack {
-                        override fun isReady(ready: Boolean) {
-                            shouldShowThumb = ready
+                        override fun onPrepareStart() {
+                            state.isReady = false
                         }
-
-                        override fun setPlaying(isPlaying: Boolean) {
-                            playing = isPlaying
-                        }
-
-                        override fun onprepared() {
+                        override fun onReady() {
+                            state.isReady = true
                             customControl?.prepared()
+                        }
+
+                        override fun onIsPlayingChanged(isPlaying: Boolean) {
+                            state.isPlaying = isPlaying
                         }
                     }
                     customControl?.bind(this)
                 }
             }
 
-            nativePlayerView.setVolume(volume)
+            platformPlayerView.setVolume(volume)
 
             fun updateState() {
-                autoPlay = nativePlayerView.playWhenReady
-                VideoPool.set(url, 0L.coerceAtLeast(nativePlayerView.contentPosition()))
+                VideoPool.set(url, 0L.coerceAtLeast(platformPlayerView.contentPosition()))
             }
 
             var isResume by remember {
@@ -138,7 +132,7 @@ fun VideoPlayer(
                 lifecycle.addObserver(observer)
                 onDispose {
                     updateState()
-                    nativePlayerView.release()
+                    platformPlayerView.release()
                     VideoPool.removeRect(videoKey)
                     lifecycle.removeObserver(observer)
                 }
@@ -178,22 +172,17 @@ fun VideoPlayer(
                     }
                 }
             ) {
-                PlatformView(
-                    nativePLayerView = nativePlayerView,
-                    modifier = modifier,
-                ) {
-                    if (isResume && isMostCenter) {
-                        it.playWhenReady = autoPlay
-                        nativePlayerView.resume()
+                platformPlayerView.Content(modifier = modifier) {
+                    if (isResume && isMostCenter && state.isReady) {
+                        platformPlayerView.play()
                     } else {
-                        it.playWhenReady = false
-                        nativePlayerView.pause()
+                        platformPlayerView.pause()
                     }
                 }
             }
         }
 
-        if ((shouldShowThumb || !playing) && thumb != null) {
+        if (state.shouldShowThumb && thumb != null) {
             thumb()
             Box(
                 modifier = Modifier
@@ -227,42 +216,14 @@ private fun getPlayInitial() = when (LocalVideoPlayback.current) {
 }
 
 interface PlayerCallBack {
-    fun isReady(ready: Boolean)
-    fun setPlaying(isPlaying: Boolean)
-    fun onprepared()
+    fun onPrepareStart() // start to prepare video
+    fun onReady() // ready to play video
+    fun onIsPlayingChanged(isPlaying: Boolean) // video play/pause
 }
 
 interface PlayerProgressCallBack {
     fun onTimeChanged(time: Long)
 }
-
-expect class NativePlayerView(
-    url: String,
-    autoPlay: Boolean,
-    httpConfig: HttpConfig,
-    zOrderMediaOverlay: Boolean,
-    keepScreenOn: Boolean,
-) {
-    var playWhenReady: Boolean
-    var enablePlaying: Boolean
-    var playerCallBack: PlayerCallBack?
-    var playerProgressCallBack: PlayerProgressCallBack?
-    fun resume()
-    fun pause()
-    fun contentPosition(): Long
-    fun duration(): Long
-    fun seekTo(time: Long)
-    fun setVolume(volume: Float)
-    fun setMute(mute: Boolean)
-    fun release()
-}
-
-@Composable
-expect fun PlatformView(
-    modifier: Modifier,
-    nativePLayerView: NativePlayerView,
-    update: (NativePlayerView) -> Unit
-)
 
 object UserAvatarDefaults {
     val AvatarSize = 44.dp

@@ -18,17 +18,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.foundation
-import java.awt.Component
-interface DesktopMediaPlayer {
-    fun play()
-    fun pause()
-    fun stop()
-    fun release()
-    fun setMute(mute: Boolean)
-    fun setVolume(volume: Float)
-    fun seekTo(time: Long)
-    fun duration(): Long
-    fun currentPosition(): Long
-    val component: Component
-}
+package com.twidere.twiderex.media
+
+class JFXMediaPlayer

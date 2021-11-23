@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.foundation
+package com.twidere.twiderex.component.foundation.platform
 
 import android.content.Context
 import android.view.SurfaceView
@@ -34,6 +34,9 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.twidere.services.http.config.HttpConfig
+import com.twidere.twiderex.component.foundation.PlayerCallBack
+import com.twidere.twiderex.component.foundation.PlayerProgressCallBack
+import com.twidere.twiderex.component.foundation.RemainingTimeExoPlayer
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.utils.video.CacheDataSourceFactory
@@ -44,34 +47,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@Composable
-actual fun PlatformView(
-    modifier: Modifier,
-    nativePLayerView: NativePlayerView,
-    update: (NativePlayerView) -> Unit
-) {
-    AndroidView(
-        factory = {
-            nativePLayerView.androidPlayer
-        },
-        modifier = modifier,
-        update = {
-            update.invoke(nativePLayerView)
-        }
-    )
-}
-
-actual class NativePlayerView actual constructor(
+actual class PlatformPlayerView actual constructor(
     url: String,
-    autoPlay: Boolean,
     httpConfig: HttpConfig,
     zOrderMediaOverlay: Boolean,
     keepScreenOn: Boolean,
 ) {
-    actual var playerCallBack: PlayerCallBack? = null
-
-    actual var playerProgressCallBack: PlayerProgressCallBack? = null
-
     private var job: Job? = null
 
     private val scope = CoroutineScope(Dispatchers.Main)
@@ -105,17 +86,13 @@ actual class NativePlayerView actual constructor(
                 }
         ).apply {
             repeatMode = Player.REPEAT_MODE_ALL
-            playWhenReady = autoPlay
             addListener(object : Player.Listener {
                 override fun onPlaybackStateChanged(state: Int) {
-                    playerCallBack?.isReady(state != Player.STATE_READY)
-                    if (state == Player.STATE_READY) {
-                        playerCallBack?.onprepared()
-                    }
+                    if (state == Player.STATE_READY) playerCallBack?.onReady()
                 }
 
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    playerCallBack?.setPlaying(isPlaying)
+                    playerCallBack?.onIsPlayingChanged(isPlaying)
                     job?.cancel()
                     if (isPlaying) {
                         job = scope.launch {
@@ -136,22 +113,21 @@ actual class NativePlayerView actual constructor(
             ).createMediaSource(MediaItem.fromUri(url)).also {
                 setMediaSource(it)
             }
+            playerCallBack?.onPrepareStart()
             prepare()
             seekTo(VideoPool.get(url))
         }
     }
 
-    actual var playWhenReady: Boolean = false
-        set(value) {
-            androidPlayer.player?.playWhenReady = value && enablePlaying
-            field = value
-        }
-
-    actual fun resume() {
+    actual fun play() {
+        println("play video")
+        androidPlayer.player?.playWhenReady = true
         androidPlayer.onResume()
     }
 
     actual fun pause() {
+        println("pause play")
+        androidPlayer.player?.playWhenReady = false
         androidPlayer.onPause()
     }
 
@@ -177,9 +153,32 @@ actual class NativePlayerView actual constructor(
         androidPlayer.player?.volume = if (mute) 0f else 1f
     }
 
-    actual var enablePlaying: Boolean = true
-        set(value) {
-            field = value
-            playWhenReady = playWhenReady
-        }
+    @Composable
+    actual fun Content(modifier: Modifier, update: () -> Unit) {
+        AndroidView(
+            factory = {
+                androidPlayer
+            },
+            modifier = modifier,
+            update = {
+                update.invoke()
+            }
+        )
+    }
+
+    actual fun addPlayerCallback(callBack: PlayerCallBack) {
+        TODO("not implemented")
+    }
+
+    actual fun addProgressCallback(callBack: PlayerProgressCallBack) {
+        TODO("not implemented")
+    }
+
+    actual fun removePlayerCallback(callback: PlayerCallBack) {
+        TODO("not implemented")
+    }
+
+    actual fun removeProgressCallback(callback: PlayerProgressCallBack) {
+        TODO("not implemented")
+    }
 }

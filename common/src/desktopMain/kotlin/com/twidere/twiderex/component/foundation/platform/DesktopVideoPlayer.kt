@@ -18,12 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.foundation
+package com.twidere.twiderex.component.foundation.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import com.twidere.services.http.config.HttpConfig
+import com.twidere.twiderex.component.foundation.PlayerCallBack
+import com.twidere.twiderex.component.foundation.PlayerProgressCallBack
 import com.twidere.twiderex.utils.video.VideoPool
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
@@ -31,16 +33,12 @@ import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
 import java.util.Locale
 
-actual class NativePlayerView actual constructor(
+actual class PlatformPlayerView actual constructor(
     url: String,
-    autoPlay: Boolean,
     httpConfig: HttpConfig,
     zOrderMediaOverlay: Boolean,
     keepScreenOn: Boolean,
 ) {
-    actual var playerCallBack: PlayerCallBack? = null
-
-    actual var playerProgressCallBack: PlayerProgressCallBack? = null
 
     private var currentVolume: Float = 1f
 
@@ -60,7 +58,7 @@ actual class NativePlayerView actual constructor(
 
                 override fun mediaPlayerReady(mediaPlayer: MediaPlayer?) {
                     super.mediaPlayerReady(mediaPlayer)
-                    playerCallBack?.onprepared()
+                    playerCallBack?.onReady()
                 }
 
                 override fun timeChanged(mediaPlayer: MediaPlayer?, newTime: Long) {
@@ -81,9 +79,7 @@ actual class NativePlayerView actual constructor(
         }
     }
 
-    actual var playWhenReady: Boolean = false
-
-    actual fun resume() {
+    actual fun play() {
         desktopPlayer.mediaPlayer().controls()?.play()
     }
 
@@ -122,38 +118,40 @@ actual class NativePlayerView actual constructor(
         desktopPlayer.mediaPlayer().audio().isMute = mute
     }
 
-    actual var enablePlaying: Boolean = true
-        set(value) {
-            field = value
-            if (field) {
-                resume()
-            } else {
-                pause()
+    @Composable
+    actual fun Content(modifier: Modifier, update: () -> Unit) {
+        // TODO FIXME 2021.11.11, SwingPanel is shown above all composables
+        // see:https://github.com/JetBrains/compose-jb/issues/221 and https://github.com/JetBrains/compose-jb/issues/1087
+        SwingPanel(
+            factory = {
+                if (isMacOS()) {
+                    desktopPlayer as CallbackMediaPlayerComponent
+                } else {
+                    desktopPlayer as EmbeddedMediaPlayerComponent
+                }
+            },
+            modifier = modifier,
+            update = {
+                update.invoke()
             }
-        }
-}
+        )
+    }
 
-@Composable
-actual fun PlatformView(
-    modifier: Modifier,
-    nativePLayerView: NativePlayerView,
-    update: (NativePlayerView) -> Unit
-) {
-    // TODO FIXME 2021.11.11, SwingPanel is shown above all composables
-    // see:https://github.com/JetBrains/compose-jb/issues/221 and https://github.com/JetBrains/compose-jb/issues/1087
-    SwingPanel(
-        factory = {
-            if (isMacOS()) {
-                nativePLayerView.desktopPlayer as CallbackMediaPlayerComponent
-            } else {
-                nativePLayerView.desktopPlayer as EmbeddedMediaPlayerComponent
-            }
-        },
-        modifier = modifier,
-        update = {
-            update.invoke(nativePLayerView)
-        }
-    )
+    actual fun addPlayerCallback(callBack: PlayerCallBack) {
+        TODO("not implemented")
+    }
+
+    actual fun addProgressCallback(callBack: PlayerProgressCallBack) {
+        TODO("not implemented")
+    }
+
+    actual fun removePlayerCallback(callback: PlayerCallBack) {
+        TODO("not implemented")
+    }
+
+    actual fun removeProgressCallback(callback: PlayerProgressCallBack) {
+        TODO("not implemented")
+    }
 }
 
 /**
