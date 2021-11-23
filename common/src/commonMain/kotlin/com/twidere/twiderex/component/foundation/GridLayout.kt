@@ -67,10 +67,11 @@ private fun gridLayoutMeasurePolicy(
         val placeables = measurables.map { measurable ->
             measurable.measure(if (itemWidth >= infinityWidth) Constraints.fixed(0, 0) else Constraints.fixed(width = itemWidth, height = itemHeight))
         }
-
         layout(
             width = constraints.maxWidth,
-            height = (itemHeight * rows + spacing * (rows - 1)).toInt()
+            // workaround for the unknown desktop crash （Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException:
+            // Can't represent a size of 1073741961 in Constraints at androidx.compose.ui.unit.Constraints$Companion.bitsNeedForSize(Constraints.kt:408)）
+            height = minOf(GridLayoutDefault.MaxSize, (itemHeight * rows + spacing * (rows - 1)).toInt())
         ) {
             var currentX = 0
             var currentY = 0
@@ -84,4 +85,8 @@ private fun gridLayoutMeasurePolicy(
             }
         }
     }
+}
+
+object GridLayoutDefault {
+    const val MaxSize = 10000
 }
