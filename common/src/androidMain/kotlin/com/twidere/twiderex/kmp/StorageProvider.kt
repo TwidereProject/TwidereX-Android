@@ -32,7 +32,7 @@ actual class StorageProvider(private val context: Context) {
     actual val cacheDir: String get() = "${context.externalCacheDir?.absolutePath ?: context.cacheDir}/caches".mkdirs()
 
     // for media caches e.g image, video
-    actual val mediaCacheDir: String get() = "${context.externalCacheDir?.absolutePath ?: context.cacheDir}/mediaCaches".mkdirs()
+    actual val mediaCacheDir: String get() = "${context.externalCacheDir?.absolutePath ?: context.cacheDir}/mediaCache".mkdirs()
 
     actual fun clearCaches(dir: String, deleteDirAlso: Boolean) {
         val cacheDir = File(dir)
