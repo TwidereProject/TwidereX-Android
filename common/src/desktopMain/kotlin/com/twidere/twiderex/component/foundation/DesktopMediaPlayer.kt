@@ -19,7 +19,9 @@
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.twidere.twiderex.component.foundation
-import java.awt.Component
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+
 interface DesktopMediaPlayer {
     fun play()
     fun pause()
@@ -30,5 +32,24 @@ interface DesktopMediaPlayer {
     fun seekTo(time: Long)
     fun duration(): Long
     fun currentPosition(): Long
-    val component: Component
+    fun registerPlayerCallback(callBack: PlayerCallBack)
+    fun registerProgressCallback(callBack: PlayerProgressCallBack)
+    fun removePlayerCallback(callback: PlayerCallBack)
+    fun removeProgressCallback(callback: PlayerProgressCallBack)
+    @Composable
+    fun Content(modifier: Modifier, update: () -> Unit)
+}
+
+interface DesktopMediaPlayerFactory {
+    fun create(url: String): DesktopMediaPlayer
+}
+
+object DesktopMediaPlayerHelper {
+    private var factory: DesktopMediaPlayerFactory? = null
+    fun register(factory: DesktopMediaPlayerFactory) {
+        this.factory = factory
+    }
+    internal fun create(url: String) = factory?.create(url) ?: throw Error(
+        "No DesktopMediaPlayerFactory found, please ensure DesktopMediaPlayerHelper.register(factory) invoked before use"
+    )
 }

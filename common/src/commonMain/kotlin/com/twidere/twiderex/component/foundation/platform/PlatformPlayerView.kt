@@ -32,8 +32,8 @@ expect class PlatformPlayerView(
     zOrderMediaOverlay: Boolean,
     keepScreenOn: Boolean,
 ) {
-    fun addPlayerCallback(callBack: PlayerCallBack)
-    fun addProgressCallback(callBack: PlayerProgressCallBack)
+    fun registerPlayerCallback(callBack: PlayerCallBack)
+    fun registerProgressCallback(callBack: PlayerProgressCallBack)
     fun removePlayerCallback(callback: PlayerCallBack)
     fun removeProgressCallback(callback: PlayerProgressCallBack)
     fun play()

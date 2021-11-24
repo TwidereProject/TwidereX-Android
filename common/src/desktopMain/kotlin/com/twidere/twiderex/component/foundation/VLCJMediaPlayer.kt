@@ -20,19 +20,27 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.SwingPanel
 import com.twidere.twiderex.utils.video.VideoPool
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
-import java.awt.Component
 import java.util.Locale
+
+class VLCJMediaPlayerFactory : DesktopMediaPlayerFactory {
+    override fun create(url: String): DesktopMediaPlayer {
+        return VLCJMediaPlayer(url)
+    }
+}
 
 class VLCJMediaPlayer(
     private val url: String,
-    private val playerCallBack: PlayerCallBack?,
-    private val playerProgressCallBack: PlayerProgressCallBack?
 ) : DesktopMediaPlayer {
+    private var playerProgressCallBack: PlayerProgressCallBack? = null
+    private var playerCallBack: PlayerCallBack? = null
     private var currentVolume: Float = 1f
 
     private val desktopPlayer = (
@@ -105,7 +113,7 @@ class VLCJMediaPlayer(
     }
 
     override fun seekTo(time: Long) {
-        TODO("Not yet implemented")
+        desktopPlayer.mediaPlayer().controls().setTime(time)
     }
 
     override fun duration(): Long {
@@ -116,10 +124,37 @@ class VLCJMediaPlayer(
         return desktopPlayer.mediaPlayer().status().time()
     }
 
-    override val component: Component get() = if (isMacOS()) {
-        desktopPlayer as CallbackMediaPlayerComponent
-    } else {
-        desktopPlayer as EmbeddedMediaPlayerComponent
+    override fun registerPlayerCallback(callBack: PlayerCallBack) {
+        playerCallBack = callBack
+    }
+
+    override fun registerProgressCallback(callBack: PlayerProgressCallBack) {
+        playerProgressCallBack = callBack
+    }
+
+    override fun removePlayerCallback(callback: PlayerCallBack) {
+        playerCallBack = null
+    }
+
+    override fun removeProgressCallback(callback: PlayerProgressCallBack) {
+        playerProgressCallBack = null
+    }
+
+    @Composable
+    override fun Content(modifier: Modifier, update: () -> Unit) {
+        SwingPanel(
+            factory = {
+                if (isMacOS()) {
+                    desktopPlayer as CallbackMediaPlayerComponent
+                } else {
+                    desktopPlayer as EmbeddedMediaPlayerComponent
+                }
+            },
+            modifier = modifier,
+            update = {
+                update.invoke()
+            }
+        )
     }
 }
 

@@ -21,8 +21,11 @@
 package com.twidere.twiderex
 
 import androidx.compose.ui.ExperimentalComposeUiApi
+import com.twidere.twiderex.component.foundation.DesktopMediaPlayerHelper
+import com.twidere.twiderex.media.JFXMediaPlayerFactory
 
 @ExperimentalComposeUiApi
 fun main(args: Array<String>) {
+    DesktopMediaPlayerHelper.register(JFXMediaPlayerFactory())
     runDesktopApp(args)
 }

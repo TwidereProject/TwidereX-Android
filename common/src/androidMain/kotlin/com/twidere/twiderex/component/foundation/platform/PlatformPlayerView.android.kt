@@ -169,11 +169,11 @@ actual class PlatformPlayerView actual constructor(
         )
     }
 
-    actual fun addPlayerCallback(callBack: PlayerCallBack) {
+    actual fun registerPlayerCallback(callBack: PlayerCallBack) {
         playerCallBack = callBack
     }
 
-    actual fun addProgressCallback(callBack: PlayerProgressCallBack) {
+    actual fun registerProgressCallback(callBack: PlayerProgressCallBack) {
         playerProgressCallBack = callBack
     }
 
