@@ -39,10 +39,11 @@ actual class PlatformPlayerView actual constructor(
     zOrderMediaOverlay: Boolean,
     keepScreenOn: Boolean,
 ) {
-
+    private var playerProgressCallBack: PlayerProgressCallBack? = null
+    private var playerCallBack: PlayerCallBack? = null
     private var currentVolume: Float = 1f
 
-    var desktopPlayer = (
+    private var desktopPlayer = (
         if (isMacOS()) {
             CallbackMediaPlayerComponent()
         } else {
@@ -138,19 +139,19 @@ actual class PlatformPlayerView actual constructor(
     }
 
     actual fun addPlayerCallback(callBack: PlayerCallBack) {
-        TODO("not implemented")
+        playerCallBack = callBack
     }
 
     actual fun addProgressCallback(callBack: PlayerProgressCallBack) {
-        TODO("not implemented")
+        playerProgressCallBack = callBack
     }
 
     actual fun removePlayerCallback(callback: PlayerCallBack) {
-        TODO("not implemented")
+        playerCallBack = null
     }
 
     actual fun removeProgressCallback(callback: PlayerProgressCallBack) {
-        TODO("not implemented")
+        playerProgressCallBack = null
     }
 }
 

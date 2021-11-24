@@ -59,7 +59,10 @@ actual class PlatformPlayerView actual constructor(
 
     private val context = get<Context>()
 
-    var androidPlayer = StyledPlayerView(context).also { playerView ->
+    private var playerProgressCallBack: PlayerProgressCallBack? = null
+    private var playerCallBack: PlayerCallBack? = null
+
+    private var androidPlayer = StyledPlayerView(context).also { playerView ->
         (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
         playerView.useController = false
         playerView.keepScreenOn = keepScreenOn
@@ -167,18 +170,18 @@ actual class PlatformPlayerView actual constructor(
     }
 
     actual fun addPlayerCallback(callBack: PlayerCallBack) {
-        TODO("not implemented")
+        playerCallBack = callBack
     }
 
     actual fun addProgressCallback(callBack: PlayerProgressCallBack) {
-        TODO("not implemented")
+        playerProgressCallBack = callBack
     }
 
     actual fun removePlayerCallback(callback: PlayerCallBack) {
-        TODO("not implemented")
+        playerCallBack = null
     }
 
     actual fun removeProgressCallback(callback: PlayerProgressCallBack) {
-        TODO("not implemented")
+        playerProgressCallBack = null
     }
 }

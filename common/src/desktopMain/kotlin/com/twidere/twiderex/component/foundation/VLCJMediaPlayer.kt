@@ -25,6 +25,7 @@ import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
+import java.awt.Component
 import java.util.Locale
 
 class VLCJMediaPlayer(
@@ -115,7 +116,7 @@ class VLCJMediaPlayer(
         return desktopPlayer.mediaPlayer().status().time()
     }
 
-    override val component get() = if (isMacOS()) {
+    override val component: Component get() = if (isMacOS()) {
         desktopPlayer as CallbackMediaPlayerComponent
     } else {
         desktopPlayer as EmbeddedMediaPlayerComponent

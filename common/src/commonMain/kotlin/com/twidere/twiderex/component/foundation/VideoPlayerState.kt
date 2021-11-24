@@ -86,6 +86,20 @@ class VideoPlayerState(
         }
     }
 
+    private val playerCallBack = object : PlayerCallBack {
+        override fun onPrepareStart() {
+            _isReady.value = false
+        }
+        override fun onReady() {
+            _isReady.value = true
+            initPlay()
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            _isPlaying.value = isPlaying
+        }
+    }
+
     private var _volume = mutableStateOf(volume)
     var volume get() = _volume.value
         set(value) {
@@ -99,6 +113,9 @@ class VideoPlayerState(
             _isMute.value = value
             player.setMute(value)
         }
+
+    private var _action = mutableStateOf(Action.PLAY)
+    val action get() = _action.value
 
     val duration get() = player.duration().coerceAtLeast(0)
     val showThumbnail get() = !isReady || !isPlaying
@@ -126,13 +143,40 @@ class VideoPlayerState(
         )
     }
 
+    private fun initPlay() {
+        player.setVolume(volume)
+        player.setMute(isMute)
+        if (isReady) player.play()
+    }
+
     fun bind(player: PlatformPlayerView) {
         this.player = player
-        player.addProgressCallback()
+        initPlay()
+    }
+
+    // only for VideoPlayer
+    internal fun onResume() {
+        player.addProgressCallback(progressCallBack)
+        player.addPlayerCallback(playerCallBack)
+        if (isPlaying) player.play() else player.pause()
+    }
+
+    // only for VideoPlayer
+    internal fun onPause() {
+        player.removeProgressCallback(progressCallBack)
+        player.removePlayerCallback(playerCallBack)
+        // remove callback first then pause, so state can store the playing state before pause
+        player.pause()
     }
 
     fun playSwitch() {
-        if (isPlaying) player.pause() else player.play()
+        if (isPlaying) {
+            _action.value = Action.PAUSE
+            player.pause()
+        } else {
+            _action.value = Action.PLAY
+            player.play()
+        }
     }
 
     fun seeking() {
@@ -146,5 +190,10 @@ class VideoPlayerState(
 
     fun mute() {
         isMute = !isMute
+    }
+
+    enum class Action {
+        PLAY, // attempt to play
+        PAUSE // attempt to pause
     }
 }
