@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
@@ -48,15 +49,10 @@ import moe.tlaster.precompose.ui.LocalLifecycleOwner
 @Composable
 fun VideoPlayer(
     modifier: Modifier = Modifier.fillMaxSize(), // must set video player size
-    url: String,
-    volume: Float = 1f,
+    videoState: VideoPlayerState,
     playEnable: Boolean = true,
     zOrderMediaOverlay: Boolean = false,
     keepScreenOn: Boolean = false,
-    videoState: VideoPlayerState = rememberVideoPlayerState(
-        url = url,
-        volume = volume,
-    ),
     thumb: @Composable (() -> Unit)? = null,
 ) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -64,9 +60,9 @@ fun VideoPlayer(
     val httpConfig = LocalHttpConfig.current
     Box {
         if (playEnable) {
-            val platformPlayerView = remember(url) {
+            val platformPlayerView = remember(videoState.url) {
                 PlatformPlayerView(
-                    url = url,
+                    url = videoState.url,
                     httpConfig = httpConfig,
                     zOrderMediaOverlay = zOrderMediaOverlay,
                     keepScreenOn = keepScreenOn,
@@ -101,7 +97,7 @@ fun VideoPlayer(
                 platformPlayerView.Content(modifier = modifier) {}
             }
         }
-        if (videoState.showThumbnail && thumb != null) {
+        if ((videoState.showThumbnail || !playEnable) && thumb != null) {
             thumb()
             Box(
                 modifier = Modifier
@@ -118,6 +114,15 @@ fun VideoPlayer(
                         MR.strings.accessibility_common_video_play
                     )
                 )
+            }
+        }
+        if (!videoState.isReady && playEnable) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
             }
         }
     }

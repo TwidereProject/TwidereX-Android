@@ -38,10 +38,11 @@ fun rememberVideoPlayerState(
     isMute: Boolean = false,
 ): VideoPlayerState {
     return rememberSaveable(
-        saver = VideoPlayerState.Saver(),
+        saver = VideoPlayerState.Saver(url),
         key = url
     ) {
         VideoPlayerState(
+            url = url,
             isPlaying = isPlaying,
             volume = volume,
             isReady = isReady,
@@ -53,6 +54,7 @@ fun rememberVideoPlayerState(
 
 @Stable
 class VideoPlayerState(
+    val url: String,
     isReady: Boolean,
     isPlaying: Boolean,
     currentPosition: Long,
@@ -118,10 +120,10 @@ class VideoPlayerState(
     val action get() = _action.value
 
     val duration get() = player.duration().coerceAtLeast(0)
-    val showThumbnail get() = !isReady || !isPlaying
+    val showThumbnail get() = !isReady
 
     companion object {
-        fun Saver(): Saver<VideoPlayerState, *> = listSaver(
+        fun Saver(url: String): Saver<VideoPlayerState, *> = listSaver(
             save = {
                 listOf<Any>(
                     it.isReady,
@@ -133,6 +135,7 @@ class VideoPlayerState(
             },
             restore = {
                 VideoPlayerState(
+                    url = url,
                     isReady = it[0] as Boolean,
                     isPlaying = it[1] as Boolean,
                     currentPosition = it[2] as Long,

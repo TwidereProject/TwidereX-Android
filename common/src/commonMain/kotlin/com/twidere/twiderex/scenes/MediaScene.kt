@@ -164,10 +164,6 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
 
     val videoPlayerState = mutableStateOf<VideoPlayerState?>(null)
 
-    val display = LocalDisplayPreferences.current
-    val isMute by remember {
-        mutableStateOf(display.muteByDefault)
-    }
     val swiperState = rememberSwiperState(
         onDismiss = {
             navController.popBackStack()
@@ -240,7 +236,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                 swiperState = swiperState,
                 onVideoPlayerStateSet = { videoPlayerState.value = it },
                 pagerState = pagerState,
-                volume = if (isMute) 0f else 1f
+                volume = 1f
             )
             val windowBarVisibility by window.windowBarVisibility.observeAsState(true)
             LaunchedEffect(windowBarVisibility) {
@@ -440,16 +436,15 @@ fun MediaView(
                     Box {
                         val state = rememberVideoPlayerState(
                             url = data.url,
-                            volume = volume
+                            volume = volume,
+                            isMute = LocalDisplayPreferences.current.muteByDefault
                         )
                         onVideoPlayerStateSet(state)
                         VideoPlayer(
-                            url = data.url,
                             playEnable = LocalVideoPlayback.current.playEnable(),
                             videoState = state,
                             zOrderMediaOverlay = true,
                             keepScreenOn = true,
-                            volume = volume,
                         )
                     }
                 MediaType.other -> Unit

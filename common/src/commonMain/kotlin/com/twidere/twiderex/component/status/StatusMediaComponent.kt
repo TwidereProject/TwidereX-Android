@@ -56,6 +56,7 @@ import com.twidere.twiderex.component.foundation.GridLayout
 import com.twidere.twiderex.component.foundation.MostCenterInListLayout
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
+import com.twidere.twiderex.component.foundation.rememberVideoPlayerState
 import com.twidere.twiderex.component.image.ImageBlur
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
@@ -310,8 +311,10 @@ fun StatusMediaPreviewItem(
                                         onClick(media)
                                     }
                                 ),
-                            url = it,
-                            volume = 0F,
+                            videoState = rememberVideoPlayerState(
+                                url = it,
+                                isMute = true
+                            ),
                             playEnable = LocalVideoPlayback.current.playEnable() && isMostCenter // TODO most center
                         ) {
                             previewUrl?.let {
