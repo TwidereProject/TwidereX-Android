@@ -25,8 +25,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.toLowerCase
 import com.twidere.twiderex.extensions.shareMedia
 import com.twidere.twiderex.extensions.shareText
 
@@ -35,15 +33,7 @@ actual class RemoteNavigator(private val context: Context) {
         context.startActivity(
             Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse(deeplink).run {
-                    scheme?.toLowerCase(
-                        Locale.current
-                    )?.let {
-                        buildUpon().apply {
-                            scheme(it)
-                        }.build()
-                    } ?: this
-                }
+                Uri.parse(deeplink).normalizeScheme()
             ).apply {
                 if (this !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
