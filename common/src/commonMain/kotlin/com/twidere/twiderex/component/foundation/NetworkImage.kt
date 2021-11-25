@@ -54,7 +54,6 @@ fun NetworkImage(
         mutableStateOf(NetworkImageState.LOADING)
     }
     val painter = if (data is Painter) {
-        println("data is painter!")
         data
     } else {
         val httpConfig = LocalHttpConfig.current

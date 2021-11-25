@@ -21,6 +21,7 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import com.twidere.twiderex.utils.video.VideoPool
@@ -30,18 +31,13 @@ import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
 import java.util.Locale
 
-class VLCJMediaPlayerFactory : DesktopMediaPlayerFactory {
-    override fun create(url: String): DesktopMediaPlayer {
-        return VLCJMediaPlayer(url)
-    }
-}
-
 class VLCJMediaPlayer(
     private val url: String,
 ) : DesktopMediaPlayer {
     private var playerProgressCallBack: PlayerProgressCallBack? = null
     private var playerCallBack: PlayerCallBack? = null
     private var currentVolume: Float = 1f
+    private var isMediaReady = mutableStateOf(false)
 
     private val desktopPlayer = (
         if (isMacOS()) {
@@ -59,12 +55,17 @@ class VLCJMediaPlayer(
 
                 override fun mediaPlayerReady(mediaPlayer: MediaPlayer?) {
                     super.mediaPlayerReady(mediaPlayer)
+                    isMediaReady.value = true
                     playerCallBack?.onReady()
                 }
 
                 override fun timeChanged(mediaPlayer: MediaPlayer?, newTime: Long) {
                     super.timeChanged(mediaPlayer, newTime)
                     playerProgressCallBack?.onTimeChanged(newTime)
+                }
+
+                override fun error(mediaPlayer: MediaPlayer?) {
+                    super.error(mediaPlayer)
                 }
 
                 override fun volumeChanged(mediaPlayer: MediaPlayer?, volume: Float) {
@@ -142,19 +143,21 @@ class VLCJMediaPlayer(
 
     @Composable
     override fun Content(modifier: Modifier, update: () -> Unit) {
-        SwingPanel(
-            factory = {
-                if (isMacOS()) {
-                    desktopPlayer as CallbackMediaPlayerComponent
-                } else {
-                    desktopPlayer as EmbeddedMediaPlayerComponent
+        if (isMediaReady.value) {
+            SwingPanel(
+                factory = {
+                    if (isMacOS()) {
+                        desktopPlayer as CallbackMediaPlayerComponent
+                    } else {
+                        desktopPlayer as EmbeddedMediaPlayerComponent
+                    }
+                },
+                modifier = modifier,
+                update = {
+                    update.invoke()
                 }
-            },
-            modifier = modifier,
-            update = {
-                update.invoke()
-            }
-        )
+            )
+        }
     }
 }
 

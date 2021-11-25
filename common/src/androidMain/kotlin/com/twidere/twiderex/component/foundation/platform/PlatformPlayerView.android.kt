@@ -123,13 +123,11 @@ actual class PlatformPlayerView actual constructor(
     }
 
     actual fun play() {
-        println("play video")
         androidPlayer.player?.playWhenReady = true
         androidPlayer.onResume()
     }
 
     actual fun pause() {
-        println("pause play")
         androidPlayer.player?.playWhenReady = false
         androidPlayer.onPause()
     }
