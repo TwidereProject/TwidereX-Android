@@ -99,30 +99,27 @@ fun VideoPlayer(
         }
         if ((videoState.showThumbnail || !playEnable) && thumb != null) {
             thumb()
+        }
+        if (!videoState.isReady) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                Icon(
-                    imageVector = Icons.Default.PlayArrow,
-                    tint = Color.White.copy(alpha = LocalContentAlpha.current),
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .size(UserAvatarDefaults.AvatarSize)
-                        .background(MaterialTheme.colors.primary, CircleShape),
-                    contentDescription = resLoder.getString(
-                        MR.strings.accessibility_common_video_play
+                if (playEnable) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.PlayArrow,
+                        tint = Color.White.copy(alpha = LocalContentAlpha.current),
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .size(UserAvatarDefaults.AvatarSize)
+                            .background(MaterialTheme.colors.primary, CircleShape),
+                        contentDescription = resLoder.getString(
+                            MR.strings.accessibility_common_video_play
+                        )
                     )
-                )
-            }
-        }
-        if (!videoState.isReady && playEnable) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
+                }
             }
         }
     }

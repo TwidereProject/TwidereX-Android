@@ -60,18 +60,7 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
 
     init {
         Logger.setLevel(Logger.DEBUG)
-        try {
-            Platform.runLater {
-                initMediaPlayer(url)
-            }
-        } catch (e: Throwable) {
-            // java.lang.IllegalStateException: Toolkit not initialized
-            // the FX runtime is initialized when the first JFXPanel instance is constructed
-            JFXPanel()
-            Platform.runLater {
-                initMediaPlayer(url)
-            }
-        }
+        initMediaPlayer(url)
     }
 
     private fun initMediaPlayer(url: String) {
