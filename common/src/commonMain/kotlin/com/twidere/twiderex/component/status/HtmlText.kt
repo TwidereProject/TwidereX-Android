@@ -32,6 +32,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -95,6 +96,7 @@ fun HtmlText(
     textStyle: TextStyle = LocalTextStyle.current.copy(color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)),
     linkStyle: TextStyle = textStyle.copy(MaterialTheme.colors.primary),
     linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
+    positionWrapper: PositionWrapper? = null,
 ) {
     val bidi = remember(htmlText) {
         Bidi(htmlText, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT)
@@ -128,6 +130,7 @@ fun HtmlText(
             lineHeight = lineHeight,
             overflow = overflow,
             softWrap = softWrap,
+            positionWrapper = positionWrapper
         )
     }
 }
@@ -153,6 +156,7 @@ private fun RenderContent(
     lineHeight: TextUnit = TextUnit.Unspecified,
     overflow: TextOverflow = TextOverflow.Clip,
     softWrap: Boolean = true,
+    positionWrapper: PositionWrapper? = null,
 ) {
     val value = renderContentAnnotatedString(
         htmlText = htmlText,
@@ -161,6 +165,19 @@ private fun RenderContent(
         linkStyle = linkStyle
     )
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
+    DisposableEffect(htmlText) {
+        positionWrapper?.action = { position ->
+            layoutResult.value?.getOffsetForPosition(position)?.let {
+                value.getStringAnnotations(start = it, end = it)
+                    .firstOrNull()
+            }?.let {
+                onLinkClicked.invoke(it.item)
+            }
+        }
+        onDispose {
+            positionWrapper?.action = null
+        }
+    }
     if (value.text.isNotEmpty() && value.text.isNotBlank()) {
         Text(
             modifier = modifier.pointerInput(Unit) {
