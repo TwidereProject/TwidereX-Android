@@ -71,7 +71,7 @@ private fun gridLayoutMeasurePolicy(
             width = constraints.maxWidth,
             // workaround for the unknown desktop crash （Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException:
             // Can't represent a size of 1073741961 in Constraints at androidx.compose.ui.unit.Constraints$Companion.bitsNeedForSize(Constraints.kt:408)）
-            height = minOf(GridLayoutDefault.MaxSize, (itemHeight * rows + spacing * (rows - 1)).toInt())
+            height = minOf(GridLayoutDefault.MaxHeight, (itemHeight * rows + spacing * (rows - 1)).toInt())
         ) {
             var currentX = 0
             var currentY = 0
@@ -88,5 +88,5 @@ private fun gridLayoutMeasurePolicy(
 }
 
 object GridLayoutDefault {
-    const val MaxSize = 10000
+    const val MaxHeight = 10000
 }

@@ -23,7 +23,6 @@ package com.twidere.twiderex.component.status
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -51,7 +50,6 @@ fun SelectionContainer(
     val positionWrapper = remember {
         if (currentPlatform != Platform.Android) PositionWrapper() else null
     }
-    val scope = rememberCoroutineScope()
     androidx.compose.foundation.text.selection.SelectionContainer(
         modifier = if (currentPlatform != Platform.Android) {
             modifier.pointerInput(Unit) {
@@ -62,7 +60,7 @@ fun SelectionContainer(
                                 this.takeIf {
                                     it.type == PointerEventType.Press
                                 }?.let {
-                                    scope.launch {
+                                    launch {
                                         for (i in 0 until 15) {
                                             delay(10)
                                             if (
