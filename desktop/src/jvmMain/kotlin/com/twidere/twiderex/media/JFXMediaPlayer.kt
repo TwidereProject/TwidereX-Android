@@ -21,12 +21,12 @@
 package com.twidere.twiderex.media
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import com.twidere.twiderex.component.foundation.DesktopMediaPlayer
 import com.twidere.twiderex.component.foundation.PlayerCallBack
 import com.twidere.twiderex.component.foundation.PlayerProgressCallBack
+import com.twidere.twiderex.extensions.observeAsState
 import javafx.application.Platform
 import javafx.embed.swing.JFXPanel
 import javafx.scene.Scene
@@ -35,84 +35,131 @@ import javafx.scene.media.Media
 import javafx.scene.media.MediaPlayer
 import javafx.scene.media.MediaView
 import javafx.util.Duration
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.awt.BorderLayout
 import javax.swing.JPanel
 
-// TODO prepare time is too long
-class JFXMediaPlayer(url: String) : DesktopMediaPlayer {
+class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
     private var playerCallBack: PlayerCallBack? = null
     private var playerProgressCallBack: PlayerProgressCallBack? = null
 
-    private val isMediaReady = mutableStateOf(false)
+    private var _mediaPlayerDelegate: MediaPlayer? = null
 
-    private val mediaPlayer = MediaPlayer(Media(url))
-        .apply {
-            JFXPanel() // FIXME 2021.11.25:java.lang.IllegalStateException: Toolkit not initialized
-            setOnReady {
-                isMediaReady.value = true
-                playerCallBack?.onReady()
+    private val mediaPlayer: MediaPlayer?
+        get() {
+            if (_mediaPlayerDelegate?.status == MediaPlayer.Status.DISPOSED) {
+                initMediaPlayer(url)
             }
-            setOnPlaying {
-                playerCallBack?.onIsPlayingChanged(true)
-            }
-            setOnPaused {
-                playerCallBack?.onIsPlayingChanged(false)
-            }
-            setOnStopped {
-                playerCallBack?.onIsPlayingChanged(false)
-            }
-            totalDurationProperty().addListener { _, _, newValue ->
-                newValue?.let { duraton ->
-                    playerProgressCallBack?.onTimeChanged(duraton.toMillis().toLong())
-                }
-            }
-            playerCallBack?.onPrepareStart()
+            return _mediaPlayerDelegate
         }
+    private val videoLayout = JPanel().apply { layout = BorderLayout() }
+
+    private val isUiReady = MutableStateFlow(false)
+    private val isMediaReady = MutableStateFlow(false)
+
+    init {
+        try {
+            Platform.runLater {
+                initMediaPlayer(url)
+            }
+        } catch (e: Throwable) {
+            // java.lang.IllegalStateException: Toolkit not initialized
+            // the FX runtime is initialized when the first JFXPanel instance is constructed
+            JFXPanel()
+            Platform.runLater {
+                initMediaPlayer(url)
+            }
+        }
+    }
+
+    private fun initMediaPlayer(url: String) {
+        _mediaPlayerDelegate = MediaPlayer(Media(url))
+            .apply {
+                // loop video
+                cycleCount = MediaPlayer.INDEFINITE
+                setOnReady {
+                    playerCallBack?.onReady()
+                    isMediaReady.value = true
+                }
+                setOnPlaying {
+                    playerCallBack?.onIsPlayingChanged(true)
+                }
+                setOnPaused {
+                    playerCallBack?.onIsPlayingChanged(false)
+                }
+                setOnStopped {
+                    playerCallBack?.onIsPlayingChanged(false)
+                }
+                currentTimeProperty().addListener { _, _, newValue ->
+                    newValue?.let { duration ->
+                        playerProgressCallBack?.onTimeChanged(duration.toMillis().toLong())
+                    }
+                }
+                playerCallBack?.onPrepareStart()
+                initUiComponent()
+            }
+    }
+
+    private fun initUiComponent() {
+        val videoPanel = JFXPanel()
+        Platform.runLater {
+            val mediaView = MediaView(mediaPlayer)
+            val root = BorderPane(mediaView)
+            val scene = Scene(root)
+            videoPanel.scene = scene
+            videoLayout.add(videoPanel, BorderLayout.CENTER)
+            mediaView.parent.layoutBoundsProperty().addListener { _, _, newValue ->
+                // Update media view width
+                if (mediaView.fitWidth != newValue.width) mediaView.fitWidth = newValue.width
+                if (mediaView.fitHeight != newValue.height) mediaView.fitHeight = newValue.height
+            }
+            isUiReady.value = true
+        }
+    }
 
     override fun play() {
-        println("play")
-        mediaPlayer.play()
-        println("play done")
+        mediaPlayer?.play()
     }
 
     override fun pause() {
-        println("pause")
-        mediaPlayer.pause()
-        println("pause done")
+        mediaPlayer?.pause()
     }
 
     override fun stop() {
-        if (mediaPlayer.status == MediaPlayer.Status.PLAYING) {
-            println("stop")
-            mediaPlayer.stop()
-            println("stop done")
+        if (mediaPlayer?.status == MediaPlayer.Status.PLAYING) {
+            mediaPlayer?.stop()
         }
     }
 
     override fun release() {
-        println("release")
-        mediaPlayer.dispose()
-        println("release done")
+        mediaPlayer?.dispose()
+        isUiReady.value = false
+        isMediaReady.value = false
+        videoLayout.removeAll()
     }
 
     override fun setMute(mute: Boolean) {
-        mediaPlayer.isMute = mute
+        mediaPlayer?.isMute = mute
     }
 
     override fun setVolume(volume: Float) {
-        mediaPlayer.volume = volume.toDouble()
+        mediaPlayer?.volume = volume.toDouble()
     }
 
     override fun seekTo(time: Long) {
-        mediaPlayer.seek(Duration.millis(time.toDouble()))
+        mediaPlayer?.seek(Duration.millis(time.toDouble()))
     }
 
     override fun duration(): Long {
-        return mediaPlayer.totalDuration.toMillis().toLong()
+        return if (mediaPlayer?.cycleCount == MediaPlayer.INDEFINITE) {
+            mediaPlayer?.cycleDuration?.toMillis()
+        } else {
+            mediaPlayer?.totalDuration?.toMillis()
+        }?.toLong() ?: 0
     }
 
     override fun currentPosition(): Long {
-        return mediaPlayer.currentTime.toMillis().toLong()
+        return mediaPlayer?.currentTime?.toMillis()?.toLong() ?: 0
     }
 
     override fun registerPlayerCallback(callBack: PlayerCallBack) {
@@ -131,25 +178,17 @@ class JFXMediaPlayer(url: String) : DesktopMediaPlayer {
         playerProgressCallBack = null
     }
 
-    private val videoLayout = JPanel().apply { layout = BorderLayout() }
-
     @Composable
     override fun Content(modifier: Modifier, update: () -> Unit) {
-        if (isMediaReady.value) {
+        val uiReady = isUiReady.observeAsState(false)
+        val mediaReady = isMediaReady.observeAsState(false)
+        if (uiReady.value && mediaReady.value) {
             SwingPanel(
                 factory = {
                     videoLayout
                 },
                 modifier = modifier,
                 update = {
-                    val videoPanel = JFXPanel()
-                    Platform.runLater {
-                        val mediaView = MediaView(mediaPlayer)
-                        val root = BorderPane(mediaView)
-                        val scene = Scene(root)
-                        videoPanel.scene = scene
-                        it.add(videoPanel, BorderLayout.CENTER)
-                    }
                     update.invoke()
                 }
             )

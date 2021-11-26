@@ -64,6 +64,6 @@ fun MostCenterInListLayout(
         // }
         // }
     ) {
-        content.invoke(false)
+        content.invoke(true)
     }
 }
