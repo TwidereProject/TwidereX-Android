@@ -60,7 +60,22 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
 
     init {
         Logger.setLevel(Logger.DEBUG)
-        initMediaPlayer(url)
+        // Keep Platform thread alive so release can be executed
+        Platform.setImplicitExit(false)
+        try {
+            // the reason why we init media player in Platform.runLater is because runLater keeps all
+            // runnable in order, so we can ensure previous MediaPlayer already released
+            Platform.runLater {
+                initMediaPlayer(url)
+            }
+        } catch (e: Throwable) {
+            // java.lang.IllegalStateException: Toolkit not initialized
+            // the FX runtime is initialized when the first JFXPanel instance is constructed
+            JFXPanel()
+            Platform.runLater {
+                initMediaPlayer(url)
+            }
+        }
     }
 
     private fun initMediaPlayer(url: String) {
@@ -81,6 +96,9 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
                 setOnStopped {
                     playerCallBack?.onIsPlayingChanged(false)
                 }
+                setOnError {
+                    println("error occurred:${mediaPlayer?.error}")
+                }
                 currentTimeProperty().addListener { _, _, newValue ->
                     newValue?.let { duration ->
                         playerProgressCallBack?.onTimeChanged(duration.toMillis().toLong())
@@ -88,6 +106,7 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
                 }
                 playerCallBack?.onPrepareStart()
                 initUiComponent()
+                println("prepare for:$url")
             }
     }
 
@@ -110,23 +129,30 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
 
     override fun play() {
         mediaPlayer?.play()
+        println("play for:$url")
     }
 
     override fun pause() {
         mediaPlayer?.pause()
+        println("pause for:$url")
     }
 
     override fun stop() {
         if (mediaPlayer?.status == MediaPlayer.Status.PLAYING) {
             mediaPlayer?.stop()
+            println("stop for:$url")
         }
     }
 
     override fun release() {
-        mediaPlayer?.dispose()
-        isUiReady.value = false
-        isMediaReady.value = false
-        videoLayout.removeAll()
+        // ensure resource released before create next media player
+        Platform.runLater {
+            mediaPlayer?.dispose()
+            isUiReady.value = false
+            isMediaReady.value = false
+            videoLayout.removeAll()
+            println("release for:$url")
+        }
     }
 
     override fun setMute(mute: Boolean) {
@@ -173,6 +199,7 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
     override fun Content(modifier: Modifier, update: () -> Unit) {
         val uiReady = isUiReady.observeAsState(false)
         val mediaReady = isMediaReady.observeAsState(false)
+        println("show Content${uiReady.value} and${mediaReady.value}  for:$url")
         if (uiReady.value && mediaReady.value) {
             SwingPanel(
                 factory = {
