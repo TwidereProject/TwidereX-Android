@@ -302,7 +302,9 @@ fun StatusMediaPreviewItem(
                         },
                     )
                 } else {
-                    MostCenterInListLayout() { isMostCenter ->
+                    MostCenterInListLayout(
+                        videoKey = it
+                    ) { isMostCenter ->
                         VideoPlayer(
                             modifier = Modifier
                                 .fillMaxSize()

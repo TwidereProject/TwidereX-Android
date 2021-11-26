@@ -80,7 +80,6 @@ actual class PlatformPlayerView actual constructor(
     }
 
     actual fun release() {
-        mediaPlayer.stop()
         mediaPlayer.release()
     }
 

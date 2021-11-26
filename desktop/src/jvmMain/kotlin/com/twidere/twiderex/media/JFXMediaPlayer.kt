@@ -23,6 +23,7 @@ package com.twidere.twiderex.media
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
+import com.sun.media.jfxmedia.logging.Logger
 import com.twidere.twiderex.component.foundation.DesktopMediaPlayer
 import com.twidere.twiderex.component.foundation.PlayerCallBack
 import com.twidere.twiderex.component.foundation.PlayerProgressCallBack
@@ -58,6 +59,7 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
     private val isMediaReady = MutableStateFlow(false)
 
     init {
+        Logger.setLevel(Logger.DEBUG)
         try {
             Platform.runLater {
                 initMediaPlayer(url)
