@@ -100,26 +100,31 @@ fun VideoPlayer(
         if ((videoState.showThumbnail || !playEnable) && thumb != null) {
             thumb()
         }
-        if (!videoState.isReady) {
+        if (videoState.showLoading && playEnable) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                if (playEnable) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.PlayArrow,
-                        tint = Color.White.copy(alpha = LocalContentAlpha.current),
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(UserAvatarDefaults.AvatarSize)
-                            .background(MaterialTheme.colors.primary, CircleShape),
-                        contentDescription = resLoder.getString(
-                            MR.strings.accessibility_common_video_play
-                        )
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+        }
+
+        if (!playEnable) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    tint = Color.White.copy(alpha = LocalContentAlpha.current),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(UserAvatarDefaults.AvatarSize)
+                        .background(MaterialTheme.colors.primary, CircleShape),
+                    contentDescription = resLoder.getString(
+                        MR.strings.accessibility_common_video_play
                     )
-                }
+                )
             }
         }
     }
@@ -129,6 +134,7 @@ interface PlayerCallBack {
     fun onPrepareStart() // start to prepare video
     fun onReady() // ready to play video
     fun onIsPlayingChanged(isPlaying: Boolean) // video play/pause
+    fun onBuffering() // video buffering
 }
 
 interface PlayerProgressCallBack {

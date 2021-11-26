@@ -68,6 +68,11 @@ class VideoPlayerState(
         set(value) {
             _isReady.value = value
         }
+    private var _isBuffering = mutableStateOf(false)
+    var isBuffering get() = _isBuffering.value
+        set(value) {
+            _isBuffering.value = value
+        }
     private var _isPlaying = mutableStateOf(isPlaying)
     var isPlaying get() = _isPlaying.value
         set(value) {
@@ -94,11 +99,17 @@ class VideoPlayerState(
         }
         override fun onReady() {
             _isReady.value = true
+            _isBuffering.value = false
             initPlay()
         }
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             _isPlaying.value = isPlaying
+            _isBuffering.value = false
+        }
+
+        override fun onBuffering() {
+            _isBuffering.value = true
         }
     }
 
@@ -121,6 +132,7 @@ class VideoPlayerState(
 
     val duration get() = player.duration().coerceAtLeast(0)
     val showThumbnail get() = !isReady
+    val showLoading get() = !isReady || isBuffering
 
     companion object {
         fun Saver(url: String): Saver<VideoPlayerState, *> = listSaver(

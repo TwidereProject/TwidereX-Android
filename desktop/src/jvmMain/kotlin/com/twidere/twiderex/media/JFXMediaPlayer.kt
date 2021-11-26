@@ -96,6 +96,9 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
                 setOnStopped {
                     playerCallBack?.onIsPlayingChanged(false)
                 }
+                setOnStalled {
+                    playerCallBack?.onBuffering()
+                }
                 setOnError {
                     println("error occurred:${mediaPlayer?.error}")
                 }
@@ -201,6 +204,7 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
         val mediaReady = isMediaReady.observeAsState(false)
         println("show Content${uiReady.value} and${mediaReady.value}  for:$url")
         if (uiReady.value && mediaReady.value) {
+            // FIXME 2021.11.26 SwingPanel will cover all compose layout https://github.com/JetBrains/compose-jb/issues/1449
             SwingPanel(
                 factory = {
                     videoLayout

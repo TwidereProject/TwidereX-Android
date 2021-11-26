@@ -91,7 +91,15 @@ actual class PlatformPlayerView actual constructor(
             repeatMode = Player.REPEAT_MODE_ALL
             addListener(object : Player.Listener {
                 override fun onPlaybackStateChanged(state: Int) {
-                    if (state == Player.STATE_READY) playerCallBack?.onReady()
+                    when (state) {
+                        Player.STATE_BUFFERING -> {
+                            playerCallBack?.onBuffering()
+                        }
+                        Player.STATE_READY -> {
+                            playerCallBack?.onReady()
+                        }
+                        else -> {}
+                    }
                 }
 
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
