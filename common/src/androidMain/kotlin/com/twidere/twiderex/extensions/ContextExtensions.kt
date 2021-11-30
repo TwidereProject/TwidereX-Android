@@ -50,7 +50,7 @@ fun Context.shareText(content: String) {
     )
 }
 
-fun Context.shareMedia(uri: Uri, mimeType: String, fromOutsideOfActivity: Boolean = false) {
+fun Context.shareMedia(uri: Uri, mimeType: String) {
     startActivity(
         Intent().apply {
             action = Intent.ACTION_SEND
@@ -59,7 +59,7 @@ fun Context.shareMedia(uri: Uri, mimeType: String, fromOutsideOfActivity: Boolea
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }.let {
             Intent.createChooser(it, null).apply {
-                if (fromOutsideOfActivity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (this !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
         }
     )

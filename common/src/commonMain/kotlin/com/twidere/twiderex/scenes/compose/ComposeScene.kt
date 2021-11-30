@@ -121,7 +121,9 @@ import com.twidere.twiderex.extensions.icon
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.stringName
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.RequestLocationPermission
+import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
@@ -1136,7 +1138,7 @@ private fun ComposeActions(
     val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
 
     val allowLocation by derivedStateOf {
-        account.type != PlatformType.Mastodon
+        account.type != PlatformType.Mastodon && currentPlatform == Platform.Android
     }
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current

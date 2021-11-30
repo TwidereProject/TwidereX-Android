@@ -200,6 +200,7 @@ fun UserComponent(
                     Pager(
                         modifier = Modifier.weight(1f),
                         state = pagerState,
+                        offscreenLimit = 0,
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
