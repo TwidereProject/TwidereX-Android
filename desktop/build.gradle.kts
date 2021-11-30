@@ -4,7 +4,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose") version Versions.compose_jb
-    id("org.openjfx.javafxplugin") version "0.0.10"
+    id("org.openjfx.javafxplugin") version Versions.javafx
 }
 
 group = Package.group
@@ -17,7 +17,7 @@ kotlin {
             kotlinOptions.jvmTarget = Versions.Java.jvmTarget
         }
         javafx {
-            version = "15"
+            version = "15" // MediaPlayer doesn't work well with 11, use Versions.Java.jvmTarget after Versions.Java.jvmTarget updated
             modules = listOf("javafx.controls", "javafx.swing", "javafx.media")
         }
     }

@@ -48,4 +48,5 @@ object Versions {
     const val koin = "3.1.2"
     const val moko = "0.17.2"
     const val sqlDelight = "1.5.1"
+    const val javafx = "0.0.10"
 }
