@@ -23,6 +23,7 @@ package com.twidere.twiderex.media
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
+import com.sun.javafx.application.PlatformImpl
 import com.sun.media.jfxmedia.logging.Logger
 import com.twidere.twiderex.component.foundation.DesktopMediaPlayer
 import com.twidere.twiderex.component.foundation.PlayerCallBack
@@ -71,7 +72,8 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
         } catch (e: Throwable) {
             // java.lang.IllegalStateException: Toolkit not initialized
             // the FX runtime is initialized when the first JFXPanel instance is constructed
-            JFXPanel()
+            // JFXPanel() // may cause other crashes on windows
+            PlatformImpl.startup {}
             Platform.runLater {
                 initMediaPlayer(url)
             }

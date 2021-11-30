@@ -127,9 +127,6 @@ class VideoPlayerState(
             player.setMute(value)
         }
 
-    private var _action = mutableStateOf(Action.PLAY)
-    val action get() = _action.value
-
     val duration get() = player.duration().coerceAtLeast(0)
     val showThumbnail get() = !isReady
     val showLoading get() = !isReady || isBuffering
@@ -186,10 +183,8 @@ class VideoPlayerState(
 
     fun playSwitch() {
         if (isPlaying) {
-            _action.value = Action.PAUSE
             player.pause()
         } else {
-            _action.value = Action.PLAY
             player.play()
         }
     }
@@ -205,10 +200,5 @@ class VideoPlayerState(
 
     fun mute() {
         isMute = !isMute
-    }
-
-    enum class Action {
-        PLAY, // attempt to play
-        PAUSE // attempt to pause
     }
 }
