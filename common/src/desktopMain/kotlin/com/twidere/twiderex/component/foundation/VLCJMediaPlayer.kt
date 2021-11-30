@@ -21,9 +21,9 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
-import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.utils.video.VideoPool
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
@@ -31,20 +31,15 @@ import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
 import java.util.Locale
 
-actual class NativePlayerView actual constructor(
-    url: String,
-    autoPlay: Boolean,
-    httpConfig: HttpConfig,
-    zOrderMediaOverlay: Boolean,
-    keepScreenOn: Boolean,
-) {
-    actual var playerCallBack: PlayerCallBack? = null
-
-    actual var playerProgressCallBack: PlayerProgressCallBack? = null
-
+class VLCJMediaPlayer(
+    private val url: String,
+) : DesktopMediaPlayer {
+    private var playerProgressCallBack: PlayerProgressCallBack? = null
+    private var playerCallBack: PlayerCallBack? = null
     private var currentVolume: Float = 1f
+    private var isMediaReady = mutableStateOf(false)
 
-    var desktopPlayer = (
+    private val desktopPlayer = (
         if (isMacOS()) {
             CallbackMediaPlayerComponent()
         } else {
@@ -60,12 +55,17 @@ actual class NativePlayerView actual constructor(
 
                 override fun mediaPlayerReady(mediaPlayer: MediaPlayer?) {
                     super.mediaPlayerReady(mediaPlayer)
-                    playerCallBack?.onprepared()
+                    isMediaReady.value = true
+                    playerCallBack?.onReady()
                 }
 
                 override fun timeChanged(mediaPlayer: MediaPlayer?, newTime: Long) {
                     super.timeChanged(mediaPlayer, newTime)
                     playerProgressCallBack?.onTimeChanged(newTime)
+                }
+
+                override fun error(mediaPlayer: MediaPlayer?) {
+                    super.error(mediaPlayer)
                 }
 
                 override fun volumeChanged(mediaPlayer: MediaPlayer?, volume: Float) {
@@ -77,23 +77,31 @@ actual class NativePlayerView actual constructor(
                     }
                 }
             })
+            playerCallBack?.onPrepareStart()
             media().prepare(url)
         }
     }
-
-    actual var playWhenReady: Boolean = false
-
-    actual fun resume() {
+    override fun play() {
         desktopPlayer.mediaPlayer().controls()?.play()
     }
 
-    actual fun pause() {
+    override fun pause() {
         desktopPlayer.mediaPlayer().controls()?.pause()
     }
 
-    actual fun contentPosition(): Long = desktopPlayer.mediaPlayer().status().time()
+    override fun stop() {
+        desktopPlayer.mediaPlayer().controls()?.stop()
+    }
 
-    actual fun setVolume(volume: Float) {
+    override fun release() {
+        desktopPlayer.mediaPlayer().release()
+    }
+
+    override fun setMute(mute: Boolean) {
+        desktopPlayer.mediaPlayer().audio().isMute = mute
+    }
+
+    override fun setVolume(volume: Float) {
         this.currentVolume = volume
         setVolume(currentVolume, desktopPlayer.mediaPlayer())
     }
@@ -105,55 +113,52 @@ actual class NativePlayerView actual constructor(
         )
     }
 
-    actual fun release() {
-        playerCallBack = null
-        playerProgressCallBack = null
-        desktopPlayer.mediaPlayer().release()
-    }
-
-    // only can get this value after prepare
-    actual fun duration(): Long = desktopPlayer.mediaPlayer().media().info().duration()
-
-    actual fun seekTo(time: Long) {
+    override fun seekTo(time: Long) {
         desktopPlayer.mediaPlayer().controls().setTime(time)
     }
 
-    actual fun setMute(mute: Boolean) {
-        desktopPlayer.mediaPlayer().audio().isMute = mute
+    override fun duration(): Long {
+        return desktopPlayer.mediaPlayer().media().info().duration()
     }
 
-    actual var enablePlaying: Boolean = true
-        set(value) {
-            field = value
-            if (field) {
-                resume()
-            } else {
-                pause()
-            }
-        }
-}
+    override fun currentPosition(): Long {
+        return desktopPlayer.mediaPlayer().status().time()
+    }
 
-@Composable
-actual fun PlatformView(
-    modifier: Modifier,
-    nativePLayerView: NativePlayerView,
-    update: (NativePlayerView) -> Unit
-) {
-    // TODO FIXME 2021.11.11, SwingPanel is shown above all composables
-    // see:https://github.com/JetBrains/compose-jb/issues/221 and https://github.com/JetBrains/compose-jb/issues/1087
-    SwingPanel(
-        factory = {
-            if (isMacOS()) {
-                nativePLayerView.desktopPlayer as CallbackMediaPlayerComponent
-            } else {
-                nativePLayerView.desktopPlayer as EmbeddedMediaPlayerComponent
-            }
-        },
-        modifier = modifier,
-        update = {
-            update.invoke(nativePLayerView)
+    override fun registerPlayerCallback(callBack: PlayerCallBack) {
+        playerCallBack = callBack
+    }
+
+    override fun registerProgressCallback(callBack: PlayerProgressCallBack) {
+        playerProgressCallBack = callBack
+    }
+
+    override fun removePlayerCallback(callback: PlayerCallBack) {
+        playerCallBack = null
+    }
+
+    override fun removeProgressCallback(callback: PlayerProgressCallBack) {
+        playerProgressCallBack = null
+    }
+
+    @Composable
+    override fun Content(modifier: Modifier, update: () -> Unit) {
+        if (isMediaReady.value) {
+            SwingPanel(
+                factory = {
+                    if (isMacOS()) {
+                        desktopPlayer as CallbackMediaPlayerComponent
+                    } else {
+                        desktopPlayer as EmbeddedMediaPlayerComponent
+                    }
+                },
+                modifier = modifier,
+                update = {
+                    update.invoke()
+                }
+            )
         }
-    )
+    }
 }
 
 /**

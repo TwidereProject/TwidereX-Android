@@ -18,14 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.media
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-import com.twidere.twiderex.component.foundation.DesktopMediaPlayerHelper
-import com.twidere.twiderex.media.DesktopMediaPlayerFactoryImpl
+import com.twidere.twiderex.component.foundation.DesktopMediaPlayer
+import com.twidere.twiderex.component.foundation.DesktopMediaPlayerFactory
 
-@ExperimentalComposeUiApi
-fun main(args: Array<String>) {
-    DesktopMediaPlayerHelper.register(DesktopMediaPlayerFactoryImpl())
-    runDesktopApp(args)
+class DesktopMediaPlayerFactoryImpl : DesktopMediaPlayerFactory {
+    override fun create(url: String): DesktopMediaPlayer {
+        return JFXMediaPlayer(url)
+    }
 }

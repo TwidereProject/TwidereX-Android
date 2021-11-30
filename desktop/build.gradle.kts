@@ -4,6 +4,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose") version Versions.compose_jb
+    id("org.openjfx.javafxplugin") version Versions.javafx
 }
 
 group = Package.group
@@ -11,8 +12,13 @@ version = Package.versionName
 
 kotlin {
     jvm {
+        withJava()
         compilations.all {
             kotlinOptions.jvmTarget = Versions.Java.jvmTarget
+        }
+        javafx {
+            version = "15" // MediaPlayer doesn't work well with 11, use Versions.Java.jvmTarget after Versions.Java.jvmTarget updated
+            modules = listOf("javafx.controls", "javafx.swing", "javafx.media")
         }
     }
     sourceSets {
@@ -36,6 +42,7 @@ compose {
                 packageVersion = Package.versionName.split("-").firstOrNull()
                 modules("java.sql") // https://github.com/JetBrains/compose-jb/issues/381
                 modules("jdk.unsupported")
+                modules("jdk.unsupported.desktop")
                 macOS {
                     bundleID = Package.id
                     infoPlist {

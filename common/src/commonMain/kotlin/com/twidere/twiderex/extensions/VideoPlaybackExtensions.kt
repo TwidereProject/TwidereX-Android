@@ -18,14 +18,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.extensions
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-import com.twidere.twiderex.component.foundation.DesktopMediaPlayerHelper
-import com.twidere.twiderex.media.DesktopMediaPlayerFactoryImpl
+import androidx.compose.runtime.Composable
+import com.twidere.twiderex.preferences.model.DisplayPreferences
+import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 
-@ExperimentalComposeUiApi
-fun main(args: Array<String>) {
-    DesktopMediaPlayerHelper.register(DesktopMediaPlayerFactoryImpl())
-    runDesktopApp(args)
+@Composable
+internal fun DisplayPreferences.AutoPlayback.playEnable() = when (this) {
+    DisplayPreferences.AutoPlayback.Auto -> !LocalIsActiveNetworkMetered.current
+    DisplayPreferences.AutoPlayback.Always -> true
+    DisplayPreferences.AutoPlayback.Off -> false
 }

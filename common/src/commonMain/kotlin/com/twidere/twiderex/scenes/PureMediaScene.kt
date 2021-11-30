@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.twidere.twiderex.component.bottomInsetsPadding
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.foundation.VideoPlayerState
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
@@ -68,7 +69,6 @@ import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.utils.video.CustomVideoControl
-import com.twidere.twiderex.utils.video.VideoController
 import com.twidere.twiderex.viewmodel.PureMediaViewModel
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
@@ -98,9 +98,7 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                     initialPage = selectedIndex,
                     pageCount = medias.size,
                 )
-                val videoControl = remember {
-                    VideoController()
-                }
+                val videoPlayerState = mutableStateOf<VideoPlayerState?>(null)
                 val swiperState = rememberSwiperState(
                     onDismiss = {
                         navController.popBackStack()
@@ -118,7 +116,7 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                             controlVisibility = controlVisibility,
                             swiperState = swiperState,
                             controlPanelColor = controlPanelColor,
-                            videoControl = videoControl,
+                            videoPlayerState = videoPlayerState.value,
                         )
                     }
                 ) {
@@ -146,7 +144,7 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                                 }
                             },
                             swiperState = swiperState,
-                            customControl = videoControl,
+                            onVideoPlayerStateSet = { videoPlayerState.value = it },
                             pagerState = pagerState,
                             volume = if (isMute) 0f else 1f
                         )
@@ -180,7 +178,7 @@ fun PureMediaBottomInfo(
     controlVisibility: Boolean,
     swiperState: SwiperState,
     controlPanelColor: Color,
-    videoControl: VideoController?,
+    videoPlayerState: VideoPlayerState?,
 ) {
     AnimatedVisibility(
         visible = controlVisibility && swiperState.progress == 0f,
@@ -194,8 +192,8 @@ fun PureMediaBottomInfo(
                 .padding(PureMediaSceneDefaults.ContentPadding)
                 .bottomInsetsPadding(),
         ) {
-            if (videoControl != null) {
-                CustomVideoControl(realController = videoControl)
+            if (videoPlayerState != null) {
+                CustomVideoControl(state = videoPlayerState)
             }
         }
     }

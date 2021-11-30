@@ -101,9 +101,7 @@ fun TimelineComponent(
         if (currentPlatform == Platform.JVM) {
             DisposableEffect(Unit) {
                 onDispose {
-                    println("Desktop ===> save state")
                     viewModel.viewModelScope.launch {
-                        println("Desktop ===> real save state:${listState.firstVisibleItemIndex}")
                         viewModel.saveScrollState(
                             TimelineScrollState(
                                 firstVisibleItemIndex = listState.firstVisibleItemIndex,
