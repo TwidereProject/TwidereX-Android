@@ -111,7 +111,6 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
                 }
                 playerCallBack?.onPrepareStart()
                 initUiComponent()
-                println("prepare for:$url")
             }
     }
 
@@ -134,18 +133,15 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
 
     override fun play() {
         mediaPlayer?.play()
-        println("play for:$url")
     }
 
     override fun pause() {
         mediaPlayer?.pause()
-        println("pause for:$url")
     }
 
     override fun stop() {
         if (mediaPlayer?.status == MediaPlayer.Status.PLAYING) {
             mediaPlayer?.stop()
-            println("stop for:$url")
         }
     }
 
@@ -156,7 +152,6 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
             isUiReady.value = false
             isMediaReady.value = false
             videoLayout.removeAll()
-            println("release for:$url")
         }
     }
 
@@ -204,7 +199,6 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
     override fun Content(modifier: Modifier, update: () -> Unit) {
         val uiReady = isUiReady.observeAsState(false)
         val mediaReady = isMediaReady.observeAsState(false)
-        println("show Content${uiReady.value} and${mediaReady.value}  for:$url")
         if (uiReady.value && mediaReady.value) {
             // FIXME 2021.11.26 SwingPanel will cover all compose layout https://github.com/JetBrains/compose-jb/issues/1449
             SwingPanel(

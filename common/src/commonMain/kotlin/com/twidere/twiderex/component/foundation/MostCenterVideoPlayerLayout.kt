@@ -22,6 +22,7 @@ package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +49,11 @@ fun MostCenterInListLayout(
         mutableStateOf(false)
     }
     var debounceJob: Job? = null
+    DisposableEffect(Unit) {
+        onDispose {
+            VideoPool.removeRect(videoKey)
+        }
+    }
     Box(
         modifier = modifier.onGloballyPositioned { coordinates ->
             if (middleLine == 0.0f) {
