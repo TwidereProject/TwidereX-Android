@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.map
 
 class SqlDelightStatusDaoImpl(private val database: SqlDelightCacheDatabase) : StatusDao {
     override suspend fun insertAll(listOf: List<UiStatus>, accountKey: MicroBlogKey) {
+        println("update status")
         listOf.map { it.toDbStatusWithAttachments(accountKey) }.saveToDb(database)
     }
 
@@ -77,6 +78,7 @@ class SqlDelightStatusDaoImpl(private val database: SqlDelightCacheDatabase) : S
             statusKey = statusKey
         ).executeAsOneOrNull()
             ?.let {
+                println("update action:$liked")
                 database.statusReactionsQueries.insert(
                     it.copy(
                         liked = liked ?: it.liked,
