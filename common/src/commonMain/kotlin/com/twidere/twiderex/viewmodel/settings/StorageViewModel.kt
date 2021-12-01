@@ -31,22 +31,23 @@ class StorageViewModel(
 ) : ViewModel() {
     val loading = MutableStateFlow(false)
 
-    fun clearDatabaseCache() = viewModelScope.launch {
-        loading.value = true
-        repository.clearDatabaseCache()
-        loading.value = false
-    }
-
     fun clearImageCache() = viewModelScope.launch {
         loading.value = true
         repository.clearImageCache()
-        repository.clearCacheDir()
         loading.value = false
     }
 
     fun clearSearchHistory() = viewModelScope.launch {
         loading.value = true
         repository.clearSearchHistory()
+        loading.value = false
+    }
+
+    fun clearAllCaches() = viewModelScope.launch {
+        loading.value = true
+        repository.clearDatabaseCache()
+        repository.clearCacheDir()
+        repository.clearImageCache()
         loading.value = false
     }
 }
