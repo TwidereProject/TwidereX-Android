@@ -43,7 +43,9 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.kmp.MediaInsertProvider
+import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.PlatformMediaWrapper
+import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.model.enums.MediaInsertType
 import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.navigation.RootRoute
@@ -55,7 +57,7 @@ enum class MediaLibraryType(
     val extensions: List<String>,
 ) {
     Video(listOf("mp4")),
-    Image(listOf("jpg", "png")),
+    Image(listOf("jpg", "png", "jpeg")),
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -81,7 +83,10 @@ fun MediaInsertMenu(
     ) { launchCamera, launchVideo ->
         Box(modifier) {
             DropdownMenu(expanded = showDropdown, onDismissRequest = { showDropdown = false }) {
-                MediaInsertType.values().forEach {
+                MediaInsertType.values().forEach loop@{
+                    if ((it == MediaInsertType.CAMERA || it == MediaInsertType.RECORD_VIDEO) && currentPlatform != Platform.Android) {
+                        return@loop
+                    }
                     val enabled = !disableList.contains(it)
                     DropdownMenuItem(
                         onClick = {

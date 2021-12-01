@@ -23,6 +23,7 @@ package com.twidere.twiderex.component
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
@@ -34,11 +35,15 @@ import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.refreshOrRetry
+import com.twidere.twiderex.kmp.Platform
+import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.viewmodel.timeline.TimelineScrollState
 import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 @Composable
 fun TimelineComponent(
@@ -77,6 +82,7 @@ fun TimelineComponent(
             }
         }
         LaunchedEffect(Unit) {
+            // TODO FIXME #listState 20211119: listState.isScrollInProgress is always false on desktop - https://github.com/JetBrains/compose-jb/issues/1423
             snapshotFlow { listState.isScrollInProgress }
                 .distinctUntilChanged()
                 .filter { !it }
@@ -90,6 +96,21 @@ fun TimelineComponent(
                         )
                     )
                 }
+        }
+        // TODO: Temporary solution， remove after [FIXME #listState] is fixed
+        if (currentPlatform == Platform.JVM) {
+            DisposableEffect(Unit) {
+                onDispose {
+                    viewModel.viewModelScope.launch {
+                        viewModel.saveScrollState(
+                            TimelineScrollState(
+                                firstVisibleItemIndex = listState.firstVisibleItemIndex,
+                                firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
+                            )
+                        )
+                    }
+                }
+            }
         }
         LazyUiStatusList(
             items = items,

@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.scenes.gif
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,6 +31,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -49,7 +52,6 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
-import com.twidere.twiderex.component.foundation.Dialog
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.TextInput
@@ -115,7 +117,12 @@ fun GifScene() {
 
 @Composable
 fun LoadingView() {
-    Dialog(onDismissRequest = { }) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .clickable { }
+            .background(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)),
+        contentAlignment = Alignment.Center
+    ) {
         LoadingProgress()
     }
 }

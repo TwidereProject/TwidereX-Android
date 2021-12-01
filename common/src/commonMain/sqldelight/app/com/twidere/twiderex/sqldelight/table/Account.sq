@@ -1,0 +1,31 @@
+import com.twidere.twiderex.model.AmUser;
+import com.twidere.twiderex.model.MicroBlogKey;
+import com.twidere.twiderex.model.TwidereAccount;
+import com.twidere.twiderex.model.cred.CredentialsType;
+import com.twidere.twiderex.model.enums.PlatformType;
+
+CREATE TABLE IF NOT EXISTS DbAccount (
+    accountKey TEXT AS MicroBlogKey PRIMARY KEY NOT NULL,
+    account TEXT AS TwidereAccount NOT NULL,
+    type TEXT AS PlatformType NOT NULL,
+    credentials_type TEXT AS CredentialsType NOT NULL ,
+    credentials_json TEXT NOT NULL,
+    extras_json TEXT NOT NULL,
+    user TEXT AS AmUser NOT NULL,
+    lastActive INTEGER NOT NULL
+);
+
+findAll:
+SELECT * FROM DbAccount;
+
+insert:
+INSERT OR REPLACE INTO DbAccount(
+     accountKey, account, type, credentials_type, credentials_json, extras_json, user, lastActive
+) VALUES ?;
+
+findWithAccountKey:
+SELECT * FROM DbAccount WHERE accountKey == :accountKey;
+
+delete:
+DELETE FROM DbAccount WHERE  accountKey == :accountKey;
+

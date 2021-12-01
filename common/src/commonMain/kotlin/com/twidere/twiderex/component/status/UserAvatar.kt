@@ -55,7 +55,7 @@ fun UserAvatar(
     ) {
         RoundAvatar(
             modifier = modifier,
-            avatar = user.profileImage,
+            avatar = user.profileImage.takeIf { it.isNotEmpty() } ?: painterResource(com.twidere.twiderex.MR.images.ic_profile_image_twidere),
             size = size,
             onClick = {
                 onClick?.invoke() ?: run { navigator.user(user) }

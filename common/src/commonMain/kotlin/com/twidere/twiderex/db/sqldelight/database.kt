@@ -21,6 +21,7 @@
 package com.twidere.twiderex.db.sqldelight
 
 import com.squareup.sqldelight.db.SqlDriver
+import com.twidere.twiderex.db.sqldelight.adapter.AccountAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.DMConversationAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.DMEventAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.DraftAdapterFactory
@@ -43,7 +44,8 @@ internal fun createAppDataBase(driver: SqlDriver): SqlDelightAppDatabase {
     return SqlDelightAppDatabase(
         driver = driver,
         draftAdapter = DraftAdapterFactory.create(),
-        searchAdapter = SearchAdapterFactory.create()
+        searchAdapter = SearchAdapterFactory.create(),
+        DbAccountAdapter = AccountAdapterFactory.create()
     )
 }
 

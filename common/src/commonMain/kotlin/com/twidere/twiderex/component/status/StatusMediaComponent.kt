@@ -53,15 +53,19 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.GridLayout
+import com.twidere.twiderex.component.foundation.MostCenterInListLayout
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
+import com.twidere.twiderex.component.foundation.rememberVideoPlayerState
 import com.twidere.twiderex.component.image.ImageBlur
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
+import com.twidere.twiderex.extensions.playEnable
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.TwidereTheme
 import moe.tlaster.placeholder.Placeholder
 
@@ -298,31 +302,38 @@ fun StatusMediaPreviewItem(
                         },
                     )
                 } else {
-                    VideoPlayer(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clickable(
-                                onClick = {
-                                    onClick(media)
-                                }
+                    MostCenterInListLayout(
+                        videoKey = it
+                    ) { isMostCenter ->
+                        VideoPlayer(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable(
+                                    onClick = {
+                                        onClick(media)
+                                    }
+                                ),
+                            videoState = rememberVideoPlayerState(
+                                url = it,
+                                isMute = true
                             ),
-                        url = it,
-                        volume = 0F
-                    ) {
-                        previewUrl?.let {
-                            NetworkImage(
-                                data = it,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable(
-                                        onClick = {
-                                            onClick(media)
-                                        }
-                                    ),
-                                placeholder = {
-                                    Placeholder(modifier = Modifier.fillMaxSize())
-                                },
-                            )
+                            playEnable = LocalVideoPlayback.current.playEnable() && isMostCenter // TODO most center
+                        ) {
+                            previewUrl?.let {
+                                NetworkImage(
+                                    data = it,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable(
+                                            onClick = {
+                                                onClick(media)
+                                            }
+                                        ),
+                                    placeholder = {
+                                        Placeholder(modifier = Modifier.fillMaxSize())
+                                    },
+                                )
+                            }
                         }
                     }
                 }

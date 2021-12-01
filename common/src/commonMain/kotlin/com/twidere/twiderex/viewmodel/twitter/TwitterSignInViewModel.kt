@@ -133,6 +133,7 @@ class TwitterSignInViewModel(
             }
         } catch (e: Throwable) {
             inAppNotification.notifyError(e)
+            e.printStackTrace()
         }
         loading.value = false
         return false

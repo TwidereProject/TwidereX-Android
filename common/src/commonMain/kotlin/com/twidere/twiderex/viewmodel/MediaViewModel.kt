@@ -57,11 +57,14 @@ class MediaViewModel(
 
     suspend fun shareMedia(currentMedia: UiMedia) {
         val account = account.firstOrNull() ?: return
-        currentMedia.mediaUrl?.let {
-            mediaAction.share(
-                source = it,
-                accountKey = account.accountKey
-            )
+        currentMedia.mediaUrl?.let { mediaUrl ->
+            currentMedia.fileName?.let { fileName ->
+                mediaAction.share(
+                    source = mediaUrl,
+                    fileName = fileName,
+                    accountKey = account.accountKey
+                )
+            }
         }
     }
 

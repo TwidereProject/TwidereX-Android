@@ -25,6 +25,11 @@ data class QueryString(
 ) {
     val map by lazy {
         rawInput
+            .split("?")
+            .lastOrNull()
+            .let {
+                it ?: ""
+            }
             .split("&")
             .asSequence()
             .map { it.split("=") }

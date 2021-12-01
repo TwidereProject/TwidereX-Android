@@ -21,6 +21,9 @@
 package com.twidere.twiderex.model
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.kmp.StorageProvider
+import com.twidere.twiderex.kmp.appFiles
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -36,8 +39,7 @@ actual class AccountPreferencesFactory {
                 scope = scope
             ) {
                 File(
-                    File(System.getProperty("user.home")),
-                    "TwidereX/datastore/preferences/$accountKey"
+                    get<StorageProvider>().appFiles.dataStoreFile("$accountKey.preferences_pb"),
                 )
             },
             scope = scope

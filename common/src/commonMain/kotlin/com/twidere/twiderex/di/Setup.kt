@@ -36,8 +36,8 @@ import org.koin.dsl.module
 fun KoinApplication.setupModules() {
     modules(storageProviderModule)
     modules(preferencesModule)
-    modules(platformModule)
     modules(dataBaseModule)
+    modules(platformModule)
     modules(viewModelModule)
     modules(repositoryModule)
     modules(actionModule)

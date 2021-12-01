@@ -73,7 +73,9 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.VideoPlayer
+import com.twidere.twiderex.component.foundation.VideoPlayerState
 import com.twidere.twiderex.component.foundation.rememberPagerState
+import com.twidere.twiderex.component.foundation.rememberVideoPlayerState
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.LikeButton
@@ -88,6 +90,7 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.component.topInsetsPadding
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.extensions.playEnable
 import com.twidere.twiderex.kmp.LocalPlatformWindow
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
@@ -99,7 +102,6 @@ import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.utils.video.CustomVideoControl
-import com.twidere.twiderex.utils.video.VideoController
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
@@ -160,13 +162,8 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
     )
     val currentMedia = status.media[pagerState.currentPage]
 
-    val videoControl = remember {
-        VideoController()
-    }
-    val display = LocalDisplayPreferences.current
-    val isMute by remember {
-        mutableStateOf(display.muteByDefault)
-    }
+    val videoPlayerState = mutableStateOf<VideoPlayerState?>(null)
+
     val swiperState = rememberSwiperState(
         onDismiss = {
             navController.popBackStack()
@@ -206,7 +203,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                             .clickable { navigator.status(status = status) },
                     ) {
                         StatusMediaInfo(
-                            videoControl, status, viewModel, currentMedia,
+                            videoPlayerState.value, status, viewModel, currentMedia,
                         )
                     }
                 }
@@ -237,9 +234,9 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                     }
                 },
                 swiperState = swiperState,
-                customControl = videoControl,
+                onVideoPlayerStateSet = { videoPlayerState.value = it },
                 pagerState = pagerState,
-                volume = if (isMute) 0f else 1f
+                volume = 1f
             )
             val windowBarVisibility by window.windowBarVisibility.observeAsState(true)
             LaunchedEffect(windowBarVisibility) {
@@ -291,7 +288,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
 
 @Composable
 private fun StatusMediaInfo(
-    videoControl: VideoController?,
+    videoPlayerState: VideoPlayerState?,
     status: UiStatus,
     viewModel: MediaViewModel,
     currentMedia: UiMedia,
@@ -301,8 +298,8 @@ private fun StatusMediaInfo(
         modifier = Modifier
             .padding(StatusMediaInfoDefaults.ContentPadding),
     ) {
-        if (videoControl != null) {
-            CustomVideoControl(realController = videoControl)
+        if (videoPlayerState != null) {
+            CustomVideoControl(state = videoPlayerState)
         }
         StatusText(status = status, maxLines = 2, showMastodonPoll = false)
         Spacer(modifier = Modifier.height(StatusMediaInfoDefaults.TextSpacing))
@@ -401,7 +398,7 @@ fun MediaView(
         initialPage = 0,
         pageCount = media.size,
     ),
-    customControl: VideoController? = null,
+    onVideoPlayerStateSet: (VideoPlayerState?) -> Unit = {},
     volume: Float = 1f
 ) {
     Box(
@@ -420,6 +417,7 @@ fun MediaView(
             when (data.type) {
                 MediaType.photo ->
                     Zoomable {
+                        onVideoPlayerStateSet(null)
                         NetworkImage(
                             modifier = Modifier.fillMaxSize(),
                             data = data.url,
@@ -436,12 +434,17 @@ fun MediaView(
                     }
                 MediaType.video, MediaType.animated_gif, MediaType.audio ->
                     Box {
-                        VideoPlayer(
+                        val state = rememberVideoPlayerState(
                             url = data.url,
-                            customControl = customControl,
+                            volume = volume,
+                            isMute = LocalDisplayPreferences.current.muteByDefault
+                        )
+                        onVideoPlayerStateSet(state)
+                        VideoPlayer(
+                            playEnable = LocalVideoPlayback.current.playEnable(),
+                            videoState = state,
                             zOrderMediaOverlay = true,
                             keepScreenOn = true,
-                            volume = volume,
                         )
                     }
                 MediaType.other -> Unit

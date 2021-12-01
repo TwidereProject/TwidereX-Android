@@ -20,25 +20,37 @@
  */
 package com.twidere.twiderex
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import com.twidere.twiderex.action.LocalStatusActions
+import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.kmp.LocalRemoteNavigator
+import com.twidere.twiderex.navigation.Router
+import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalActiveAccountViewModel
+import com.twidere.twiderex.utils.LocalPlatformResolver
+import moe.tlaster.precompose.navigation.NavController
 
 @Composable
-fun App() {
+fun App(navController: NavController = NavController()) {
+    val accountViewModel =
+        com.twidere.twiderex.di.ext.getViewModel<com.twidere.twiderex.viewmodel.ActiveAccountViewModel>()
+    val account by accountViewModel.account.observeAsState(null)
     CompositionLocalProvider(
         LocalResLoader provides get(),
         LocalRemoteNavigator provides get(),
+        LocalActiveAccount provides account,
+        LocalActiveAccountViewModel provides accountViewModel,
+        LocalStatusActions provides get<StatusActions>(),
+        LocalPlatformResolver provides get(),
+        LocalRemoteNavigator provides get(),
     ) {
-        MaterialTheme {
-            Scaffold {
-                Text("Twidere X!")
-            }
-        }
+        Router(
+            navController = navController
+        )
     }
 }

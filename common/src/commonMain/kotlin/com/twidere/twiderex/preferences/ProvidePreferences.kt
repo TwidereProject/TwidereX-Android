@@ -31,6 +31,7 @@ import com.twidere.services.proxy.ProxyConfig
 import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.preferences.model.MiscPreferences
+import com.twidere.twiderex.ui.LocalVideoPlayback
 import kotlinx.coroutines.flow.map
 
 val LocalAppearancePreferences =
@@ -74,7 +75,8 @@ fun ProvidePreferences(
     CompositionLocalProvider(
         LocalAppearancePreferences provides appearances,
         LocalDisplayPreferences provides display,
-        LocalHttpConfig provides proxyConfig
+        LocalHttpConfig provides proxyConfig,
+        LocalVideoPlayback provides display.autoPlayback,
     ) {
         content.invoke()
     }
