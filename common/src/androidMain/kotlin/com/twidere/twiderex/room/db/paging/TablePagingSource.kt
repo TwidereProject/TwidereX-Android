@@ -106,7 +106,7 @@ internal fun RoomPagingTimelineDao.getPagingSource(
     queryItemCount = {
         getPagingListCount(accountKey = accountKey, pagingKey = pagingKey)
     },
-    tables = arrayOf("paging_timeline, status")
+    tables = arrayOf("paging_timeline", "status")
 )
 
 internal fun RoomTrendDao.getPagingSource(
