@@ -58,7 +58,6 @@ internal abstract class QueryPagingSource<Key : Any, RowType : Any> :
     }
 
     final override fun queryResultsChanged() {
-        println("invalidate paging source")
         invalidate()
     }
 }
