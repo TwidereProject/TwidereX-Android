@@ -85,7 +85,6 @@ class TwidereServiceFactory(private val configProvider: TwidereHttpConfigProvide
         fun createGifService(): GifService {
             return instance?.let {
                 GiphyService(
-                    // TODO MERGE DEVELOP replace build config
                     apiKey = BuildConfig.GIPHYKEY,
                     httpClientFactory = createHttpClientFactory()
                 )

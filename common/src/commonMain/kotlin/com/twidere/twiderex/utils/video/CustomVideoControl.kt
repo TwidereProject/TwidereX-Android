@@ -33,7 +33,6 @@ import androidx.compose.ui.Modifier
 import com.twidere.twiderex.component.foundation.VideoPlayerState
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-// TODO modify invoke
 @Composable
 fun CustomVideoControl(
     state: VideoPlayerState,

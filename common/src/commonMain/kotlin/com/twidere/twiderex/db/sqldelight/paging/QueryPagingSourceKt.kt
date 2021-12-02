@@ -27,7 +27,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlin.properties.Delegates
 
-// TODO relate query change invalidate
 internal abstract class QueryPagingSource<Key : Any, RowType : Any> :
     PagingSource<Key, RowType>(),
     Query.Listener {
