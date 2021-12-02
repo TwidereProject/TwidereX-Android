@@ -77,7 +77,6 @@ class SqlDelightStatusDaoImpl(private val database: SqlDelightCacheDatabase) : S
             statusKey = statusKey
         ).executeAsOneOrNull()
             ?.let {
-                println("update action:$liked")
                 database.statusReactionsQueries.insert(
                     it.copy(
                         liked = liked ?: it.liked,
