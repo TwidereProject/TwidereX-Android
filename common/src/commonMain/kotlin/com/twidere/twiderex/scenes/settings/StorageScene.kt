@@ -102,7 +102,7 @@ fun StorageScene() {
                 ListItem(
                     modifier = Modifier
                         .clickable {
-                            viewModel.clearDatabaseCache()
+                            viewModel.clearAllCaches()
                         },
                     text = {
                         Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_all_title), color = Color.Red)

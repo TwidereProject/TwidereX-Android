@@ -28,7 +28,7 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicLong
 
 internal class OffsetQueryPagingSource<RowType : Any>(
-    private val queryProvider: (limit: Long, offset: Long) -> Query<RowType>,
+    private val queryProvider: (limit: Long, offset: Long, relationQueryRegister: RelationQueryRegister) -> Query<RowType>,
     private val countQuery: Query<Long>,
     private val transacter: Transacter,
     private val dispatcher: CoroutineDispatcher,
@@ -96,7 +96,7 @@ internal class OffsetQueryPagingSource<RowType : Any>(
         itemCount: Long,
     ): LoadResult<Int, RowType> {
         return try {
-            val data = queryProvider(limit.toLong(), offset.toLong())
+            val data = queryProvider(limit.toLong(), offset.toLong(), relationQueryRegister)
                 .also { currentQuery = it }
                 .executeAsList()
             val nextPosToLoad = offset + data.size

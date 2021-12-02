@@ -656,7 +656,6 @@ private fun UserRelationship(viewModel: UserViewModel) {
         ?.let { relationshipResult ->
             Surface(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(percent = 50))
                     .let {
                         if (relationshipResult.followedBy) {
                             it
@@ -668,7 +667,20 @@ private fun UserRelationship(viewModel: UserViewModel) {
                             )
                         }
                     }
-                    .clip(shape),
+                    .clip(shape)
+                    .clickable {
+                        when {
+                            relationshipResult.blocking -> {
+                                viewModel.unblock()
+                            }
+                            relationshipResult.followedBy -> {
+                                viewModel.unfollow()
+                            }
+                            else -> {
+                                viewModel.follow()
+                            }
+                        }
+                    },
                 contentColor = when {
                     relationshipResult.blocking -> MaterialTheme.colors.onPrimary
                     relationshipResult.followedBy -> contentColorFor(backgroundColor = MaterialTheme.colors.primary)
@@ -679,19 +691,6 @@ private fun UserRelationship(viewModel: UserViewModel) {
                     relationshipResult.followedBy -> MaterialTheme.colors.primary
                     else -> MaterialTheme.colors.background
                 },
-                onClick = {
-                    when {
-                        relationshipResult.blocking -> {
-                            viewModel.unblock()
-                        }
-                        relationshipResult.followedBy -> {
-                            viewModel.unfollow()
-                        }
-                        else -> {
-                            viewModel.follow()
-                        }
-                    }
-                }
             ) {
                 Text(
                     modifier = Modifier

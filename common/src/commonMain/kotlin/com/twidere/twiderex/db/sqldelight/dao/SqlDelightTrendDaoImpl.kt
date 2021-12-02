@@ -41,7 +41,7 @@ internal class SqlDelightTrendDaoImpl(private val database: SqlDelightCacheDatab
         return QueryPagingSource(
             countQuery = database.trendQueries.getTrendPagingCount(accountKey = accountKey),
             transacter = database.trendQueries,
-            queryProvider = { limit, offset ->
+            queryProvider = { limit, offset, _ ->
                 database.trendQueries.getTrendPagingList(
                     accountKey = accountKey,
                     limit = limit,

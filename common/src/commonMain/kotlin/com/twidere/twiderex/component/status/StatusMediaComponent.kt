@@ -317,7 +317,7 @@ fun StatusMediaPreviewItem(
                                 url = it,
                                 isMute = true
                             ),
-                            playEnable = LocalVideoPlayback.current.playEnable() && isMostCenter // TODO most center
+                            playEnable = LocalVideoPlayback.current.playEnable() && isMostCenter
                         ) {
                             previewUrl?.let {
                                 NetworkImage(

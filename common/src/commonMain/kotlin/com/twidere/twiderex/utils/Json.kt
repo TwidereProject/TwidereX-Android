@@ -25,21 +25,20 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-// TODO Make it private after all android code migrate to common
-val JSON by lazy {
+private val JSON by lazy {
     Json {
         ignoreUnknownKeys = true
         isLenient = true
         coerceInputValues = true
     }
 }
-// TODO Make it internal after all android code migrate to common
+
 @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
-inline fun <reified T> T.json(): String =
+internal inline fun <reified T> T.json(): String =
     JSON.encodeToString<T>(this)
 
 @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
-inline fun <reified T> String.fromJson() =
+internal inline fun <reified T> String.fromJson() =
     JSON.decodeFromString<T>(this)
 
 fun <T> T.json(serializer: KSerializer<T>) = JSON.encodeToString(serializer, this)

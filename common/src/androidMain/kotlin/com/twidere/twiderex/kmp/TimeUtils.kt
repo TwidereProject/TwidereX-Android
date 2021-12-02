@@ -31,14 +31,6 @@ actual object TimeUtils {
     }
 
     actual fun humanizedDateTime(time: Long): String {
-        // TODO: Context
         return humanizedTimestamp(time)
-        // return DateUtils.getRelativeDateTimeString(
-        //     context,
-        //     time,
-        //     DateUtils.MINUTE_IN_MILLIS,
-        //     DateUtils.DAY_IN_MILLIS,
-        //     DateUtils.FORMAT_ABBREV_ALL
-        // ).toString()
     }
 }

@@ -39,7 +39,7 @@ internal class SqlDelightListsDaoImpl(private val listQueries: ListQueries) : Li
         return QueryPagingSource(
             countQuery = listQueries.getPagingCount(accountKey = accountKey),
             transacter = listQueries,
-            queryProvider = { limit, offset ->
+            queryProvider = { limit, offset, _ ->
                 listQueries.getPagingList(accountKey = accountKey, limit = limit, offSet = offset)
                     .flatMap { it.toUi() }
             }
