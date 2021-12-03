@@ -416,22 +416,31 @@ fun MediaView(
             val data = media[page]
             when (data.type) {
                 MediaType.photo ->
-                    Zoomable {
-                        onVideoPlayerStateSet(null)
-                        NetworkImage(
-                            modifier = Modifier.fillMaxSize(),
-                            data = data.url,
-                            contentScale = ContentScale.Fit,
-                            placeholder = {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    CircularProgressIndicator()
+                    Box {
+                        var showPlaceholder by remember {
+                            mutableStateOf(false)
+                        }
+                        Zoomable {
+                            onVideoPlayerStateSet(null)
+                            NetworkImage(
+                                modifier = Modifier.fillMaxSize(),
+                                data = data.url,
+                                contentScale = ContentScale.Fit,
+                                onLoadingStateChange = {
+                                    showPlaceholder = it
                                 }
+                            )
+                        }
+                        if (showPlaceholder) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                CircularProgressIndicator()
                             }
-                        )
+                        }
                     }
+
                 MediaType.video, MediaType.animated_gif, MediaType.audio ->
                     Box {
                         val state = rememberVideoPlayerState(

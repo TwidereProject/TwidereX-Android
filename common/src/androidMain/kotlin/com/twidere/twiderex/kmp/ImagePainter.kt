@@ -30,6 +30,7 @@ import coil.compose.LocalImageLoader
 import coil.compose.rememberImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
+import coil.size.OriginalSize
 import coil.transform.BlurTransformation
 import coil.util.CoilUtils
 import com.twidere.services.http.authorization.Authorization
@@ -57,6 +58,7 @@ internal actual fun rememberNetworkImagePainter(
         data = data,
         imageLoader = buildImageLoader(cacheDir),
         builder = {
+            size(OriginalSize)
             crossfade(effects.crossFade)
             if (effects.blur != null) {
                 transformations(
