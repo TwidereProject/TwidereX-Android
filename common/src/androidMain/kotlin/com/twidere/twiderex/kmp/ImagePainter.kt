@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
+import coil.compose.ImagePainter
 import coil.compose.LocalImageLoader
 import coil.compose.rememberImagePainter
 import coil.decode.GifDecoder
@@ -85,6 +86,10 @@ internal actual fun rememberNetworkImagePainter(
                 )
             }
         },
+        onExecute = { previous, current ->
+            (current.state !is ImagePainter.State.Success && previous?.request != current.request) ||
+                current.state == ImagePainter.State.Empty
+        }
     )
 }
 
