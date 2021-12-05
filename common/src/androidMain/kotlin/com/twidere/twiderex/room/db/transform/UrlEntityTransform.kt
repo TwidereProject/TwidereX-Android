@@ -35,10 +35,10 @@ internal fun DbUrlEntity.toUi() = UiUrlEntity(
 )
 internal fun List<DbUrlEntity>.toUi() = map { it.toUi() }
 
-internal fun List<UiUrlEntity>.toDbUrl(belongToKey: MicroBlogKey, dbId: String = UUID.randomUUID().toString()) = map {
+internal fun List<UiUrlEntity>.toDbUrl(belongToKey: MicroBlogKey) = map {
     DbUrlEntity(
         url = it.url,
-        _id = dbId,
+        _id = UUID.randomUUID().toString(),
         statusKey = belongToKey,
         expandedUrl = it.expandedUrl,
         displayUrl = it.displayUrl,

@@ -45,7 +45,7 @@ internal class SqlDelightDirectMessageEventDaoImpl(
             countQuery = dmEventQueries.getMessagesPagingCount(accountKey = accountKey, conversationKey = conversationKey),
             transacter = dmEventQueries,
             dispatcher = Dispatchers.IO,
-            queryProvider = { limit, offset ->
+            queryProvider = { limit, offset, _ ->
                 dmEventQueries.getMessagesPagingList(
                     accountKey = accountKey,
                     conversationKey = conversationKey,
