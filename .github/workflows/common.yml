@@ -2,10 +2,12 @@ name: Common CI
 
 on:
   push:
+    branches:
+      - master
+      - develop
     paths-ignore:
       - '**.md'
   pull_request:
-    types: [opened,reopened]
     paths-ignore:
       - '**.md'
 
@@ -32,7 +34,7 @@ jobs:
         run: ./gradlew :common:test
 
       - name: Run test in desktopTest
-        run: ./gradlew :common:desktopTestj
+        run: ./gradlew :common:desktopTest
 
       - name: Upload test results
         if: always()
