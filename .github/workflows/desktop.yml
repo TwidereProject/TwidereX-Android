@@ -36,3 +36,153 @@ jobs:
           name: build-reports
           path: '**/build/reports'
           
+  release-linux:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 15
+      
+      - name: Build with Gradle
+        run: ./gradlew :desktop:packageDeb
+
+      - name: Check if is prelease
+        if: startsWith(github.ref, 'refs/tags/')
+        id: check-tag
+        run: |
+          if [[ ${{ github.event.ref }} =~ ^refs/tags/[0-9]+\.[0-9]+\.[0-9]+\-(dev|beta)[0-9]+$ ]]; then
+              echo ::set-output name=prelease::true
+          fi
+
+      - name: Create Prerelease
+        if: steps.check-tag.outputs.prelease == 'true'
+        run: |
+          set -x
+          assets=()
+          for asset in $(find -name *.deb); do
+            assets+=("-a" "$asset")
+          done
+          tag_name="${GITHUB_REF##*/}"
+          hub release create "${assets[@]}" -m "$tag_name" "$tag_name" -p
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        if: steps.check-tag.outputs.prelease != 'true'
+        run: |
+          set -x
+          assets=()
+          for asset in $(find -name *.deb); do
+            assets+=("-a" "$asset")
+          done
+          tag_name="${GITHUB_REF##*/}"
+          hub release create "${assets[@]}" -m "$tag_name" "$tag_name"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-windows:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 15
+      
+      - name: Build with Gradle
+        run: ./gradlew :desktop:packageExe
+
+      - name: Check if is prelease
+        if: startsWith(github.ref, 'refs/tags/')
+        id: check-tag
+        run: |
+          if [[ ${{ github.event.ref }} =~ ^refs/tags/[0-9]+\.[0-9]+\.[0-9]+\-(dev|beta)[0-9]+$ ]]; then
+              echo ::set-output name=prelease::true
+          fi
+
+      - name: Create Prerelease
+        if: steps.check-tag.outputs.prelease == 'true'
+        run: |
+          set -x
+          assets=()
+          for asset in $(find -name *.exe); do
+            assets+=("-a" "$asset")
+          done
+          tag_name="${GITHUB_REF##*/}"
+          hub release create "${assets[@]}" -m "$tag_name" "$tag_name" -p
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        if: steps.check-tag.outputs.prelease != 'true'
+        run: |
+          set -x
+          assets=()
+          for asset in $(find -name *.exe); do
+            assets+=("-a" "$asset")
+          done
+          tag_name="${GITHUB_REF##*/}"
+          hub release create "${assets[@]}" -m "$tag_name" "$tag_name"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-macos:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 15
+      
+      - name: Build with Gradle
+        run: ./gradlew :desktop:packageDmg
+
+      - name: Check if is prelease
+        if: startsWith(github.ref, 'refs/tags/')
+        id: check-tag
+        run: |
+          if [[ ${{ github.event.ref }} =~ ^refs/tags/[0-9]+\.[0-9]+\.[0-9]+\-(dev|beta)[0-9]+$ ]]; then
+              echo ::set-output name=prelease::true
+          fi
+
+      - name: Create Prerelease
+        if: steps.check-tag.outputs.prelease == 'true'
+        run: |
+          set -x
+          assets=()
+          for asset in $(find -name *.Dmg); do
+            assets+=("-a" "$asset")
+          done
+          tag_name="${GITHUB_REF##*/}"
+          hub release create "${assets[@]}" -m "$tag_name" "$tag_name" -p
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        if: steps.check-tag.outputs.prelease != 'true'
+        run: |
+          set -x
+          assets=()
+          for asset in $(find -name *.Dmg); do
+            assets+=("-a" "$asset")
+          done
+          tag_name="${GITHUB_REF##*/}"
+          hub release create "${assets[@]}" -m "$tag_name" "$tag_name"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
