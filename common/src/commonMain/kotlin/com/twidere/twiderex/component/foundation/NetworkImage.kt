@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import com.twidere.services.http.authorization.EmptyAuthorization
@@ -96,7 +97,7 @@ fun NetworkImage(
         val size = painter.intrinsicSize
         Image(
             painter = painter,
-            modifier = Modifier.aspectRatio(size.width / size.height).then(modifier),
+            modifier = if (size != Size.Unspecified) Modifier.aspectRatio(size.width / size.height).then(modifier) else modifier,
             contentScale = contentScale,
             contentDescription = stringResource(MR.strings.accessibility_common_network_image)
         )
