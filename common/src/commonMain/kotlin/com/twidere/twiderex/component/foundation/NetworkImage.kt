@@ -21,6 +21,7 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -91,12 +92,15 @@ fun NetworkImage(
     if (state.value == NetworkImageState.LOADING) {
         placeholder?.invoke()
     }
-    Image(
-        painter = painter,
-        modifier = modifier,
-        contentScale = contentScale,
-        contentDescription = stringResource(MR.strings.accessibility_common_network_image)
-    )
+    if (state.value == NetworkImageState.SUCCESS) {
+        val size = painter.intrinsicSize
+        Image(
+            painter = painter,
+            modifier = Modifier.aspectRatio(size.width / size.height).then(modifier),
+            contentScale = contentScale,
+            contentDescription = stringResource(MR.strings.accessibility_common_network_image)
+        )
+    }
 }
 
 internal enum class NetworkImageState {

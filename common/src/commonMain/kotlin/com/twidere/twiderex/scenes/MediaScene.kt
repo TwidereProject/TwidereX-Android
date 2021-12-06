@@ -432,6 +432,7 @@ fun MediaView(
                             }
                         )
                     }
+
                 MediaType.video, MediaType.animated_gif, MediaType.audio ->
                     Box {
                         val state = rememberVideoPlayerState(

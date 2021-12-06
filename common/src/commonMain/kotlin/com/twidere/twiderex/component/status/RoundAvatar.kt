@@ -51,6 +51,7 @@ fun RoundAvatar(
             }
             .withAvatarClip()
             .clipToBounds()
+            .size(size)
     ) {
         NetworkImage(
             data = avatar,
@@ -59,8 +60,7 @@ fun RoundAvatar(
                     onClick = {
                         onClick?.invoke()
                     }
-                )
-                .size(size),
+                ),
             placeholder = {
                 Placeholder(modifier = Modifier.size(size))
             },
