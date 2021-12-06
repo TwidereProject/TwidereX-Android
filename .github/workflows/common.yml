@@ -5,9 +5,13 @@ on:
     paths-ignore:
       - '**.md'
   pull_request:
+    types: [opened,reopened]
     paths-ignore:
       - '**.md'
 
+concurrency:
+  group: common-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   unit-test:
@@ -28,7 +32,7 @@ jobs:
         run: ./gradlew :common:test
 
       - name: Run test in desktopTest
-        run: ./gradlew :common:desktopTest
+        run: ./gradlew :common:desktopTestj
 
       - name: Upload test results
         if: always()

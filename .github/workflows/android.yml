@@ -5,9 +5,13 @@ on:
     paths-ignore:
       - '**.md'
   pull_request:
+    types: [opened,reopened]
     paths-ignore:
       - '**.md'
 
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
