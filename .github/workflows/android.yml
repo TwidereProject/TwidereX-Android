@@ -2,12 +2,18 @@ name: Android CI
 
 on:
   push:
+    branches:
+      - master
+      - develop
     paths-ignore:
       - '**.md'
   pull_request:
     paths-ignore:
       - '**.md'
 
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:

@@ -2,12 +2,18 @@ name: Desktop CI
 
 on:
   push:
+    branches:
+      - master
+      - develop
     paths-ignore:
       - '**.md'
   pull_request:
     paths-ignore:
       - '**.md'
 
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:

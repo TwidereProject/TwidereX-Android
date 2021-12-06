@@ -20,19 +20,27 @@
  */
 package com.twidere.twiderex
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.junit.Rule
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import org.junit.rules.TestWatcher
+import org.junit.runner.Description
 
-@OptIn(ExperimentalCoroutinesApi::class)
-internal open class MainThreadTestBase {
-    @get:Rule
-    var mainCoroutineRule = MainCoroutineScopeRule()
+@ExperimentalCoroutinesApi
+class MainCoroutineScopeRule(private val dispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()) :
+    TestWatcher(),
+    TestCoroutineScope by TestCoroutineScope() {
+    override fun starting(description: Description?) {
+        super.starting(description)
+        Dispatchers.setMain(dispatcher)
+    }
 
-    @BeforeTest
-    open fun setUp() {}
-
-    @AfterTest
-    open fun tearDown() {}
+    override fun finished(description: Description?) {
+        super.finished(description)
+        cleanupTestCoroutines()
+        Dispatchers.resetMain()
+    }
 }
