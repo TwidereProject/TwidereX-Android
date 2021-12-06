@@ -50,7 +50,6 @@ fun NetworkImage(
     contentScale: ContentScale = ContentScale.Crop,
     effects: ImageEffects.Builder.() -> Unit = { crossFade(true) },
     placeholder: @Composable (() -> Unit)? = null,
-    onLoadingStateChange: ((isLoading: Boolean) -> Unit)? = null
 ) {
     val state = remember {
         mutableStateOf(NetworkImageState.LOADING)
@@ -93,9 +92,6 @@ fun NetworkImage(
     if (state.value == NetworkImageState.LOADING) {
         placeholder?.invoke()
     }
-    onLoadingStateChange?.invoke(
-        state.value == NetworkImageState.LOADING
-    )
     if (state.value == NetworkImageState.SUCCESS) {
         val size = painter.intrinsicSize
         Image(
