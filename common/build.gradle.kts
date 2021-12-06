@@ -58,12 +58,12 @@ kotlin {
                 api("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:${Versions.Kotlin.serialization}")
                 api("io.insert-koin:koin-core:${Versions.koin}")
                 implementation("com.twitter.twittertext:twitter-text:3.1.0")
-                implementation("org.jsoup:jsoup:1.13.1")
+                implementation("org.jsoup:jsoup:1.14.3")
                 implementation(projects.routeProcessor)
                 ksp(projects.routeProcessor)
                 implementation("com.squareup.sqldelight:coroutines-extensions-jvm:${Versions.sqlDelight}")
                 api("dev.icerock.moko:resources:${Versions.moko}")
-                implementation("app.cash.turbine:turbine:0.6.1")
+                implementation("app.cash.turbine:turbine:0.7.0")
                 implementation("ca.gosyer:accompanist-pager:${Versions.accompanist_jb}")
                 implementation("ca.gosyer:accompanist-pager-indicators:${Versions.accompanist_jb}")
                 api("com.github.Tlaster.KFilePicker:KFilePicker:1.0.2")
@@ -74,14 +74,14 @@ kotlin {
                 implementation(kotlin("test"))
                 implementation("io.insert-koin:koin-test:${Versions.koin}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.coroutines}")
-                implementation("io.mockk:mockk:1.12.0")
+                implementation("io.mockk:mockk:1.12.1")
             }
         }
         val androidMain by getting {
             dependencies {
                 implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
                 implementation("androidx.savedstate:savedstate-ktx:1.1.0")
-                implementation("androidx.core:core-ktx:1.7.0-rc01")
+                implementation("androidx.core:core-ktx:1.8.0-alpha01")
                 implementation("io.insert-koin:koin-android:${Versions.koin}")
                 implementation("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
                 implementation("androidx.room:room-runtime:${Versions.room}")
@@ -102,8 +102,8 @@ kotlin {
                 implementation("androidx.startup:startup-runtime:${Versions.startup}")
                 implementation("com.google.accompanist:accompanist-insets:${Versions.accompanist}")
                 implementation("androidx.browser:browser:${Versions.browser}")
-                implementation("androidx.vectordrawable:vectordrawable:1.1.0")
-                implementation("androidx.activity:activity-compose:1.4.0-rc01")
+                implementation("androidx.vectordrawable:vectordrawable:1.2.0-alpha02")
+                implementation("androidx.activity:activity-compose:${Versions.activity}")
             }
         }
         val androidAndroidTest by getting {

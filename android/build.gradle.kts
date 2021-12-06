@@ -151,6 +151,6 @@ dependencies {
     }
 
     junit4()
-    mockito()
+    // mockito()
     androidTest()
 }

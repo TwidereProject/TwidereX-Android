@@ -39,8 +39,8 @@ fun DependencyHandlerScope.okhttp() {
 
 fun DependencyHandlerScope.junit5() {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
 }
 
 fun DependencyHandlerScope.junit4() {
@@ -128,13 +128,13 @@ fun DependencyHandlerScope.widget() {
 
 fun DependencyHandlerScope.misc() {
     implementation("com.twitter.twittertext:twitter-text:3.1.0")
-    implementation("org.jsoup:jsoup:1.13.1")
+    implementation("org.jsoup:jsoup:1.14.3")
     implementation("com.google.protobuf:protobuf-javalite", Versions.protobuf)
 }
 
 fun DependencyHandlerScope.mockito() {
-    testImplementation("org.mockito:mockito-core:3.11.2")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
+    testImplementation("org.mockito:mockito-core:4.1.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
 }
 
 fun DependencyHandlerScope.androidTest() {
