@@ -169,10 +169,10 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
         },
     )
     StatusMediaSceneLayout(
-        backgroundColor = Color.Transparent,
+        windowBackgroundColor = Color.Transparent,
+        backgroundColor = MaterialTheme.colors.background,
         contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
         bottomView = {
-            // TODO navigate to another page close current one
             StatusMediaBottomContent(
                 status = status,
                 visible = controlVisibility && swiperState.progress == 0f,
@@ -216,6 +216,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
             }
         },
         onClick = {
+            // TODO FIXME onClick not invoke
             controlVisibility = !controlVisibility
             if (controlVisibility) {
                 window.hideControls()

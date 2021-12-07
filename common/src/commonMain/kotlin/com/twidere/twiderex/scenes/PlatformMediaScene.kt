@@ -36,10 +36,11 @@ expect fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int)
 
 @Composable
 expect fun StatusMediaSceneLayout(
+    windowBackgroundColor: Color,
     backgroundColor: Color,
     contentColor: Color,
     closeButton: @Composable () -> Unit,
     bottomView: @Composable () -> Unit,
     mediaView: @Composable () -> Unit,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 )

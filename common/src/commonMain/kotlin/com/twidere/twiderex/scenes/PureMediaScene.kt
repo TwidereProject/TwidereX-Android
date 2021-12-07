@@ -27,8 +27,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -53,7 +51,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.twidere.twiderex.component.bottomInsetsPadding
-import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.VideoPlayerState
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.painterResource
@@ -108,32 +105,30 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                 val isMute by remember {
                     mutableStateOf(display.muteByDefault)
                 }
-                InAppNotificationScaffold(
-                    backgroundColor = Color.Transparent,
+
+                StatusMediaSceneLayout(
+                    windowBackgroundColor = Color.Transparent,
+                    backgroundColor = MaterialTheme.colors.background,
                     contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
-                    bottomBar = {
+                    bottomView = {
                         PureMediaBottomInfo(
                             controlVisibility = controlVisibility,
                             swiperState = swiperState,
                             controlPanelColor = controlPanelColor,
                             videoPlayerState = videoPlayerState.value,
                         )
-                    }
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .clickable(
-                                onClick = {
-                                    if (controlVisibility) {
-                                        window.hideControls()
-                                    } else {
-                                        window.showControls()
-                                    }
-                                },
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() }
-                            ),
-                    ) {
+                    },
+                    closeButton = {
+                        PureMediaControlPanel(
+                            controlVisibility = controlVisibility,
+                            swiperState = swiperState,
+                            controlPanelColor = controlPanelColor,
+                            onPopBack = {
+                                navController.popBackStack()
+                            }
+                        )
+                    },
+                    mediaView = {
                         MediaView(
                             media = medias.mapNotNull {
                                 it.mediaUrl?.let { it1 ->
@@ -157,16 +152,15 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                                 window.showControls()
                             }
                         }
-                        PureMediaControlPanel(
-                            controlVisibility = controlVisibility,
-                            swiperState = swiperState,
-                            controlPanelColor = controlPanelColor,
-                            onPopBack = {
-                                navController.popBackStack()
-                            }
-                        )
+                    },
+                    onClick = {
+                        if (controlVisibility) {
+                            window.hideControls()
+                        } else {
+                            window.showControls()
+                        }
                     }
-                }
+                )
             }
         }
     }

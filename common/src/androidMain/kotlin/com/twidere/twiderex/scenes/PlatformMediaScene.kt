@@ -48,15 +48,16 @@ actual fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int)
 
 @Composable
 actual fun StatusMediaSceneLayout(
+    windowBackgroundColor: Color,
     backgroundColor: Color,
     contentColor: Color,
     closeButton: @Composable () -> Unit,
     bottomView: @Composable () -> Unit,
     mediaView: @Composable () -> Unit,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     InAppNotificationScaffold(
-        backgroundColor = backgroundColor,
+        backgroundColor = windowBackgroundColor,
         contentColor = contentColor,
         bottomBar = {
             bottomView.invoke()

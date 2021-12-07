@@ -20,18 +20,15 @@
  */
 package com.twidere.twiderex.scenes
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.awt.ComposePanel
-import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.model.MicroBlogKey
@@ -41,99 +38,58 @@ import moe.tlaster.precompose.PreComposeWindow
 
 @Composable
 actual fun PlatformStatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
-    DialogScene {
+    MediaScene {
         StatusMediaScene(statusKey = statusKey, selectedIndex = selectedIndex)
     }
 }
 
 @Composable
 actual fun PlatformRawMediaScene(url: String, type: MediaType) {
-    DialogScene {
+    MediaScene {
         RawMediaScene(url = url, type = type)
     }
 }
 
 @Composable
 actual fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
-    DialogScene {
+    MediaScene {
         PureMediaScene(belongToKey = belongToKey, selectedIndex = selectedIndex)
     }
 }
 
 @Composable
 actual fun StatusMediaSceneLayout(
+    windowBackgroundColor: Color,
     backgroundColor: Color,
     contentColor: Color,
     closeButton: @Composable () -> Unit,
     bottomView: @Composable () -> Unit,
     mediaView: @Composable () -> Unit,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     InAppNotificationScaffold(
-        backgroundColor = backgroundColor,
+        backgroundColor = windowBackgroundColor,
         contentColor = contentColor,
-        bottomBar = {
-        }
     ) {
-        val context = currentCompositionLocalContext
-        SwingPanel(
+        Column(
             modifier = Modifier.fillMaxSize()
+                .background(color = backgroundColor)
                 .clickable(
                     onClick = onClick,
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
-                ),
-            factory = {
-                ComposePanel().apply {
-                    setContent {
-                        CompositionLocalProvider(
-                            context = context
-                        ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                            ) {
-                                Box(modifier = Modifier.fillMaxSize()) {
-                                    mediaView.invoke()
-                                }
-                                // TODO  FIXEME: place SwingPanel to bottom
-                                SwingPanel(
-                                    modifier = Modifier.align(Alignment.BottomCenter),
-                                    factory = {
-                                        ComposePanel().apply {
-                                            setContent {
-                                                CompositionLocalProvider(
-                                                    context = context
-                                                ) {
-                                                    bottomView.invoke()
-                                                }
-                                            }
-                                        }
-                                    }
-                                )
-                                SwingPanel(
-                                    factory = {
-                                        ComposePanel().apply {
-                                            setContent {
-                                                CompositionLocalProvider(
-                                                    context = context
-                                                ) {
-                                                    closeButton.invoke()
-                                                }
-                                            }
-                                        }
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
+                )
+        ) {
+            Box(modifier = Modifier.weight(1f)) {
+                mediaView.invoke()
             }
-        )
+            bottomView.invoke()
+        }
     }
 }
 
 @Composable
-private fun DialogScene(content: @Composable () -> Unit) {
+private fun MediaScene(content: @Composable () -> Unit) {
     val navController = LocalNavController.current
     PreComposeWindow(
         onCloseRequest = {
