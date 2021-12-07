@@ -429,7 +429,8 @@ fun MediaView(
                                 ) {
                                     CircularProgressIndicator()
                                 }
-                            }
+                            },
+                            zoomable = true
                         )
                     }
 
