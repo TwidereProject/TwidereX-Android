@@ -51,6 +51,7 @@ fun NetworkImage(
     contentScale: ContentScale = ContentScale.Crop,
     effects: ImageEffects.Builder.() -> Unit = { crossFade(true) },
     placeholder: @Composable (() -> Unit)? = null,
+    zoomable: Boolean = false
 ) {
     val state = remember {
         mutableStateOf(NetworkImageState.LOADING)
@@ -97,7 +98,7 @@ fun NetworkImage(
         val size = painter.intrinsicSize
         Image(
             painter = painter,
-            modifier = if (size != Size.Unspecified) Modifier.aspectRatio(size.width / size.height).then(modifier) else modifier,
+            modifier = if (zoomable && size != Size.Unspecified) Modifier.aspectRatio(size.width / size.height).then(modifier) else modifier,
             contentScale = contentScale,
             contentDescription = stringResource(MR.strings.accessibility_common_network_image)
         )
