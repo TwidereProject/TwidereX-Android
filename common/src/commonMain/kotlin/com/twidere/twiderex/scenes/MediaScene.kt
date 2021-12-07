@@ -172,6 +172,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
         windowBackgroundColor = Color.Transparent,
         backgroundColor = MaterialTheme.colors.background,
         contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
+        fullScreen = !controlVisibility,
         bottomView = {
             StatusMediaBottomContent(
                 status = status,
@@ -215,9 +216,9 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                 }
             }
         },
-        onClick = {
+        onFullScreenSwitch = {
             // TODO FIXME onClick not invoke
-            controlVisibility = !controlVisibility
+            controlVisibility = !it
             if (controlVisibility) {
                 window.hideControls()
             } else {

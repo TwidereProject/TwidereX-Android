@@ -51,10 +51,11 @@ actual fun StatusMediaSceneLayout(
     windowBackgroundColor: Color,
     backgroundColor: Color,
     contentColor: Color,
+    fullScreen: Boolean,
     closeButton: @Composable () -> Unit,
     bottomView: @Composable () -> Unit,
     mediaView: @Composable () -> Unit,
-    onClick: () -> Unit,
+    onFullScreenSwitch: (Boolean) -> Unit,
 ) {
     InAppNotificationScaffold(
         backgroundColor = windowBackgroundColor,
@@ -66,7 +67,9 @@ actual fun StatusMediaSceneLayout(
         Box(
             modifier = Modifier
                 .clickable(
-                    onClick = onClick,
+                    onClick = {
+                        onFullScreenSwitch.invoke(!fullScreen)
+                    },
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ),

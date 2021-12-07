@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -57,15 +58,17 @@ actual fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int)
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 actual fun StatusMediaSceneLayout(
     windowBackgroundColor: Color,
     backgroundColor: Color,
     contentColor: Color,
+    fullScreen: Boolean,
     closeButton: @Composable () -> Unit,
     bottomView: @Composable () -> Unit,
     mediaView: @Composable () -> Unit,
-    onClick: () -> Unit,
+    onFullScreenSwitch: (Boolean) -> Unit,
 ) {
     InAppNotificationScaffold(
         backgroundColor = windowBackgroundColor,
@@ -75,7 +78,9 @@ actual fun StatusMediaSceneLayout(
             modifier = Modifier.fillMaxSize()
                 .background(color = backgroundColor)
                 .clickable(
-                    onClick = onClick,
+                    onClick = {
+                        onFullScreenSwitch.invoke(!fullScreen)
+                    },
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 )

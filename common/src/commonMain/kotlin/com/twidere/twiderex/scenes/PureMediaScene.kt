@@ -110,6 +110,7 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                     windowBackgroundColor = Color.Transparent,
                     backgroundColor = MaterialTheme.colors.background,
                     contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
+                    fullScreen = !controlVisibility,
                     bottomView = {
                         PureMediaBottomInfo(
                             controlVisibility = controlVisibility,
@@ -153,7 +154,8 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                             }
                         }
                     },
-                    onClick = {
+                    onFullScreenSwitch = {
+                        controlVisibility = !it
                         if (controlVisibility) {
                             window.hideControls()
                         } else {
