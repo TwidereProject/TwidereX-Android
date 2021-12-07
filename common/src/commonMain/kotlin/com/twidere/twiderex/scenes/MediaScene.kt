@@ -28,7 +28,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,7 +66,6 @@ import com.mxalbert.zoomable.Zoomable
 import com.twidere.twiderex.component.bottomInsetsHeight
 import com.twidere.twiderex.component.bottomInsetsPadding
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
-import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
@@ -76,6 +74,7 @@ import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.foundation.VideoPlayerState
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.foundation.rememberVideoPlayerState
+import com.twidere.twiderex.component.navigation.INavigator
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.LikeButton
@@ -105,6 +104,7 @@ import com.twidere.twiderex.utils.video.CustomVideoControl
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
+import moe.tlaster.precompose.navigation.NavController
 import moe.tlaster.swiper.Swiper
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
@@ -148,7 +148,6 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
     val window = LocalPlatformWindow.current
@@ -169,61 +168,29 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
             navController.popBackStack()
         },
     )
-    InAppNotificationScaffold(
+    StatusMediaSceneLayout(
         backgroundColor = Color.Transparent,
         contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
-        bottomBar = {
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (status.media.size > 1) {
-                    // HorizontalPagerIndicator(
-                    //     pagerState = pagerState,
-                    //     modifier = Modifier
-                    //         .padding(16.dp)
-                    //         .align(Alignment.CenterHorizontally),
-                    // )
-                    AnimatedVisibility(
-                        visible = !(controlVisibility && swiperState.progress == 0f),
-                        enter = expandVertically(),
-                        exit = shrinkVertically(),
-                    ) {
-                        Spacer(modifier = Modifier.bottomInsetsHeight())
-                    }
-                }
-                AnimatedVisibility(
-                    visible = controlVisibility && swiperState.progress == 0f,
-                    enter = fadeIn() + expandVertically(),
-                    exit = shrinkVertically() + fadeOut()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .background(color = controlPanelColor)
-                            .bottomInsetsPadding()
-                            .clickable { navigator.status(status = status) },
-                    ) {
-                        StatusMediaInfo(
-                            videoPlayerState.value, status, viewModel, currentMedia,
-                        )
-                    }
-                }
-            }
-        }
-    ) {
-        Box(
-            modifier = Modifier
-                .clickable(
-                    onClick = {
-                        if (controlVisibility) {
-                            window.hideControls()
-                        } else {
-                            window.showControls()
-                        }
-                    },
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ),
-        ) {
+        bottomView = {
+            // TODO navigate to another page close current one
+            StatusMediaBottomContent(
+                status = status,
+                visible = controlVisibility && swiperState.progress == 0f,
+                controlPanelColor = controlPanelColor,
+                navigator = navigator,
+                videoPlayerState = videoPlayerState.value,
+                viewModel = viewModel,
+                currentMedia = currentMedia
+            )
+        },
+        closeButton = {
+            StatusMediaCloseButton(
+                visible = controlVisibility && swiperState.progress == 0f,
+                backgroundColor = controlPanelColor,
+                navController = navController
+            )
+        },
+        mediaView = {
             MediaView(
                 media = status.media.mapNotNull {
                     it.mediaUrl?.let { it1 ->
@@ -247,40 +214,105 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                     window.showControls()
                 }
             }
-            AnimatedVisibility(
-                visible = controlVisibility && swiperState.progress == 0f,
-                enter = fadeIn() + expandVertically(),
-                exit = shrinkVertically() + fadeOut()
+        },
+        onClick = {
+            controlVisibility = !controlVisibility
+            if (controlVisibility) {
+                window.hideControls()
+            } else {
+                window.showControls()
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun StatusMediaCloseButton(
+    visible: Boolean,
+    backgroundColor: Color,
+    navController: NavController
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + expandVertically(),
+        exit = shrinkVertically() + fadeOut()
+    ) {
+        Box(
+            modifier = Modifier
+                .topInsetsPadding()
+                .padding(16.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .clip(MaterialTheme.shapes.small)
+                    .background(
+                        color = backgroundColor,
+                        shape = MaterialTheme.shapes.small
+                    )
+                    .clipToBounds()
             ) {
-                Box(
-                    modifier = Modifier
-                        .topInsetsPadding()
-                        .padding(16.dp),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(
-                                color = controlPanelColor,
-                                shape = MaterialTheme.shapes.small
-                            )
-                            .clipToBounds()
-                    ) {
-                        IconButton(
-                            onClick = {
-                                navController.popBackStack()
-                            }
-                        ) {
-                            Icon(
-                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
-                                contentDescription = stringResource(
-                                    res = com.twidere.twiderex.MR.strings.accessibility_common_close
-                                )
-                            )
-                        }
+                IconButton(
+                    onClick = {
+                        navController.popBackStack()
                     }
+                ) {
+                    Icon(
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
+                        contentDescription = stringResource(
+                            res = com.twidere.twiderex.MR.strings.accessibility_common_close
+                        )
+                    )
                 }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun StatusMediaBottomContent(
+    status: UiStatus,
+    visible: Boolean,
+    controlPanelColor: Color,
+    navigator: INavigator,
+    videoPlayerState: VideoPlayerState?,
+    viewModel: MediaViewModel,
+    currentMedia: UiMedia
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        if (status.media.size > 1) {
+            // HorizontalPagerIndicator(
+            //     pagerState = pagerState,
+            //     modifier = Modifier
+            //         .padding(16.dp)
+            //         .align(Alignment.CenterHorizontally),
+            // )
+            AnimatedVisibility(
+                visible = !(visible),
+                enter = expandVertically(),
+                exit = shrinkVertically(),
+            ) {
+                Spacer(modifier = Modifier.bottomInsetsHeight())
+            }
+        }
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn() + expandVertically(),
+            exit = shrinkVertically() + fadeOut()
+        ) {
+            Box(
+                modifier = Modifier
+                    .background(color = controlPanelColor)
+                    .bottomInsetsPadding()
+                    .clickable { navigator.status(status = status) },
+            ) {
+                StatusMediaInfo(
+                    videoPlayerState, status, viewModel, currentMedia,
+                )
             }
         }
     }

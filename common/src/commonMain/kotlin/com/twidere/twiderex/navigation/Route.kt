@@ -37,10 +37,10 @@ import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.scenes.DraftListScene
 import com.twidere.twiderex.scenes.HomeScene
-import com.twidere.twiderex.scenes.PureMediaScene
-import com.twidere.twiderex.scenes.RawMediaScene
+import com.twidere.twiderex.scenes.PlatformPureMediaScene
+import com.twidere.twiderex.scenes.PlatformRawMediaScene
+import com.twidere.twiderex.scenes.PlatformStatusMediaScene
 import com.twidere.twiderex.scenes.SignInScene
-import com.twidere.twiderex.scenes.StatusMediaScene
 import com.twidere.twiderex.scenes.StatusScene
 import com.twidere.twiderex.scenes.compose.ComposeScene
 import com.twidere.twiderex.scenes.compose.ComposeSearchHashtagScene
@@ -369,7 +369,7 @@ fun RouteBuilder.route(constraints: Constraints) {
             ProvideStatusPlatform(statusKey = statusKey) { platformType ->
                 RequirePlatformAccount(platformType = platformType) {
                     val selectedIndex = backStackEntry.query("selectedIndex", 0) ?: 0
-                    StatusMediaScene(
+                    PlatformStatusMediaScene(
                         statusKey = statusKey,
                         selectedIndex = selectedIndex
                     )
@@ -385,7 +385,7 @@ fun RouteBuilder.route(constraints: Constraints) {
             MicroBlogKey.valueOf(it)
         }?.let { belongToKey ->
             val selectedIndex = backStackEntry.query("selectedIndex", 0) ?: 0
-            PureMediaScene(
+            PlatformPureMediaScene(
                 belongToKey = belongToKey,
                 selectedIndex = selectedIndex
             )
@@ -400,7 +400,7 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
         val type = MediaType.valueOf(backStackEntry.path<String>("type") ?: MediaType.photo.name)
         url?.let {
-            RawMediaScene(url = it, type = type)
+            PlatformRawMediaScene(url = it, type = type)
         }
     }
 
