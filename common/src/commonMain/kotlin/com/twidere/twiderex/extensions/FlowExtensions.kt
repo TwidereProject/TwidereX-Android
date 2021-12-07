@@ -34,13 +34,15 @@ import kotlinx.coroutines.flow.stateIn
 import moe.tlaster.precompose.lifecycle.Lifecycle
 import moe.tlaster.precompose.lifecycle.repeatOnLifecycle
 import moe.tlaster.precompose.ui.LocalLifecycleOwner
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 @Composable
-fun <T> Flow<T>.observeAsState(initial: T): State<T> {
+fun <T> Flow<T>.observeAsState(initial: T, coroutineContext: CoroutineContext = EmptyCoroutineContext): State<T> {
     val lifecycleOwner = LocalLifecycleOwner.current
     return remember(this, lifecycleOwner) {
         flowWithLifecycle(lifecycleOwner.lifecycle)
-    }.collectAsState(initial = initial)
+    }.collectAsState(initial = initial, coroutineContext)
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
