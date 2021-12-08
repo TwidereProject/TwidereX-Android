@@ -169,10 +169,8 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
         },
     )
     StatusMediaSceneLayout(
-        windowBackgroundColor = Color.Transparent,
-        backgroundColor = MaterialTheme.colors.background,
+        backgroundColor = Color.Transparent,
         contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
-        fullScreen = !controlVisibility,
         bottomView = {
             StatusMediaBottomContent(
                 status = status,
@@ -204,7 +202,15 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                 swiperState = swiperState,
                 onVideoPlayerStateSet = { videoPlayerState.value = it },
                 pagerState = pagerState,
-                volume = 1f
+                volume = 1f,
+                onClick = {
+                    controlVisibility = !controlVisibility
+                    if (controlVisibility) {
+                        window.hideControls()
+                    } else {
+                        window.showControls()
+                    }
+                }
             )
             val windowBarVisibility by window.windowBarVisibility.observeAsState(true)
             LaunchedEffect(windowBarVisibility) {
@@ -216,14 +222,12 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                 }
             }
         },
-        onFullScreenSwitch = {
-            // TODO FIXME onClick not invoke
-            controlVisibility = !it
-            if (controlVisibility) {
-                window.hideControls()
-            } else {
-                window.showControls()
-            }
+        backgroundView = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
+            )
         }
     )
 }
@@ -433,13 +437,9 @@ fun MediaView(
         pageCount = media.size,
     ),
     onVideoPlayerStateSet: (VideoPlayerState?) -> Unit = {},
-    volume: Float = 1f
+    volume: Float = 1f,
+    onClick: () -> Unit = {}
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
-    )
     Swiper(
         modifier = modifier,
         state = swiperState,
@@ -450,7 +450,9 @@ fun MediaView(
             val data = media[page]
             when (data.type) {
                 MediaType.photo ->
-                    Zoomable {
+                    Zoomable(
+                        onClick = onClick
+                    ) {
                         onVideoPlayerStateSet(null)
                         NetworkImage(
                             modifier = Modifier.fillMaxSize(),
@@ -469,7 +471,11 @@ fun MediaView(
                     }
 
                 MediaType.video, MediaType.animated_gif, MediaType.audio ->
-                    Box {
+                    Box(
+                        modifier = Modifier.clickable {
+                            onClick.invoke()
+                        }
+                    ) {
                         val state = rememberVideoPlayerState(
                             url = data.url,
                             volume = volume,

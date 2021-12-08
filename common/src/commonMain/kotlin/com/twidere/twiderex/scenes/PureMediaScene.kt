@@ -29,6 +29,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
@@ -107,10 +108,8 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                 }
 
                 StatusMediaSceneLayout(
-                    windowBackgroundColor = Color.Transparent,
-                    backgroundColor = MaterialTheme.colors.background,
+                    backgroundColor = Color.Transparent,
                     contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
-                    fullScreen = !controlVisibility,
                     bottomView = {
                         PureMediaBottomInfo(
                             controlVisibility = controlVisibility,
@@ -142,7 +141,15 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                             swiperState = swiperState,
                             onVideoPlayerStateSet = { videoPlayerState.value = it },
                             pagerState = pagerState,
-                            volume = if (isMute) 0f else 1f
+                            volume = if (isMute) 0f else 1f,
+                            onClick = {
+                                controlVisibility = !controlVisibility
+                                if (controlVisibility) {
+                                    window.hideControls()
+                                } else {
+                                    window.showControls()
+                                }
+                            }
                         )
                         val windowBarVisibility by window.windowBarVisibility.observeAsState(true)
                         LaunchedEffect(windowBarVisibility) {
@@ -154,13 +161,12 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                             }
                         }
                     },
-                    onFullScreenSwitch = {
-                        controlVisibility = !it
-                        if (controlVisibility) {
-                            window.hideControls()
-                        } else {
-                            window.showControls()
-                        }
+                    backgroundView = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
+                        )
                     }
                 )
             }

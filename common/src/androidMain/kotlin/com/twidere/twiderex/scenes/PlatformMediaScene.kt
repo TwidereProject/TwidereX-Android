@@ -20,12 +20,8 @@
  */
 package com.twidere.twiderex.scenes
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.model.MicroBlogKey
@@ -48,32 +44,22 @@ actual fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int)
 
 @Composable
 actual fun StatusMediaSceneLayout(
-    windowBackgroundColor: Color,
     backgroundColor: Color,
     contentColor: Color,
-    fullScreen: Boolean,
     closeButton: @Composable () -> Unit,
     bottomView: @Composable () -> Unit,
     mediaView: @Composable () -> Unit,
-    onFullScreenSwitch: (Boolean) -> Unit,
+    backgroundView: @Composable () -> Unit,
 ) {
     InAppNotificationScaffold(
-        backgroundColor = windowBackgroundColor,
+        backgroundColor = backgroundColor,
         contentColor = contentColor,
         bottomBar = {
             bottomView.invoke()
         }
     ) {
-        Box(
-            modifier = Modifier
-                .clickable(
-                    onClick = {
-                        onFullScreenSwitch.invoke(!fullScreen)
-                    },
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ),
-        ) {
+        Box {
+            backgroundView.invoke()
             mediaView.invoke()
             closeButton.invoke()
         }

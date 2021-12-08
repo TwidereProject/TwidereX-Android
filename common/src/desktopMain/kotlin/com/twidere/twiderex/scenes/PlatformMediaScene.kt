@@ -20,14 +20,10 @@
  */
 package com.twidere.twiderex.scenes
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,35 +55,28 @@ actual fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int)
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 actual fun StatusMediaSceneLayout(
-    windowBackgroundColor: Color,
     backgroundColor: Color,
     contentColor: Color,
-    fullScreen: Boolean,
     closeButton: @Composable () -> Unit,
     bottomView: @Composable () -> Unit,
     mediaView: @Composable () -> Unit,
-    onFullScreenSwitch: (Boolean) -> Unit,
+    backgroundView: @Composable () -> Unit,
 ) {
     InAppNotificationScaffold(
-        backgroundColor = windowBackgroundColor,
+        backgroundColor = backgroundColor,
         contentColor = contentColor,
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-                .background(color = backgroundColor)
-                .clickable(
-                    onClick = {
-                        onFullScreenSwitch.invoke(!fullScreen)
-                    },
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                )
-        ) {
-            closeButton.invoke()
-            Box(modifier = Modifier.weight(1f)) {
-                mediaView.invoke()
+        Box {
+            backgroundView.invoke()
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                closeButton.invoke()
+                Box(modifier = Modifier.weight(1f)) {
+                    mediaView.invoke()
+                }
+                bottomView.invoke()
             }
-            bottomView.invoke()
         }
     }
 }
