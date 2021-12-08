@@ -34,8 +34,6 @@ import androidx.compose.ui.graphics.Color
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
-import com.twidere.twiderex.ui.LocalNavController
-import moe.tlaster.precompose.PreComposeWindow
 
 @Composable
 actual fun PlatformStatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
@@ -85,6 +83,7 @@ actual fun StatusMediaSceneLayout(
                     interactionSource = remember { MutableInteractionSource() }
                 )
         ) {
+            closeButton.invoke()
             Box(modifier = Modifier.weight(1f)) {
                 mediaView.invoke()
             }
@@ -95,14 +94,6 @@ actual fun StatusMediaSceneLayout(
 
 @Composable
 private fun MediaScene(content: @Composable () -> Unit) {
-    val navController = LocalNavController.current
-    PreComposeWindow(
-        onCloseRequest = {
-            navController.goBack()
-        },
-        title = "",
-        content = {
-            content.invoke()
-        },
-    )
+    // causes some bug when navigate to other scenes when open a new window to show media
+    content.invoke()
 }
