@@ -55,6 +55,7 @@ fun VideoPlayer(
     keepScreenOn: Boolean = false,
     thumb: @Composable() (() -> Unit)? = null,
     backgroundColor: Color? = null,
+    onClick: (() -> Unit)? = null
 ) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val resLoder = LocalResLoader.current
@@ -67,7 +68,8 @@ fun VideoPlayer(
                     httpConfig = httpConfig,
                     zOrderMediaOverlay = zOrderMediaOverlay,
                     keepScreenOn = keepScreenOn,
-                    backgroundColor = backgroundColor
+                    backgroundColor = backgroundColor,
+                    onClick = onClick
                 ).apply {
                     videoState.bind(this)
                 }

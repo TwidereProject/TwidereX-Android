@@ -33,6 +33,7 @@ expect class PlatformPlayerView(
     zOrderMediaOverlay: Boolean,
     keepScreenOn: Boolean,
     backgroundColor: Color?,
+    onClick: (() -> Unit)?
 ) {
     fun registerPlayerCallback(callBack: PlayerCallBack)
     fun registerProgressCallback(callBack: PlayerProgressCallBack)

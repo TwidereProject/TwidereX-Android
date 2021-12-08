@@ -42,7 +42,7 @@ interface DesktopMediaPlayer {
 }
 
 interface DesktopMediaPlayerFactory {
-    fun create(url: String, backgroundColor: Color?): DesktopMediaPlayer
+    fun create(url: String, backgroundColor: Color?, onClick: (() -> Unit)?): DesktopMediaPlayer
 }
 
 object DesktopMediaPlayerHelper {
@@ -50,7 +50,7 @@ object DesktopMediaPlayerHelper {
     fun register(factory: DesktopMediaPlayerFactory) {
         this.factory = factory
     }
-    internal fun create(url: String, backgroundColor: Color?) = factory?.create(url, backgroundColor) ?: throw Error(
+    internal fun create(url: String, backgroundColor: Color?, onClick: (() -> Unit)?) = factory?.create(url, backgroundColor, onClick) ?: throw Error(
         "No DesktopMediaPlayerFactory found, please ensure DesktopMediaPlayerHelper.register(factory) invoked before use"
     )
 }
