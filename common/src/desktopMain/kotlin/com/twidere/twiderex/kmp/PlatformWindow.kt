@@ -21,15 +21,15 @@
 package com.twidere.twiderex.kmp
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableStateFlow
 
 actual class PlatformWindow {
-    // TODO: Implementation
-    actual val windowBarVisibility: Flow<Boolean> = flowOf(true)
+    private val _visibilityFlow = MutableStateFlow(true)
+    actual val windowBarVisibility: Flow<Boolean> get() = _visibilityFlow
     actual fun hideControls() {
-        // TODO: Implementation
+        _visibilityFlow.value = false
     }
     actual fun showControls() {
-        // TODO: Implementation
+        _visibilityFlow.value = true
     }
 }

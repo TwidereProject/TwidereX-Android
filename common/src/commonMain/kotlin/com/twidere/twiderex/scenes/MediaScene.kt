@@ -168,6 +168,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
             navController.popBackStack()
         },
     )
+    println("controlVisibility:$controlVisibility and swiper progress:${swiperState.progress}")
     StatusMediaSceneLayout(
         backgroundColor = Color.Transparent,
         contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
@@ -204,7 +205,6 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                 pagerState = pagerState,
                 volume = 1f,
                 onClick = {
-                    controlVisibility = !controlVisibility
                     if (controlVisibility) {
                         window.hideControls()
                     } else {

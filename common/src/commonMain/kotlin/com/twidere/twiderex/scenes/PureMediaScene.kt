@@ -143,7 +143,6 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                             pagerState = pagerState,
                             volume = if (isMute) 0f else 1f,
                             onClick = {
-                                controlVisibility = !controlVisibility
                                 if (controlVisibility) {
                                     window.hideControls()
                                 } else {
