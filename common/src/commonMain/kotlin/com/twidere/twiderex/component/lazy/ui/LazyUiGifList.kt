@@ -20,16 +20,12 @@
  */
 package com.twidere.twiderex.component.lazy.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -42,11 +38,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
+import com.twidere.twiderex.component.foundation.GifTag
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
 import com.twidere.twiderex.component.lazy.loadState
-import com.twidere.twiderex.component.painterResource
-import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiGif
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -87,14 +82,7 @@ fun LazyUiGifList(
                             Modifier.fillMaxWidth()
                                 .aspectRatio(1f)
                         )
-                        Image(
-                            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_gif_tag),
-                            contentDescription = MediaType.animated_gif.name,
-                            modifier = Modifier.align(Alignment.BottomEnd)
-                                .padding(LazyUiGifListDefaults.Tag.Padding)
-                                .width(LazyUiGifListDefaults.Tag.Width)
-                                .height(LazyUiGifListDefaults.Tag.Height)
-                        )
+                        GifTag(Modifier.align(Alignment.BottomEnd))
                     }
                 }
             }

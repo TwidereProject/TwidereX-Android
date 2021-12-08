@@ -168,7 +168,6 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
             navController.popBackStack()
         },
     )
-    println("controlVisibility:$controlVisibility and swiper progress:${swiperState.progress}")
     StatusMediaSceneLayout(
         backgroundColor = Color.Transparent,
         contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
@@ -481,7 +480,11 @@ fun MediaView(
                             volume = volume,
                             isMute = LocalDisplayPreferences.current.muteByDefault
                         )
-                        onVideoPlayerStateSet(state)
+                        if (data.type == MediaType.animated_gif) {
+                            onVideoPlayerStateSet(null)
+                        } else {
+                            onVideoPlayerStateSet(state)
+                        }
                         VideoPlayer(
                             playEnable = LocalVideoPlayback.current.playEnable(),
                             videoState = state,

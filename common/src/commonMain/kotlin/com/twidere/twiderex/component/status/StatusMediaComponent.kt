@@ -52,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.component.foundation.GifTag
 import com.twidere.twiderex.component.foundation.GridLayout
 import com.twidere.twiderex.component.foundation.MostCenterInListLayout
 import com.twidere.twiderex.component.foundation.NetworkImage
@@ -336,6 +337,9 @@ fun StatusMediaPreviewItem(
                             }
                         }
                     }
+                }
+                if (media.type == MediaType.animated_gif) {
+                    GifTag(Modifier.align(Alignment.BottomStart))
                 }
             }
             MediaType.audio -> {
