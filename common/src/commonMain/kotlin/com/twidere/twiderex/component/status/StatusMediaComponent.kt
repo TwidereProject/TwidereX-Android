@@ -318,24 +318,26 @@ fun StatusMediaPreviewItem(
                                 url = it,
                                 isMute = true
                             ),
-                            playEnable = LocalVideoPlayback.current.playEnable() && isMostCenter
-                        ) {
-                            previewUrl?.let {
-                                NetworkImage(
-                                    data = it,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable(
-                                            onClick = {
-                                                onClick(media)
-                                            }
-                                        ),
-                                    placeholder = {
-                                        Placeholder(modifier = Modifier.fillMaxSize())
-                                    },
-                                )
-                            }
-                        }
+                            playEnable = LocalVideoPlayback.current.playEnable() && isMostCenter,
+                            thumb = {
+                                previewUrl?.let {
+                                    NetworkImage(
+                                        data = it,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable(
+                                                onClick = {
+                                                    onClick(media)
+                                                }
+                                            ),
+                                        placeholder = {
+                                            Placeholder(modifier = Modifier.fillMaxSize())
+                                        },
+                                    )
+                                }
+                            },
+                            backgroundColor = MaterialTheme.colors.background
+                        )
                     }
                 }
                 if (media.type == MediaType.animated_gif) {

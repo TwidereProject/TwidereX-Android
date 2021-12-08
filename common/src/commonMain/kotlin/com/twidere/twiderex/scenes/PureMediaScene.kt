@@ -148,7 +148,8 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                                 } else {
                                     window.showControls()
                                 }
-                            }
+                            },
+                            backgroundColor = MaterialTheme.colors.background
                         )
                         val windowBarVisibility by window.windowBarVisibility.observeAsState(true)
                         LaunchedEffect(windowBarVisibility) {

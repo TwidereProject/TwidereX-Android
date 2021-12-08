@@ -22,6 +22,7 @@ package com.twidere.twiderex.component.foundation.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.component.foundation.DesktopMediaPlayerHelper
 import com.twidere.twiderex.component.foundation.PlayerCallBack
@@ -32,8 +33,9 @@ actual class PlatformPlayerView actual constructor(
     httpConfig: HttpConfig,
     zOrderMediaOverlay: Boolean,
     keepScreenOn: Boolean,
+    backgroundColor: Color?,
 ) {
-    private val mediaPlayer = DesktopMediaPlayerHelper.create(url)
+    private val mediaPlayer = DesktopMediaPlayerHelper.create(url, backgroundColor)
 
     actual fun registerPlayerCallback(callBack: PlayerCallBack) {
         mediaPlayer.registerPlayerCallback(callBack)

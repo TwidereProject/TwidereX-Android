@@ -22,6 +22,7 @@ package com.twidere.twiderex.component.foundation.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.component.foundation.PlayerCallBack
 import com.twidere.twiderex.component.foundation.PlayerProgressCallBack
@@ -31,6 +32,7 @@ expect class PlatformPlayerView(
     httpConfig: HttpConfig,
     zOrderMediaOverlay: Boolean,
     keepScreenOn: Boolean,
+    backgroundColor: Color?,
 ) {
     fun registerPlayerCallback(callBack: PlayerCallBack)
     fun registerProgressCallback(callBack: PlayerProgressCallBack)

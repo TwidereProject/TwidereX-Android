@@ -209,7 +209,8 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                     } else {
                         window.showControls()
                     }
-                }
+                },
+                backgroundColor = MaterialTheme.colors.background
             )
             val windowBarVisibility by window.windowBarVisibility.observeAsState(true)
             LaunchedEffect(windowBarVisibility) {
@@ -290,6 +291,7 @@ private fun StatusMediaBottomContent(
         modifier = Modifier.fillMaxWidth()
     ) {
         if (status.media.size > 1) {
+            // TODO implement HorizontalPagerIndicator
             // HorizontalPagerIndicator(
             //     pagerState = pagerState,
             //     modifier = Modifier
@@ -424,7 +426,7 @@ fun RawMediaScene(url: String, type: MediaType) {
                 )
                 MediaView(media = listOf(MediaData(url, type)), swiperState = swiperState, onClick = {
                     navController.popBackStack()
-                })
+                }, backgroundColor = MaterialTheme.colors.background)
             }
         }
     }
@@ -437,6 +439,7 @@ data class MediaData(
 
 @Composable
 fun MediaView(
+    backgroundColor: Color? = null,
     modifier: Modifier = Modifier,
     media: List<MediaData>,
     swiperState: SwiperState = rememberSwiperState(),
@@ -499,6 +502,7 @@ fun MediaView(
                             videoState = state,
                             zOrderMediaOverlay = true,
                             keepScreenOn = true,
+                            backgroundColor = backgroundColor
                         )
                     }
                 MediaType.other -> Unit
