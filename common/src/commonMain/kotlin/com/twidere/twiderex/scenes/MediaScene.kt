@@ -416,7 +416,16 @@ fun RawMediaScene(url: String, type: MediaType) {
                     navController.popBackStack()
                 },
             )
-            MediaView(media = listOf(MediaData(url, type)), swiperState = swiperState)
+            Box {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
+                )
+                MediaView(media = listOf(MediaData(url, type)), swiperState = swiperState, onClick = {
+                    navController.popBackStack()
+                })
+            }
         }
     }
 }
