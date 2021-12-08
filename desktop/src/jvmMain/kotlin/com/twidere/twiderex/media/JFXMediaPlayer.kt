@@ -37,11 +37,15 @@ import javafx.scene.media.Media
 import javafx.scene.media.MediaPlayer
 import javafx.scene.media.MediaView
 import javafx.util.Duration
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import java.awt.BorderLayout
 import javax.swing.JPanel
 
 class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
+    private val scope = CoroutineScope(Dispatchers.IO)
     private var playerCallBack: PlayerCallBack? = null
     private var playerProgressCallBack: PlayerProgressCallBack? = null
 
@@ -151,7 +155,9 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
             mediaPlayer?.dispose()
             isUiReady.value = false
             isMediaReady.value = false
-            videoLayout.removeAll()
+            scope.launch {
+                videoLayout.removeAll()
+            }
         }
     }
 
