@@ -40,7 +40,8 @@ actual class StorageProvider() {
             cacheDir.deleteRecursively()
         else {
             cacheDir.listFiles()?.forEach { file ->
-                file.deleteRecursively()
+                // delete database may cause error
+                if (!file.absolutePath.contains(cacheFiles.databaseDir)) file.deleteRecursively()
             }
         }
     }

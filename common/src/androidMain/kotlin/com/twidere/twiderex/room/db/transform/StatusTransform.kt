@@ -113,30 +113,33 @@ internal fun DbStatusV2.toUi(
 
 internal fun DbStatusWithMediaAndUser.toUi(
     accountKey: MicroBlogKey,
+    isGap: Boolean = false
 ): UiStatus {
     val reaction = reactions.firstOrNull { it.accountKey == accountKey }
     return data.toUi(
         user = user.toUi(),
         media = media.toUi(),
         url = url.toUi(),
-        isGap = false,
+        isGap = isGap,
         reaction = reaction
     )
 }
 
 internal fun DbStatusWithReference.toUi(
     accountKey: MicroBlogKey,
+    isGap: Boolean = false
 ) = with(status) {
     val reaction = reactions.firstOrNull { it.accountKey == accountKey }
     data.toUi(
         user = user.toUi(),
         media = media.toUi(),
-        isGap = false,
+        isGap = isGap,
         url = url.toUi(),
         reaction = reaction,
         referenceStatus = references.map {
             it.reference.referenceType to it.status.toUi(
-                accountKey = accountKey
+                accountKey = accountKey,
+                isGap = isGap,
             )
         }.toMap()
     )
@@ -260,7 +263,7 @@ internal fun DbPagingTimelineWithStatus.toPagingTimeline(
     accountKey: MicroBlogKey
 ) = PagingTimeLineWithStatus(
     timeline = timeline.toUi(),
-    status = status.toUi(accountKey = accountKey)
+    status = status.toUi(accountKey = accountKey, isGap = timeline.isGap)
 )
 
 internal fun DbPagingTimeline.toUi() = PagingTimeLine(

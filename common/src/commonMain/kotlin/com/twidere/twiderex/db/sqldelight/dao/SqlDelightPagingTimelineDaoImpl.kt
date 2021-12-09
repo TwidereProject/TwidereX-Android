@@ -82,7 +82,7 @@ internal class SqlDelightPagingTimelineDaoImpl(private val database: SqlDelightC
         return database.pagingTimelineQueries.findWithStatusKey(
             statusKey = maxStatusKey,
             accountKey = accountKey
-        ).executeAsOneOrNull()?.toUi()
+        ).executeAsList().firstOrNull()?.toUi()
     }
 
     override suspend fun insertAll(listOf: List<PagingTimeLine>) {
