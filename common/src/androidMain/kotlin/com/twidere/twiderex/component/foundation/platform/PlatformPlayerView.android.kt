@@ -54,6 +54,7 @@ actual class PlatformPlayerView actual constructor(
     zOrderMediaOverlay: Boolean,
     keepScreenOn: Boolean,
     backgroundColor: Color?,
+    onClick: (() -> Unit)?
 ) {
     private var job: Job? = null
 

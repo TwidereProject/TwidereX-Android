@@ -91,6 +91,8 @@ import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.playEnable
 import com.twidere.twiderex.kmp.LocalPlatformWindow
+import com.twidere.twiderex.kmp.Platform
+import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
@@ -502,7 +504,15 @@ fun MediaView(
                             videoState = state,
                             zOrderMediaOverlay = true,
                             keepScreenOn = true,
-                            backgroundColor = backgroundColor
+                            backgroundColor = backgroundColor,
+                            // Pass the click event to swing on JVM
+                            onClick = if (
+                                currentPlatform == Platform.JVM
+                            ) {
+                                onClick
+                            } else {
+                                null
+                            }
                         )
                     }
                 MediaType.other -> Unit

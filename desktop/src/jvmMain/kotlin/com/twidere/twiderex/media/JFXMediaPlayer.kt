@@ -42,9 +42,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.awt.BorderLayout
+import java.awt.event.MouseEvent
 import javax.swing.JPanel
+import javax.swing.event.MouseInputAdapter
 
-class JFXMediaPlayer(private val url: String, private val backgroundColor: androidx.compose.ui.graphics.Color?) : DesktopMediaPlayer {
+class JFXMediaPlayer(
+    private val url: String,
+    private val backgroundColor: androidx.compose.ui.graphics.Color?,
+    private val onClick: (() -> Unit)?
+) : DesktopMediaPlayer {
     private val scope = CoroutineScope(Dispatchers.IO)
     private var playerCallBack: PlayerCallBack? = null
     private var playerProgressCallBack: PlayerProgressCallBack? = null
@@ -119,7 +125,14 @@ class JFXMediaPlayer(private val url: String, private val backgroundColor: andro
     }
 
     private fun initUiComponent() {
-        val videoPanel = JFXPanel()
+        val videoPanel = JFXPanel().apply {
+            addMouseListener(object : MouseInputAdapter() {
+                override fun mouseClicked(e: MouseEvent?) {
+                    super.mouseClicked(e)
+                    onClick?.invoke()
+                }
+            })
+        }
         Platform.runLater {
             val mediaView = MediaView(mediaPlayer)
             val root = BorderPane(mediaView)

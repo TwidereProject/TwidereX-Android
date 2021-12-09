@@ -34,8 +34,9 @@ actual class PlatformPlayerView actual constructor(
     zOrderMediaOverlay: Boolean,
     keepScreenOn: Boolean,
     backgroundColor: Color?,
+    onClick: (() -> Unit)?
 ) {
-    private val mediaPlayer = DesktopMediaPlayerHelper.create(url, backgroundColor)
+    private val mediaPlayer = DesktopMediaPlayerHelper.create(url, backgroundColor, onClick)
 
     actual fun registerPlayerCallback(callBack: PlayerCallBack) {
         mediaPlayer.registerPlayerCallback(callBack)
