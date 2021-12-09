@@ -30,7 +30,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -54,9 +53,9 @@ fun RetweetHeader(
             )
         },
         text = {
-            Text(
-                style = MaterialTheme.typography.caption,
-                text = stringResource(
+            HtmlText(
+                textStyle = MaterialTheme.typography.caption,
+                htmlText = stringResource(
                     res = com.twidere.twiderex.MR.strings.common_controls_status_user_retweeted,
                     data.user.displayName
                 ),
