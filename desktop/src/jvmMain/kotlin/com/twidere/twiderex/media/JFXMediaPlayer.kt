@@ -37,11 +37,15 @@ import javafx.scene.media.Media
 import javafx.scene.media.MediaPlayer
 import javafx.scene.media.MediaView
 import javafx.util.Duration
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import java.awt.BorderLayout
 import javax.swing.JPanel
 
-class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
+class JFXMediaPlayer(private val url: String, private val backgroundColor: androidx.compose.ui.graphics.Color?) : DesktopMediaPlayer {
+    private val scope = CoroutineScope(Dispatchers.IO)
     private var playerCallBack: PlayerCallBack? = null
     private var playerProgressCallBack: PlayerProgressCallBack? = null
 
@@ -119,7 +123,9 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
         Platform.runLater {
             val mediaView = MediaView(mediaPlayer)
             val root = BorderPane(mediaView)
-            val scene = Scene(root)
+            val scene = backgroundColor?.let {
+                Scene(root, javafx.scene.paint.Color(it.red.toDouble(), it.green.toDouble(), it.blue.toDouble(), it.alpha.toDouble()))
+            } ?: Scene(root)
             videoPanel.scene = scene
             videoLayout.add(videoPanel, BorderLayout.CENTER)
             mediaView.parent.layoutBoundsProperty().addListener { _, _, newValue ->
@@ -151,7 +157,9 @@ class JFXMediaPlayer(private val url: String) : DesktopMediaPlayer {
             mediaPlayer?.dispose()
             isUiReady.value = false
             isMediaReady.value = false
-            videoLayout.removeAll()
+            scope.launch {
+                videoLayout.removeAll()
+            }
         }
     }
 

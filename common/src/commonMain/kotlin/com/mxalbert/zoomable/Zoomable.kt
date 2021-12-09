@@ -68,6 +68,7 @@ fun Zoomable(
     enabled: Boolean = true,
     dismissGestureEnabled: Boolean = false,
     onDismiss: () -> Boolean = { false },
+    onClick: () -> Unit = {},
     content: @Composable () -> Unit
 ) {
     val dismissGestureEnabledState = rememberUpdatedState(dismissGestureEnabled)
@@ -77,7 +78,8 @@ fun Zoomable(
             detectTapAndDragGestures(
                 state = state,
                 dismissGestureEnabled = dismissGestureEnabledState,
-                onDismiss = onDismiss
+                onDismiss = onDismiss,
+                onClick = onClick,
             )
         }
         .transformable(
@@ -124,7 +126,8 @@ fun Zoomable(
 internal suspend fun PointerInputScope.detectTapAndDragGestures(
     state: ZoomableState,
     dismissGestureEnabled: State<Boolean>,
-    onDismiss: () -> Boolean
+    onDismiss: () -> Boolean,
+    onClick: () -> Unit
 ) = coroutineScope {
     launch {
         detectTapGestures(
@@ -145,6 +148,9 @@ internal suspend fun PointerInputScope.detectTapAndDragGestures(
             },
             onPress = {
                 state.onPress()
+            },
+            onTap = {
+                onClick.invoke()
             }
         )
     }

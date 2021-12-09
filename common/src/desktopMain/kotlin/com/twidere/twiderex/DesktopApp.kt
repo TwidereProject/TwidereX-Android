@@ -33,6 +33,8 @@ import com.twidere.twiderex.kmp.PlatformWindow
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
+import com.twidere.twiderex.preferences.model.DisplayPreferences
+import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.utils.OperatingSystem
 import com.twidere.twiderex.utils.WindowsDatastoreModifier
@@ -162,6 +164,7 @@ private fun startDesktopApp() {
                 FilePicker.init(window)
                 CompositionLocalProvider(
                     LocalPlatformWindow provides PlatformWindow(),
+                    LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
                 ) {
                     App(navController = navController)
                 }

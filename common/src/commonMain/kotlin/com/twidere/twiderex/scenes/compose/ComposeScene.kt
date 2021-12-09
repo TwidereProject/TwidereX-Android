@@ -103,6 +103,7 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.CheckboxItem
 import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
+import com.twidere.twiderex.component.foundation.GifTag
 import com.twidere.twiderex.component.foundation.InAppNotificationBottomSheetScaffold
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
@@ -1342,14 +1343,13 @@ private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel) {
             NetworkImage(data = item.preview)
             when (type) {
                 MediaType.animated_gif ->
-                    Image(
-                        painter = painterResource(res = MR.files.ic_gif_tag),
-                        contentDescription = type.name,
+                    GifTag(
                         modifier = Modifier
                             .align(Alignment.BottomStart)
                             .width(ComposeImageDefaults.Tag.Width)
                             .height(ComposeImageDefaults.Tag.Height)
-                            .padding(ComposeImageDefaults.Tag.Padding)
+                            .padding(ComposeImageDefaults.Tag.Padding),
+                        resize = true
                     )
                 MediaType.video -> Icon(
                     imageVector = Icons.Default.PlayArrow,

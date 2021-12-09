@@ -21,6 +21,7 @@
 package com.twidere.twiderex.component.foundation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 
 interface DesktopMediaPlayer {
     fun play()
@@ -41,7 +42,7 @@ interface DesktopMediaPlayer {
 }
 
 interface DesktopMediaPlayerFactory {
-    fun create(url: String): DesktopMediaPlayer
+    fun create(url: String, backgroundColor: Color?): DesktopMediaPlayer
 }
 
 object DesktopMediaPlayerHelper {
@@ -49,7 +50,7 @@ object DesktopMediaPlayerHelper {
     fun register(factory: DesktopMediaPlayerFactory) {
         this.factory = factory
     }
-    internal fun create(url: String) = factory?.create(url) ?: throw Error(
+    internal fun create(url: String, backgroundColor: Color?) = factory?.create(url, backgroundColor) ?: throw Error(
         "No DesktopMediaPlayerFactory found, please ensure DesktopMediaPlayerHelper.register(factory) invoked before use"
     )
 }
