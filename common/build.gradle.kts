@@ -228,6 +228,21 @@ tasks.create("generateTranslationFromZip") {
     }
 }
 
+val updateJvmLocalizationFileName by tasks.registering {
+    doLast {
+        val generatedDir = File(project.buildDir, "generated/moko")
+        generatedDir.walkTopDown().filter { file ->
+            file.name.endsWith(".properties")
+        }.forEach {
+            it.renameTo(File(it.parent, it.name.replace("-r", "_")))
+        }
+    }
+}
+
+afterEvaluate {
+    tasks.getByName("generateMRdesktopMain").finalizedBy(updateJvmLocalizationFileName)
+}
+
 fun generateLocalization(appJson: File, target: File) {
     val json = appJson.readText(Charsets.UTF_8)
     val obj = org.json.JSONObject(json)
