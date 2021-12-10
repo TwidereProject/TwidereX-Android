@@ -49,6 +49,9 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import java.awt.Desktop
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
+import kotlin.io.path.absolutePathString
 
 private val navController = NavController()
 private val mainScope = MainScope()
@@ -101,11 +104,12 @@ private fun ensureDesktopEntry() {
     if (!entryFile.exists()) {
         entryFile.createNewFile()
     }
+    val path = Files.readSymbolicLink(Paths.get("/proc/self/exe"))
     entryFile.writeText(
         "[Desktop Entry]${System.lineSeparator()}" +
             "Type=Application${System.lineSeparator()}" +
             "Name=Twidere X${System.lineSeparator()}" +
-            "Exec=\"${File("").absolutePath + "/bin/Twidere X\" %u"}${System.lineSeparator()}" +
+            "Exec=\"${path.absolutePathString() + "\" %u"}${System.lineSeparator()}" +
             "Terminal=false${System.lineSeparator()}" +
             "MimeType=x-scheme-handler/$twidereXSchema;"
     )
