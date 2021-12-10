@@ -72,6 +72,7 @@ import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.foundation.VideoPlayerState
+import com.twidere.twiderex.component.foundation.platform.HorizontalPagerIndicator
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.foundation.rememberVideoPlayerState
 import com.twidere.twiderex.component.navigation.INavigator
@@ -181,7 +182,8 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                 navigator = navigator,
                 videoPlayerState = videoPlayerState.value,
                 viewModel = viewModel,
-                currentMedia = currentMedia
+                currentMedia = currentMedia,
+                pagerState = pagerState
             )
         },
         closeButton = {
@@ -287,19 +289,19 @@ private fun StatusMediaBottomContent(
     navigator: INavigator,
     videoPlayerState: VideoPlayerState?,
     viewModel: MediaViewModel,
-    currentMedia: UiMedia
+    currentMedia: UiMedia,
+    pagerState: PagerState
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         if (status.media.size > 1) {
-            // TODO implement HorizontalPagerIndicator
-            // HorizontalPagerIndicator(
-            //     pagerState = pagerState,
-            //     modifier = Modifier
-            //         .padding(16.dp)
-            //         .align(Alignment.CenterHorizontally),
-            // )
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .align(Alignment.CenterHorizontally),
+            )
             AnimatedVisibility(
                 visible = !(visible),
                 enter = expandVertically(),
