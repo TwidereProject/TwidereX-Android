@@ -275,3 +275,15 @@ fun flattenJson(obj: org.json.JSONObject): Map<String, String> {
         }
     }.toMap()
 }
+
+gradle.taskGraph.afterTask {
+    if(name == "generateMRdesktopMain") {
+        println("Renaming desktop resources...")
+        val resources = project.file("../common/build/generated/moko/desktopMain/comtwideretwiderex/res/localization/")
+        if (resources.exists()) {
+            resources.listFiles().forEach { file ->
+                if (file.name.contains("-r")) file.renameTo(File(file.path.replace("-r", "_")))
+            }
+        }
+    }
+}
