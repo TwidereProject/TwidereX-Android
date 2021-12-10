@@ -23,6 +23,7 @@ package com.twidere.twiderex
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.application
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
@@ -109,6 +110,7 @@ private fun ensureDesktopEntry() {
         "[Desktop Entry]${System.lineSeparator()}" +
             "Type=Application${System.lineSeparator()}" +
             "Name=Twidere X${System.lineSeparator()}" +
+            "Icon=\"${path.parent.parent.absolutePathString() + "/lib/Twidere X.png" + "\""}${System.lineSeparator()}" +
             "Exec=\"${path.absolutePathString() + "\" %u"}${System.lineSeparator()}" +
             "Terminal=false${System.lineSeparator()}" +
             "MimeType=x-scheme-handler/$twidereXSchema;"
@@ -161,7 +163,8 @@ private fun startDesktopApp() {
                     stopKoin()
                     exitApplication()
                 },
-                title = "Twidere X"
+                title = "Twidere X",
+                icon = painterResource(MR.files.ic_launcher.filePath),
             ) {
                 FilePicker.init(window)
                 CompositionLocalProvider(
