@@ -21,10 +21,6 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.awaitVerticalTouchSlopOrCancellation
-import androidx.compose.foundation.gestures.forEachGesture
-import androidx.compose.foundation.gestures.verticalDrag
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,15 +50,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.input.pointer.PointerInputChange
-import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.consumePositionChange
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.kmp.detectVerticalDrag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -262,20 +255,18 @@ fun SwipeToRefreshLayout(
         modifier = modifier
             .fillMaxSize()
             .nestedScroll(state)
-            .pointerInput(Unit) {
-                detectVerticalDrag(
-                    onVerticalDrag = { change, dragAmount ->
-                        if (state.drag(dragAmount) != 0f) {
-                            change.consumePositionChange()
-                        }
-                    },
-                    onDragEnd = {
-                        scope.launch {
-                            state.fling()
-                        }
+            .detectVerticalDrag(
+                onVerticalDrag = { change, dragAmount ->
+                    if (state.drag(dragAmount) != 0f) {
+                        change?.consumePositionChange()
                     }
-                )
-            }
+                },
+                onDragEnd = {
+                    scope.launch {
+                        state.fling()
+                    }
+                }
+            )
     ) {
         content()
         Box(
@@ -294,32 +285,6 @@ fun SwipeToRefreshLayout(
         LaunchedEffect(refreshingState) {
             scope.launch {
                 state.animateTo(refreshingState)
-            }
-        }
-    }
-}
-
-private suspend fun PointerInputScope.detectVerticalDrag(
-    onDragStart: (Offset) -> Unit = { },
-    onDragEnd: () -> Unit = { },
-    onDragCancel: () -> Unit = { },
-    onVerticalDrag: (change: PointerInputChange, dragAmount: Float) -> Unit
-) {
-    forEachGesture {
-        awaitPointerEventScope {
-            val down = awaitFirstDown(requireUnconsumed = false)
-            val drag = awaitVerticalTouchSlopOrCancellation(down.id, onVerticalDrag)
-            if (drag != null) {
-                onDragStart.invoke(drag.position)
-                if (
-                    verticalDrag(drag.id) {
-                        onVerticalDrag(it, it.positionChange().y)
-                    }
-                ) {
-                    onDragEnd()
-                } else {
-                    onDragCancel()
-                }
             }
         }
     }
