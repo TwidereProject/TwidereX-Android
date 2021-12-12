@@ -23,6 +23,7 @@ package com.twidere.twiderex.di.modules
 import com.twidere.twiderex.dataprovider.DataProvider
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.http.TwidereHttpConfigProvider
+import com.twidere.twiderex.kmp.GlobalKeyEventHolder
 import com.twidere.twiderex.model.AccountPreferencesFactory
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.PreferencesHolder
@@ -36,4 +37,5 @@ internal actual val platformModule = module {
     single { InAppNotification() }
     single { TwidereHttpConfigProvider(get<PreferencesHolder>().miscPreferences) }
     single { PlatformResolver(get()) }
+    single { GlobalKeyEventHolder() }
 }

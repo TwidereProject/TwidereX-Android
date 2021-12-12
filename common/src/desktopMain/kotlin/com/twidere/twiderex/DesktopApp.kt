@@ -29,6 +29,7 @@ import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
 import com.twidere.twiderex.init.Initializer
 import com.twidere.twiderex.init.TwidereServiceFactoryInitialTask
+import com.twidere.twiderex.kmp.GlobalKeyEventHolder
 import com.twidere.twiderex.kmp.LocalPlatformWindow
 import com.twidere.twiderex.kmp.PlatformWindow
 import com.twidere.twiderex.navigation.twidereXSchema
@@ -145,6 +146,7 @@ private fun startDesktopApp() {
         setupModules()
     }
     val preferencesHolder = get<PreferencesHolder>()
+    val keyEventHolder = get<GlobalKeyEventHolder>()
     try {
         Desktop.getDesktop().setOpenURIHandler { event ->
             onDeeplink(url = event.uri.toString())
@@ -167,6 +169,10 @@ private fun startDesktopApp() {
                 },
                 title = "Twidere X",
                 icon = painterResource(MR.files.ic_launcher.filePath),
+                onKeyEvent = {
+                    keyEventHolder.onKeyEvent(it)
+                    false
+                }
             ) {
                 FilePicker.init(window)
                 CompositionLocalProvider(

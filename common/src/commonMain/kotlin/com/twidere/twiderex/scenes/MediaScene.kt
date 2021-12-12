@@ -461,6 +461,7 @@ fun MediaView(
     ) {
         Pager(
             state = pagerState,
+            supportKeyBoard = true
         ) {
             val data = media[page]
             when (data.type) {

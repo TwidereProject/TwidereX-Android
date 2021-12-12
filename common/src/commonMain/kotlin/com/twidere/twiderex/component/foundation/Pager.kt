@@ -52,6 +52,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.unit.Density
+import com.twidere.twiderex.kmp.pagerWithKeyEvent
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -201,10 +202,14 @@ fun Pager(
     state: PagerState,
     offscreenLimit: Int = 2,
     dragEnabled: Boolean = true,
+    supportKeyBoard: Boolean = false,
     content: @Composable PagerScope.() -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     var pageSize by remember { mutableStateOf(0) }
+    if (supportKeyBoard) {
+        pagerWithKeyEvent(state)
+    }
     Layout(
         content = {
             val minPage = (state.currentPage - offscreenLimit).coerceAtLeast(state.firstPageIndex)
