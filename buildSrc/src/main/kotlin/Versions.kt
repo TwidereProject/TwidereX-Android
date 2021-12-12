@@ -2,7 +2,7 @@ import org.gradle.api.JavaVersion
 
 object Versions {
     object Kotlin {
-        const val lang = "1.6.0"
+        const val lang = "1.6.10-RC"
         const val coroutines = "1.6.0-RC"
         const val serialization = "1.3.1"
     }
@@ -20,7 +20,7 @@ object Versions {
     const val okhttp = "4.9.1"
     const val retrofit2 = "2.9.0"
     const val hson = "0.1.4"
-    const val compose_jb = "1.0.0"
+    const val compose_jb = "0.0.0-use_kotlin_1.6.10-RC-dev521"
     const val paging = "3.1.0"
     const val paging_compose = "1.0.0-alpha14"
     const val activity = "1.4.0"

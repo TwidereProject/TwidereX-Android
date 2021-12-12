@@ -22,7 +22,7 @@ package com.twidere.twiderex.image
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.asComposeImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.IntSize
@@ -66,7 +66,7 @@ internal class GifPainter(private val codec: Codec, private val parentScope: Cor
         val bitmap = recycleBitmap(codec)
         codec.readPixels(bitmap, frameIndex.value)
         val intSize = IntSize(size.width.toInt(), size.height.toInt())
-        drawImage(bitmap.asComposeImageBitmap(), dstSize = intSize)
+        drawImage(bitmap.asImageBitmap(), dstSize = intSize)
     }
 
     private fun recycleBitmap(codec: Codec): Bitmap {
