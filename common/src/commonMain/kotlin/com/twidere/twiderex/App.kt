@@ -34,12 +34,13 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import moe.tlaster.precompose.navigation.NavController
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 @Composable
 fun App(navController: NavController = NavController()) {
     val accountViewModel =
         com.twidere.twiderex.di.ext.getViewModel<com.twidere.twiderex.viewmodel.ActiveAccountViewModel>()
-    val account by accountViewModel.account.observeAsState(null)
+    val account by accountViewModel.account.observeAsState(null, accountViewModel.viewModelScope.coroutineContext)
     CompositionLocalProvider(
         LocalResLoader provides get(),
         LocalRemoteNavigator provides get(),

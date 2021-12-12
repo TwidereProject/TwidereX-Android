@@ -50,5 +50,5 @@ internal fun PagingTimeLineWithStatus.toDbPagingTimelineWithStatus() = DbPagingT
 
 internal fun DbPagingTimelineWithStatus.toUi() = PagingTimeLineWithStatus(
     timeline = timeline.toUi(),
-    status = status.toUi()
+    status = status.toUi().copy(isGap = timeline.isGap)
 )

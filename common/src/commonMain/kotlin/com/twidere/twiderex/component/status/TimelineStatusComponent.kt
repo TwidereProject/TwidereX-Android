@@ -180,7 +180,7 @@ object NormalStatusDefaults {
 @Composable
 private fun StatusHeader(data: UiStatus) {
     when {
-        data.platformType == PlatformType.Mastodon && data.mastodonExtra != null -> {
+        data.platformType == PlatformType.Mastodon && data.mastodonExtra != null && data.mastodonExtra.type != MastodonStatusType.Status -> {
             MastodonStatusHeader(data.mastodonExtra, data)
         }
         data.retweet != null -> {
@@ -422,6 +422,7 @@ fun StatusContent(
                         size = StatusThreadDefaults.AvatarSize,
                         modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing)
                     )
+                    Spacer(modifier = Modifier.height(NormalStatusDefaults.ThreadBottomPadding))
                 }
             }
             Spacer(modifier = Modifier.width(StatusContentDefaults.AvatarSpacing))
@@ -488,51 +489,6 @@ fun StatusContent(
         }
     }
 }
-//
-// @Composable
-// fun statusConstraintSets() = ConstraintSet {
-//     val avatarRef = createRefFor(StatusContentDefaults.Ref.Avatar)
-//     val statusHeaderRef = createRefFor(StatusContentDefaults.Ref.StatusHeader)
-//     val contentRef = createRefFor(StatusContentDefaults.Ref.Content)
-//     val extendRef = createRefFor(StatusContentDefaults.Ref.Extend)
-//     val footerRef = createRefFor(StatusContentDefaults.Ref.Footer)
-//     val lineUpRef = createRefFor(StatusContentDefaults.Ref.LineUp)
-//     val lineDownRef = createRefFor(StatusContentDefaults.Ref.LineDown)
-//     constrain(statusHeaderRef) {
-//         top.linkTo(parent.top)
-//         start.linkTo(parent.start)
-//     }
-//     constrain(avatarRef) {
-//         top.linkTo(statusHeaderRef.bottom)
-//         start.linkTo(parent.start)
-//     }
-//     constrain(contentRef) {
-//         start.linkTo(avatarRef.end, margin = StatusContentDefaults.AvatarSpacing)
-//         top.linkTo(avatarRef.top)
-//         end.linkTo(parent.end)
-//         width = Dimension.fillToConstraints
-//     }
-//     constrain(extendRef) {
-//         top.linkTo(contentRef.bottom)
-//     }
-//     constrain(footerRef) {
-//         top.linkTo(contentRef.bottom)
-//     }
-//     constrain(lineUpRef) {
-//         bottom.linkTo(avatarRef.top)
-//         top.linkTo(parent.top)
-//         start.linkTo(avatarRef.start)
-//         end.linkTo(avatarRef.end)
-//         height = Dimension.fillToConstraints
-//     }
-//     constrain(lineDownRef) {
-//         top.linkTo(avatarRef.bottom)
-//         bottom.linkTo(parent.bottom)
-//         start.linkTo(avatarRef.start)
-//         end.linkTo(avatarRef.end)
-//         height = Dimension.fillToConstraints
-//     }
-// }
 
 @Composable
 private fun StatusThread(threadStyle: StatusThreadStyle, data: UiStatus) {

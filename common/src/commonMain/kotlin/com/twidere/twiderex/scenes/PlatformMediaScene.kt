@@ -18,18 +18,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.kmp
+package com.twidere.twiderex.scenes
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.MediaType
 
-actual class PlatformWindow {
-    private val _visibilityFlow = MutableStateFlow(true)
-    actual val windowBarVisibility: Flow<Boolean> get() = _visibilityFlow
-    actual fun hideControls() {
-        _visibilityFlow.value = false
-    }
-    actual fun showControls() {
-        _visibilityFlow.value = true
-    }
-}
+@Composable
+expect fun PlatformStatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int)
+
+@Composable
+expect fun PlatformRawMediaScene(url: String, type: MediaType)
+
+@Composable
+expect fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int)
+
+@Composable
+expect fun StatusMediaSceneLayout(
+    backgroundColor: Color,
+    contentColor: Color,
+    closeButton: @Composable () -> Unit,
+    bottomView: @Composable () -> Unit,
+    mediaView: @Composable () -> Unit,
+    backgroundView: @Composable () -> Unit,
+)

@@ -52,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.component.foundation.GifTag
 import com.twidere.twiderex.component.foundation.GridLayout
 import com.twidere.twiderex.component.foundation.MostCenterInListLayout
 import com.twidere.twiderex.component.foundation.NetworkImage
@@ -317,25 +318,30 @@ fun StatusMediaPreviewItem(
                                 url = it,
                                 isMute = true
                             ),
-                            playEnable = LocalVideoPlayback.current.playEnable() && isMostCenter
-                        ) {
-                            previewUrl?.let {
-                                NetworkImage(
-                                    data = it,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable(
-                                            onClick = {
-                                                onClick(media)
-                                            }
-                                        ),
-                                    placeholder = {
-                                        Placeholder(modifier = Modifier.fillMaxSize())
-                                    },
-                                )
-                            }
-                        }
+                            playEnable = LocalVideoPlayback.current.playEnable() && isMostCenter,
+                            thumb = {
+                                previewUrl?.let {
+                                    NetworkImage(
+                                        data = it,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable(
+                                                onClick = {
+                                                    onClick(media)
+                                                }
+                                            ),
+                                        placeholder = {
+                                            Placeholder(modifier = Modifier.fillMaxSize())
+                                        },
+                                    )
+                                }
+                            },
+                            backgroundColor = MaterialTheme.colors.background
+                        )
                     }
+                }
+                if (media.type == MediaType.animated_gif) {
+                    GifTag(Modifier.align(Alignment.BottomStart))
                 }
             }
             MediaType.audio -> {

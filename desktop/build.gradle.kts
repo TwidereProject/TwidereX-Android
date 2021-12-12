@@ -48,6 +48,13 @@ compose {
                     infoPlist {
                         extraKeysRawXml = macExtraPlistKeys
                     }
+                    iconFile.set(project.file("src/jvmMain/resources/icon/ic_launcher.icns"))
+                }
+                linux {
+                    iconFile.set(project.file("src/jvmMain/resources/icon/ic_launcher.png"))
+                }
+                windows {
+                    iconFile.set(project.file("src/jvmMain/resources/icon/ic_launcher.ico"))
                 }
             }
         }

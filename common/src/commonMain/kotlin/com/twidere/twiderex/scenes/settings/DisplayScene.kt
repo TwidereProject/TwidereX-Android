@@ -53,6 +53,8 @@ import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
+import com.twidere.twiderex.kmp.Platform
+import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
@@ -189,7 +191,7 @@ fun DisplayScene() {
                         Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_media_mute_by_default))
                     }
                 )
-                if (display.mediaPreview) {
+                if (display.mediaPreview && currentPlatform != Platform.JVM) {
                     RadioItem(
                         options = listOf(
                             DisplayPreferences.AutoPlayback.Auto,

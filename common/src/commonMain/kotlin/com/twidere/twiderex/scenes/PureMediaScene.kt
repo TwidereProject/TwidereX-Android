@@ -27,10 +27,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
@@ -53,7 +52,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.twidere.twiderex.component.bottomInsetsPadding
-import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.VideoPlayerState
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.painterResource
@@ -108,32 +106,29 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                 val isMute by remember {
                     mutableStateOf(display.muteByDefault)
                 }
-                InAppNotificationScaffold(
+
+                StatusMediaSceneLayout(
                     backgroundColor = Color.Transparent,
                     contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
-                    bottomBar = {
+                    bottomView = {
                         PureMediaBottomInfo(
                             controlVisibility = controlVisibility,
                             swiperState = swiperState,
                             controlPanelColor = controlPanelColor,
                             videoPlayerState = videoPlayerState.value,
                         )
-                    }
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .clickable(
-                                onClick = {
-                                    if (controlVisibility) {
-                                        window.hideControls()
-                                    } else {
-                                        window.showControls()
-                                    }
-                                },
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() }
-                            ),
-                    ) {
+                    },
+                    closeButton = {
+                        PureMediaControlPanel(
+                            controlVisibility = controlVisibility,
+                            swiperState = swiperState,
+                            controlPanelColor = controlPanelColor,
+                            onPopBack = {
+                                navController.popBackStack()
+                            }
+                        )
+                    },
+                    mediaView = {
                         MediaView(
                             media = medias.mapNotNull {
                                 it.mediaUrl?.let { it1 ->
@@ -146,7 +141,15 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                             swiperState = swiperState,
                             onVideoPlayerStateSet = { videoPlayerState.value = it },
                             pagerState = pagerState,
-                            volume = if (isMute) 0f else 1f
+                            volume = if (isMute) 0f else 1f,
+                            onClick = {
+                                if (controlVisibility) {
+                                    window.hideControls()
+                                } else {
+                                    window.showControls()
+                                }
+                            },
+                            backgroundColor = MaterialTheme.colors.background
                         )
                         val windowBarVisibility by window.windowBarVisibility.observeAsState(true)
                         LaunchedEffect(windowBarVisibility) {
@@ -157,16 +160,15 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                                 window.showControls()
                             }
                         }
-                        PureMediaControlPanel(
-                            controlVisibility = controlVisibility,
-                            swiperState = swiperState,
-                            controlPanelColor = controlPanelColor,
-                            onPopBack = {
-                                navController.popBackStack()
-                            }
+                    },
+                    backgroundView = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
                         )
                     }
-                }
+                )
             }
         }
     }
