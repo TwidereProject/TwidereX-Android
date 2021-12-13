@@ -53,7 +53,7 @@ jobs:
       - name: Upload build binaries
         uses: actions/upload-artifact@v2
         with:
-          name: build-binaries
+          name: build-binaries-ubuntu
           path: '**/build/compose/binaries'
 
       - name: Check if is prelease
@@ -107,7 +107,7 @@ jobs:
       - name: Upload build binaries
         uses: actions/upload-artifact@v2
         with:
-          name: build-binaries
+          name: build-binaries-windows
           path: '**/build/compose/binaries'
 
       - name: Check if is prelease
@@ -161,7 +161,7 @@ jobs:
       - name: Upload build binaries
         uses: actions/upload-artifact@v2
         with:
-          name: build-binaries
+          name: build-binaries-macos
           path: '**/build/compose/binaries'
 
       - name: Check if is prelease
