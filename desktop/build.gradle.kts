@@ -54,6 +54,8 @@ compose {
                     iconFile.set(project.file("src/jvmMain/resources/icon/ic_launcher.png"))
                 }
                 windows {
+                    shortcut = true
+                    menu = true
                     iconFile.set(project.file("src/jvmMain/resources/icon/ic_launcher.ico"))
                 }
             }
