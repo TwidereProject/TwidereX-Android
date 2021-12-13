@@ -37,7 +37,6 @@ jobs:
   #         path: '**/build/reports'
           
   build-linux:
-    needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -54,7 +53,7 @@ jobs:
       - name: Upload build binaries
         uses: actions/upload-artifact@v2
         with:
-          name: build-binaries
+          name: build-binaries-ubuntu
           path: '**/build/compose/binaries'
 
       - name: Check if is prelease
@@ -92,7 +91,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-windows:
-    needs: build
     runs-on: windows-latest
     timeout-minutes: 30
     steps:
@@ -109,7 +107,7 @@ jobs:
       - name: Upload build binaries
         uses: actions/upload-artifact@v2
         with:
-          name: build-binaries
+          name: build-binaries-windows
           path: '**/build/compose/binaries'
 
       - name: Check if is prelease
@@ -147,7 +145,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-macos:
-    needs: build
     runs-on: macos-latest
     timeout-minutes: 30
     steps:
@@ -164,7 +161,7 @@ jobs:
       - name: Upload build binaries
         uses: actions/upload-artifact@v2
         with:
-          name: build-binaries
+          name: build-binaries-macos
           path: '**/build/compose/binaries'
 
       - name: Check if is prelease
