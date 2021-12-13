@@ -25,7 +25,6 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.StringWriter
-import java.lang.Exception
 
 object WindowsRegistry {
 
@@ -37,7 +36,8 @@ object WindowsRegistry {
         val regFile = File("${root.absolutePath}/deeplink.reg")
         if (!regFile.exists()) {
             regFile.createNewFile()
-            val reg = """
+        }
+        val reg = """
         Windows Registry Editor Version 5.00
 
         [HKEY_CLASSES_ROOT\TwidereX]
@@ -50,9 +50,8 @@ object WindowsRegistry {
 
         [HKEY_CLASSES_ROOT\TwidereX\shell\open\command]
         @="\"${File("").absolutePath.replace("\\", "\\\\")}\\Twidere X.exe\" \"%1\""
-            """.trimIndent()
-            regFile.writeText(reg)
-        }
+        """.trimIndent()
+        regFile.writeText(reg)
         try {
             val process = ProcessBuilder("cmd", "/c", "regedit", "/s", regFile.canonicalPath).start()
             process.waitFor()
