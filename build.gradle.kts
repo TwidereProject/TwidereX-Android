@@ -19,7 +19,7 @@ allprojects {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
             jvmTarget = Versions.Java.jvmTarget
-            allWarningsAsErrors = true
+            // allWarningsAsErrors = true
             freeCompilerArgs = listOf(
                 "-Xopt-in=kotlin.RequiresOptIn",
             )

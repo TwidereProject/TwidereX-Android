@@ -51,16 +51,18 @@ object WindowsRegistry {
         [HKEY_CLASSES_ROOT\TwidereX\shell\open\command]
         @="\"${File("").absolutePath.replace("\\", "\\\\")}\\Twidere X.exe\" \"%1\""
         """.trimIndent()
-        regFile.writeText(reg)
-        try {
-            val process = ProcessBuilder("cmd", "/c", "regedit", "/s", regFile.canonicalPath).start()
-            process.waitFor()
-        } catch (e: Throwable) {
+        if (regFile.readText() != reg) {
+            regFile.writeText(reg)
             try {
-                // if process is not working use Desktop open file
-                Desktop.getDesktop().open(regFile)
+                val process = ProcessBuilder("cmd", "/c", "regedit", "/s", regFile.canonicalPath).start()
+                process.waitFor()
             } catch (e: Throwable) {
-                e.printStackTrace()
+                try {
+                    // if process is not working use Desktop open file
+                    Desktop.getDesktop().open(regFile)
+                } catch (e: Throwable) {
+                    e.printStackTrace()
+                }
             }
         }
     }
