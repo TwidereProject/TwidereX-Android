@@ -134,8 +134,8 @@ private fun ensureMimeInfo() {
 }
 
 private fun ensureWindowsRegistry() {
-    // val protocol = WindowsRegistry.readRegistry("HKCR\\TwidereX", "URL Protocol")
-    // if (protocol?.contains(twidereXSchema) == true) return
+    val protocol = WindowsRegistry.readRegistry("HKCR\\TwidereX", "URL Protocol")
+    if (protocol?.contains(twidereXSchema) == true) return
     WindowsRegistry.registryUrlProtocol(twidereXSchema)
 }
 
