@@ -67,7 +67,9 @@ fun runDesktopApp(
     when (currentOperatingSystem) {
         OperatingSystem.Windows -> {
             ensureWindowsDatastore()
-            ensureWindowsRegistry()
+            if (args.isEmpty()) {
+                ensureWindowsRegistry()
+            }
             ensureSingleAppInstance(args)
         }
         OperatingSystem.Linux -> {
