@@ -260,14 +260,6 @@ open class ComposeViewModel(
         )
     }
     val enableThreadMode = MutableStateFlow(composeType == ComposeType.Thread)
-    val maxContentLength = account.map {
-        when (it.type) {
-            PlatformType.Twitter -> TwitterTextConfiguration.getDefaultConfig().maxWeightedTweetLength
-            PlatformType.StatusNet -> TODO()
-            PlatformType.Fanfou -> TODO()
-            PlatformType.Mastodon -> 500
-        }
-    }.asStateIn(viewModelScope, 1)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val status by lazy {
@@ -311,6 +303,20 @@ open class ComposeViewModel(
             }
         }.asStateIn(viewModelScope, null)
     }
+
+    val maxContentLength = account.combine(status) { account, status ->
+        when (account.type) {
+            PlatformType.Twitter -> TwitterTextConfiguration.getDefaultConfig().maxWeightedTweetLength -
+                (
+                    status?.generateShareLink()?.let {
+                        it.length + 1 // for space
+                    } ?: 0
+                    )
+            PlatformType.StatusNet -> TODO()
+            PlatformType.Fanfou -> TODO()
+            PlatformType.Mastodon -> 500
+        }
+    }.asStateIn(viewModelScope, 1)
 
     val mediaInsertMode = MutableStateFlow(MediaInsertMode.All)
 
