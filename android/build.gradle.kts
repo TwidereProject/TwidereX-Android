@@ -88,8 +88,6 @@ android {
             if (hasSigningProps) {
                 signingConfig = signingConfigs.getByName("twidere")
             }
-            // isMinifyEnabled = true
-            // isShrinkResources = true
         }
         release {
             if (hasSigningProps) {
