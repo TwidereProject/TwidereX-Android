@@ -50,6 +50,7 @@ import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.MastodonEmojiCache
 import com.twidere.twiderex.utils.notifyError
 import com.twitter.twittertext.Extractor
+import com.twitter.twittertext.TwitterTextConfiguration
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -243,9 +244,11 @@ open class ComposeViewModel(
     val contentWarningTextFieldValue = MutableStateFlow(TextFieldValue())
     val textFieldValue = MutableStateFlow(TextFieldValue())
     val images = MutableStateFlow<List<UiMediaInsert>>(emptyList())
-    val canSend = textFieldValue
-        .combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
-        .asStateIn(viewModelScope, false)
+    val canSend by lazy {
+        combine(textFieldValue, images, maxContentLength) { text, imgs, maxLength ->
+            (text.text.isNotEmpty() || !imgs.isNullOrEmpty()) && text.text.length <= maxLength
+        }.asStateIn(viewModelScope, false)
+    }
     val canSaveDraft = textFieldValue
         .combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
         .asStateIn(viewModelScope, false)
@@ -300,6 +303,20 @@ open class ComposeViewModel(
             }
         }.asStateIn(viewModelScope, null)
     }
+
+    val maxContentLength = account.combine(status) { account, status ->
+        when (account.type) {
+            PlatformType.Twitter -> TwitterTextConfiguration.getDefaultConfig().maxWeightedTweetLength -
+                (
+                    status?.generateShareLink()?.let {
+                        it.length + 1 // for space
+                    } ?: 0
+                    )
+            PlatformType.StatusNet -> TODO()
+            PlatformType.Fanfou -> TODO()
+            PlatformType.Mastodon -> 500
+        }
+    }.asStateIn(viewModelScope, 1)
 
     val mediaInsertMode = MutableStateFlow(MediaInsertMode.All)
 

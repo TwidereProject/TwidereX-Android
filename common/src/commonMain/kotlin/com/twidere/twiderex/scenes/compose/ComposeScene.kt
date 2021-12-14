@@ -143,7 +143,6 @@ import com.twidere.twiderex.viewmodel.compose.DraftComposeViewModel
 import com.twidere.twiderex.viewmodel.compose.DraftItemViewModel
 import com.twidere.twiderex.viewmodel.compose.VoteExpired
 import com.twidere.twiderex.viewmodel.compose.VoteState
-import com.twitter.twittertext.TwitterTextConfiguration
 import com.twitter.twittertext.TwitterTextParser
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -206,6 +205,7 @@ private fun ComposeBody(
     val enableThreadMode by viewModel.enableThreadMode.observeAsState(initial = false)
     var showSaveDraftDialog by remember { mutableStateOf(false) }
     val scaffoldState = rememberBottomSheetScaffoldState()
+    val maxLength by viewModel.maxContentLength.observeAsState(initial = 1)
     if (showSaveDraftDialog || canSaveDraft) {
         BackHandler {
             when {
@@ -396,7 +396,7 @@ private fun ComposeBody(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    TextProgress(textFieldValue)
+                    TextProgress(textFieldValue, maxLength)
                     if (account.type == PlatformType.Mastodon) {
                         ComposeMastodonVisibility(
                             modifier = Modifier.weight(1f),
@@ -644,16 +644,7 @@ private object LocationDisplayDefaults {
 }
 
 @Composable
-private fun TextProgress(textFieldValue: TextFieldValue) {
-    val account = LocalActiveAccount.current ?: return
-    val maxLength = remember {
-        when (account.type) {
-            PlatformType.Twitter -> TwitterTextConfiguration.getDefaultConfig().maxWeightedTweetLength
-            PlatformType.StatusNet -> TODO()
-            PlatformType.Fanfou -> TODO()
-            PlatformType.Mastodon -> 500
-        }
-    }
+private fun TextProgress(textFieldValue: TextFieldValue, maxLength: Int) {
     val textLength = remember(textFieldValue) {
         TwitterTextParser.parseTweet(textFieldValue.text).weightedLength
     }
