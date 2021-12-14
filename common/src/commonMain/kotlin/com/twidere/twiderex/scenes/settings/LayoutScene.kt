@@ -23,6 +23,7 @@ package com.twidere.twiderex.scenes.settings
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
@@ -44,6 +45,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -204,9 +206,10 @@ private fun LayoutItemContent(
                                     res = if (visible) {
                                         com.twidere.twiderex.MR.files.ic_delete_colored
                                     } else {
-                                        com.twidere.twiderex.MR.files.ic_add
+                                        com.twidere.twiderex.MR.files.ic_add_colored
                                     }
                                 ),
+                                modifier = Modifier.size(24.dp),
                                 contentDescription = null,
                             )
                         }
