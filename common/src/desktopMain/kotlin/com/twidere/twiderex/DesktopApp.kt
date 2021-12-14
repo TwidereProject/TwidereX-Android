@@ -50,6 +50,7 @@ import moe.tlaster.precompose.PreComposeWindow
 import moe.tlaster.precompose.navigation.NavController
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
+import org.koin.core.logger.Level
 import java.awt.Desktop
 import java.io.File
 import java.nio.file.Files
@@ -141,7 +142,7 @@ private fun ensureWindowsRegistry() {
 
 private fun startDesktopApp() {
     startKoin {
-        printLogger()
+        printLogger(Level.NONE)
         setupModules()
     }
     val preferencesHolder = get<PreferencesHolder>()
