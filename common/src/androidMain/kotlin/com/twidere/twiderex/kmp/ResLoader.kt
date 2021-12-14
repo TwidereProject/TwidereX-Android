@@ -24,7 +24,7 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import coil.compose.LocalImageLoader
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import dev.icerock.moko.resources.FileResource
 import dev.icerock.moko.resources.ImageResource
@@ -44,10 +44,10 @@ actual class ResLoader(
     @Composable
     actual fun getSvg(res: FileResource): Painter {
         val data = "android.resource://${context.packageName}/raw/${context.resources.getResourceEntryName(res.rawResId)}"
-        return rememberImagePainter(
-            data = data,
+        return rememberAsyncImagePainter(
+            model = data,
             imageLoader = LocalImageLoader.current.newBuilder()
-                .componentRegistry { add(SvgDecoder(context)) }
+                .components { add(SvgDecoder.Factory()) }
                 .build(),
         )
     }
@@ -56,10 +56,10 @@ actual class ResLoader(
     @Composable
     actual fun getImage(res: ImageResource): Painter {
         val data = "android.resource://${context.packageName}/drawable/${context.resources.getResourceEntryName(res.drawableResId)}"
-        return rememberImagePainter(
-            data = data,
+        return rememberAsyncImagePainter(
+            model = data,
             imageLoader = LocalImageLoader.current.newBuilder()
-                .componentRegistry { add(SvgDecoder(context)) }
+                .components { add(SvgDecoder.Factory()) }
                 .build(),
         )
     }

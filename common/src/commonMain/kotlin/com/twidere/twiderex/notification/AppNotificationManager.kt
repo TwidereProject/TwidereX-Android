@@ -21,6 +21,7 @@
 package com.twidere.twiderex.notification
 
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 expect class AppNotificationManager {
@@ -30,7 +31,7 @@ expect class AppNotificationManager {
     fun notifyTransient(
         notificationId: Int,
         appNotification: AppNotification,
-        duration: Duration = Duration.Companion.seconds(5),
+        duration: Duration = 5.seconds,
     )
 }
 

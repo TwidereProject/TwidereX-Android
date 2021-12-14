@@ -26,24 +26,24 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
-import coil.compose.ImagePainter
 import coil.compose.LocalImageLoader
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
-import coil.size.OriginalSize
-import coil.transform.BlurTransformation
-import coil.util.CoilUtils
+import coil.disk.DiskCache
+import coil.request.ImageRequest
+import coil.size.Size
 import com.twidere.services.http.authorization.Authorization
 import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.component.foundation.NetworkImageState
 import com.twidere.twiderex.component.image.ImageEffects
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.preferences.LocalHttpConfig
-import okhttp3.Cache
+import com.twidere.twiderex.utils.BlurTransformation
 import okhttp3.Request
 import java.io.File
 import java.net.URL
+
 @OptIn(coil.annotation.ExperimentalCoilApi::class)
 @Composable
 internal actual fun rememberNetworkImagePainter(
@@ -55,41 +55,39 @@ internal actual fun rememberNetworkImagePainter(
     onImageStateChanged: (NetworkImageState) -> Unit
 ): Painter {
     val context = LocalContext.current
-    return rememberImagePainter(
-        data = data,
-        imageLoader = buildImageLoader(cacheDir),
-        builder = {
-            size(OriginalSize)
-            crossfade(effects.crossFade)
-            if (effects.blur != null) {
-                transformations(
-                    BlurTransformation(
-                        context = context,
-                        radius = effects.blur.blurRadius,
-                        sampling = effects.blur.bitmapScale
+    return rememberAsyncImagePainter(
+        model = ImageRequest
+            .Builder(context)
+            .data(data)
+            .apply {
+                size(Size.ORIGINAL)
+                crossfade(effects.crossFade)
+                if (effects.blur != null) {
+                    transformations(
+                        BlurTransformation(
+                            context = context,
+                            radius = effects.blur.blurRadius,
+                        )
                     )
+                }
+                listener(
+                    onSuccess = { _, _ -> onImageStateChanged(NetworkImageState.SUCCESS) },
+                    onError = { _, _ -> onImageStateChanged(NetworkImageState.ERROR) },
+                    onStart = { onImageStateChanged(NetworkImageState.LOADING) }
                 )
-            }
-            listener(
-                onSuccess = { _, _ -> onImageStateChanged(NetworkImageState.SUCCESS) },
-                onError = { _, _ -> onImageStateChanged(NetworkImageState.ERROR) },
-                onStart = { onImageStateChanged(NetworkImageState.LOADING) }
-            )
-            if (authorization.hasAuthorization) {
-                addHeader(
-                    "Authorization",
-                    authorization.getAuthorizationHeader(
-                        Request.Builder()
-                            .url(URL(data.toString()))
-                            .build()
+                if (authorization.hasAuthorization) {
+                    addHeader(
+                        "Authorization",
+                        authorization.getAuthorizationHeader(
+                            Request.Builder()
+                                .url(URL(data.toString()))
+                                .build()
+                        )
                     )
-                )
+                }
             }
-        },
-        onExecute = { previous, current ->
-            (current.state !is ImagePainter.State.Success && previous?.request != current.request) ||
-                current.state == ImagePainter.State.Empty
-        }
+            .build(),
+        imageLoader = buildImageLoader(cacheDir)
     )
 }
 
@@ -104,18 +102,22 @@ private fun buildImageLoader(cacheDir: String): ImageLoader {
             if (httpConfig.proxyConfig.enable &&
                 httpConfig.proxyConfig.server.isNotEmpty()
             ) {
-                callFactory(
+                callFactory {
                     TwidereServiceFactory.createHttpClientFactory()
                         .createHttpClientBuilder()
-                        .cache(Cache(File(cacheDir), CoilUtils.createDefaultCache(context).maxSize()))
                         .build()
-                )
+                }
+                diskCache {
+                    DiskCache.Builder(context)
+                        .directory(File(cacheDir))
+                        .build()
+                }
             }
-        }.componentRegistry {
+        }.components {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                add(ImageDecoderDecoder(context))
+                add(ImageDecoderDecoder.Factory())
             } else {
-                add(GifDecoder())
+                add(GifDecoder.Factory())
             }
         }
         .build()

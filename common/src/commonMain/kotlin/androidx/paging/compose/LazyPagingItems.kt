@@ -299,7 +299,3 @@ public fun <T : Any> LazyListScope.itemsIndexed(
         itemContent(index, items[index])
     }
 }
-
-expect class PagingPlaceholderKey(index: Int) {
-    val index: Int
-}

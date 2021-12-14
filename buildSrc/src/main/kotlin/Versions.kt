@@ -19,7 +19,7 @@ object Versions {
     const val okhttp = "4.9.1"
     const val retrofit2 = "2.9.0"
     const val hson = "0.1.4"
-    const val compose_jb = "0.0.0-use_kotlin_1.6.10-RC-dev521"
+    const val compose_jb = "1.0.1-rc1"
     const val paging = "3.1.0"
     const val activity = "1.4.0"
     const val datastore = "1.0.0"
