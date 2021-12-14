@@ -43,7 +43,7 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
@@ -81,10 +81,10 @@ fun ListsSceneFab() {
     FloatingActionButton(
         onClick = {
             when (account.type) {
-                PlatformType.Twitter -> navController.navigate(RootRoute.Lists.TwitterCreate)
+                PlatformType.Twitter -> navController.navigate(Root.Lists.TwitterCreate)
                 PlatformType.StatusNet -> TODO()
                 PlatformType.Fanfou -> TODO()
-                PlatformType.Mastodon -> navController.navigate(RootRoute.Lists.MastodonCreateDialog)
+                PlatformType.Mastodon -> navController.navigate(Root.Lists.MastodonCreateDialog)
             }
         }
     ) {
@@ -126,7 +126,7 @@ fun ListsSceneContent() {
             source = sourceItems,
             ownerItems = ownerItems,
             subscribedItems = subscribeItems,
-            onItemClicked = { navController.navigate(RootRoute.Lists.Timeline(it.listKey)) }
+            onItemClicked = { navController.navigate(Root.Lists.Timeline(it.listKey)) }
         )
     }
 }

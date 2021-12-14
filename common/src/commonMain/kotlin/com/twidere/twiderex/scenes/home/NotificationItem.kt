@@ -33,7 +33,7 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.HomeNavigationItem
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineViewModel
@@ -42,7 +42,7 @@ class NotificationItem : HomeNavigationItem() {
     @Composable
     override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_notification_title)
     override val route: String
-        get() = RootRoute.Notification
+        get() = Root.Notification
 
     @Composable
     override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_message_circle)

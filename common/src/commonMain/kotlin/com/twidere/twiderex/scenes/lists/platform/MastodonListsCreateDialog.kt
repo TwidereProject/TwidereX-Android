@@ -32,7 +32,7 @@ import com.twidere.twiderex.component.lists.MastodonListsModifyComponent
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
 import kotlinx.coroutines.launch
@@ -79,7 +79,7 @@ fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
                 dismiss()
                 if (result != null) {
                     navController.navigate(
-                        RootRoute.Lists.Timeline(result.listKey),
+                        Root.Lists.Timeline(result.listKey),
                     )
                 }
             }

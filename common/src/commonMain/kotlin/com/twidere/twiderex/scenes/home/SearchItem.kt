@@ -58,7 +58,7 @@ import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
@@ -69,7 +69,7 @@ class SearchItem : HomeNavigationItem() {
     @Composable
     override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_search_title)
     override val route: String
-        get() = RootRoute.Search.Home
+        get() = Root.Search.Home
 
     @Composable
     override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search)

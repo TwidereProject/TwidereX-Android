@@ -37,7 +37,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.navigation.RootDeepLinksRouteDefinition
+import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.twitter.user.TwitterUserViewModel
 import moe.tlaster.precompose.navigation.NavOptions
@@ -56,7 +56,7 @@ fun TwitterUserScene(screenName: String) {
         user?.let {
             navigator.user(
                 user = it,
-                NavOptions(popUpTo = PopUpTo(RootDeepLinksRouteDefinition.Twitter.User, inclusive = true))
+                NavOptions(popUpTo = PopUpTo(RootDeepLinks.Twitter.User.route, inclusive = true))
             )
         }
     }

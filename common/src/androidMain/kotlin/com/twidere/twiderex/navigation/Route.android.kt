@@ -27,7 +27,7 @@ import java.net.URLDecoder
 
 actual fun RouteBuilder.platformScene() {
     scene(
-        RootRouteDefinition.SignIn.Web.Twitter,
+        Root.SignIn.Web.Twitter,
     ) { backStackEntry ->
         backStackEntry.path<String>("target")?.let {
             TwitterWebSignInScene(target = URLDecoder.decode(it, "UTF-8"))

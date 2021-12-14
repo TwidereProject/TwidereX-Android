@@ -53,7 +53,7 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.currentPlatform
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalNavController
 import kotlinx.coroutines.launch
 
@@ -79,7 +79,7 @@ private fun MastodonSignIn() {
     SignInButton(
         onClick = {
             scope.launch {
-                navController.navigateForResult(RootRoute.SignIn.Mastodon)
+                navController.navigateForResult(Root.SignIn.Mastodon)
                     ?.let {
                         it as Boolean
                     }?.let {
@@ -141,7 +141,7 @@ private fun TwitterSignIn() {
         onClick = {
             scope.launch {
                 navController.navigateForResult(
-                    RootRoute.SignIn.Twitter(
+                    Root.SignIn.Twitter(
                         BuildConfig.CONSUMERKEY,
                         BuildConfig.CONSUMERSECRET,
                     )
@@ -239,7 +239,7 @@ private fun TwitterCustomKeySignIn(
                 onClick = {
                     scope.launch {
                         navController.navigateForResult(
-                            RootRoute.SignIn.Twitter(
+                            Root.SignIn.Twitter(
                                 apiKey,
                                 apiSecret,
                             )

@@ -47,7 +47,7 @@ import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
@@ -69,7 +69,7 @@ fun AccountManagementScene() {
                         val navController = LocalNavController.current
                         IconButton(
                             onClick = {
-                                navController.navigate(RootRoute.SignIn.General)
+                                navController.navigate(Root.SignIn.General)
                             }
                         ) {
                             Icon(

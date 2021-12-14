@@ -30,7 +30,7 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.enums.ReferenceType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.navigation.twidereXSchema
 import moe.tlaster.precompose.navigation.NavController
 import moe.tlaster.precompose.navigation.NavOptions
@@ -67,7 +67,7 @@ class Navigator(
     private val remoteNavigator: RemoteNavigator,
 ) : INavigator {
     override fun user(user: UiUser, navOptions: NavOptions?) {
-        navController.navigate(RootRoute.User(user.userKey), navOptions)
+        navController.navigate(Root.User(user.userKey), navOptions)
     }
 
     override fun status(status: UiStatus, navOptions: NavOptions?) {
@@ -89,7 +89,7 @@ class Navigator(
         }
         if (statusKey != null) {
             navController.navigate(
-                RootRoute.Status(statusKey),
+                Root.Status(statusKey),
                 navOptions
             )
         }
@@ -100,16 +100,16 @@ class Navigator(
         selectedIndex: Int,
         navOptions: NavOptions?
     ) {
-        navController.navigate(RootRoute.Media.Status(statusKey, selectedIndex), navOptions)
+        navController.navigate(Root.Media.Status(statusKey, selectedIndex), navOptions)
     }
 
     override fun search(keyword: String) {
-        navController.navigate(RootRoute.Search.Result(keyword))
+        navController.navigate(Root.Search.Result(keyword))
     }
 
     override fun searchInput(initial: String?) {
         navController.navigate(
-            RootRoute.Search.Input(initial),
+            Root.Search.Input(initial),
         )
     }
 
@@ -118,7 +118,7 @@ class Navigator(
         statusKey: MicroBlogKey?,
         navOptions: NavOptions?
     ) {
-        navController.navigate(RootRoute.Compose.Home(composeType, statusKey))
+        navController.navigate(Root.Compose.Home(composeType, statusKey))
     }
 
     override fun openLink(it: String, deepLink: Boolean) {
@@ -138,12 +138,12 @@ class Navigator(
     override suspend fun twitterSignInWeb(target: String): String {
         clearCookie()
         return navController.navigateForResult(
-            RootRoute.SignIn.Web.Twitter(target)
+            Root.SignIn.Web.Twitter(target)
         ).toString()
     }
 
     override fun hashtag(name: String) {
-        navController.navigate(RootRoute.Mastodon.Hashtag(name))
+        navController.navigate(Root.Mastodon.Hashtag(name))
     }
 
     override fun goBack() {

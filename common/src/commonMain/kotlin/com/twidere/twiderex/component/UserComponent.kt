@@ -101,7 +101,7 @@ import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
@@ -460,7 +460,7 @@ fun UserInfo(
                         user = user,
                         size = UserInfoDefaults.AvatarSize
                     ) {
-                        navController.navigate(RootRoute.Media.Raw(MediaType.photo, user.profileImage))
+                        navController.navigate(Root.Media.Raw(MediaType.photo, user.profileImage))
                     }
                 }
             }
@@ -735,7 +735,7 @@ private fun UserBanner(
             .heightIn(max = maxBannerSize)
             .clickable(
                 onClick = {
-                    navController.navigate(RootRoute.Media.Raw(MediaType.photo, bannerUrl))
+                    navController.navigate(Root.Media.Raw(MediaType.photo, bannerUrl))
                 },
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() },
@@ -763,7 +763,7 @@ fun UserMetrics(
             modifier = Modifier
                 .weight(1f)
                 .clickable {
-                    navController.navigate(RootRoute.Following(user.userKey))
+                    navController.navigate(Root.Following(user.userKey))
                 },
             primaryText = user.metrics.follow.toString(),
             secondaryText = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_profile_dashboard_following),
@@ -775,7 +775,7 @@ fun UserMetrics(
             modifier = Modifier
                 .weight(1f)
                 .clickable {
-                    navController.navigate(RootRoute.Followers(user.userKey))
+                    navController.navigate(Root.Followers(user.userKey))
                 },
             primaryText = user.metrics.fans.toString(),
             secondaryText = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_profile_dashboard_followers),

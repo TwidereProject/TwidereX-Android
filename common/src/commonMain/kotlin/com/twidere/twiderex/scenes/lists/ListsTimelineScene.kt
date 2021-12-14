@@ -62,7 +62,7 @@ import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.scenes.lists.platform.MastodonListsEditDialog
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -158,7 +158,7 @@ fun ListTimeLineScene(
                                     onClick = {
                                         menuExpand = false
                                         navController.navigate(
-                                            RootRoute.Lists.Members(
+                                            Root.Lists.Members(
                                                 listKey,
                                                 uiList.isOwner(account.user.userId)
                                             )
@@ -173,7 +173,7 @@ fun ListTimeLineScene(
                                         onClick = {
                                             menuExpand = false
                                             navController.navigate(
-                                                RootRoute.Lists.Subscribers(
+                                                Root.Lists.Subscribers(
                                                     listKey
                                                 )
                                             )
@@ -189,7 +189,7 @@ fun ListTimeLineScene(
                                             menuExpand = false
                                             when (account.type) {
                                                 PlatformType.Twitter -> navController.navigate(
-                                                    RootRoute.Lists.TwitterEdit(listKey = listKey)
+                                                    Root.Lists.TwitterEdit(listKey = listKey)
                                                 )
                                                 PlatformType.StatusNet -> TODO()
                                                 PlatformType.Fanfou -> TODO()

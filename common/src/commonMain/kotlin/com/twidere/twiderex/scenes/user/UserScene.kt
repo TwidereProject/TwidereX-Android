@@ -50,7 +50,7 @@ import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
@@ -92,7 +92,7 @@ fun UserScene(
                                                 it,
                                                 onResult = { conversationKey ->
                                                     conversationKey?.let {
-                                                        navController.navigate(RootRoute.Messages.Conversation(it))
+                                                        navController.navigate(Root.Messages.Conversation(it))
                                                     }
                                                 }
                                             )

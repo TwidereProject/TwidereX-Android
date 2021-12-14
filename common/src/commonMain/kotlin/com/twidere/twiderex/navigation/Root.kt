@@ -26,51 +26,86 @@ import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MediaType
 
 @AppRoute
-interface Root {
+expect object Root {
     val Home: String
     val HomeTimeline: String
     val Notification: String
     val Mentions: String
     val Me: String
 
-    interface Draft {
+    object Draft {
         val List: String
-        fun Compose(draftId: String): String
-    }
 
-    interface SignIn {
-        val General: String
-        fun Twitter(consumerKey: String, consumerSecret: String): String
-        val Mastodon: String
-        interface Web {
-            fun Twitter(target: String): String
+        object Compose : IRoute {
+            operator fun invoke(draftId: String): String
         }
     }
-    fun User(userKey: MicroBlogKey): String
 
-    interface Media {
-        fun Status(statusKey: MicroBlogKey, selectedIndex: Int?): String
-        fun Raw(type: MediaType, url: String): String
-        fun Pure(belongToKey: MicroBlogKey, selectedIndex: Int?): String
+    object SignIn {
+        val General: String
+
+        object Twitter : IRoute {
+            operator fun invoke(consumerKey: String, consumerSecret: String): String
+        }
+
+        val Mastodon: String
+
+        object Web {
+            object Twitter : IRoute {
+                operator fun invoke(target: String): String
+            }
+        }
     }
 
-    interface Search {
+    object User : IRoute {
+        operator fun invoke(userKey: MicroBlogKey): String
+    }
+
+    object Media {
+        object Status : IRoute {
+            operator fun invoke(statusKey: MicroBlogKey, selectedIndex: Int?): String
+        }
+
+        object Raw : IRoute {
+            operator fun invoke(type: MediaType, url: String): String
+        }
+
+        object Pure : IRoute {
+            operator fun invoke(belongToKey: MicroBlogKey, selectedIndex: Int?): String
+        }
+    }
+
+    object Search {
         val Home: String
-        fun Result(keyword: String): String
-        fun Input(keyword: String?): String
+
+        object Result : IRoute {
+            operator fun invoke(keyword: String): String
+        }
+
+        object Input : IRoute {
+            operator fun invoke(keyword: String?): String
+        }
     }
 
-    interface Compose {
-        fun Home(composeType: ComposeType?, statusKey: MicroBlogKey?): String
-        interface Search {
+    object Compose {
+        object Home : IRoute {
+            operator fun invoke(composeType: ComposeType?, statusKey: MicroBlogKey?): String
+        }
+
+        object Search {
             val User: String
         }
     }
 
-    fun Following(userKey: MicroBlogKey): String
-    fun Followers(userKey: MicroBlogKey): String
+    object Following : IRoute {
+        operator fun invoke(userKey: MicroBlogKey): String
+    }
 
-    interface Settings {
+    object Followers : IRoute {
+        operator fun invoke(userKey: MicroBlogKey): String
+    }
+
+    object Settings {
         val Home: String
         val Appearance: String
         val Display: String
@@ -80,40 +115,67 @@ interface Root {
         val Misc: String
         val Notification: String
         val Layout: String
-        fun AccountNotification(accountKey: MicroBlogKey): String
+
+        object AccountNotification : IRoute {
+            operator fun invoke(accountKey: MicroBlogKey): String
+        }
     }
 
-    fun Status(statusKey: MicroBlogKey): String
+    object Status : IRoute {
+        operator fun invoke(statusKey: MicroBlogKey): String
+    }
 
-    interface Mastodon {
-        fun Hashtag(keyword: String): String
+    object Mastodon {
+        object Hashtag : IRoute {
+            operator fun invoke(keyword: String): String
+        }
+
         val Notification: String
         val FederatedTimeline: String
         val LocalTimeline: String
 
-        interface Compose {
+        object Compose {
             val Hashtag: String
         }
     }
 
-    interface Lists {
+    object Lists {
         val Home: String
         val MastodonCreateDialog: String
         val TwitterCreate: String
-        fun TwitterEdit(listKey: MicroBlogKey): String
-        fun Timeline(listKey: MicroBlogKey): String
-        fun Members(listKey: MicroBlogKey, owned: Boolean?): String
-        fun Subscribers(listKey: MicroBlogKey): String
-        fun AddMembers(listKey: MicroBlogKey): String
+
+        object TwitterEdit : IRoute {
+            operator fun invoke(listKey: MicroBlogKey): String
+        }
+
+        object Timeline : IRoute {
+            operator fun invoke(listKey: MicroBlogKey): String
+        }
+
+        object Members : IRoute {
+            operator fun invoke(listKey: MicroBlogKey, owned: Boolean?): String
+        }
+
+        object Subscribers : IRoute {
+            operator fun invoke(listKey: MicroBlogKey): String
+        }
+
+        object AddMembers : IRoute {
+            operator fun invoke(listKey: MicroBlogKey): String
+        }
     }
 
-    interface Messages {
+    object Messages {
         val Home: String
-        fun Conversation(conversationKey: MicroBlogKey): String
+
+        object Conversation : IRoute {
+            operator fun invoke(conversationKey: MicroBlogKey): String
+        }
+
         val NewConversation: String
     }
 
-    interface Gif {
+    object Gif {
         val Home: String
     }
 }

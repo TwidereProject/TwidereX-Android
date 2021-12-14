@@ -77,7 +77,7 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.kmp.TimeUtils
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMedia
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
@@ -243,7 +243,7 @@ private fun MessageBody(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) ->
             MediaMessage(
                 media = event.media.firstOrNull(),
                 onClick = {
-                    navController.navigate(RootRoute.Media.Pure(event.messageKey, 0))
+                    navController.navigate(Root.Media.Pure(event.messageKey, 0))
                 }
             )
             if (event.media.isNotEmpty() && event.htmlText.isNotEmpty()) Spacer(modifier = Modifier.height(MessageBodyDefaults.ContentSpacing))

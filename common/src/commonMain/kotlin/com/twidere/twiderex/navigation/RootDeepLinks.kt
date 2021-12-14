@@ -33,27 +33,51 @@ const val twidereXSchema = "twiderex"
 @AppRoute(
     schema = twidereXSchema
 )
-interface RootDeepLinks {
-    interface Twitter {
-        fun User(screenName: String): String
-        fun Status(statusId: String): String
+expect object RootDeepLinks {
+    object Twitter {
+        object User : IRoute {
+            operator fun invoke(screenName: String): String
+        }
+
+        object Status : IRoute {
+            operator fun invoke(statusId: String): String
+        }
     }
 
-    interface Mastodon {
-        fun Hashtag(keyword: String): String
+    object Mastodon {
+        object Hashtag : IRoute {
+            operator fun invoke(keyword: String): String
+        }
     }
 
-    fun User(userKey: MicroBlogKey): String
-    fun Status(statusKey: MicroBlogKey): String
-    fun Search(keyword: String): String
+    object User : IRoute {
+        operator fun invoke(userKey: MicroBlogKey): String
+    }
+
+    object Status : IRoute {
+        operator fun invoke(statusKey: MicroBlogKey): String
+    }
+
+    object Search : IRoute {
+        operator fun invoke(keyword: String): String
+    }
+
     val SignIn: String
 
-    fun Draft(draftId: String): String
-    fun Compose(composeType: ComposeType?, statusKey: MicroBlogKey?): String
-    fun Conversation(conversationKey: MicroBlogKey): String
+    object Draft : IRoute {
+        operator fun invoke(draftId: String): String
+    }
 
-    interface Callback {
-        interface SignIn {
+    object Compose : IRoute {
+        operator fun invoke(composeType: ComposeType?, statusKey: MicroBlogKey?): String
+    }
+
+    object Conversation : IRoute {
+        operator fun invoke(conversationKey: MicroBlogKey): String
+    }
+
+    object Callback {
+        object SignIn {
             val Mastodon: String
             val Twitter: String
         }

@@ -55,7 +55,7 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsUserViewModel
@@ -92,7 +92,7 @@ fun ListsMembersScene(
                     onClick = {
                         scope.launch {
                             val result =
-                                navController.navigateForResult(RootRoute.Lists.AddMembers(listKey = listKey)) as? List<*>?
+                                navController.navigateForResult(Root.Lists.AddMembers(listKey = listKey)) as? List<*>?
                             if (result != null && result.isNotEmpty()) source.refresh()
                         }
                     }
