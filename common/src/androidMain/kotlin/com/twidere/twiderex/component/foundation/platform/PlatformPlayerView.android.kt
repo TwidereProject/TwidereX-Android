@@ -24,6 +24,7 @@ import android.content.Context
 import android.view.SurfaceView
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -51,6 +52,8 @@ actual class PlatformPlayerView actual constructor(
     httpConfig: HttpConfig,
     zOrderMediaOverlay: Boolean,
     keepScreenOn: Boolean,
+    backgroundColor: Color?,
+    onClick: (() -> Unit)?
 ) {
     private var job: Job? = null
 

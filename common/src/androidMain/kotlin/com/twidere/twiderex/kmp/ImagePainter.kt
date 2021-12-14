@@ -22,6 +22,7 @@ package com.twidere.twiderex.kmp
 
 import android.os.Build
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import coil.ImageLoader
@@ -31,7 +32,9 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.disk.DiskCache
+import coil.request.ErrorResult
 import coil.request.ImageRequest
+import coil.request.SuccessResult
 import coil.size.Size
 import com.twidere.services.http.authorization.Authorization
 import com.twidere.services.http.config.HttpConfig
@@ -55,6 +58,25 @@ internal actual fun rememberNetworkImagePainter(
     onImageStateChanged: (NetworkImageState) -> Unit
 ): Painter {
     val context = LocalContext.current
+    val listener = remember {
+        object : ImageRequest.Listener {
+            override fun onStart(request: ImageRequest) {
+                onImageStateChanged(NetworkImageState.LOADING)
+            }
+
+            override fun onError(request: ImageRequest, result: ErrorResult) {
+                onImageStateChanged(NetworkImageState.ERROR)
+            }
+
+            override fun onSuccess(request: ImageRequest, result: SuccessResult) {
+                onImageStateChanged(NetworkImageState.SUCCESS)
+            }
+
+            override fun onCancel(request: ImageRequest) {
+                onImageStateChanged(NetworkImageState.ERROR)
+            }
+        }
+    }
     return rememberAsyncImagePainter(
         model = ImageRequest
             .Builder(context)
@@ -70,11 +92,7 @@ internal actual fun rememberNetworkImagePainter(
                         )
                     )
                 }
-                listener(
-                    onSuccess = { _, _ -> onImageStateChanged(NetworkImageState.SUCCESS) },
-                    onError = { _, _ -> onImageStateChanged(NetworkImageState.ERROR) },
-                    onStart = { onImageStateChanged(NetworkImageState.LOADING) }
-                )
+                listener(listener)
                 if (authorization.hasAuthorization) {
                     addHeader(
                         "Authorization",

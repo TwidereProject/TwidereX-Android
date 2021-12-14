@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.component.image
 
-class ImageEffects private constructor(
+data class ImageEffects(
     val blur: ImageBlur?,
     val crossFade: Boolean
 ) {

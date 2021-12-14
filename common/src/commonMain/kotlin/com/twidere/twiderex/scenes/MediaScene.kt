@@ -28,7 +28,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,15 +66,16 @@ import com.mxalbert.zoomable.Zoomable
 import com.twidere.twiderex.component.bottomInsetsHeight
 import com.twidere.twiderex.component.bottomInsetsPadding
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
-import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.foundation.VideoPlayerState
+import com.twidere.twiderex.component.foundation.platform.HorizontalPagerIndicator
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.foundation.rememberVideoPlayerState
+import com.twidere.twiderex.component.navigation.INavigator
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.LikeButton
@@ -92,6 +92,8 @@ import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.playEnable
 import com.twidere.twiderex.kmp.LocalPlatformWindow
+import com.twidere.twiderex.kmp.Platform
+import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
@@ -105,6 +107,7 @@ import com.twidere.twiderex.utils.video.CustomVideoControl
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
+import moe.tlaster.precompose.navigation.NavController
 import moe.tlaster.swiper.Swiper
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
@@ -148,7 +151,6 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
     val window = LocalPlatformWindow.current
@@ -169,61 +171,29 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
             navController.popBackStack()
         },
     )
-    InAppNotificationScaffold(
+    StatusMediaSceneLayout(
         backgroundColor = Color.Transparent,
         contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
-        bottomBar = {
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (status.media.size > 1) {
-                    // HorizontalPagerIndicator(
-                    //     pagerState = pagerState,
-                    //     modifier = Modifier
-                    //         .padding(16.dp)
-                    //         .align(Alignment.CenterHorizontally),
-                    // )
-                    AnimatedVisibility(
-                        visible = !(controlVisibility && swiperState.progress == 0f),
-                        enter = expandVertically(),
-                        exit = shrinkVertically(),
-                    ) {
-                        Spacer(modifier = Modifier.bottomInsetsHeight())
-                    }
-                }
-                AnimatedVisibility(
-                    visible = controlVisibility && swiperState.progress == 0f,
-                    enter = fadeIn() + expandVertically(),
-                    exit = shrinkVertically() + fadeOut()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .background(color = controlPanelColor)
-                            .bottomInsetsPadding()
-                            .clickable { navigator.status(status = status) },
-                    ) {
-                        StatusMediaInfo(
-                            videoPlayerState.value, status, viewModel, currentMedia,
-                        )
-                    }
-                }
-            }
-        }
-    ) {
-        Box(
-            modifier = Modifier
-                .clickable(
-                    onClick = {
-                        if (controlVisibility) {
-                            window.hideControls()
-                        } else {
-                            window.showControls()
-                        }
-                    },
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ),
-        ) {
+        bottomView = {
+            StatusMediaBottomContent(
+                status = status,
+                visible = controlVisibility && swiperState.progress == 0f,
+                controlPanelColor = controlPanelColor,
+                navigator = navigator,
+                videoPlayerState = videoPlayerState.value,
+                viewModel = viewModel,
+                currentMedia = currentMedia,
+                pagerState = pagerState
+            )
+        },
+        closeButton = {
+            StatusMediaCloseButton(
+                visible = controlVisibility && swiperState.progress == 0f,
+                backgroundColor = controlPanelColor,
+                navController = navController
+            )
+        },
+        mediaView = {
             MediaView(
                 media = status.media.mapNotNull {
                     it.mediaUrl?.let { it1 ->
@@ -236,7 +206,15 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                 swiperState = swiperState,
                 onVideoPlayerStateSet = { videoPlayerState.value = it },
                 pagerState = pagerState,
-                volume = 1f
+                volume = 1f,
+                onClick = {
+                    if (controlVisibility) {
+                        window.hideControls()
+                    } else {
+                        window.showControls()
+                    }
+                },
+                backgroundColor = MaterialTheme.colors.background
             )
             val windowBarVisibility by window.windowBarVisibility.observeAsState(true)
             LaunchedEffect(windowBarVisibility) {
@@ -247,40 +225,105 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                     window.showControls()
                 }
             }
-            AnimatedVisibility(
-                visible = controlVisibility && swiperState.progress == 0f,
-                enter = fadeIn() + expandVertically(),
-                exit = shrinkVertically() + fadeOut()
+        },
+        backgroundView = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
+            )
+        }
+    )
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun StatusMediaCloseButton(
+    visible: Boolean,
+    backgroundColor: Color,
+    navController: NavController
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + expandVertically(),
+        exit = shrinkVertically() + fadeOut()
+    ) {
+        Box(
+            modifier = Modifier
+                .topInsetsPadding()
+                .padding(16.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .clip(MaterialTheme.shapes.small)
+                    .background(
+                        color = backgroundColor,
+                        shape = MaterialTheme.shapes.small
+                    )
+                    .clipToBounds()
             ) {
-                Box(
-                    modifier = Modifier
-                        .topInsetsPadding()
-                        .padding(16.dp),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(
-                                color = controlPanelColor,
-                                shape = MaterialTheme.shapes.small
-                            )
-                            .clipToBounds()
-                    ) {
-                        IconButton(
-                            onClick = {
-                                navController.popBackStack()
-                            }
-                        ) {
-                            Icon(
-                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
-                                contentDescription = stringResource(
-                                    res = com.twidere.twiderex.MR.strings.accessibility_common_close
-                                )
-                            )
-                        }
+                IconButton(
+                    onClick = {
+                        navController.popBackStack()
                     }
+                ) {
+                    Icon(
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
+                        contentDescription = stringResource(
+                            res = com.twidere.twiderex.MR.strings.accessibility_common_close
+                        )
+                    )
                 }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun StatusMediaBottomContent(
+    status: UiStatus,
+    visible: Boolean,
+    controlPanelColor: Color,
+    navigator: INavigator,
+    videoPlayerState: VideoPlayerState?,
+    viewModel: MediaViewModel,
+    currentMedia: UiMedia,
+    pagerState: PagerState
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        if (status.media.size > 1) {
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .align(Alignment.CenterHorizontally),
+            )
+            AnimatedVisibility(
+                visible = !(visible),
+                enter = expandVertically(),
+                exit = shrinkVertically(),
+            ) {
+                Spacer(modifier = Modifier.bottomInsetsHeight())
+            }
+        }
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn() + expandVertically(),
+            exit = shrinkVertically() + fadeOut()
+        ) {
+            Box(
+                modifier = Modifier
+                    .background(color = controlPanelColor)
+                    .bottomInsetsPadding()
+                    .clickable { navigator.status(status = status) },
+            ) {
+                StatusMediaInfo(
+                    videoPlayerState, status, viewModel, currentMedia,
+                )
             }
         }
     }
@@ -379,7 +422,16 @@ fun RawMediaScene(url: String, type: MediaType) {
                     navController.popBackStack()
                 },
             )
-            MediaView(media = listOf(MediaData(url, type)), swiperState = swiperState)
+            Box {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
+                )
+                MediaView(media = listOf(MediaData(url, type)), swiperState = swiperState, onClick = {
+                    navController.popBackStack()
+                }, backgroundColor = MaterialTheme.colors.background)
+            }
         }
     }
 }
@@ -391,6 +443,7 @@ data class MediaData(
 
 @Composable
 fun MediaView(
+    backgroundColor: Color? = null,
     modifier: Modifier = Modifier,
     media: List<MediaData>,
     swiperState: SwiperState = rememberSwiperState(),
@@ -399,13 +452,9 @@ fun MediaView(
         pageCount = media.size,
     ),
     onVideoPlayerStateSet: (VideoPlayerState?) -> Unit = {},
-    volume: Float = 1f
+    volume: Float = 1f,
+    onClick: () -> Unit = {}
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
-    )
     Swiper(
         modifier = modifier,
         state = swiperState,
@@ -416,7 +465,9 @@ fun MediaView(
             val data = media[page]
             when (data.type) {
                 MediaType.photo ->
-                    Zoomable {
+                    Zoomable(
+                        onClick = onClick
+                    ) {
                         onVideoPlayerStateSet(null)
                         NetworkImage(
                             modifier = Modifier.fillMaxSize(),
@@ -429,23 +480,41 @@ fun MediaView(
                                 ) {
                                     CircularProgressIndicator()
                                 }
-                            }
+                            },
+                            zoomable = true
                         )
                     }
 
                 MediaType.video, MediaType.animated_gif, MediaType.audio ->
-                    Box {
+                    Box(
+                        modifier = Modifier.clickable {
+                            onClick.invoke()
+                        }
+                    ) {
                         val state = rememberVideoPlayerState(
                             url = data.url,
                             volume = volume,
                             isMute = LocalDisplayPreferences.current.muteByDefault
                         )
-                        onVideoPlayerStateSet(state)
+                        if (data.type == MediaType.animated_gif) {
+                            onVideoPlayerStateSet(null)
+                        } else {
+                            onVideoPlayerStateSet(state)
+                        }
                         VideoPlayer(
                             playEnable = LocalVideoPlayback.current.playEnable(),
                             videoState = state,
                             zOrderMediaOverlay = true,
                             keepScreenOn = true,
+                            backgroundColor = backgroundColor,
+                            // Pass the click event to swing on JVM
+                            onClick = if (
+                                currentPlatform == Platform.JVM
+                            ) {
+                                onClick
+                            } else {
+                                null
+                            }
                         )
                     }
                 MediaType.other -> Unit

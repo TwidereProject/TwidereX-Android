@@ -37,7 +37,7 @@ compose {
         application {
             mainClass = "com.twidere.twiderex.MainKt"
             nativeDistributions {
-                targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
+                targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
                 packageName = Package.name
                 packageVersion = Package.versionName.split("-").firstOrNull()
                 modules("java.sql") // https://github.com/JetBrains/compose-jb/issues/381
@@ -48,6 +48,15 @@ compose {
                     infoPlist {
                         extraKeysRawXml = macExtraPlistKeys
                     }
+                    iconFile.set(project.file("src/jvmMain/resources/icon/ic_launcher.icns"))
+                }
+                linux {
+                    iconFile.set(project.file("src/jvmMain/resources/icon/ic_launcher.png"))
+                }
+                windows {
+                    shortcut = true
+                    menu = true
+                    iconFile.set(project.file("src/jvmMain/resources/icon/ic_launcher.ico"))
                 }
             }
         }

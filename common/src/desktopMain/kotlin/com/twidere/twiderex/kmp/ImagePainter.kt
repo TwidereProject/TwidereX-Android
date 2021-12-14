@@ -52,7 +52,7 @@ internal actual fun rememberNetworkImagePainter(
     onImageStateChanged: (NetworkImageState) -> Unit
 ): Painter {
     val scope = rememberCoroutineScope { Dispatchers.IO }
-    return remember(data) {
+    return remember(data, effects) {
         ImagePainter(
             data,
             scope,

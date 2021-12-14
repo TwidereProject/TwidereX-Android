@@ -23,6 +23,7 @@ package com.twidere.twiderex
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.application
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
@@ -33,6 +34,8 @@ import com.twidere.twiderex.kmp.PlatformWindow
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
+import com.twidere.twiderex.preferences.model.DisplayPreferences
+import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.utils.OperatingSystem
 import com.twidere.twiderex.utils.WindowsDatastoreModifier
@@ -49,6 +52,9 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import java.awt.Desktop
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
+import kotlin.io.path.absolutePathString
 
 private val navController = NavController()
 private val mainScope = MainScope()
@@ -101,11 +107,13 @@ private fun ensureDesktopEntry() {
     if (!entryFile.exists()) {
         entryFile.createNewFile()
     }
+    val path = Files.readSymbolicLink(Paths.get("/proc/self/exe"))
     entryFile.writeText(
         "[Desktop Entry]${System.lineSeparator()}" +
             "Type=Application${System.lineSeparator()}" +
             "Name=Twidere X${System.lineSeparator()}" +
-            "Exec=\"${File("").absolutePath + "/bin/Twidere X\" %u"}${System.lineSeparator()}" +
+            "Icon=\"${path.parent.parent.absolutePathString() + "/lib/Twidere X.png" + "\""}${System.lineSeparator()}" +
+            "Exec=\"${path.absolutePathString() + "\" %u"}${System.lineSeparator()}" +
             "Terminal=false${System.lineSeparator()}" +
             "MimeType=x-scheme-handler/$twidereXSchema;"
     )
@@ -157,11 +165,13 @@ private fun startDesktopApp() {
                     stopKoin()
                     exitApplication()
                 },
-                title = "Twidere X"
+                title = "Twidere X",
+                icon = painterResource(MR.files.ic_launcher.filePath),
             ) {
                 FilePicker.init(window)
                 CompositionLocalProvider(
                     LocalPlatformWindow provides PlatformWindow(),
+                    LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
                 ) {
                     App(navController = navController)
                 }

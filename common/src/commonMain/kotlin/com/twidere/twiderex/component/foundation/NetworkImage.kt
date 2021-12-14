@@ -21,11 +21,13 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import com.twidere.services.http.authorization.EmptyAuthorization
@@ -50,6 +52,7 @@ fun NetworkImage(
     contentScale: ContentScale = ContentScale.Crop,
     effects: ImageEffects.Builder.() -> Unit = { crossFade(true) },
     placeholder: @Composable (() -> Unit)? = null,
+    zoomable: Boolean = false
 ) {
     val state = remember {
         mutableStateOf(NetworkImageState.LOADING)
@@ -89,17 +92,19 @@ fun NetworkImage(
             }
         )
     }
-    if (state.value == NetworkImageState.LOADING) {
-        placeholder?.invoke()
-    }
-    if (state.value == NetworkImageState.SUCCESS) {
+
+    Box {
         val size = painter.intrinsicSize
         Image(
             painter = painter,
-            modifier = Modifier.aspectRatio(size.width / size.height).then(modifier),
+            modifier = if (zoomable && size != Size.Unspecified) Modifier.aspectRatio(size.width / size.height).then(modifier) else modifier,
             contentScale = contentScale,
             contentDescription = stringResource(MR.strings.accessibility_common_network_image)
         )
+
+        if (state.value == NetworkImageState.LOADING) {
+            placeholder?.invoke()
+        }
     }
 }
 

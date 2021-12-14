@@ -20,11 +20,12 @@
  */
 package com.twidere.twiderex.media
 
+import androidx.compose.ui.graphics.Color
 import com.twidere.twiderex.component.foundation.DesktopMediaPlayer
 import com.twidere.twiderex.component.foundation.DesktopMediaPlayerFactory
 
 class DesktopMediaPlayerFactoryImpl : DesktopMediaPlayerFactory {
-    override fun create(url: String): DesktopMediaPlayer {
-        return JFXMediaPlayer(url)
+    override fun create(url: String, backgroundColor: Color?, onClick: (() -> Unit)?): DesktopMediaPlayer {
+        return JFXMediaPlayer(url, backgroundColor, onClick)
     }
 }

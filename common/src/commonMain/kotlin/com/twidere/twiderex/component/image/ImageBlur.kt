@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.component.image
 
-class ImageBlur(
+data class ImageBlur(
     val blurRadius: Int,
     val bitmapScale: Float,
 ) {

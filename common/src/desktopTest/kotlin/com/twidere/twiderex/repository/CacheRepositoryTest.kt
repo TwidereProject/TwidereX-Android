@@ -20,7 +20,10 @@
  */
 package com.twidere.twiderex.repository
 
+import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.StorageProvider
+import com.twidere.twiderex.kmp.cacheFiles
+import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.mock.db.MockAppDatabase
 import com.twidere.twiderex.mock.db.MockCacheDatabase
 import com.twidere.twiderex.mock.model.mockUiSearch
@@ -58,7 +61,12 @@ internal class CacheRepositoryTest {
         repository.clearSearchHistory()
 
         assert(mediaDir.listFiles()?.isEmpty() ?: true)
-        assert(cacheDir.listFiles()?.isEmpty() ?: true)
+        if (currentPlatform == Platform.JVM) {
+            assert(!File(cacheDir, "test").exists())
+            assert(File(storage.cacheFiles.databaseDir).exists())
+        } else {
+            assert(cacheDir.listFiles()?.isEmpty() ?: true)
+        }
         assert(cacheDatabase.isAllTablesCleared())
         assert(appDatabase.searchDao().getAll(MicroBlogKey.twitter("1")).firstOrNull().isNullOrEmpty())
     }
