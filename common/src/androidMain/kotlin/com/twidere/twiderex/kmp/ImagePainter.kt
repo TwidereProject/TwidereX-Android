@@ -22,15 +22,17 @@ package com.twidere.twiderex.kmp
 
 import android.os.Build
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
-import coil.compose.ImagePainter
 import coil.compose.LocalImageLoader
 import coil.compose.rememberImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
+import coil.request.ImageResult
 import coil.size.OriginalSize
 import coil.transform.BlurTransformation
 import coil.util.CoilUtils
@@ -44,6 +46,7 @@ import okhttp3.Cache
 import okhttp3.Request
 import java.io.File
 import java.net.URL
+
 @OptIn(coil.annotation.ExperimentalCoilApi::class)
 @Composable
 internal actual fun rememberNetworkImagePainter(
@@ -55,6 +58,21 @@ internal actual fun rememberNetworkImagePainter(
     onImageStateChanged: (NetworkImageState) -> Unit
 ): Painter {
     val context = LocalContext.current
+    val listener = remember {
+        object : ImageRequest.Listener {
+            override fun onStart(request: ImageRequest) {
+                onImageStateChanged(NetworkImageState.LOADING)
+            }
+
+            override fun onError(request: ImageRequest, throwable: Throwable) {
+                onImageStateChanged(NetworkImageState.ERROR)
+            }
+
+            override fun onSuccess(request: ImageRequest, metadata: ImageResult.Metadata) {
+                onImageStateChanged(NetworkImageState.SUCCESS)
+            }
+        }
+    }
     return rememberImagePainter(
         data = data,
         imageLoader = buildImageLoader(cacheDir),
@@ -70,11 +88,7 @@ internal actual fun rememberNetworkImagePainter(
                     )
                 )
             }
-            listener(
-                onSuccess = { _, _ -> onImageStateChanged(NetworkImageState.SUCCESS) },
-                onError = { _, _ -> onImageStateChanged(NetworkImageState.ERROR) },
-                onStart = { onImageStateChanged(NetworkImageState.LOADING) }
-            )
+            listener(listener)
             if (authorization.hasAuthorization) {
                 addHeader(
                     "Authorization",
@@ -85,10 +99,6 @@ internal actual fun rememberNetworkImagePainter(
                     )
                 )
             }
-        },
-        onExecute = { previous, current ->
-            (current.state !is ImagePainter.State.Success && previous?.request != current.request) ||
-                current.state == ImagePainter.State.Empty
         }
     )
 }

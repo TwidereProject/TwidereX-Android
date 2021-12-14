@@ -197,8 +197,8 @@ private fun LinkWithTitleAndSmallImagePreview(
         val textPlaceable = measurables[1].measure(constraints = constraints)
         val imagePlaceable = measurables[0].measure(
             Constraints.fixed(
-                textPlaceable.measuredHeight,
-                textPlaceable.measuredHeight
+                textPlaceable.measuredHeight.ensureSizeNotInfinity(),
+                textPlaceable.measuredHeight.ensureSizeNotInfinity()
             )
         )
         layout(
@@ -266,7 +266,7 @@ private fun LinkWithTitleAndLargeImagePreview(
     ) { measurables, constraints ->
         val textPlaceable = measurables[1].measure(constraints = constraints)
         val imagePlaceable =
-            measurables[0].measure(constraints = constraints.copy(minWidth = textPlaceable.measuredWidth))
+            measurables[0].measure(constraints = constraints.copy(minWidth = textPlaceable.measuredWidth.ensureSizeNotInfinity()))
         layout(
             width = textPlaceable.measuredWidth,
             height = textPlaceable.measuredHeight + imagePlaceable.measuredHeight
@@ -274,5 +274,13 @@ private fun LinkWithTitleAndLargeImagePreview(
             imagePlaceable.placeRelative(0, 0)
             textPlaceable.placeRelative(0, imagePlaceable.measuredHeight)
         }
+    }
+}
+
+private fun Int.ensureSizeNotInfinity(): Int {
+    return if (this == Constraints.Infinity) {
+        0
+    } else {
+        this
     }
 }

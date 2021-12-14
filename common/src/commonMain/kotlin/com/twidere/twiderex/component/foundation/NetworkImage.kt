@@ -21,6 +21,7 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -91,10 +92,8 @@ fun NetworkImage(
             }
         )
     }
-    if (state.value == NetworkImageState.LOADING) {
-        placeholder?.invoke()
-    }
-    if (state.value == NetworkImageState.SUCCESS) {
+
+    Box {
         val size = painter.intrinsicSize
         Image(
             painter = painter,
@@ -102,6 +101,10 @@ fun NetworkImage(
             contentScale = contentScale,
             contentDescription = stringResource(MR.strings.accessibility_common_network_image)
         )
+
+        if (state.value == NetworkImageState.LOADING) {
+            placeholder?.invoke()
+        }
     }
 }
 
