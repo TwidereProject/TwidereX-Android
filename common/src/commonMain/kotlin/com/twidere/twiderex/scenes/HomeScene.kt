@@ -89,8 +89,6 @@ import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.withElevation
-import com.twidere.twiderex.kmp.Platform
-import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.model.HomeMenus
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.RootRoute
@@ -256,13 +254,8 @@ fun HomeAppBar(
     scope: CoroutineScope,
 ) {
     if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
-        // FIXME: 2021/12/7  workaround for desktop crash  'place was called on a node which was placed already'
         AnimatedVisibility(
-            visible = if (currentPlatform == Platform.JVM) {
-                true
-            } else {
-                menus[pagerState.currentPage].item.withAppBar
-            },
+            visible = menus[pagerState.currentPage].item.withAppBar,
             enter = expandVertically(clip = false),
             exit = shrinkVertically(clip = false),
             modifier = modifier
