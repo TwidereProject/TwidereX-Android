@@ -25,6 +25,4 @@ package com.twidere.route.processor
 annotation class AppRoute(
     val schema: String = "",
     val packageName: String = "",
-    val routeClassName: String = "",
-    val definitionClassName: String = "",
 )
