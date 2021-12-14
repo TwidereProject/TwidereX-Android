@@ -32,6 +32,7 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.navigation.twidereXSchema
+import com.twidere.twiderex.twitterHosts
 import moe.tlaster.precompose.navigation.NavController
 import moe.tlaster.precompose.navigation.NavOptions
 
@@ -122,17 +123,20 @@ class Navigator(
     }
 
     override fun openLink(it: String, deepLink: Boolean) {
-        if ((
-            it.contains(twidereXSchema) || it.contains(
-                    "twitter.com",
-                    ignoreCase = true
-                )
-            ) && deepLink
-        ) {
+        if ((it.contains(twidereXSchema) || isTwitterDeeplink(it)) && deepLink) {
             navController.navigate(it)
         } else {
             remoteNavigator.openDeepLink(it)
         }
+    }
+
+    private fun isTwitterDeeplink(url: String): Boolean {
+        twitterHosts.forEach {
+            if (url.startsWith(it) && url.length > it.length) {
+                return true
+            }
+        }
+        return false
     }
 
     override suspend fun twitterSignInWeb(target: String): String {
