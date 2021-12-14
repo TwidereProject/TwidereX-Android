@@ -1,3 +1,4 @@
+
 import org.jetbrains.compose.compose
 import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import org.jetbrains.kotlin.konan.properties.loadProperties
@@ -7,7 +8,6 @@ plugins {
     id("org.jetbrains.compose") version Versions.compose_jb
     kotlin("plugin.serialization") version Versions.Kotlin.lang
     id("com.android.library")
-    kotlin("kapt")
     id("com.google.devtools.ksp").version(Versions.ksp)
     id("dev.icerock.mobile.multiplatform-resources") version Versions.moko
     id("com.squareup.sqldelight")
@@ -87,7 +87,7 @@ kotlin {
                 implementation("androidx.room:room-runtime:${Versions.room}")
                 implementation("androidx.room:room-ktx:${Versions.room}")
                 implementation("androidx.room:room-paging:${Versions.room}")
-                kapt("androidx.room:room-compiler:${Versions.room}")
+                ksp("androidx.room:room-compiler:${Versions.room}")
                 implementation("io.coil-kt:coil-base:${Versions.coil}")
                 implementation("io.coil-kt:coil-compose:${Versions.coil}")
                 implementation("io.coil-kt:coil-gif:${Versions.coil}")
@@ -151,12 +151,8 @@ multiplatformResources {
     multiplatformResourcesPackage = Package.id
 }
 
-fun org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler.kapt(dependencyNotation: String) {
-    configurations["kapt"].dependencies.add(project.dependencies.create(dependencyNotation))
-}
-
-fun org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler.ksp(dependencyNotation: org.gradle.accessors.dm.RouteProcessorProjectDependency) {
-    configurations["ksp"].dependencies.add(projects.routeProcessor)
+fun org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler.ksp(dependencyNotation: Any) {
+    configurations["ksp"].dependencies.add(project.dependencies.create(dependencyNotation))
 }
 
 android {
