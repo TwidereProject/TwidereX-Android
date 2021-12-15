@@ -20,8 +20,11 @@
  */
 package com.twidere.twiderex.component.status
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.with
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -53,7 +56,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -605,21 +607,17 @@ private fun StatusLinkPreview(card: UiCard) {
 
 @Composable
 @OptIn(ExperimentalAnimationApi::class)
-private fun ColumnScope.StatusBodyMedia(
-    status: UiStatus,
-) {
-    val navigator = LocalNavigator.current
+private fun ColumnScope.StatusBodyMedia(status: UiStatus) {
     if (status.media.any()) {
-        Spacer(modifier = Modifier.height(StatusBodyMediaDefaults.Spacing))
-        AnimatedVisibility(visible = LocalDisplayPreferences.current.mediaPreview) {
-            StatusMediaComponent(
-                status = status,
-            )
-        }
-        AnimatedVisibility(visible = !LocalDisplayPreferences.current.mediaPreview) {
-            CompositionLocalProvider(
-                LocalContentAlpha provides ContentAlpha.medium
-            ) {
+        Spacer(Modifier.height(StatusBodyMediaDefaults.Spacing))
+        AnimatedContent(
+            targetState = LocalDisplayPreferences.current.mediaPreview,
+            transitionSpec = { (fadeIn()) with (fadeOut()) }
+        ) { preview ->
+            if (preview) {
+                StatusMediaComponent(status)
+            } else {
+                val navigator = LocalNavigator.current
                 MediaPreviewButton {
                     navigator.media(statusKey = status.statusKey)
                 }
@@ -633,32 +631,28 @@ object StatusBodyMediaDefaults {
 }
 
 @Composable
-fun MediaPreviewButton(
-    onClick: () -> Unit,
-) {
+fun MediaPreviewButton(onClick: () -> Unit) {
+    val contentColor = LocalContentColor.current
+    val colorAlpha = ContentAlpha.medium
     Row(
         modifier = Modifier
-            .background(
-                LocalContentColor.current.copy(alpha = 0.04f),
-                shape = MaterialTheme.shapes.small,
-            )
-            .clip(MaterialTheme.shapes.small)
-            .clipToBounds()
-            .clickable(
-                onClick = {
-                    onClick.invoke()
-                }
-            )
-            .padding(4.dp)
+            .background(contentColor.copy(alpha = 0.04f), shape = MaterialTheme.shapes.small)
+            .clickable { onClick() }
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             painter = painterResource(res = com.twidere.twiderex.MR.files.ic_photo),
             contentDescription = stringResource(
                 res = com.twidere.twiderex.MR.strings.accessibility_common_status_media
-            )
+            ),
+            tint = contentColor.copy(alpha = colorAlpha)
         )
         Spacer(modifier = Modifier.width(MediaPreviewButtonDefaults.IconSpacing))
-        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_status_media))
+        Text(
+            text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_status_media),
+            color = contentColor.copy(alpha = colorAlpha)
+        )
     }
 }
 
