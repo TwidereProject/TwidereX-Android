@@ -130,23 +130,26 @@ fun LazyUiStatusList(
     val listState = rememberSaveable(saver = LazyUiStatusListState.Saver) {
         LazyUiStatusListState()
     }
-    LaunchedEffect(Unit) {
-        snapshotFlow { items.itemCount }
-            .filter { it > 0 }
-            .mapNotNull { items.peek(0)?.statusKey }
-            .distinctUntilChanged()
-            .collect {
-                listState.update(it)
-            }
-    }
-    LaunchedEffect(Unit) {
-        snapshotFlow { state.firstVisibleItemIndex }
-            .distinctUntilChanged()
-            .collect {
-                if (it == 0) {
-                    listState.hide()
+    if (!listState.showCursor) {
+        LaunchedEffect(Unit) {
+            snapshotFlow { items.itemCount }
+                .filter { it > 0 }
+                .mapNotNull { items.peek(0)?.statusKey }
+                .distinctUntilChanged()
+                .collect {
+                    listState.update(it)
                 }
-            }
+        }
+    } else {
+        LaunchedEffect(Unit) {
+            snapshotFlow { state.firstVisibleItemIndex }
+                .distinctUntilChanged()
+                .collect {
+                    if (it == 0) {
+                        listState.hide()
+                    }
+                }
+        }
     }
     LazyUiList(
         items = items,
