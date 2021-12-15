@@ -42,7 +42,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -86,17 +85,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.MR
-import com.twidere.twiderex.component.ImeBottomInsets
-import com.twidere.twiderex.component.ImeHeightWithInsets
 import com.twidere.twiderex.component.ImeVisibleWithInsets
 import com.twidere.twiderex.component.foundation.AlertDialog
 import com.twidere.twiderex.component.foundation.AppBar
@@ -107,7 +102,7 @@ import com.twidere.twiderex.component.foundation.GifTag
 import com.twidere.twiderex.component.foundation.InAppNotificationBottomSheetScaffold
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
-import com.twidere.twiderex.component.lazy.itemsGridIndexed
+import com.twidere.twiderex.component.foundation.platform.PlatformEmojiPanel
 import com.twidere.twiderex.component.media.MediaInsertMenu
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.StatusLineComponent
@@ -131,7 +126,6 @@ import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.model.ui.UiEmojiCategory
 import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
@@ -150,7 +144,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.BackHandler
 import org.koin.core.parameter.parametersOf
-import kotlin.math.max
 
 @Composable
 fun DraftComposeScene(
@@ -205,6 +198,7 @@ private fun ComposeBody(
     val enableThreadMode by viewModel.enableThreadMode.observeAsState(initial = false)
     var showSaveDraftDialog by remember { mutableStateOf(false) }
     val scaffoldState = rememberBottomSheetScaffoldState()
+    val emojis by viewModel.emojis.observeAsState(emptyList())
     val maxLength by viewModel.maxContentLength.observeAsState(initial = 1)
     if (showSaveDraftDialog || canSaveDraft) {
         BackHandler {
@@ -440,7 +434,13 @@ private fun ComposeBody(
                         },
                     )
                 }
-                EmojiPanel(viewModel = viewModel, showEmoji = showEmoji)
+                PlatformEmojiPanel(
+                    showEmoji = showEmoji,
+                    items = emojis,
+                    onEmojiSelected = {
+                        viewModel.insertEmoji(it)
+                    },
+                )
             }
         }
     }
@@ -473,107 +473,6 @@ private object ComposeImageListDefaults {
         horizontal = 16.dp,
         vertical = 0.dp
     )
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun EmojiPanel(
-    viewModel: ComposeViewModel,
-    showEmoji: Boolean,
-) {
-    val items by viewModel.emojis.observeAsState(initial = emptyList())
-
-    var height by remember { mutableStateOf(0) }
-    ImeHeightWithInsets(
-        filter = {
-            it > 0
-        },
-        collectIme = {
-            height = max(height, it)
-        }
-
-    )
-    val targetHeight = with(LocalDensity.current) {
-        height.toDp()
-    }
-    val bottom = ImeBottomInsets()
-    var visibility by remember { mutableStateOf(false) }
-    LaunchedEffect(showEmoji, bottom) {
-        if (bottom == targetHeight || showEmoji) {
-            visibility = showEmoji
-        }
-    }
-    Box(
-        modifier = Modifier
-            .height(
-                height = if (visibility) {
-                    (targetHeight - bottom).coerceAtLeast(0.dp)
-                } else {
-                    0.dp
-                }
-            )
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center,
-    ) {
-        EmojiList(items, viewModel)
-    }
-}
-
-@ExperimentalFoundationApi
-@Composable
-private fun EmojiList(
-    items: List<UiEmojiCategory>,
-    viewModel: ComposeViewModel
-) {
-    BoxWithConstraints(modifier = Modifier.padding(EmojiListDefaults.ContentPadding)) {
-        val column = maxOf((maxWidth / EmojiListDefaults.Icon.Size).toInt(), 1)
-        LazyColumn {
-            items.forEach {
-                it.category?.let { category ->
-                    item {
-                        Text(
-                            text = category,
-                            style = MaterialTheme.typography.h6,
-                            modifier = Modifier.padding(EmojiListDefaults.Category.ContentPadding)
-                        )
-                    }
-                }
-                itemsGridIndexed(
-                    data = it.emoji,
-                    rowSize = column,
-                ) { _, item ->
-                    item.url?.let { it1 ->
-                        NetworkImage(
-                            modifier = Modifier
-                                .size(EmojiListDefaults.Icon.Size)
-                                .padding(EmojiListDefaults.Icon.ContentPadding)
-                                .clickable {
-                                    viewModel.insertEmoji(item)
-                                },
-                            data = it1,
-                            contentScale = ContentScale.Fit,
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-object EmojiListDefaults {
-    object Icon {
-        val Size = 48.dp
-        val ContentPadding = PaddingValues(4.dp)
-    }
-
-    val ContentPadding = PaddingValues(
-        horizontal = 8.dp,
-        vertical = 0.dp
-    )
-
-    object Category {
-        val ContentPadding = PaddingValues(vertical = 16.dp, horizontal = 4.dp)
-    }
 }
 
 @Composable
