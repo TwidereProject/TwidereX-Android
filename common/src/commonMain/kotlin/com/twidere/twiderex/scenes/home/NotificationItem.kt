@@ -49,10 +49,25 @@ class NotificationItem : HomeNavigationItem() {
 
     @Composable
     override fun Content() {
-        NotificationContent(
+        NotificationSceneContent(
             lazyListController = lazyListController,
         )
     }
+}
+
+@Composable
+fun NotificationSceneContent(
+    lazyListController: LazyListController? = null
+) {
+    val account = LocalActiveAccount.current ?: return
+    if (account.service !is NotificationService) {
+        return
+    }
+    val viewModel: NotificationTimelineViewModel = getViewModel()
+    TimelineComponent(
+        viewModel = viewModel,
+        lazyListController = lazyListController,
+    )
 }
 
 @Composable
@@ -73,19 +88,4 @@ fun NotificationScene() {
             NotificationContent()
         }
     }
-}
-
-@Composable
-fun NotificationContent(
-    lazyListController: LazyListController? = null
-) {
-    val account = LocalActiveAccount.current ?: return
-    if (account.service !is NotificationService) {
-        return
-    }
-    val viewModel: NotificationTimelineViewModel = getViewModel()
-    TimelineComponent(
-        viewModel = viewModel,
-        lazyListController = lazyListController,
-    )
 }

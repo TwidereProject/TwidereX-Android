@@ -54,6 +54,14 @@ class MeItem : HomeNavigationItem() {
 }
 
 @Composable
+fun MeSceneContent() {
+    val account = LocalActiveAccount.current
+    account?.toUi()?.let { user ->
+        UserComponent(userKey = user.userKey)
+    }
+}
+
+@Composable
 fun MeScene() {
     TwidereScene {
         InAppNotificationScaffold(
@@ -70,13 +78,5 @@ fun MeScene() {
         ) {
             MeSceneContent()
         }
-    }
-}
-
-@Composable
-fun MeSceneContent() {
-    val account = LocalActiveAccount.current
-    account?.toUi()?.let { user ->
-        UserComponent(userKey = user.userKey)
     }
 }

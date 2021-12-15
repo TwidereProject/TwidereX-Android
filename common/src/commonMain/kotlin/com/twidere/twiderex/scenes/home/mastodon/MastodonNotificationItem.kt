@@ -72,26 +72,6 @@ class MastodonNotificationItem : HomeNavigationItem() {
 }
 
 @Composable
-fun MastodonNotificationScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_title))
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    }
-                )
-            }
-        ) {
-            MastodonNotificationSceneContent()
-        }
-    }
-}
-
-@Composable
 fun MastodonNotificationSceneContent(
     setLazyListController: ((lazyListController: LazyListController) -> Unit)? = null,
 ) {
@@ -128,6 +108,26 @@ fun MastodonNotificationSceneContent(
     ) {
         Pager(state = pagerState) {
             tabs[page].Content()
+        }
+    }
+}
+
+@Composable
+fun MastodonNotificationScene() {
+    TwidereScene {
+        InAppNotificationScaffold(
+            topBar = {
+                AppBar(
+                    title = {
+                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_title))
+                    },
+                    navigationIcon = {
+                        AppBarNavigationButton()
+                    }
+                )
+            }
+        ) {
+            MastodonNotificationSceneContent()
         }
     }
 }

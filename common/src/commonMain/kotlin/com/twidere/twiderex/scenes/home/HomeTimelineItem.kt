@@ -69,6 +69,17 @@ class HomeTimelineItem : HomeNavigationItem() {
 }
 
 @Composable
+fun HomeTimelineSceneContent(
+    lazyListController: LazyListController? = null
+) {
+    val viewModel: HomeTimelineViewModel = getViewModel()
+    TimelineComponent(
+        viewModel = viewModel,
+        lazyListController = lazyListController,
+    )
+}
+
+@Composable
 fun HomeTimelineScene() {
     TwidereScene {
         InAppNotificationScaffold(
@@ -106,17 +117,6 @@ private fun HomeTimelineFab() {
             )
         )
     }
-}
-
-@Composable
-fun HomeTimelineSceneContent(
-    lazyListController: LazyListController? = null
-) {
-    val viewModel: HomeTimelineViewModel = getViewModel()
-    TimelineComponent(
-        viewModel = viewModel,
-        lazyListController = lazyListController,
-    )
 }
 
 private object HomeTimeLineItemDefaults {

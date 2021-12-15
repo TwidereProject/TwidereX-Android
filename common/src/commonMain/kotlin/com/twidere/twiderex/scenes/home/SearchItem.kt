@@ -83,26 +83,6 @@ class SearchItem : HomeNavigationItem() {
     }
 }
 
-@Composable
-fun SearchScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_title))
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    }
-                )
-            }
-        ) {
-            SearchSceneContent()
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchSceneContent() {
@@ -252,6 +232,26 @@ fun SearchSceneContent() {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun SearchScene() {
+    TwidereScene {
+        InAppNotificationScaffold(
+            topBar = {
+                AppBar(
+                    title = {
+                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_title))
+                    },
+                    navigationIcon = {
+                        AppBarNavigationButton()
+                    }
+                )
+            }
+        ) {
+            SearchSceneContent()
         }
     }
 }

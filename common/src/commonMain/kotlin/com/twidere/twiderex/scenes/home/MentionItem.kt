@@ -56,6 +56,17 @@ class MentionItem : HomeNavigationItem() {
 }
 
 @Composable
+fun MentionSceneContent(
+    lazyListController: LazyListController? = null
+) {
+    val viewModel: MentionsTimelineViewModel = getViewModel()
+    TimelineComponent(
+        viewModel = viewModel,
+        lazyListController = lazyListController,
+    )
+}
+
+@Composable
 fun MentionScene() {
     TwidereScene {
         InAppNotificationScaffold(
@@ -73,15 +84,4 @@ fun MentionScene() {
             MentionSceneContent()
         }
     }
-}
-
-@Composable
-fun MentionSceneContent(
-    lazyListController: LazyListController? = null
-) {
-    val viewModel: MentionsTimelineViewModel = getViewModel()
-    TimelineComponent(
-        viewModel = viewModel,
-        lazyListController = lazyListController,
-    )
 }

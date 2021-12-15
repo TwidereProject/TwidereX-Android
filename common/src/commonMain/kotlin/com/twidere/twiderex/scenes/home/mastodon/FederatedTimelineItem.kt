@@ -54,10 +54,22 @@ class FederatedTimelineItem : HomeNavigationItem() {
 
     @Composable
     override fun Content() {
-        FederatedTimelineContent(
+        FederatedTimelineSceneContent(
             lazyListController = lazyListController
         )
     }
+}
+
+@Composable
+fun FederatedTimelineSceneContent(
+    lazyListController: LazyListController? = null,
+) {
+    val account = LocalActiveAccount.current ?: return
+    if (account.service !is MastodonService) {
+        return
+    }
+    val viewModel: FederatedTimelineViewModel = getViewModel()
+    TimelineComponent(viewModel = viewModel, lazyListController = lazyListController)
 }
 
 @Composable
@@ -75,19 +87,7 @@ fun FederatedTimelineScene() {
                 )
             }
         ) {
-            FederatedTimelineContent()
+            FederatedTimelineSceneContent()
         }
     }
-}
-
-@Composable
-fun FederatedTimelineContent(
-    lazyListController: LazyListController? = null,
-) {
-    val account = LocalActiveAccount.current ?: return
-    if (account.service !is MastodonService) {
-        return
-    }
-    val viewModel: FederatedTimelineViewModel = getViewModel()
-    TimelineComponent(viewModel = viewModel, lazyListController = lazyListController)
 }

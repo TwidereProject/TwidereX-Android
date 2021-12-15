@@ -62,6 +62,17 @@ class AllNotificationItem : HomeNavigationItem() {
 }
 
 @Composable
+fun AllNotificationSceneContent(
+    lazyListController: LazyListController? = null,
+) {
+    val viewModel: NotificationTimelineViewModel = getViewModel()
+    TimelineComponent(
+        viewModel = viewModel,
+        lazyListController = lazyListController,
+    )
+}
+
+@Composable
 fun AllNotificationScene() {
     TwidereScene {
         InAppNotificationScaffold(
@@ -79,15 +90,4 @@ fun AllNotificationScene() {
             AllNotificationSceneContent()
         }
     }
-}
-
-@Composable
-fun AllNotificationSceneContent(
-    lazyListController: LazyListController? = null,
-) {
-    val viewModel: NotificationTimelineViewModel = getViewModel()
-    TimelineComponent(
-        viewModel = viewModel,
-        lazyListController = lazyListController,
-    )
 }

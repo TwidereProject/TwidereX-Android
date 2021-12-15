@@ -54,10 +54,22 @@ class LocalTimelineItem : HomeNavigationItem() {
 
     @Composable
     override fun Content() {
-        LocalTimelineContent(
+        LocalTimelineSceneContent(
             lazyListController = lazyListController
         )
     }
+}
+
+@Composable
+fun LocalTimelineSceneContent(
+    lazyListController: LazyListController? = null,
+) {
+    val account = LocalActiveAccount.current ?: return
+    if (account.service !is MastodonService) {
+        return
+    }
+    val viewModel: LocalTimelineViewModel = getViewModel()
+    TimelineComponent(viewModel = viewModel, lazyListController = lazyListController)
 }
 
 @Composable
@@ -75,19 +87,7 @@ fun LocalTimelineScene() {
                 )
             }
         ) {
-            LocalTimelineContent()
+            LocalTimelineSceneContent()
         }
     }
-}
-
-@Composable
-fun LocalTimelineContent(
-    lazyListController: LazyListController? = null,
-) {
-    val account = LocalActiveAccount.current ?: return
-    if (account.service !is MastodonService) {
-        return
-    }
-    val viewModel: LocalTimelineViewModel = getViewModel()
-    TimelineComponent(viewModel = viewModel, lazyListController = lazyListController)
 }
