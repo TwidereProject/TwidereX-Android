@@ -85,8 +85,10 @@ fun TimelineStatusComponent(
     val isMastodonFollow = remember(data) {
         data.platformType == PlatformType.Mastodon &&
             data.mastodonExtra != null &&
-            (data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
-                data.mastodonExtra.type == MastodonStatusType.NotificationFollow)
+            (
+                data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
+                    data.mastodonExtra.type == MastodonStatusType.NotificationFollow
+                )
     }
     if (isMastodonFollow) {
         MastodonFollowStatus(data) {
@@ -150,14 +152,14 @@ private fun NormalStatus(
             lineDown = lineDown || (threadStyle.lineDown && data.isInThread()),
             data = data,
             footer = {
-                    if (showActions) {
-                        Row {
-                            Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize))
-                            StatusActions(data)
-                        }
-                    } else {
-                        Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
+                if (showActions) {
+                    Row {
+                        Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize))
+                        StatusActions(data)
                     }
+                } else {
+                    Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
+                }
             }
         )
     }
@@ -401,7 +403,10 @@ fun StatusContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxHeight()
             ) {
-                UserAvatar(user = status.user, modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing))
+                UserAvatar(
+                    user = status.user,
+                    modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing)
+                )
                 if (lineDown) {
                     AvatarConnectLine(
                         modifier = Modifier
@@ -424,49 +429,49 @@ fun StatusContent(
             }
             Spacer(modifier = Modifier.width(StatusContentDefaults.AvatarSpacing))
             Column(modifier = Modifier.weight(1f)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Row(
-                                modifier = Modifier.weight(1f),
-                            ) {
-                                UserName(status.user, fontWeight = FontWeight.W600)
-                                if (type == StatusContentType.Normal) {
-                                    Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
-                                    UserScreenName(status.user)
-                                }
-                            }
-                            CompositionLocalProvider(
-                                LocalContentAlpha provides ContentAlpha.disabled
-                            ) {
-                                val mastodonExtra = status.mastodonExtra
-                                if (status.platformType == PlatformType.Mastodon && mastodonExtra != null) {
-                                    Icon(
-                                        modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
-                                        painter = mastodonExtra.visibility.icon(),
-                                        contentDescription = mastodonExtra.visibility.name
-                                    )
-                                    Spacer(modifier = Modifier.width(StatusContentDefaults.Mastodon.VisibilitySpacing))
-                                }
-                                if (type == StatusContentType.Normal) {
-                                    HumanizedTime(time = status.timestamp)
-                                }
-                            }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Row(
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        UserName(status.user, fontWeight = FontWeight.W600)
+                        if (type == StatusContentType.Normal) {
+                            Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
+                            UserScreenName(status.user)
                         }
-                        when (type) {
-                            StatusContentType.Normal -> {
-                                Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
-                                StatusBody(status, type = type)
-                            }
-                            StatusContentType.Extend -> UserScreenName(status.user)
+                    }
+                    CompositionLocalProvider(
+                        LocalContentAlpha provides ContentAlpha.disabled
+                    ) {
+                        val mastodonExtra = status.mastodonExtra
+                        if (status.platformType == PlatformType.Mastodon && mastodonExtra != null) {
+                            Icon(
+                                modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
+                                painter = mastodonExtra.visibility.icon(),
+                                contentDescription = mastodonExtra.visibility.name
+                            )
+                            Spacer(modifier = Modifier.width(StatusContentDefaults.Mastodon.VisibilitySpacing))
                         }
-                if (type == StatusContentType.Extend) {
-                        Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
-                        StatusBody(status = status, type = type)
+                        if (type == StatusContentType.Normal) {
+                            HumanizedTime(time = status.timestamp)
+                        }
+                    }
                 }
-                    Spacer(modifier = Modifier.height(StatusContentDefaults.FooterSpacing))
-                    footer.invoke()
-                    Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
+                when (type) {
+                    StatusContentType.Normal -> {
+                        Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
+                        StatusBody(status, type = type)
+                    }
+                    StatusContentType.Extend -> UserScreenName(status.user)
+                }
+                if (type == StatusContentType.Extend) {
+                    Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
+                    StatusBody(status = status, type = type)
+                }
+                Spacer(modifier = Modifier.height(StatusContentDefaults.FooterSpacing))
+                footer.invoke()
+                Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
                 if (data.isInThread()) {
                     StatusThread(threadStyle, data)
                     Spacer(modifier = Modifier.height(NormalStatusDefaults.ThreadBottomPadding))
