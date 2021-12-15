@@ -49,6 +49,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -80,28 +81,30 @@ fun TimelineStatusComponent(
     lineDown: Boolean = false,
     threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
 ) {
-    when {
+    val navigator = LocalNavigator.current
+    val isMastodonFollow = remember(data) {
         data.platformType == PlatformType.Mastodon &&
             data.mastodonExtra != null &&
-            (
-                data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
-                    data.mastodonExtra.type == MastodonStatusType.NotificationFollow
-                ) -> {
-            MastodonFollowStatus(data)
+            (data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
+                data.mastodonExtra.type == MastodonStatusType.NotificationFollow)
+    }
+    if (isMastodonFollow) {
+        MastodonFollowStatus(data) {
+            navigator.user(data.user)
         }
-        else -> NormalStatus(data, showActions, threadStyle, lineUp, lineDown)
+    } else {
+        NormalStatus(data, showActions, threadStyle, lineUp, lineDown) {
+            navigator.status(data)
+        }
     }
 }
 
 @Composable
-fun MastodonFollowStatus(data: UiStatus) {
-    val navigator = LocalNavigator.current
+fun MastodonFollowStatus(data: UiStatus, onItemClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                navigator.user(data.user)
-            }
+            .clickable { onItemClick() }
             .padding(MastodonFollowStatusDefaults.ContentPadding),
     ) {
         StatusHeader(data = data)
@@ -132,17 +135,13 @@ private fun NormalStatus(
     showActions: Boolean,
     threadStyle: StatusThreadStyle,
     lineUp: Boolean,
-    lineDown: Boolean
+    lineDown: Boolean,
+    onItemClick: () -> Unit,
 ) {
-    val navigator = LocalNavigator.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(
-                onClick = {
-                    navigator.status(data)
-                },
-            )
+            .clickable { onItemClick() },
     ) {
         StatusContent(
             contentPadding = NormalStatusDefaults.ContentPadding,
