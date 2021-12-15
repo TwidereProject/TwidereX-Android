@@ -85,7 +85,7 @@ fun NotificationScene() {
                 )
             }
         ) {
-            NotificationContent()
+            NotificationSceneContent()
         }
     }
 }
