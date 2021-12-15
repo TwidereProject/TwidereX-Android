@@ -57,6 +57,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -172,11 +173,13 @@ fun LazyUiStatusList(
                         StatusDivider()
                     } else {
                         Column {
+                            val lineUp = remember(items.itemCount) { index > 0 && items.peek(index - 1)?.statusId == item.inReplyToStatusId }
+                            val lineDown = remember(items.itemCount) { index < items.itemCount - 1 && items.peek(index + 1)?.inReplyToStatusId == item.statusId }
                             TimelineStatusComponent(
                                 item,
                                 threadStyle = StatusThreadStyle.WITH_AVATAR,
-                                lineUp = index > 0 && items.peek(index - 1)?.statusId == item.inReplyToStatusId,
-                                lineDown = index < items.itemCount - 1 && items.peek(index + 1)?.inReplyToStatusId == item.statusId,
+                                lineUp = lineUp,
+                                lineDown = lineDown,
                             )
                             when {
                                 loadingBetween.contains(item.statusKey) -> {
