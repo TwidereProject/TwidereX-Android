@@ -150,7 +150,6 @@ private fun NormalStatus(
             lineDown = lineDown || (threadStyle.lineDown && data.isInThread()),
             data = data,
             footer = {
-                Column {
                     if (showActions) {
                         Row {
                             Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize))
@@ -159,7 +158,6 @@ private fun NormalStatus(
                     } else {
                         Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
                     }
-                }
             }
         )
     }
@@ -425,12 +423,7 @@ fun StatusContent(
                 }
             }
             Spacer(modifier = Modifier.width(StatusContentDefaults.AvatarSpacing))
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-            ) {
-                Row {
-                    Column {
+            Column(modifier = Modifier.weight(1f)) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
@@ -467,19 +460,13 @@ fun StatusContent(
                             }
                             StatusContentType.Extend -> UserScreenName(status.user)
                         }
-                    }
-                }
                 if (type == StatusContentType.Extend) {
-                    Column {
                         Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
                         StatusBody(status = status, type = type)
-                    }
                 }
-                Column {
                     Spacer(modifier = Modifier.height(StatusContentDefaults.FooterSpacing))
                     footer.invoke()
                     Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
-                }
                 if (data.isInThread()) {
                     StatusThread(threadStyle, data)
                     Spacer(modifier = Modifier.height(NormalStatusDefaults.ThreadBottomPadding))
