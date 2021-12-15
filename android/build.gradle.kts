@@ -19,10 +19,7 @@ buildscript {
 plugins {
     id("com.android.application")
     kotlin("android")
-    kotlin("kapt")
     id("org.jetbrains.compose").version(Versions.compose_jb)
-    kotlin("plugin.serialization").version(Versions.Kotlin.lang)
-    id("com.google.devtools.ksp").version(Versions.ksp)
 }
 
 if (enableGoogleVariant) {
@@ -49,15 +46,6 @@ android {
             annotationProcessorOptions {
                 argument("room.schemaLocation", "$projectDir/schemas")
             }
-        }
-        val apiKeyProperties = rootProject.file("apiKey.properties")
-        val hasApiKeyProps = apiKeyProperties.exists()
-        if (hasApiKeyProps) {
-            val apiKeyProp = Properties()
-            apiKeyProp.load(apiKeyProperties.inputStream())
-            buildConfigField("String", "CONSUMERKEY", apiKeyProp.getProperty("ConsumerKey"))
-            buildConfigField("String", "CONSUMERSECRET", apiKeyProp.getProperty("ConsumerSecret"))
-            buildConfigField("String", "GIPHYKEY", apiKeyProp.getProperty("GiphyKey"))
         }
     }
 
@@ -132,13 +120,6 @@ android {
         sourceCompatibility = Versions.Java.java
         targetCompatibility = Versions.Java.java
     }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = Versions.compose
-    }
-
     packagingOptions {
         resources {
             excludes.addAll(
@@ -152,23 +133,12 @@ android {
     }
 }
 
-// TODO: workaround for https://github.com/google/ksp/issues/518
-evaluationDependsOn(":routeProcessor")
-
 dependencies {
-    android()
-    kotlinSerialization()
-    kotlinCoroutines()
-    implementation(projects.services)
+    implementation("androidx.activity:activity-ktx:${Versions.activity}")
     implementation(projects.common)
-    implementation(projects.routeProcessor)
-    ksp(projects.routeProcessor)
-    compose()
-    paging()
-    datastore()
-    accompanist()
-    widget()
-    misc()
+    implementation("com.google.accompanist:accompanist-insets:${Versions.accompanist}")
+    implementation("androidx.startup:startup-runtime:${Versions.startup}")
+    work()
 
     if (enableGoogleVariant) {
         // START Non-FOSS component

@@ -21,4 +21,5 @@
 package com.twidere.twiderex.kmp
 expect object TimeUtils {
     fun humanizedTimestamp(time: Long): String
+    fun humanizedDateTime(time: Long): String
 }

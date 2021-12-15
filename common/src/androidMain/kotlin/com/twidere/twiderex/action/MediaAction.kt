@@ -48,8 +48,8 @@ actual class MediaAction(
         )
     }
 
-    actual fun share(source: String, accountKey: MicroBlogKey) {
-        val uri = storageProvider.cacheFiles.mediaFile(source).toUri(context)
+    actual fun share(source: String, fileName: String, accountKey: MicroBlogKey) {
+        val uri = storageProvider.cacheFiles.mediaFile(fileName).toUri(context)
         DownloadMediaWorker.create(
             accountKey = accountKey,
             source = source,

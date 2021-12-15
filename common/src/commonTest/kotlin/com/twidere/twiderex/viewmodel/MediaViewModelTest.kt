@@ -76,9 +76,11 @@ internal class MediaViewModelTest : AccountViewModelTestBase() {
         viewModel.saveFile(
             mockk {
                 every { mediaUrl }.returns("123")
-            },
-            "target",
-        )
+                every { fileName }.returns("target")
+            }
+        ) {
+            it
+        }
         verify(exactly = 1) {
             mediaAction.download(
                 "123",
@@ -93,8 +95,15 @@ internal class MediaViewModelTest : AccountViewModelTestBase() {
         viewModel.shareMedia(
             mockk {
                 every { mediaUrl }.returns("123")
+                every { fileName }.returns("target")
             }
         )
-        verify(exactly = 1) { mediaAction.share("123", MicroBlogKey.twitter("123")) }
+        verify(exactly = 1) {
+            mediaAction.share(
+                "123",
+                "target",
+                MicroBlogKey.twitter("123")
+            )
+        }
     }
 }

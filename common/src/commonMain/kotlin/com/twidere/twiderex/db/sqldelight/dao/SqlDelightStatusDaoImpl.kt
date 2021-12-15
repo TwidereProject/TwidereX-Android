@@ -43,7 +43,7 @@ class SqlDelightStatusDaoImpl(private val database: SqlDelightCacheDatabase) : S
         accountKey: MicroBlogKey
     ): UiStatus? {
         return database.statusQueries.findWithStatusKey(statusKey = statusKey)
-            .executeAsOneOrNull()
+            .executeAsList().firstOrNull()
             ?.withAttachments(database, accountKey)
             ?.toUi()
     }

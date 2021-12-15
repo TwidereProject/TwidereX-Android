@@ -20,9 +20,11 @@
  */
 package com.twidere.twiderex.kmp
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
 import com.twidere.twiderex.extensions.shareMedia
 import com.twidere.twiderex.extensions.shareText
 
@@ -31,9 +33,9 @@ actual class RemoteNavigator(private val context: Context) {
         context.startActivity(
             Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse(deeplink)
+                Uri.parse(deeplink).normalizeScheme()
             ).apply {
-                if (fromBackground) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (this !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
         )
     }
@@ -42,14 +44,21 @@ actual class RemoteNavigator(private val context: Context) {
         context.shareMedia(
             uri = Uri.parse(filePath),
             mimeType = mimeType,
-            fromOutsideOfActivity = fromBackground
         )
     }
 
     actual fun shareText(content: String, fromBackground: Boolean) {
         context.shareText(
             content = content,
-            fromOutsideOfActivity = fromBackground
         )
+    }
+
+    actual fun launchOAuthUri(uri: String) {
+        CustomTabsIntent.Builder()
+            .setShareState(CustomTabsIntent.SHARE_STATE_OFF)
+            .build().run {
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                launchUrl(context, Uri.parse(uri))
+            }
     }
 }

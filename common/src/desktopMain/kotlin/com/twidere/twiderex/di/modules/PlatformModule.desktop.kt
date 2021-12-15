@@ -20,11 +20,20 @@
  */
 package com.twidere.twiderex.di.modules
 
-import com.twidere.twiderex.kmp.ResLoader
+import com.twidere.twiderex.dataprovider.DataProvider
+import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.http.TwidereHttpConfigProvider
 import com.twidere.twiderex.model.AccountPreferencesFactory
+import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.preferences.PreferencesHolder
+import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.utils.PlatformResolver
 import org.koin.dsl.module
 
 internal actual val platformModule = module {
-    single { ResLoader() }
     single { AccountPreferencesFactory() }
+    single { AccountRepository(get<DataProvider>().realAppDatabase.accountQueries, get()) }
+    single { InAppNotification() }
+    single { TwidereHttpConfigProvider(get<PreferencesHolder>().miscPreferences) }
+    single { PlatformResolver(get()) }
 }

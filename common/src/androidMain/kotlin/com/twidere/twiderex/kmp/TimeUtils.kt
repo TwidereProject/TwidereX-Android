@@ -29,4 +29,8 @@ actual object TimeUtils {
             DateUtils.FORMAT_ABBREV_ALL
         ).toString()
     }
+
+    actual fun humanizedDateTime(time: Long): String {
+        return humanizedTimestamp(time)
+    }
 }

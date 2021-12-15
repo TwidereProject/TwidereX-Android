@@ -21,33 +21,11 @@
 package com.twidere.twiderex
 
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.application
-import com.twidere.twiderex.di.ext.get
-import com.twidere.twiderex.di.setupModules
-import com.twidere.twiderex.preferences.PreferencesHolder
-import com.twidere.twiderex.preferences.ProvidePreferences
-import moe.tlaster.precompose.PreComposeWindow
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
+import com.twidere.twiderex.component.foundation.DesktopMediaPlayerHelper
+import com.twidere.twiderex.media.DesktopMediaPlayerFactoryImpl
 
 @ExperimentalComposeUiApi
-fun main() {
-    startKoin {
-        printLogger()
-        setupModules()
-    }
-    val preferencesHolder = get<PreferencesHolder>()
-    application {
-        ProvidePreferences(preferencesHolder) {
-            PreComposeWindow(
-                onCloseRequest = {
-                    stopKoin()
-                    exitApplication()
-                },
-                title = "Twidere X"
-            ) {
-                App()
-            }
-        }
-    }
+fun main(args: Array<String>) {
+    DesktopMediaPlayerHelper.register(DesktopMediaPlayerFactoryImpl())
+    runDesktopApp(args)
 }

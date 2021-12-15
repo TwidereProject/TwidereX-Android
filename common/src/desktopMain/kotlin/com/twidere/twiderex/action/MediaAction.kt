@@ -48,7 +48,7 @@ actual class MediaAction(
         }
     }
 
-    actual fun share(source: String, accountKey: MicroBlogKey) {
+    actual fun share(source: String, fileName: String, accountKey: MicroBlogKey) {
         scope.launchCatching {
             val f = File(URI(source))
             val target = File.createTempFile(

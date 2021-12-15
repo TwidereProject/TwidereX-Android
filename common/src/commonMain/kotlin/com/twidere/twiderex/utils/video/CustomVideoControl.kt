@@ -28,86 +28,17 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Slider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.twidere.twiderex.MR
-import com.twidere.twiderex.component.foundation.NativePlayerView
-import com.twidere.twiderex.component.foundation.PlayerProgressCallBack
+import com.twidere.twiderex.component.foundation.VideoPlayerState
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-
-class VideoController {
-
-    private var player: NativePlayerView? = null
-
-    var videoPrepared = mutableStateOf(false)
-
-    fun bind(player: NativePlayerView) {
-        this.player = player
-    }
-
-    fun setProgressCallBack(progressCallBack: PlayerProgressCallBack) {
-        player?.playerProgressCallBack = progressCallBack
-    }
-
-    fun playSwitch(play: Boolean) {
-        player?.enablePlaying = play
-    }
-
-    fun contentPosition(): Long {
-        return player?.contentPosition() ?: 0
-    }
-
-    fun duration(): Long {
-        return player?.duration()?.coerceAtLeast(0) ?: 0
-    }
-
-    fun seekTo(time: Long) {
-        player?.seekTo(time)
-    }
-
-    fun setMute(mute: Boolean) {
-        player?.setMute(mute)
-    }
-}
-
 @Composable
 fun CustomVideoControl(
-    realController: VideoController,
-    playEnabled: Boolean = true,
-    mute: Boolean = false,
+    state: VideoPlayerState,
     modifier: Modifier = Modifier,
 ) {
-    var videoPrapared by remember(realController) {
-        realController.videoPrepared
-    }
-    var isPlaying by remember {
-        mutableStateOf(playEnabled)
-    }
-    var isMute by remember {
-        mutableStateOf(mute)
-    }
-    var isSeeking by remember {
-        mutableStateOf(false)
-    }
-    var sliderValue by remember {
-        mutableStateOf(realController.contentPosition().toFloat())
-    }
-    LaunchedEffect(realController) {
-        realController.setProgressCallBack(object : PlayerProgressCallBack {
-            override fun onTimeChanged(time: Long) {
-                if (!isSeeking) {
-                    sliderValue = time.toFloat()
-                }
-            }
-        })
-    }
-    if (!videoPrapared) {
+    if (!state.isReady) {
         return
     }
     Row(
@@ -118,43 +49,38 @@ fun CustomVideoControl(
 
         IconButton(
             onClick = {
-                isPlaying = (!isPlaying).apply {
-                    realController.playSwitch(this)
-                }
+                state.playSwitch()
             },
         ) {
             Icon(
-                painter = painterResource(res = if (isPlaying) MR.files.ic_player_pause else MR.files.ic_player_play),
-                contentDescription = stringResource(res = MR.strings.accessibility_common_video_play),
+                painter = painterResource(res = if (state.isPlaying) com.twidere.twiderex.MR.files.ic_player_pause else com.twidere.twiderex.MR.files.ic_player_play),
+                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_video_play),
                 tint = MaterialTheme.colors.onSurface
             )
         }
 
         Box(modifier.weight(1f)) {
             Slider(
-                valueRange = 0f..realController.duration().toFloat(),
-                value = sliderValue,
+                valueRange = 0f..state.duration.toFloat(),
+                value = state.currentPosition.toFloat(),
                 onValueChange = {
-                    isSeeking = true
-                    sliderValue = it
+                    state.seeking()
+                    state.currentPosition = it.toLong()
                 },
                 onValueChangeFinished = {
-                    realController.seekTo(sliderValue.toLong())
-                    isSeeking = false
+                    state.seekTo(state.currentPosition)
                 }
             )
         }
 
         IconButton(
             onClick = {
-                isMute = (!isMute).apply {
-                    realController.setMute(this)
-                }
+                state.mute()
             },
         ) {
             Icon(
-                painter = painterResource(res = if (isMute) MR.files.ic_volume_mute else MR.files.ic_volume),
-                contentDescription = stringResource(res = MR.strings.accessibility_common_video_play),
+                painter = painterResource(res = if (state.isMute) com.twidere.twiderex.MR.files.ic_volume_mute else com.twidere.twiderex.MR.files.ic_volume),
+                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_video_play),
                 tint = MaterialTheme.colors.onSurface
             )
         }

@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.action.DraftAction
+import com.twidere.twiderex.component.media.MediaLibraryType
 import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.extensions.getTextAfterSelection
 import com.twidere.twiderex.extensions.getTextBeforeSelection
@@ -49,6 +50,7 @@ import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.MastodonEmojiCache
 import com.twidere.twiderex.utils.notifyError
 import com.twitter.twittertext.Extractor
+import com.twitter.twittertext.TwitterTextConfiguration
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -214,24 +216,24 @@ open class ComposeViewModel(
 
     val replyToUser by lazy {
         combine(account.mapNotNull { it }, replyToUserName) { account, list ->
-            if (list.isNotEmpty()) {
-                loadingReplyUser.value = true
-                try {
-                    userRepository.lookupUsersByName(
-                        list,
-                        accountKey = account.accountKey,
-                        lookupService = account.service as LookupService,
-                    )
-                } catch (e: Throwable) {
-                    inAppNotification.notifyError(e)
-                    emptyList()
-                } finally {
-                    loadingReplyUser.value = false
-                }
-            } else {
+        if (list.isNotEmpty()) {
+            loadingReplyUser.value = true
+            try {
+                userRepository.lookupUsersByName(
+                    list,
+                    accountKey = account.accountKey,
+                    lookupService = account.service as LookupService,
+                )
+            } catch (e: Throwable) {
+                inAppNotification.notifyError(e)
                 emptyList()
+            } finally {
+                loadingReplyUser.value = false
             }
-        }.asStateIn(viewModelScope, emptyList())
+        } else {
+            emptyList()
+        }
+    }.asStateIn(viewModelScope, emptyList())
     }
 
     val voteState = MutableStateFlow<VoteState?>(null)
@@ -242,13 +244,21 @@ open class ComposeViewModel(
     val contentWarningTextFieldValue = MutableStateFlow(TextFieldValue())
     val textFieldValue = MutableStateFlow(TextFieldValue())
     val images = MutableStateFlow<List<UiMediaInsert>>(emptyList())
-    val canSend = textFieldValue
-        .combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
-        .asStateIn(viewModelScope, false)
+    val canSend by lazy {
+        combine(textFieldValue, images, maxContentLength) { text, imgs, maxLength ->
+            (text.text.isNotEmpty() || !imgs.isNullOrEmpty()) && text.text.length <= maxLength
+        }.asStateIn(viewModelScope, false)
+    }
     val canSaveDraft = textFieldValue
         .combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
         .asStateIn(viewModelScope, false)
-    val locationEnabled = MutableStateFlow(false)
+    val locationEnabled by lazy {
+        locationProvider.locationEnabled.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            false
+        )
+    }
     val enableThreadMode = MutableStateFlow(composeType == ComposeType.Thread)
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -293,6 +303,20 @@ open class ComposeViewModel(
             }
         }.asStateIn(viewModelScope, null)
     }
+
+    val maxContentLength = account.combine(status) { account, status ->
+        when (account.type) {
+            PlatformType.Twitter -> TwitterTextConfiguration.getDefaultConfig().maxWeightedTweetLength -
+                (
+                    status?.generateShareLink()?.let {
+                        it.length + 1 // for space
+                    } ?: 0
+                    )
+            PlatformType.StatusNet -> TODO()
+            PlatformType.Fanfou -> TODO()
+            PlatformType.Mastodon -> 500
+        }
+    }.asStateIn(viewModelScope, 1)
 
     val mediaInsertMode = MutableStateFlow(MediaInsertMode.All)
 
@@ -362,14 +386,17 @@ open class ComposeViewModel(
     )
 
     fun putImages(value: List<UiMediaInsert>) = viewModelScope.launch {
-        val allowType = images.value.firstOrNull()?.type ?: value.firstOrNull()?.type ?: MediaType.photo
+        val allowType =
+            images.value.firstOrNull()?.type ?: value.firstOrNull()?.type ?: MediaType.photo
         images.value.let {
             value + it.filter { media -> media.type == allowType }
         }.take(if (allowType == MediaType.photo) imageLimit.first() else 1).let {
             images.value = it
         }
         when (allowType) {
-            MediaType.video, MediaType.animated_gif -> mediaInsertMode.value = MediaInsertMode.Disabled
+            MediaType.video, MediaType.animated_gif ->
+                mediaInsertMode.value =
+                    MediaInsertMode.Disabled
             else -> {
                 mediaInsertMode.value = if (images.value.size == imageLimit.first())
                     MediaInsertMode.Disabled
@@ -391,12 +418,10 @@ open class ComposeViewModel(
     }
 
     fun trackingLocation() {
-        locationEnabled.value = true
         locationProvider.enable()
     }
 
     fun disableLocation() {
-        locationEnabled.value = false
         locationProvider.disable()
     }
 
@@ -449,18 +474,22 @@ open class ComposeViewModel(
     data class MediaInsertMode(
         val disabledInsertType: List<MediaInsertType>,
         val multiSelect: Boolean,
-        val librarySupportedType: List<String>
+        val librarySupportedType: List<MediaLibraryType>
     ) {
         companion object {
-            val All = MediaInsertMode(emptyList(), false, listOf("image/*", "video/*"))
+            val All = MediaInsertMode(emptyList(), false, MediaLibraryType.values().toList())
             val ImageOnly = MediaInsertMode(
                 listOf(
                     MediaInsertType.GIF,
                     MediaInsertType.RECORD_VIDEO
                 ),
-                true, listOf("image/*")
+                true, listOf(MediaLibraryType.Image)
             )
-            val Disabled = MediaInsertMode(MediaInsertType.values().toList(), true, listOf("image/*"))
+            val Disabled = MediaInsertMode(
+                MediaInsertType.values().toList(),
+                true,
+                listOf(MediaLibraryType.Image)
+            )
         }
     }
 }

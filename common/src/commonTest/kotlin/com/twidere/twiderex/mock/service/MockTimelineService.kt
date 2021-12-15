@@ -25,6 +25,7 @@ import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.mock.model.mockIStatus
 import com.twidere.twiderex.mock.model.toIPaging
+import kotlinx.coroutines.delay
 import org.jetbrains.annotations.TestOnly
 
 internal class MockTimelineService @TestOnly constructor() : TimelineService, MicroBlogService, ErrorService() {
@@ -79,9 +80,10 @@ internal class MockTimelineService @TestOnly constructor() : TimelineService, Mi
         }
     }
 
-    private fun generateData(count: Int, create: () -> IStatus = { mockIStatus() }): List<IStatus> {
+    private suspend fun generateData(count: Int, create: () -> IStatus = { mockIStatus() }): List<IStatus> {
         val list = mutableListOf<IStatus>()
         for (i in 0 until count) {
+            delay(1)
             list.add(create())
         }
         return list.reversed().toIPaging()

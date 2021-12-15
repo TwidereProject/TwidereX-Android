@@ -28,9 +28,8 @@ import java.io.File
 
 private const val PROVIDER_NAME = "com.twidere.twiderex.fileprovider"
 
-// TODO Make it internal after migrate ui to common
-val uriRex = Regex("[a-zA-z]+://.+")
-fun String.toUri(context: Context): Uri {
+private val uriRex = Regex("[a-zA-z]+://.+")
+internal fun String.toUri(context: Context): Uri {
     return try {
         if (!uriRex.matches(this)) throw Error()
         Uri.parse(this)
@@ -39,6 +38,6 @@ fun String.toUri(context: Context): Uri {
     }
 }
 
-fun File.fileProviderUri(context: Context): Uri {
+internal fun File.fileProviderUri(context: Context): Uri {
     return FileProvider.getUriForFile(context, PROVIDER_NAME, this)
 }

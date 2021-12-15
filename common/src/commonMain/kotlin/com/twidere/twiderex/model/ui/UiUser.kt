@@ -66,7 +66,7 @@ data class UiUser(
             id = "",
             name = "Twidere",
             screenName = "TwidereProject",
-            profileImage = "", // painterResource(id = R.drawable.ic_profile_image_twidere),
+            profileImage = "", // painterResource(res = com.twidere.twiderex.MR.files.ic_profile_image_twidere),
             profileBackgroundImage = null,
             metrics = UserMetrics(
                 fans = 0,

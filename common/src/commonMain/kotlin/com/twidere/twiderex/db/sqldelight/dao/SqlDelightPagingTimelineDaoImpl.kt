@@ -22,8 +22,10 @@ package com.twidere.twiderex.db.sqldelight.dao
 
 import androidx.paging.PagingSource
 import com.twidere.twiderex.db.dao.PagingTimelineDao
+import com.twidere.twiderex.db.sqldelight.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.sqldelight.model.DbPagingTimelineWithStatus.Companion.saveToDb
 import com.twidere.twiderex.db.sqldelight.model.DbPagingTimelineWithStatus.Companion.withStatus
+import com.twidere.twiderex.db.sqldelight.model.DbStatusWithAttachments.Companion.withAttachments
 import com.twidere.twiderex.db.sqldelight.paging.QueryPagingSource
 import com.twidere.twiderex.db.sqldelight.query.flatMap
 import com.twidere.twiderex.db.sqldelight.transform.toDbPagingTimeline
@@ -41,14 +43,22 @@ internal class SqlDelightPagingTimelineDaoImpl(private val database: SqlDelightC
         return QueryPagingSource(
             countQuery = database.pagingTimelineQueries.getPagingCount(accountKey = accountKey, pagingKey = pagingKey),
             transacter = database.pagingTimelineQueries,
-            queryProvider = { limit, offset ->
+            queryProvider = { limit, offset, relationQueryRegister ->
                 database.pagingTimelineQueries.getPagingList(
                     accountKey = accountKey,
                     pagingKey = pagingKey,
                     limit = limit,
                     offset = offset
                 ).flatMap {
-                    it.withStatus(database).toUi()
+                    DbPagingTimelineWithStatus(
+                        timeline = it,
+                        status = database.statusQueries
+                            .findWithStatusKey(statusKey = it.statusKey)
+                            .also { query ->
+                                relationQueryRegister.addRelationQuery(query)
+                            }.executeAsOne()
+                            .withAttachments(database, accountKey = accountKey)
+                    ).toUi()
                 }
             }
         )
@@ -72,7 +82,7 @@ internal class SqlDelightPagingTimelineDaoImpl(private val database: SqlDelightC
         return database.pagingTimelineQueries.findWithStatusKey(
             statusKey = maxStatusKey,
             accountKey = accountKey
-        ).executeAsOneOrNull()?.toUi()
+        ).executeAsList().firstOrNull()?.toUi()
     }
 
     override suspend fun insertAll(listOf: List<PagingTimeLine>) {

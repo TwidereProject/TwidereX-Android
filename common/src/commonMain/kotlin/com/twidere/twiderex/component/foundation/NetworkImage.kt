@@ -21,21 +21,27 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import com.twidere.services.http.authorization.EmptyAuthorization
+import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.image.ImageEffects
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.kmp.StorageProvider
 import com.twidere.twiderex.kmp.rememberNetworkImagePainter
+import com.twidere.twiderex.model.cred.OAuthCredentials
 import com.twidere.twiderex.preferences.LocalHttpConfig
 import com.twidere.twiderex.twitterTonApiHost
+import com.twidere.twiderex.ui.LocalActiveAccount
 import java.net.MalformedURLException
 import java.net.URL
 
@@ -46,6 +52,7 @@ fun NetworkImage(
     contentScale: ContentScale = ContentScale.Crop,
     effects: ImageEffects.Builder.() -> Unit = { crossFade(true) },
     placeholder: @Composable (() -> Unit)? = null,
+    zoomable: Boolean = false
 ) {
     val state = remember {
         mutableStateOf(NetworkImageState.LOADING)
@@ -54,18 +61,20 @@ fun NetworkImage(
         data
     } else {
         val httpConfig = LocalHttpConfig.current
+        val account = LocalActiveAccount.current
         val auth = try {
             val url = URL(data.toString())
             if (url.host == twitterTonApiHost) {
-                // (account.credentials as OAuthCredentials).let {
-                //     OAuth1Authorization(
-                //         consumerKey = it.consumer_key,
-                //         consumerSecret = it.consumer_secret,
-                //         accessToken = it.access_token,
-                //         accessSecret = it.access_token_secret,
-                //     )
-                // }
-                TODO("Waiting for LocalActiveAccount")
+                account?.let {
+                    (it.credentials as OAuthCredentials).let { oauth ->
+                        OAuth1Authorization(
+                            consumerKey = oauth.consumer_key,
+                            consumerSecret = oauth.consumer_secret,
+                            accessToken = oauth.access_token,
+                            accessSecret = oauth.access_token_secret,
+                        )
+                    }
+                } ?: EmptyAuthorization()
             } else {
                 EmptyAuthorization()
             }
@@ -83,15 +92,20 @@ fun NetworkImage(
             }
         )
     }
-    if (state.value == NetworkImageState.LOADING) {
-        placeholder?.invoke()
+
+    Box {
+        val size = painter.intrinsicSize
+        Image(
+            painter = painter,
+            modifier = if (zoomable && size != Size.Unspecified) Modifier.aspectRatio(size.width / size.height).then(modifier) else modifier,
+            contentScale = contentScale,
+            contentDescription = stringResource(MR.strings.accessibility_common_network_image)
+        )
+
+        if (state.value == NetworkImageState.LOADING) {
+            placeholder?.invoke()
+        }
     }
-    Image(
-        painter = painter,
-        modifier = modifier,
-        contentScale = contentScale,
-        contentDescription = stringResource(MR.strings.accessibility_common_network_image)
-    )
 }
 
 internal enum class NetworkImageState {

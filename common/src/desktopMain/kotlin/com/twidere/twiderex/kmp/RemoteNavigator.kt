@@ -39,4 +39,8 @@ actual class RemoteNavigator {
     actual fun shareText(content: String, fromBackground: Boolean) {
         // TODO: Show native UI for sharing
     }
+
+    actual fun launchOAuthUri(uri: String) {
+        Desktop.getDesktop().browse(URI(uri))
+    }
 }

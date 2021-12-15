@@ -20,28 +20,19 @@
  */
 package com.twidere.twiderex
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.newSingleThreadContext
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
+import org.junit.Rule
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal open class MainThreadTestBase {
-    @OptIn(ObsoleteCoroutinesApi::class)
-    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
+    @get:Rule
+    var mainCoroutineRule = MainCoroutineScopeRule()
 
     @BeforeTest
-    open fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
-    }
+    open fun setUp() {}
 
     @AfterTest
-    open fun tearDown() {
-        Dispatchers.resetMain() // reset main dispatcher to the original Main dispatcher
-        mainThreadSurrogate.close()
-    }
+    open fun tearDown() {}
 }

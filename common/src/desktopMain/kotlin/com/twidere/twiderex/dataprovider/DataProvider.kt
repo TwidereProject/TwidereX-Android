@@ -43,9 +43,11 @@ actual class DataProvider {
         }
     }
 
+    internal val realAppDatabase = createAppDataBase(JdbcSqliteDriver(APP_DATABASE))
+
     actual val appDatabase: AppDatabase
         get() = SqlDelightAppDatabaseImpl(
-            database = createAppDataBase(JdbcSqliteDriver(APP_DATABASE))
+            database = realAppDatabase
         )
 
     actual val cacheDatabase: CacheDatabase

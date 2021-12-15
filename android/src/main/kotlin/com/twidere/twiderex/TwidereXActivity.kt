@@ -56,10 +56,13 @@ import androidx.lifecycle.lifecycleScope
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
+import com.twidere.twiderex.component.LocalWindowInsetsController
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.kmp.LocalPlatformWindow
 import com.twidere.twiderex.kmp.LocalRemoteNavigator
+import com.twidere.twiderex.kmp.PlatformWindow
 import com.twidere.twiderex.kmp.RemoteNavigator
 import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.navigation.Router
@@ -68,16 +71,13 @@ import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
-import com.twidere.twiderex.ui.LocalActivity
-import com.twidere.twiderex.ui.LocalApplication
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
-import com.twidere.twiderex.ui.LocalWindow
-import com.twidere.twiderex.ui.LocalWindowInsetsController
 import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.utils.IsActiveNetworkMeteredLiveData
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
 import kotlinx.coroutines.flow.MutableStateFlow
+import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.precompose.lifecycle.PreComposeActivity
 import moe.tlaster.precompose.lifecycle.setContent
 import moe.tlaster.precompose.navigation.NavController
@@ -110,6 +110,7 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FilePicker.init(activityResultRegistry, this, contentResolver)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         isActiveNetworkMeteredLiveData.observe(this) {
@@ -169,17 +170,15 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
         val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
         CompositionLocalProvider(
             LocalInAppNotification provides inAppNotification,
-            LocalWindow provides window,
             LocalWindowInsetsController provides windowInsetsControllerCompat,
             LocalActiveAccount provides account,
-            LocalApplication provides application,
             LocalStatusActions provides statusActions,
-            LocalActivity provides this,
             LocalActiveAccountViewModel provides accountViewModel,
             LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
             LocalPlatformResolver provides platformResolver,
             LocalResLoader provides ResLoader(this),
             LocalRemoteNavigator provides remoteNavigator,
+            LocalPlatformWindow provides PlatformWindow(window),
         ) {
             ProvidePreferences(
                 preferencesHolder,
@@ -196,9 +195,9 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
     }
 
     private fun onDeeplink(it: Uri) {
-        if (CustomTabSignInChannel.canHandle(it)) {
+        if (CustomTabSignInChannel.canHandle(it.toString())) {
             lifecycleScope.launchWhenResumed {
-                CustomTabSignInChannel.send(it)
+                CustomTabSignInChannel.send(it.toString())
             }
         } else {
             navController.navigate(it.toString())

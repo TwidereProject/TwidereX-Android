@@ -28,6 +28,8 @@ expect class RemoteNavigator {
     fun shareMedia(filePath: String, mimeType: String, fromBackground: Boolean = false)
 
     fun shareText(content: String, fromBackground: Boolean = false)
+
+    fun launchOAuthUri(uri: String)
 }
 
 val LocalRemoteNavigator = staticCompositionLocalOf<RemoteNavigator> { error("No RemoteNavigator") }

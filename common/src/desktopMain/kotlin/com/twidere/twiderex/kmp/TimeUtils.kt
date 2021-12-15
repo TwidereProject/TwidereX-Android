@@ -20,24 +20,26 @@
  */
 package com.twidere.twiderex.kmp
 
+import org.ocpsoft.prettytime.PrettyTime
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.Date
 
 actual object TimeUtils {
-    private const val hour = 60
-    private const val day = 24 * 60
+    private val prettyTime = PrettyTime()
     private const val week = 7 * 24 * 60
     actual fun humanizedTimestamp(time: Long): String {
         val now: Instant = Instant.now()
         val instant: Instant = Instant.ofEpochMilli(time)
         val relativeMinute = ChronoUnit.MINUTES.between(instant, now)
         return when {
-            relativeMinute < hour -> "$relativeMinute min.ago"
-            relativeMinute in (hour + 1) until day -> "${ChronoUnit.HOURS.between(instant, now)} hr.ago"
-            relativeMinute in (day + 1) until week -> "${ChronoUnit.DAYS.between(instant, now)} days ago"
+            relativeMinute < week -> prettyTime.format(instant)
             else -> SimpleDateFormat.getDateTimeInstance().format(Date(time))
         }
+    }
+
+    actual fun humanizedDateTime(time: Long): String {
+        return humanizedTimestamp(time)
     }
 }

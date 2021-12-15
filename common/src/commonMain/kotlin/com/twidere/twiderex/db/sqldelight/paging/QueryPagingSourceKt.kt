@@ -31,9 +31,22 @@ internal abstract class QueryPagingSource<Key : Any, RowType : Any> :
     PagingSource<Key, RowType>(),
     Query.Listener {
 
+    protected val relationQueryRegister = object : RelationQueryRegister {
+        override fun addRelationQuery(query: Query<Any>) {
+            query.addListener(this@QueryPagingSource)
+            relationQueries.add(query)
+        }
+    }
+
+    private val relationQueries = mutableListOf<Query<Any>>()
+
     protected var currentQuery: Query<RowType>? by Delegates.observable(null) { _, old, new ->
         old?.removeListener(this)
         new?.addListener(this)
+        relationQueries.forEach {
+            it.removeListener(this)
+        }
+        relationQueries.clear()
     }
 
     init {
@@ -43,7 +56,13 @@ internal abstract class QueryPagingSource<Key : Any, RowType : Any> :
         }
     }
 
-    final override fun queryResultsChanged() = invalidate()
+    final override fun queryResultsChanged() {
+        invalidate()
+    }
+}
+
+interface RelationQueryRegister {
+    fun addRelationQuery(query: Query<Any>)
 }
 
 /**
@@ -66,7 +85,7 @@ fun <RowType : Any> QueryPagingSource(
     countQuery: Query<Long>,
     transacter: Transacter,
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    queryProvider: (limit: Long, offset: Long) -> Query<RowType>,
+    queryProvider: (limit: Long, offset: Long, relationQueryRegister: RelationQueryRegister) -> Query<RowType>,
 ): PagingSource<Int, RowType> = OffsetQueryPagingSource(
     queryProvider,
     countQuery,

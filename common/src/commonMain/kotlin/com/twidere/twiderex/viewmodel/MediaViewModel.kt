@@ -42,24 +42,29 @@ class MediaViewModel(
         accountRepository.activeAccount.mapNotNull { it }
     }
 
-    suspend fun saveFile(currentMedia: UiMedia, target: String) {
+    suspend fun saveFile(currentMedia: UiMedia, target: suspend (fileName: String) -> String?) {
         val account = account.firstOrNull() ?: return
+        val fileName = currentMedia.fileName ?: return
+        val path = target.invoke(fileName) ?: return
         currentMedia.mediaUrl?.let {
             mediaAction.download(
                 accountKey = account.accountKey,
                 source = it,
-                target = target
+                target = path
             )
         }
     }
 
     suspend fun shareMedia(currentMedia: UiMedia) {
         val account = account.firstOrNull() ?: return
-        currentMedia.mediaUrl?.let {
-            mediaAction.share(
-                source = it,
-                accountKey = account.accountKey
-            )
+        currentMedia.mediaUrl?.let { mediaUrl ->
+            currentMedia.fileName?.let { fileName ->
+                mediaAction.share(
+                    source = mediaUrl,
+                    fileName = fileName,
+                    accountKey = account.accountKey
+                )
+            }
         }
     }
 

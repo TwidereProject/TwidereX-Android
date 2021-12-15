@@ -1,5 +1,6 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
+import org.jetbrains.kotlin.konan.properties.loadProperties
 
 plugins {
     kotlin("multiplatform")
@@ -10,6 +11,7 @@ plugins {
     id("com.google.devtools.ksp").version(Versions.ksp)
     id("dev.icerock.mobile.multiplatform-resources") version Versions.moko
     id("com.squareup.sqldelight")
+    id("com.codingfeline.buildkonfig") version "0.11.0"
 }
 
 sqldelight {
@@ -30,6 +32,9 @@ repositories {
     google()
 }
 
+// TODO: workaround for https://github.com/google/ksp/issues/518
+evaluationDependsOn(":routeProcessor")
+
 kotlin {
     android()
     jvm("desktop") {
@@ -43,6 +48,7 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
+                api(compose.materialIconsExtended)
                 implementation(projects.services)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Kotlin.coroutines}")
                 api("androidx.paging:paging-common:${Versions.paging}")
@@ -58,6 +64,9 @@ kotlin {
                 implementation("com.squareup.sqldelight:coroutines-extensions-jvm:${Versions.sqlDelight}")
                 api("dev.icerock.moko:resources:${Versions.moko}")
                 implementation("app.cash.turbine:turbine:0.6.1")
+                implementation("ca.gosyer:accompanist-pager:${Versions.accompanist_jb}")
+                implementation("ca.gosyer:accompanist-pager-indicators:${Versions.accompanist_jb}")
+                api("com.github.Tlaster.KFilePicker:KFilePicker:1.0.2")
             }
         }
         val commonTest by getting {
@@ -72,7 +81,7 @@ kotlin {
             dependencies {
                 implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
                 implementation("androidx.savedstate:savedstate-ktx:1.1.0")
-                implementation("androidx.core:core-ktx:1.7.0-alpha01")
+                implementation("androidx.core:core-ktx:1.7.0-rc01")
                 implementation("io.insert-koin:koin-android:${Versions.koin}")
                 implementation("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
                 implementation("androidx.room:room-runtime:${Versions.room}")
@@ -91,6 +100,10 @@ kotlin {
                 implementation("androidx.datastore:datastore-preferences:${Versions.datastore}")
                 implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
                 implementation("androidx.startup:startup-runtime:${Versions.startup}")
+                implementation("com.google.accompanist:accompanist-insets:${Versions.accompanist}")
+                implementation("androidx.browser:browser:${Versions.browser}")
+                implementation("androidx.vectordrawable:vectordrawable:1.1.0")
+                implementation("androidx.activity:activity-compose:1.4.0-rc01")
             }
         }
         val androidAndroidTest by getting {
@@ -108,9 +121,30 @@ kotlin {
             dependencies {
                 implementation("uk.co.caprica:vlcj:4.7.1")
                 implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
+                implementation("de.huxhorn.lilith:de.huxhorn.lilith.3rdparty.junique:1.0.4")
+                implementation("org.javassist:javassist:3.28.0-GA")
+                implementation("org.ocpsoft.prettytime:prettytime:5.0.2.Final")
             }
         }
         val desktopTest by getting
+    }
+}
+
+buildkonfig {
+    packageName = Package.id
+    objectName = "BuildConfig"
+    defaultConfigs {
+        buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "VERSION_NAME", Package.versionName)
+        buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "APPLICATION_ID", Package.id)
+        buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "APPLICATION_NAME", Package.name)
+        val apiKeyProperties = rootProject.file("apiKey.properties")
+        val hasApiKeyProps = apiKeyProperties.exists()
+        if (hasApiKeyProps) {
+            val apiKeyProp = loadProperties(apiKeyProperties.absolutePath)
+            buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "CONSUMERKEY", apiKeyProp.getProperty("ConsumerKey"))
+            buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "CONSUMERSECRET", apiKeyProp.getProperty("ConsumerSecret"))
+            buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "GIPHYKEY", apiKeyProp.getProperty("GiphyKey"))
+        }
     }
 }
 
@@ -192,6 +226,21 @@ tasks.create("generateTranslationFromZip") {
             generateLocalization(source, target)
         }
     }
+}
+
+val updateJvmLocalizationFileName by tasks.registering {
+    doLast {
+        val generatedDir = File(project.buildDir, "generated/moko")
+        generatedDir.walkTopDown().filter { file ->
+            file.name.endsWith(".properties")
+        }.forEach {
+            it.renameTo(File(it.parent, it.name.replace("-r", "_")))
+        }
+    }
+}
+
+afterEvaluate {
+    tasks.getByName("generateMRdesktopMain").finalizedBy(updateJvmLocalizationFileName)
 }
 
 fun generateLocalization(appJson: File, target: File) {

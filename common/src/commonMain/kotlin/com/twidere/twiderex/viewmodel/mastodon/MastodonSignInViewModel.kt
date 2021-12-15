@@ -32,6 +32,7 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.utils.OAuthLauncher
 import com.twidere.twiderex.utils.json
 import com.twidere.twiderex.utils.notifyError
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,6 +44,7 @@ import java.net.URI
 class MastodonSignInViewModel(
     private val repository: AccountRepository,
     private val inAppNotification: InAppNotification,
+    private val oAuthLauncher: OAuthLauncher,
 ) : ViewModel() {
 
     val loading = MutableStateFlow(false)
@@ -53,7 +55,6 @@ class MastodonSignInViewModel(
 
     fun beginOAuth(
         host: String,
-        codeProvider: suspend (url: String) -> String?,
         finished: (success: Boolean) -> Unit,
     ) = viewModelScope.launch {
         loading.value = true
@@ -70,8 +71,8 @@ class MastodonSignInViewModel(
             )
             val application = service.createApplication()
             val target = service.getWebOAuthUrl(application)
-            val code = codeProvider.invoke(target)
-            if (!code.isNullOrBlank()) {
+            val code = oAuthLauncher.launchOAuth(target, "code")
+            if (code.isNotBlank()) {
                 val accessTokenResponse = service.getAccessToken(code, application)
                 val accessToken = accessTokenResponse.accessToken
                 if (accessToken != null) {

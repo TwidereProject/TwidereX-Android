@@ -87,8 +87,6 @@ internal fun UiDMConversation.toDbDMConversation(dbId: String = UUID.randomUUID(
 
 internal fun UiDMEvent.toDbMEventWithAttachments(
     dbId: String = UUID.randomUUID().toString(),
-    dbMediaId: String = UUID.randomUUID().toString(),
-    dbUrlId: String = UUID.randomUUID().toString(),
     dbSenderId: String = UUID.randomUUID().toString(),
 ) = DbDMEventWithAttachments(
     message = DbDMEvent(
@@ -110,7 +108,7 @@ internal fun UiDMEvent.toDbMEventWithAttachments(
             UiDMEvent.SendStatus.FAILED -> DbDMEvent.SendStatus.FAILED
         },
     ),
-    media = media.toDbMedia(dbId = dbMediaId),
-    urlEntity = urlEntity.toDbUrl(belongToKey = messageKey, dbId = dbUrlId),
+    media = media.toDbMedia(),
+    urlEntity = urlEntity.toDbUrl(belongToKey = messageKey),
     sender = sender.toDbUser(dbId = dbSenderId)
 )

@@ -22,7 +22,7 @@ package com.twidere.twiderex.viewmodel.twitter
 
 import com.twidere.services.twitter.TwitterOAuthService
 import com.twidere.services.twitter.TwitterService
-import com.twidere.twiderex.DefaultConfig
+import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.dataprovider.mapper.toAmUser
 import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.http.TwidereServiceFactory
@@ -33,6 +33,7 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.utils.OAuthLauncher
 import com.twidere.twiderex.utils.json
 import com.twidere.twiderex.utils.notifyError
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +41,6 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-typealias OauthVerifierProvider = suspend (url: String) -> String?
 typealias PinCodeProvider = suspend (url: String) -> String?
 typealias OnResult = (success: Boolean) -> Unit
 
@@ -49,7 +49,7 @@ class TwitterSignInViewModel(
     private val inAppNotification: InAppNotification,
     private val consumerKey: String,
     private val consumerSecret: String,
-    private val oauthVerifierProvider: OauthVerifierProvider,
+    private val oAuthLauncher: OAuthLauncher,
     private val pinCodeProvider: PinCodeProvider,
     private val onResult: OnResult,
 ) : ViewModel() {
@@ -80,7 +80,7 @@ class TwitterSignInViewModel(
                 }
             )
             val pinCode = if (isBuiltInKey()) {
-                oauthVerifierProvider.invoke(service.getWebOAuthUrl(token))
+                oAuthLauncher.launchOAuth(service.getWebOAuthUrl(token), "oauth_verifier")
             } else {
                 pinCodeProvider.invoke(service.getWebOAuthUrl(token))
             }
@@ -133,13 +133,14 @@ class TwitterSignInViewModel(
             }
         } catch (e: Throwable) {
             inAppNotification.notifyError(e)
+            e.printStackTrace()
         }
         loading.value = false
         return false
     }
 
     private fun isBuiltInKey(): Boolean {
-        return consumerKey == DefaultConfig.ConsumerKey && consumerSecret == DefaultConfig.ConsumerSecret
+        return consumerKey == BuildConfig.CONSUMERKEY && consumerSecret == BuildConfig.CONSUMERSECRET
     }
 
     fun cancel() {
