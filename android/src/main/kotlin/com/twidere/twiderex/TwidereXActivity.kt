@@ -58,24 +58,15 @@ import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.LocalWindowInsetsController
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
-import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.kmp.LocalPlatformWindow
-import com.twidere.twiderex.kmp.LocalRemoteNavigator
 import com.twidere.twiderex.kmp.PlatformWindow
-import com.twidere.twiderex.kmp.RemoteNavigator
-import com.twidere.twiderex.kmp.ResLoader
-import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
-import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.utils.IsActiveNetworkMeteredLiveData
-import com.twidere.twiderex.utils.LocalPlatformResolver
-import com.twidere.twiderex.utils.PlatformResolver
 import kotlinx.coroutines.flow.MutableStateFlow
 import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.precompose.lifecycle.PreComposeActivity
@@ -97,10 +88,6 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
     private val inAppNotification: InAppNotification by inject()
 
     private val connectivityManager: ConnectivityManager by inject()
-
-    private val platformResolver: PlatformResolver by inject()
-
-    private val remoteNavigator: RemoteNavigator by inject()
 
     private val isActiveNetworkMetered = MutableStateFlow(false)
     private val isActiveNetworkMeteredLiveData by lazy {
@@ -164,20 +151,12 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
     private fun App() {
         val windowInsetsControllerCompat =
             remember { WindowInsetsControllerCompat(window, window.decorView) }
-        val accountViewModel =
-            com.twidere.twiderex.di.ext.getViewModel<com.twidere.twiderex.viewmodel.ActiveAccountViewModel>()
-        val account by accountViewModel.account.observeAsState(null)
         val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
         CompositionLocalProvider(
             LocalInAppNotification provides inAppNotification,
             LocalWindowInsetsController provides windowInsetsControllerCompat,
-            LocalActiveAccount provides account,
             LocalStatusActions provides statusActions,
-            LocalActiveAccountViewModel provides accountViewModel,
             LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
-            LocalPlatformResolver provides platformResolver,
-            LocalResLoader provides ResLoader(this),
-            LocalRemoteNavigator provides remoteNavigator,
             LocalPlatformWindow provides PlatformWindow(window),
         ) {
             ProvidePreferences(
@@ -186,7 +165,7 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
                 ProvideWindowInsets(
                     windowInsetsAnimationsEnabled = true
                 ) {
-                    Router(
+                    App(
                         navController = navController
                     )
                 }
