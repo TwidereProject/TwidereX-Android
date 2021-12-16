@@ -26,6 +26,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -75,14 +76,16 @@ fun ReplyButton(
     status: UiStatus,
     withNumber: Boolean = true,
 ) {
-    val navigator = LocalNavigator.current
     val icon = painterResource(res = com.twidere.twiderex.MR.files.ic_corner_up_left)
     val contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_actions_reply)
+
+    val navigator = LocalNavigator.current
     val action = {
         navigator.compose(ComposeType.Reply, statusKey = status.statusKey)
     }
-    val data = status.retweet ?: status
+
     if (withNumber) {
+        val data = status.retweet ?: status
         StatusActionButtonWithNumbers(
             modifier = modifier,
             icon = icon,
@@ -369,55 +372,44 @@ private fun StatusActionButtonWithNumbers(
     onClick: () -> Unit,
 ) {
     val contentColor = color.copy(LocalContentAlpha.current)
-    Box(
-        modifier = modifier,
-    ) {
-        val source = remember {
-            MutableInteractionSource()
-        }
-        Row(
-            modifier = Modifier
-                .defaultMinSize(
-                    minHeight = ButtonDefaults.MinHeight
-                )
-                .clickable(
-                    onClick = onClick,
-                    enabled = enabled,
-                    interactionSource = source,
-                    indication = null,
-                )
-                .padding(StatusActionsDefaults.ContentPadding),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                modifier = Modifier
-                    .size(MaterialTheme.typography.body1.fontSize.value.dp)
-                    .indication(
-                        source,
-                        rememberRipple(
-                            bounded = false,
-                            radius = rippleSize
-                        )
-                    ),
-                tint = contentColor,
-                painter = icon,
-                contentDescription = contentDescription,
+    val source = remember { MutableInteractionSource() }
+    Row(
+        modifier = modifier
+            .defaultMinSize(
+                minHeight = ButtonDefaults.MinHeight
             )
-            Row(
-                modifier = modifier
-                    .weight(1f),
-            ) {
-                if (count > 0) {
-                    Box(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = count.humanizedCount(),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.body2,
-                        color = contentColor,
+            .clickable(
+                onClick = onClick,
+                enabled = enabled,
+                interactionSource = source,
+                indication = null,
+            )
+            .padding(StatusActionsDefaults.ContentPadding),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            modifier = Modifier
+                .size(MaterialTheme.typography.body1.fontSize.value.dp)
+                .indication(
+                    source,
+                    rememberRipple(
+                        bounded = false,
+                        radius = rippleSize
                     )
-                }
-            }
+                ),
+            tint = contentColor,
+            painter = icon,
+            contentDescription = contentDescription,
+        )
+        if (count > 0) {
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = count.humanizedCount(),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.body2,
+                color = contentColor,
+            )
         }
     }
 }
