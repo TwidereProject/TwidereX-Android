@@ -61,7 +61,7 @@ internal class RouteProcessor(
             val schema = annotation.getStringValue(AppRoute::schema.name) ?: ""
             val packageName = annotation.getStringValue(AppRoute::packageName.name)
                 ?: node.packageName.asString()
-            val className = node.qualifiedName!!.getShortName()
+            val className = node.qualifiedName?.getShortName() ?: "<ERROR>"
 
             val route = generateRoute(declaration = node)
                 .takeIf {
@@ -110,13 +110,13 @@ internal class RouteProcessor(
             val name = declaration.simpleName.getShortName()
             return when (declaration) {
                 is KSClassDeclaration -> {
-                    val isIRoute = declaration.superTypes.any {
-                        it.resolve().declaration.simpleName.getShortName() == "IRoute"
-                    }
+                    val superQualifiedName = declaration.superTypes.firstOrNull()?.resolve()
+                        ?.declaration?.qualifiedName?.asString()
+
                     NestedRouteDefinition(
                         name = name,
                         parent = parent,
-                        iRouteName = if (isIRoute) "com.twidere.twiderex.navigation.IRoute" else ""
+                        superQualifiedName = superQualifiedName.orEmpty()
                     ).also { nestedRouteDefinition ->
                         nestedRouteDefinition.childRoute.addAll(
                             declaration.declarations

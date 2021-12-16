@@ -70,12 +70,12 @@ internal data class PrefixRouteDefinition(
 internal data class NestedRouteDefinition(
     override val name: String,
     override var parent: RouteDefinition? = null,
-    val iRouteName: String,
+    val superQualifiedName: String,
     val childRoute: ArrayList<RouteDefinition> = arrayListOf(),
 ) : RouteDefinition {
 
     override fun generateRoute(): String {
-        return if (iRouteName.isEmpty()) generateRootRoute() else generateIRoute()
+        return if (superQualifiedName.isEmpty()) generateRootRoute() else generateIRoute()
     }
 
     private fun generateRootRoute(): String {
@@ -97,7 +97,7 @@ internal data class NestedRouteDefinition(
             overrideRoute = "override val route = \"${functions.parentPath}$pathWithParameter\""
         }
 
-        return "${indent}actual object $name: $iRouteName {${System.lineSeparator()}" +
+        return "${indent}actual object $name: $superQualifiedName {${System.lineSeparator()}" +
             "${indent}$StandardIndent$overrideRoute${System.lineSeparator()}" +
             childRoute.joinToString(System.lineSeparator()) { it.generateRoute() } +
             System.lineSeparator() +
