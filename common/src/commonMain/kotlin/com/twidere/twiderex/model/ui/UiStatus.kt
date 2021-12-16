@@ -76,6 +76,13 @@ data class UiStatus(
         referenceStatus[ReferenceType.Quote]
     }
 
+    val isMastodonFollow by lazy {
+        platformType == PlatformType.Mastodon && mastodonExtra != null && (
+            mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
+                mastodonExtra.type == MastodonStatusType.NotificationFollow
+            )
+    }
+
     fun isInThread(detailStatusId: String? = null): Boolean {
         return if (detailStatusId == null) {
             // show all reply as thread

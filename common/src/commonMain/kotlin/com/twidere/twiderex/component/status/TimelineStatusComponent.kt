@@ -52,7 +52,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -84,15 +83,7 @@ fun TimelineStatusComponent(
     threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
 ) {
     val navigator = LocalNavigator.current
-    val isMastodonFollow = remember(data) {
-        data.platformType == PlatformType.Mastodon &&
-            data.mastodonExtra != null &&
-            (
-                data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
-                    data.mastodonExtra.type == MastodonStatusType.NotificationFollow
-                )
-    }
-    if (isMastodonFollow) {
+    if (data.isMastodonFollow) {
         MastodonFollowStatus(data) {
             navigator.user(data.user)
         }
