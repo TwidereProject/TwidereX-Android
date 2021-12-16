@@ -21,13 +21,10 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.preferences.model.MiscPreferences
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.NitterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -51,22 +48,9 @@ class MiscViewModel(
         MutableStateFlow(false)
     }
 
-    val nitterVerifyError by lazy {
-        MutableStateFlow("")
+    val nitterVerify by lazy {
+        MutableStateFlow(false)
     }
-
-    val nitterVerify = nitter.filter { it.isNotEmpty() }.combine(account) { n, account ->
-        try {
-            nitterVerifyLoading.value = true
-            nitterRepository.verifyInstance(account.user.screenName, instance = n)
-            true
-        } catch (e: Exception) {
-            nitterVerifyError.value = e.message ?: "UnKnown Error"
-            false
-        } finally {
-            nitterVerifyLoading.value = false
-        }
-    }.asStateIn(viewModelScope, false)
 
     val useProxy by lazy {
         MutableStateFlow(false)
@@ -102,6 +86,7 @@ class MiscViewModel(
             proxyPassword.value = miscPreferences.data.first().proxyPassword
             proxyType.value = miscPreferences.data.first().proxyType
         }
+        verifyNitterInstance()
     }
 
     fun setNitterInstance(value: String) {
@@ -109,6 +94,26 @@ class MiscViewModel(
         viewModelScope.launch {
             miscPreferences.updateData {
                 it.copy(nitterInstance = value)
+            }
+        }
+        verifyNitterInstance()
+    }
+
+    fun verifyNitterInstance() {
+        if (nitter.value.isEmpty()) {
+            nitterVerify.value = false
+            nitterVerifyLoading.value = false
+            return
+        }
+        viewModelScope.launch {
+            try {
+                nitterVerifyLoading.value = true
+                nitterRepository.verifyInstance(account.first().user.screenName, instance = nitter.value)
+                nitterVerify.value = true
+            } catch (e: Exception) {
+                nitterVerify.value = false
+            } finally {
+                nitterVerifyLoading.value = false
             }
         }
     }
