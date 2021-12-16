@@ -87,7 +87,6 @@ fun TimelineComponent(
                 .distinctUntilChanged()
                 .filter { !it }
                 .filter { listState.layoutInfo.totalItemsCount != 0 }
-                .filter { listState.firstVisibleItemIndex != 0 && listState.firstVisibleItemScrollOffset != 0 }
                 .collect {
                     viewModel.saveScrollState(
                         TimelineScrollState(
