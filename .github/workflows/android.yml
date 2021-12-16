@@ -111,6 +111,7 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           profile: 4in WVGA (Nexus S)
+          ram-size: 2048M
           target: ${{ matrix.target }}
           script: |
             adb logcat > logcat.txt &
