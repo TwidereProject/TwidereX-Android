@@ -335,14 +335,11 @@ fun AvatarConnectLine(
     lineShape: Shape = RoundedCornerShape(lineWidth / 2),
     lineColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
 ) {
-    Box(modifier.clip(lineShape)) {
-        Box(
-            modifier = Modifier
-                .width(lineWidth)
-                .fillMaxHeight()
-                .background(lineColor)
-        )
-    }
+    Spacer(
+        modifier = modifier
+            .width(lineWidth)
+            .background(lineColor, shape = lineShape)
+    )
 }
 
 object AvatarConnectLineDefaults {
@@ -375,10 +372,9 @@ fun StatusContent(
         // Status header, include line up and tweet headers e.g. retweet
         Row(modifier = Modifier.height(IntrinsicSize.Min)) {
             if (lineUp) {
+                Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2))
                 AvatarConnectLine(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(start = UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2),
+                    modifier = Modifier.fillMaxHeight(),
                     lineShape = RoundedCornerShape(
                         bottomStart = AvatarConnectLineDefaults.LineWidth / 2,
                         bottomEnd = AvatarConnectLineDefaults.LineWidth / 2
@@ -402,8 +398,7 @@ fun StatusContent(
                 )
                 if (lineDown) {
                     AvatarConnectLine(
-                        modifier = Modifier
-                            .weight(1f),
+                        modifier = Modifier.weight(1f),
                         lineShape = RoundedCornerShape(
                             topStart = AvatarConnectLineDefaults.LineWidth / 2,
                             topEnd = AvatarConnectLineDefaults.LineWidth / 2
