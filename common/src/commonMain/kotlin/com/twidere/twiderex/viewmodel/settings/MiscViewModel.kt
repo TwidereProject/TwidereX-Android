@@ -21,19 +21,52 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.preferences.model.MiscPreferences
+import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.repository.NitterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class MiscViewModel(
     private val miscPreferences: DataStore<MiscPreferences>,
+    private val accountRepository: AccountRepository,
+    private val nitterRepository: NitterRepository,
 ) : ViewModel() {
+    private val account by lazy {
+        accountRepository.activeAccount.mapNotNull { it }
+    }
+
     val nitter by lazy {
         MutableStateFlow("")
     }
+
+    val nitterVerifyLoading by lazy {
+        MutableStateFlow(false)
+    }
+
+    val nitterVerifyError by lazy {
+        MutableStateFlow("")
+    }
+
+    val nitterVerify = nitter.filter { it.isNotEmpty() }.combine(account) { n, account ->
+        try {
+            nitterVerifyLoading.value = true
+            nitterRepository.verifyInstance(account.user.screenName, instance = n)
+            true
+        } catch (e: Exception) {
+            nitterVerifyError.value = e.message ?: "UnKnown Error"
+            false
+        } finally {
+            nitterVerifyLoading.value = false
+        }
+    }.asStateIn(viewModelScope, false)
 
     val useProxy by lazy {
         MutableStateFlow(false)

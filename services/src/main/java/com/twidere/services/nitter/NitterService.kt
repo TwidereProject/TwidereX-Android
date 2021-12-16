@@ -24,6 +24,7 @@ import com.twidere.services.http.HttpClientFactory
 import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.nitter.model.ConversationTimeline
 import com.twidere.services.nitter.model.TweetNotFound
+import com.twidere.services.nitter.model.Users
 import com.twidere.services.utils.await
 import moe.tlaster.hson.Hson
 import okhttp3.Request
@@ -32,6 +33,11 @@ class NitterService(
     private val host: String,
     private val httpClientFactory: HttpClientFactory,
 ) {
+    suspend fun verifyInstance(userName: String) {
+        val target = "$host/search?f=users&q=$userName"
+        if (request<Users>(target)?.users.isNullOrEmpty()) throw TweetNotFoundException()
+    }
+
     suspend fun conversation(
         screenName: String,
         statusId: String,
@@ -44,11 +50,16 @@ class NitterService(
                 it
             }
         }
+        println("target: $target")
+        return request(target)
+    }
+
+    private suspend inline fun <reified T> request(target: String,): T? {
         return httpClientFactory.createHttpClientBuilder()
             .addNetworkInterceptor {
-                it.proceed(it.request()).also {
-                    if (it.code != 200) {
-                        throw MicroBlogHttpException(it.code)
+                it.proceed(it.request()).also { response ->
+                    if (response.code != 200) {
+                        throw MicroBlogHttpException(response.code)
                     }
                 }
             }

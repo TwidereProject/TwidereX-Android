@@ -20,19 +20,25 @@
  */
 package com.twidere.twiderex.scenes.settings
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
 import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -53,6 +59,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.AlertDialog
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -285,6 +292,9 @@ fun ItemProxy(
 @Composable
 fun NitterPreference(viewModel: MiscViewModel) {
     val value by viewModel.nitter.observeAsState(initial = "")
+    val nitterVerify by viewModel.nitterVerify.observeAsState(initial = false)
+    val nitterVerifyError by viewModel.nitterVerifyError.observeAsState(initial = "")
+    val nitterVerifyLoading by viewModel.nitterVerifyLoading.observeAsState(initial = false)
     var showInformationDialog by remember {
         mutableStateOf(false)
     }
@@ -332,21 +342,37 @@ fun NitterPreference(viewModel: MiscViewModel) {
                     )
                 },
                 trailingIcon = {
-                    IconButton(
-                        onClick = {
-                            showUsageDialog = true
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_info_circle),
-                            contentDescription = null,
+                    if (nitterVerifyLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp)
                         )
+                    } else {
+                        IconButton(
+                            onClick = {
+                                showUsageDialog = true
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_info_circle),
+                                contentDescription = null,
+                            )
+                        }
                     }
-                }
+                },
+                colors = TextFieldDefaults.textFieldColors(),
+                isError = !nitterVerify && value.isNotEmpty()
             )
         },
         secondaryText = {
-            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_description))
+            Row {
+                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_description))
+                AnimatedVisibility(
+                    visible = !nitterVerify,
+                    modifier = Modifier.padding(start = 8.dp)
+                ) {
+                    Text(nitterVerifyError, color = MaterialTheme.colors.error)
+                }
+            }
         }
     )
 }
