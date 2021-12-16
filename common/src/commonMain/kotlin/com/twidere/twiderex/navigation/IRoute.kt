@@ -37,12 +37,11 @@ fun List<Any>.mapToString() = map {
     }
 }
 
-@Suppress("NOTHING_TO_INLINE")
-inline fun RouteBuilder.scene(
+fun RouteBuilder.scene(
     route: IRoute,
     deepLinks: List<Any> = emptyList(),
     navTransition: NavTransition? = null,
-    noinline content: @Composable (BackStackEntry) -> Unit,
+    content: @Composable (BackStackEntry) -> Unit,
 ) = scene(
     route = route.route,
     deepLinks = deepLinks.mapToString(),
@@ -50,12 +49,11 @@ inline fun RouteBuilder.scene(
     content = content
 )
 
-@Suppress("NOTHING_TO_INLINE")
-inline fun RouteBuilder.authorizedScene(
+fun RouteBuilder.authorizedScene(
     route: IRoute,
     deepLinks: List<Any> = emptyList(),
     navTransition: NavTransition? = null,
-    noinline content: @Composable (BackStackEntry) -> Unit,
+    content: @Composable (BackStackEntry) -> Unit,
 ) = authorizedScene(
     route = route.route,
     deepLinks = deepLinks.mapToString(),
@@ -63,8 +61,7 @@ inline fun RouteBuilder.authorizedScene(
     content = content
 )
 
-@Suppress("NOTHING_TO_INLINE")
-inline fun RouteBuilder.authorizedDialog(
+fun RouteBuilder.authorizedDialog(
     route: IRoute,
-    noinline content: @Composable (BackStackEntry) -> Unit,
+    content: @Composable (BackStackEntry) -> Unit,
 ) = authorizedDialog(route.route, content)
