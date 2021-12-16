@@ -48,7 +48,7 @@ import com.twidere.twiderex.kmp.PlatformMediaWrapper
 import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.model.enums.MediaInsertType
 import com.twidere.twiderex.model.ui.UiMediaInsert
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalNavController
 import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
@@ -110,7 +110,7 @@ fun MediaInsertMenu(
                                     }
                                 }
                                 MediaInsertType.GIF -> scope.launch {
-                                    navController.navigateForResult(RootRoute.Gif.Home)
+                                    navController.navigateForResult(Root.Gif.Home)
                                         ?.let { result ->
                                             onResult(
                                                 listOf(result as String).map {

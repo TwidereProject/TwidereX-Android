@@ -30,7 +30,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.OAuthCredentials
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.navigation.RootDeepLinksRoute
+import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.OAuthLauncher
@@ -74,7 +74,7 @@ class TwitterSignInViewModel(
             )
             val token = service.getOAuthToken(
                 if (isBuiltInKey()) {
-                    RootDeepLinksRoute.Callback.SignIn.Twitter
+                    RootDeepLinks.Callback.SignIn.Twitter
                 } else {
                     "oob"
                 }

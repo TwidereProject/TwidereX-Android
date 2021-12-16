@@ -26,7 +26,7 @@ import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.enums.ReferenceType
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.navigation.RootDeepLinksRoute
+import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.notification.AppNotification
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
@@ -83,7 +83,7 @@ class NotificationJob(
                         status.user.displayName
                     ),
                     htmlContent = status.htmlText,
-                    deepLink = RootDeepLinksRoute.Twitter.Status(status.statusId),
+                    deepLink = RootDeepLinks.Twitter.Status(status.statusId),
                     profileImage = status.user.profileImage,
                 )
             }
@@ -125,7 +125,7 @@ class NotificationJob(
                         com.twidere.twiderex.MR.strings.common_notification_follow,
                         actualStatus.user.displayName
                     ),
-                    deepLink = RootDeepLinksRoute.User(actualStatus.user.userKey),
+                    deepLink = RootDeepLinks.User(actualStatus.user.userKey),
                     profileImage = actualStatus.user.profileImage,
                 )
             }
@@ -135,7 +135,7 @@ class NotificationJob(
                         com.twidere.twiderex.MR.strings.common_notification_follow_request,
                         actualStatus.user.displayName
                     ),
-                    deepLink = RootDeepLinksRoute.User(actualStatus.user.userKey)
+                    deepLink = RootDeepLinks.User(actualStatus.user.userKey)
                 )
             }
             MastodonStatusType.NotificationMention -> {
@@ -145,7 +145,7 @@ class NotificationJob(
                         actualStatus.user.displayName
                     ),
                     htmlContent = actualStatus.htmlText,
-                    deepLink = RootDeepLinksRoute.Status(actualStatus.statusKey),
+                    deepLink = RootDeepLinks.Status(actualStatus.statusKey),
                     profileImage = actualStatus.user.profileImage,
                 )
             }
@@ -155,7 +155,7 @@ class NotificationJob(
                         com.twidere.twiderex.MR.strings.common_notification_reblog,
                         actualStatus.user.displayName
                     ),
-                    deepLink = RootDeepLinksRoute.Status(actualStatus.statusKey),
+                    deepLink = RootDeepLinks.Status(actualStatus.statusKey),
                     profileImage = actualStatus.user.profileImage,
                 )
             }
@@ -165,7 +165,7 @@ class NotificationJob(
                         com.twidere.twiderex.MR.strings.common_notification_favourite,
                         actualStatus.user.displayName
                     ),
-                    deepLink = RootDeepLinksRoute.Status(actualStatus.statusKey),
+                    deepLink = RootDeepLinks.Status(actualStatus.statusKey),
                     profileImage = actualStatus.user.profileImage,
                 )
             }
@@ -174,7 +174,7 @@ class NotificationJob(
                     title = resLoader.getString(
                         com.twidere.twiderex.MR.strings.common_notification_poll,
                     ),
-                    deepLink = RootDeepLinksRoute.Status(actualStatus.statusKey),
+                    deepLink = RootDeepLinks.Status(actualStatus.statusKey),
                     profileImage = actualStatus.user.profileImage,
                 )
             }

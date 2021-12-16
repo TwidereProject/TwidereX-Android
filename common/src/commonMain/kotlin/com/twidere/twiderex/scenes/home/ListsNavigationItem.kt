@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.HomeNavigationItem
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.scenes.lists.ListsSceneContent
 import com.twidere.twiderex.scenes.lists.ListsSceneFab
 
@@ -37,7 +37,7 @@ class ListsNavigationItem : HomeNavigationItem() {
     }
 
     override val route: String
-        get() = RootRoute.Lists.Home
+        get() = Root.Lists.Home
 
     @Composable
     override fun icon(): Painter {

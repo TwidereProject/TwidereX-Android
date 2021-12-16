@@ -102,7 +102,7 @@ import moe.tlaster.precompose.navigation.transition.fadeScaleCreateTransition
 import moe.tlaster.precompose.navigation.transition.fadeScaleDestroyTransition
 import java.net.URLDecoder
 
-const val initialRoute = RootRouteDefinition.Home
+val initialRoute get() = Root.Home
 
 fun RouteBuilder.authorizedScene(
     route: String,
@@ -211,47 +211,47 @@ fun RequirePlatformAccount(
  */
 fun RouteBuilder.route(constraints: Constraints) {
     authorizedScene(
-        RootRouteDefinition.Home,
+        Root.Home,
         deepLinks = twitterHosts.map { "$it/*" }
     ) {
         HomeScene()
     }
 
-    authorizedScene(RootRouteDefinition.Mastodon.Notification) {
+    authorizedScene(Root.Mastodon.Notification) {
         MastodonNotificationScene()
     }
 
-    authorizedScene(RootRouteDefinition.Mastodon.FederatedTimeline) {
+    authorizedScene(Root.Mastodon.FederatedTimeline) {
         FederatedTimelineScene()
     }
 
-    authorizedScene(RootRouteDefinition.Mastodon.LocalTimeline) {
+    authorizedScene(Root.Mastodon.LocalTimeline) {
         LocalTimelineScene()
     }
 
-    authorizedScene(RootRouteDefinition.Me) {
+    authorizedScene(Root.Me) {
         MeScene()
     }
 
-    authorizedScene(RootRouteDefinition.Mentions) {
+    authorizedScene(Root.Mentions) {
         MentionScene()
     }
 
-    authorizedScene(RootRouteDefinition.HomeTimeline) {
+    authorizedScene(Root.HomeTimeline) {
         HomeTimelineScene()
     }
 
     scene(
-        RootRouteDefinition.SignIn.General,
+        Root.SignIn.General,
         deepLinks = listOf(
-            RootDeepLinksRouteDefinition.SignIn
+            RootDeepLinks.SignIn
         ),
     ) {
         SignInScene()
     }
 
     scene(
-        RootRouteDefinition.SignIn.Twitter,
+        Root.SignIn.Twitter,
     ) { backStackEntry ->
         val consumerKey = backStackEntry.path<String>("consumerKey")
         val consumerSecret = backStackEntry.path<String>("consumerSecret")
@@ -260,7 +260,7 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    scene(RootRouteDefinition.SignIn.Mastodon) {
+    scene(Root.SignIn.Mastodon) {
         MastodonSignInScene()
     }
 
@@ -273,7 +273,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     // }
 
     authorizedScene(
-        RootDeepLinksRouteDefinition.Twitter.User,
+        RootDeepLinks.Twitter.User,
         deepLinks = twitterHosts.map {
             "$it/{screenName}"
         }
@@ -293,9 +293,9 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        RootRouteDefinition.User,
+        Root.User,
         deepLinks = listOf(
-            RootDeepLinksRouteDefinition.User
+            RootDeepLinks.User
         )
     ) { backStackEntry ->
         backStackEntry.path<String>("userKey")?.let {
@@ -310,9 +310,9 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        RootRouteDefinition.Mastodon.Hashtag,
+        Root.Mastodon.Hashtag,
         deepLinks = listOf(
-            RootDeepLinksRouteDefinition.Mastodon.Hashtag
+            RootDeepLinks.Mastodon.Hashtag
         )
     ) { backStackEntry ->
         backStackEntry.path<String>("keyword")?.let {
@@ -321,9 +321,9 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        RootRouteDefinition.Status,
+        Root.Status,
         deepLinks = listOf(
-            RootDeepLinksRouteDefinition.Status,
+            RootDeepLinks.Status,
         )
     ) { backStackEntry ->
         backStackEntry.path<String>("statusKey")?.let {
@@ -338,7 +338,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        RootDeepLinksRouteDefinition.Twitter.Status,
+        RootDeepLinks.Twitter.Status,
         deepLinks = twitterHosts.map {
             "$it/{screenName}/status/{statusId:[0-9]+}"
         }
@@ -361,7 +361,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedDialog(
-        RootRouteDefinition.Media.Status,
+        Root.Media.Status,
     ) { backStackEntry ->
         backStackEntry.path<String>("statusKey")?.let {
             MicroBlogKey.valueOf(it)
@@ -379,7 +379,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedDialog(
-        RootRouteDefinition.Media.Pure,
+        Root.Media.Pure,
     ) { backStackEntry ->
         backStackEntry.path<String>("belongToKey")?.let {
             MicroBlogKey.valueOf(it)
@@ -393,7 +393,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedDialog(
-        RootRouteDefinition.Media.Raw,
+        Root.Media.Raw,
     ) { backStackEntry ->
         val url = backStackEntry.path<String>("url")?.let {
             URLDecoder.decode(it, "UTF-8")
@@ -404,12 +404,12 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    authorizedScene(RootRouteDefinition.Search.Home) {
+    authorizedScene(Root.Search.Home) {
         com.twidere.twiderex.scenes.home.SearchScene()
     }
 
     authorizedScene(
-        RootRouteDefinition.Search.Input,
+        Root.Search.Input,
         navTransition = NavTransition(
             createTransition = fadeCreateTransition,
             destroyTransition = fadeDestroyTransition,
@@ -423,10 +423,10 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        RootRouteDefinition.Search.Result,
+        Root.Search.Result,
         deepLinks = twitterHosts.map {
             "$it/search?q={keyword}"
-        } + RootDeepLinksRouteDefinition.Search,
+        } + RootDeepLinks.Search,
         navTransition = NavTransition(
             createTransition = fadeCreateTransition,
             destroyTransition = fadeDestroyTransition,
@@ -440,7 +440,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        RootRouteDefinition.Compose.Home,
+        Root.Compose.Home,
         navTransition = NavTransition(
             createTransition = {
                 translationY = constraints.maxHeight * (1 - it)
@@ -454,7 +454,7 @@ fun RouteBuilder.route(constraints: Constraints) {
             resumeTransition = fadeScaleCreateTransition,
         ),
         deepLinks = listOf(
-            RootDeepLinksRouteDefinition.Compose
+            RootDeepLinks.Compose
         )
     ) { backStackEntry ->
         val type = backStackEntry.query<String>("composeType")?.let {
@@ -475,7 +475,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        RootRouteDefinition.Followers,
+        Root.Followers,
     ) { backStackEntry ->
         backStackEntry.path<String>("userKey")?.let {
             MicroBlogKey.valueOf(it)
@@ -485,7 +485,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        RootRouteDefinition.Following,
+        Root.Following,
     ) { backStackEntry ->
         backStackEntry.path<String>("userKey")?.let {
             MicroBlogKey.valueOf(it)
@@ -494,40 +494,40 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    scene(RootRouteDefinition.Settings.Home) {
+    scene(Root.Settings.Home) {
         SettingsScene()
     }
 
-    scene(RootRouteDefinition.Settings.Appearance) {
+    scene(Root.Settings.Appearance) {
         AppearanceScene()
     }
 
-    scene(RootRouteDefinition.Settings.Display) {
+    scene(Root.Settings.Display) {
         DisplayScene()
     }
 
-    scene(RootRouteDefinition.Settings.Storage) {
+    scene(Root.Settings.Storage) {
         StorageScene()
     }
 
-    scene(RootRouteDefinition.Settings.AccountManagement) {
+    scene(Root.Settings.AccountManagement) {
         AccountManagementScene()
     }
 
-    scene(RootRouteDefinition.Settings.Misc) {
+    scene(Root.Settings.Misc) {
         MiscScene()
     }
 
-    scene(RootRouteDefinition.Settings.Notification) {
+    scene(Root.Settings.Notification) {
         NotificationScene()
     }
 
-    authorizedScene(RootRouteDefinition.Settings.Layout) {
+    authorizedScene(Root.Settings.Layout) {
         LayoutScene()
     }
 
     scene(
-        RootRouteDefinition.Settings.AccountNotification
+        Root.Settings.AccountNotification
     ) {
         it.path<String>("accountKey", null)?.let {
             MicroBlogKey.valueOf(it)
@@ -536,18 +536,18 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    scene(RootRouteDefinition.Settings.About) {
+    scene(Root.Settings.About) {
         AboutScene()
     }
 
-    scene(RootRouteDefinition.Draft.List) {
+    scene(Root.Draft.List) {
         DraftListScene()
     }
 
     scene(
-        RootRouteDefinition.Draft.Compose,
+        Root.Draft.Compose,
         deepLinks = listOf(
-            RootDeepLinksRouteDefinition.Draft,
+            RootDeepLinks.Draft,
         )
     ) { backStackEntry ->
         backStackEntry.path<String>("draftId")?.let {
@@ -555,29 +555,29 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    authorizedScene(RootRouteDefinition.Compose.Search.User) {
+    authorizedScene(Root.Compose.Search.User) {
         ComposeSearchUserScene()
     }
 
-    authorizedScene(RootRouteDefinition.Mastodon.Compose.Hashtag) {
+    authorizedScene(Root.Mastodon.Compose.Hashtag) {
         ComposeSearchHashtagScene()
     }
 
-    authorizedScene(RootRouteDefinition.Lists.Home) {
+    authorizedScene(Root.Lists.Home) {
         ListsScene()
     }
 
-    authorizedDialog(RootRouteDefinition.Lists.MastodonCreateDialog) {
+    authorizedDialog(Root.Lists.MastodonCreateDialog) {
         val navController = LocalNavController.current
         MastodonListsCreateDialog(onDismissRequest = { navController.goBack() })
     }
 
-    authorizedScene(RootRouteDefinition.Lists.TwitterCreate) {
+    authorizedScene(Root.Lists.TwitterCreate) {
         TwitterListsCreateScene()
     }
 
     authorizedScene(
-        RootRouteDefinition.Lists.TwitterEdit,
+        Root.Lists.TwitterEdit,
     ) { backStackEntry ->
         backStackEntry.path<String>("listKey")?.let {
             TwitterListsEditScene(listKey = MicroBlogKey.valueOf(it))
@@ -585,7 +585,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        RootRouteDefinition.Lists.Timeline,
+        Root.Lists.Timeline,
     ) { backStackEntry ->
         backStackEntry.path<String>("listKey")?.let {
             ListTimeLineScene(listKey = MicroBlogKey.valueOf(it))
@@ -593,7 +593,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        RootRouteDefinition.Lists.Members,
+        Root.Lists.Members,
     ) { backStackEntry ->
         backStackEntry.path<String>("listKey")?.let {
             ListsMembersScene(listKey = MicroBlogKey.valueOf(it), backStackEntry.query<Boolean>("owned") ?: false)
@@ -601,7 +601,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        RootRouteDefinition.Lists.Subscribers,
+        Root.Lists.Subscribers,
     ) { backStackEntry ->
         backStackEntry.path<String>("listKey")?.let {
             ListsSubscribersScene(listKey = MicroBlogKey.valueOf(it))
@@ -609,25 +609,25 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        RootRouteDefinition.Lists.AddMembers,
+        Root.Lists.AddMembers,
     ) { backStackEntry ->
         backStackEntry.path<String>("listKey")?.let {
             ListsAddMembersScene(listKey = MicroBlogKey.valueOf(it))
         }
     }
 
-    authorizedScene(RootRouteDefinition.Messages.Home) {
+    authorizedScene(Root.Messages.Home) {
         DMConversationListScene()
     }
 
-    authorizedScene(RootRouteDefinition.Messages.NewConversation) {
+    authorizedScene(Root.Messages.NewConversation) {
         DMNewConversationScene()
     }
 
     authorizedScene(
-        RootRouteDefinition.Messages.Conversation,
+        Root.Messages.Conversation,
         deepLinks = listOf(
-            RootDeepLinksRouteDefinition.Conversation
+            RootDeepLinks.Conversation
         )
     ) { backStackEntry ->
         backStackEntry.path<String>("conversationKey")?.let {
@@ -635,7 +635,7 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    authorizedScene(RootRouteDefinition.Gif.Home) {
+    authorizedScene(Root.Gif.Home) {
         GifScene()
     }
 

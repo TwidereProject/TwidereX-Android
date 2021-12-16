@@ -33,7 +33,7 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.HomeNavigationItem
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.mastodon.FederatedTimelineViewModel
@@ -45,7 +45,7 @@ class FederatedTimelineItem : HomeNavigationItem() {
     }
 
     override val route: String
-        get() = RootRoute.Mastodon.FederatedTimeline
+        get() = Root.Mastodon.FederatedTimeline
 
     @Composable
     override fun icon(): Painter {

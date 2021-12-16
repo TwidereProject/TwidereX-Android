@@ -37,7 +37,7 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 
@@ -56,39 +56,39 @@ fun SettingsScene() {
                 SettingItem(
                     stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_title),
                     painterResource(res = com.twidere.twiderex.MR.files.ic_shirt),
-                    route = RootRoute.Settings.Appearance,
+                    route = Root.Settings.Appearance,
                 ),
                 SettingItem(
                     stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_title),
                     painterResource(res = com.twidere.twiderex.MR.files.ic_template),
-                    route = RootRoute.Settings.Display,
+                    route = Root.Settings.Display,
                 ),
                 SettingItem(
                     stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_layout_title),
                     painterResource(res = com.twidere.twiderex.MR.files.ic_layout_sidebar),
-                    route = RootRoute.Settings.Layout,
+                    route = Root.Settings.Layout,
                 ),
                 SettingItem(
                     stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_notification_title),
                     painterResource(res = com.twidere.twiderex.MR.files.ic_settings_notification),
-                    route = RootRoute.Settings.Notification,
+                    route = Root.Settings.Notification,
                 ),
                 SettingItem(
                     stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_title),
                     painterResource(res = com.twidere.twiderex.MR.files.ic_database),
-                    route = RootRoute.Settings.Storage,
+                    route = Root.Settings.Storage,
                 ),
                 SettingItem(
                     stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_title),
                     painterResource(res = com.twidere.twiderex.MR.files.ic_triangle_square_circle),
-                    route = RootRoute.Settings.Misc,
+                    route = Root.Settings.Misc,
                 ),
             ),
             stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_section_header_about) to listOf(
                 SettingItem(
                     stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_title),
                     painterResource(res = com.twidere.twiderex.MR.files.ic_info_circle),
-                    route = RootRoute.Settings.About,
+                    route = Root.Settings.About,
                 ),
             )
         )

@@ -29,7 +29,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.OAuth2Credentials
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.navigation.RootDeepLinksRoute
+import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.OAuthLauncher
@@ -66,7 +66,7 @@ class MastodonSignInViewModel(
                 host = realHost,
                 client_name = "Twidere X",
                 website = "https://github.com/TwidereProject/TwidereX-Android",
-                redirect_uri = RootDeepLinksRoute.Callback.SignIn.Mastodon,
+                redirect_uri = RootDeepLinks.Callback.SignIn.Mastodon,
                 httpClientFactory = TwidereServiceFactory.createHttpClientFactory()
             )
             val application = service.createApplication()

@@ -25,7 +25,7 @@ import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
-import com.twidere.twiderex.navigation.RootDeepLinksRoute
+import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.notification.AppNotification
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
@@ -70,7 +70,7 @@ class DirectMessageFetchJob(
                     message.latestMessage.sender.displayName
                 )
             )
-            .setDeepLink(RootDeepLinksRoute.Conversation(message.conversation.conversationKey))
+            .setDeepLink(RootDeepLinks.Conversation(message.conversation.conversationKey))
         notificationManager.notify(message.latestMessage.messageKey.hashCode(), builder.build())
     }
 }

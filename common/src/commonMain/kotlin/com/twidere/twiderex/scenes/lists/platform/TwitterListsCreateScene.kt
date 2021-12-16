@@ -45,7 +45,7 @@ import com.twidere.twiderex.component.lists.TwitterListsModifyComponent
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
@@ -88,9 +88,9 @@ fun TwitterListsCreateScene() {
                                         private = isPrivate
                                     )?.let {
                                         navController.navigate(
-                                            RootRoute.Lists.Timeline(it.listKey),
+                                            Root.Lists.Timeline(it.listKey),
                                             options = NavOptions(
-                                                popUpTo = PopUpTo(RootRoute.Lists.Home)
+                                                popUpTo = PopUpTo(Root.Lists.Home)
                                             )
                                         )
                                     }

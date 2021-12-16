@@ -32,7 +32,7 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.HomeNavigationItem
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
 
@@ -40,7 +40,7 @@ class MentionItem : HomeNavigationItem() {
     @Composable
     override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_mentions_title)
     override val route: String
-        get() = RootRoute.Mentions
+        get() = Root.Mentions
 
     @Composable
     override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_message_circle)

@@ -38,7 +38,7 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.model.enums.ComposeType
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
 
@@ -47,7 +47,7 @@ class HomeTimelineItem : HomeNavigationItem() {
     @Composable
     override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_timeline_title)
     override val route: String
-        get() = RootRoute.HomeTimeline
+        get() = Root.HomeTimeline
 
     @Composable
     override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_home)

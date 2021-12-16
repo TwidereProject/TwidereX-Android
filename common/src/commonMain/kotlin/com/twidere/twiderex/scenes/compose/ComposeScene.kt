@@ -127,7 +127,7 @@ import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiMediaInsert
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.Orange
@@ -1086,7 +1086,7 @@ private fun ComposeActions(
                     onClick = {
                         scope.launch {
                             val result =
-                                navController.navigateForResult(RootRoute.Compose.Search.User)
+                                navController.navigateForResult(Root.Compose.Search.User)
                                     ?.toString()
                             if (!result.isNullOrEmpty()) {
                                 viewModel.insertText("$result ")
@@ -1107,7 +1107,7 @@ private fun ComposeActions(
                     onClick = {
                         scope.launch {
                             val result =
-                                navController.navigateForResult(RootRoute.Mastodon.Compose.Hashtag)
+                                navController.navigateForResult(Root.Mastodon.Compose.Hashtag)
                                     ?.toString()
                             if (!result.isNullOrEmpty()) {
                                 viewModel.insertText("$result ")
@@ -1166,7 +1166,7 @@ private fun ComposeActions(
             if (draftCount.value > 0) {
                 IconButton(
                     onClick = {
-                        navController.navigate(RootRoute.Draft.List)
+                        navController.navigate(Root.Draft.List)
                     }
                 ) {
                     Box {
@@ -1221,7 +1221,7 @@ private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel) {
                 .clickable(
                     onClick = {
                         navController.navigate(
-                            RootRoute.Media.Raw(
+                            Root.Media.Raw(
                                 if (type == MediaType.video) MediaType.video else MediaType.photo,
                                 item.filePath.toString()
                             )

@@ -28,7 +28,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.job.ComposeData
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.navigation.RootDeepLinksRoute
+import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.notification.AppNotification
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
@@ -85,7 +85,7 @@ abstract class ComposeJob<T : MicroBlogService>(
             if (composeData.isThreadMode) {
                 // open compose scene in thread mode
                 remoteNavigator.openDeepLink(
-                    deeplink = RootDeepLinksRoute.Compose(ComposeType.Thread, status.statusKey),
+                    deeplink = RootDeepLinks.Compose(ComposeType.Thread, status.statusKey),
                     fromBackground = true
                 )
             }
@@ -96,7 +96,7 @@ abstract class ComposeJob<T : MicroBlogService>(
                 .setSilent(false)
                 .setContentTitle(resLoader.getString(com.twidere.twiderex.MR.strings.common_alerts_tweet_fail_title))
                 .setContentText(composeData.content)
-                .setDeepLink(RootDeepLinksRoute.Draft(composeData.draftId))
+                .setDeepLink(RootDeepLinks.Draft(composeData.draftId))
             notificationManager.notify(notificationId, builder.build())
             throw e
         }

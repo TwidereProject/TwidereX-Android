@@ -50,7 +50,7 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMNewConversationViewModel
@@ -95,8 +95,8 @@ fun DMNewConversationScene() {
                         onResult = { key ->
                             key?.let {
                                 navController.navigate(
-                                    RootRoute.Messages.Conversation(it),
-                                    NavOptions(popUpTo = PopUpTo(RootRoute.Messages.Home))
+                                    Root.Messages.Conversation(it),
+                                    NavOptions(popUpTo = PopUpTo(Root.Messages.Home))
                                 )
                             }
                         }
