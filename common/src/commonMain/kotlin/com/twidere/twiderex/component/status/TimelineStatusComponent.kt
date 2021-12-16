@@ -133,29 +133,26 @@ private fun NormalStatus(
     lineDown: Boolean,
     onItemClick: () -> Unit,
 ) {
-    Column(
+    StatusContent(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onItemClick() },
-    ) {
-        StatusContent(
-            contentPadding = NormalStatusDefaults.ContentPadding,
-            threadStyle = threadStyle,
-            lineUp = lineUp,
-            lineDown = lineDown || (threadStyle.lineDown && data.isInThread()),
-            data = data,
-            footer = {
-                if (showActions) {
-                    Row {
-                        Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize))
-                        StatusActions(data)
-                    }
-                } else {
-                    Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
+        contentPadding = NormalStatusDefaults.ContentPadding,
+        threadStyle = threadStyle,
+        lineUp = lineUp,
+        lineDown = lineDown || (threadStyle.lineDown && data.isInThread()),
+        data = data,
+        footer = {
+            if (showActions) {
+                Row {
+                    Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize))
+                    StatusActions(data)
                 }
+            } else {
+                Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
             }
-        )
-    }
+        }
+    )
 }
 
 object NormalStatusDefaults {
