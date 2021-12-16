@@ -443,17 +443,11 @@ fun StatusContent(
                         }
                     }
                 }
-                when (type) {
-                    StatusContentType.Normal -> {
-                        Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
-                        StatusBody(status, type = type)
-                    }
-                    StatusContentType.Extend -> UserScreenName(status.user)
-                }
                 if (type == StatusContentType.Extend) {
-                    Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
-                    StatusBody(status = status, type = type)
+                    UserScreenName(status.user)
                 }
+                Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
+                StatusBody(status, type = type)
                 Spacer(modifier = Modifier.height(StatusContentDefaults.FooterSpacing))
                 footer.invoke()
                 Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
