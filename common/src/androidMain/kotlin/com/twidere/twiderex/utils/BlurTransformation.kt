@@ -31,12 +31,10 @@ import com.google.android.renderscript.Toolkit
 class BlurTransformation @JvmOverloads constructor(
     private val context: Context,
     private val radius: Int = DEFAULT_RADIUS,
-    // private val sampling: Int = DEFAULT_SAMPLING
 ) : Transformation {
 
     init {
         require(radius in 0..25) { "radius must be in [0, 25]." }
-        // require(sampling > 0) { "sampling must be > 0." }
     }
 
     override val cacheKey: String
