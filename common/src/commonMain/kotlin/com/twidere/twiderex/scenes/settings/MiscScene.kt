@@ -293,6 +293,7 @@ fun NitterPreference(viewModel: MiscViewModel) {
     val value by viewModel.nitter.observeAsState(initial = "")
     val nitterVerify by viewModel.nitterVerify.observeAsState(initial = false)
     val nitterVerifyLoading by viewModel.nitterVerifyLoading.observeAsState(initial = false)
+    val isNitterInputValid by viewModel.isNitterInputValid.observeAsState(initial = false)
     var showInformationDialog by remember {
         mutableStateOf(false)
     }
@@ -307,7 +308,11 @@ fun NitterPreference(viewModel: MiscViewModel) {
             value = value,
             onConfirm = {
                 viewModel.setNitterInstance(it)
-            }
+            },
+            onValidCheck = {
+                viewModel.checkIfNitterInputValid(it)
+            },
+            isValid = isNitterInputValid
         )
     }
     if (showInformationDialog) {
@@ -384,12 +389,15 @@ fun NitterPreference(viewModel: MiscViewModel) {
 fun NitterUsageDialog(
     onDismissRequest: () -> Unit,
     value: String,
-    onConfirm: (String) -> Unit
+    onConfirm: (String) -> Unit,
+    onValidCheck: (String) -> Unit,
+    isValid: Boolean
 ) {
     val navigator = LocalNavigator.current
     var input by remember {
         mutableStateOf(value)
     }
+
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = {
@@ -401,6 +409,7 @@ fun NitterUsageDialog(
                 TextField(
                     value = input,
                     onValueChange = {
+                        onValidCheck.invoke(it)
                         input = it
                     },
                     placeholder = {
@@ -410,17 +419,27 @@ fun NitterUsageDialog(
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent
                     ),
+                    isError = !isValid,
                 )
+                if (!isValid) {
+                    Text(
+                        // TOOD LOCALIZE
+                        text = "Nitter instance URL is invalid, e.g. https://nitter.net",
+                        modifier = Modifier.padding(top = 8.dp),
+                        style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.error)
+                    )
+                }
             }
         },
         confirmButton = {
             TextButton(onClick = {
-                // TODO check if input is valid
-                onConfirm(input)
-                onDismissRequest.invoke()
-            }) {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_ok))
-            }
+                if (isValid) {
+                    onConfirm.invoke(input)
+                    onDismissRequest.invoke()
+                }
+            }, enabled = isValid) {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_ok))
+        }
         },
         dismissButton = {
             TextButton(

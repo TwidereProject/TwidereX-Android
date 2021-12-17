@@ -36,12 +36,17 @@ class MiscViewModel(
     private val accountRepository: AccountRepository,
     private val nitterRepository: NitterRepository,
 ) : ViewModel() {
+
     private val account by lazy {
         accountRepository.activeAccount.mapNotNull { it }
     }
 
     val nitter by lazy {
         MutableStateFlow("")
+    }
+
+    val isNitterInputValid by lazy {
+        MutableStateFlow(true)
     }
 
     val nitterVerifyLoading by lazy {
@@ -89,7 +94,16 @@ class MiscViewModel(
         verifyNitterInstance()
     }
 
+    fun checkIfNitterInputValid(value: String) {
+        isNitterInputValid.value = value.isEmpty() ||
+            (
+                (value.startsWith("http://") || value.startsWith("https://")) &&
+                    !value.endsWith("/")
+                )
+    }
+
     fun setNitterInstance(value: String) {
+        if (nitter.value == value) return
         nitter.value = value
         viewModelScope.launch {
             miscPreferences.updateData {
@@ -111,6 +125,7 @@ class MiscViewModel(
                 nitterRepository.verifyInstance(account.first().user.screenName, instance = nitter.value)
                 nitterVerify.value = true
             } catch (e: Exception) {
+                e.printStackTrace()
                 nitterVerify.value = false
             } finally {
                 nitterVerifyLoading.value = false

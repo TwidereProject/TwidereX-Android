@@ -24,5 +24,5 @@ import com.twidere.services.nitter.NitterService
 import com.twidere.twiderex.http.TwidereServiceFactory
 
 class NitterRepository {
-    suspend fun verifyInstance(userName: String, instance: String) = NitterService(instance, TwidereServiceFactory.createHttpClientFactory()).verifyInstance(userName)
+    suspend fun verifyInstance(screenName: String, instance: String) = NitterService(instance, TwidereServiceFactory.createHttpClientFactory()).verifyInstance(screenName)
 }

@@ -23,19 +23,21 @@ package com.twidere.services.nitter
 import com.twidere.services.http.HttpClientFactory
 import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.nitter.model.ConversationTimeline
+import com.twidere.services.nitter.model.Profile
 import com.twidere.services.nitter.model.TweetNotFound
-import com.twidere.services.nitter.model.Users
+import com.twidere.services.utils.DEBUG
 import com.twidere.services.utils.await
 import moe.tlaster.hson.Hson
 import okhttp3.Request
+import okhttp3.logging.HttpLoggingInterceptor
 
 class NitterService(
     private val host: String,
     private val httpClientFactory: HttpClientFactory,
 ) {
-    suspend fun verifyInstance(userName: String) {
-        val target = "$host/search?f=users&q=$userName"
-        if (request<Users>(target)?.users.isNullOrEmpty()) throw TweetNotFoundException()
+    suspend fun verifyInstance(screenName: String) {
+        val target = "$host/$screenName"
+        if (request<Profile>(target) == null) throw TweetNotFoundException()
     }
 
     suspend fun conversation(
@@ -50,17 +52,24 @@ class NitterService(
                 it
             }
         }
-        println("target: $target")
         return request(target)
     }
 
-    private suspend inline fun <reified T> request(target: String,): T? {
+    private suspend inline fun <reified T> request(target: String): T? {
         return httpClientFactory.createHttpClientBuilder()
             .addNetworkInterceptor {
                 it.proceed(it.request()).also { response ->
                     if (response.code != 200) {
                         throw MicroBlogHttpException(response.code)
                     }
+                }
+            }.apply {
+                if (DEBUG) {
+                    addInterceptor(
+                        HttpLoggingInterceptor().apply {
+                            setLevel(HttpLoggingInterceptor.Level.BODY)
+                        }
+                    )
                 }
             }
             .build()
