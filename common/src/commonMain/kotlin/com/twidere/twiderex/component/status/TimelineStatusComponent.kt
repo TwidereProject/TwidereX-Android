@@ -616,7 +616,8 @@ fun MediaPreviewButton(onClick: () -> Unit) {
         modifier = Modifier
             .background(contentColor.copy(alpha = 0.04f), shape = MaterialTheme.shapes.small)
             .clickable { onClick() }
-            .padding(4.dp),
+            .padding(horizontal = 4.dp)
+            .height(30.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
