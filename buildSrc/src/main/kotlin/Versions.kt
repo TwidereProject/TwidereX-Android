@@ -2,8 +2,8 @@ import org.gradle.api.JavaVersion
 
 object Versions {
     object Kotlin {
-        const val lang = "1.6.10-RC"
-        const val coroutines = "1.6.0-RC"
+        const val lang = "1.6.10"
+        const val coroutines = "1.6.0-RC3"
         const val serialization = "1.3.1"
     }
 
@@ -12,7 +12,7 @@ object Versions {
         val java = JavaVersion.VERSION_11
     }
 
-    const val ksp = "${Kotlin.lang}-1.0.1"
+    const val ksp = "${Kotlin.lang}-1.0.2"
     const val agp = "7.0.3"
     const val spotless = "6.0.4"
     const val ktlint = "0.42.1"
@@ -24,7 +24,7 @@ object Versions {
     const val activity = "1.4.0"
     const val datastore = "1.0.0"
     const val androidx_hilt = "1.0.0"
-    const val room = "2.4.0-rc01"
+    const val room = "2.4.0"
     const val lifecycle = "2.4.0"
     const val lifecycle_compose = "2.4.0"
     const val work = "2.7.1"
