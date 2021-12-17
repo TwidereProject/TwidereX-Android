@@ -70,7 +70,7 @@ jobs:
       - name: set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 17
+          java-version: 11
 
       - name: Set up Android SDK License
         run: (while sleep 3; do echo "y"; done) | /Users/runner/Library/Android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses
