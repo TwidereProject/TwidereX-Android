@@ -24,8 +24,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -345,9 +347,9 @@ fun NitterPreference(viewModel: MiscViewModel) {
         trailing = {
             if (nitterVerifyLoading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(48.dp)
-                        .padding(12.dp),
-                    strokeWidth = 2.dp
+                    modifier = Modifier.size(NitterPreferenceDefaults.Loading.Size)
+                        .padding(NitterPreferenceDefaults.Loading.Padding),
+                    strokeWidth = NitterPreferenceDefaults.Loading.StrokeWidth
                 )
             } else if (value.isNotEmpty()) {
                 IconButton(
@@ -372,17 +374,27 @@ fun NitterPreference(viewModel: MiscViewModel) {
             }
         },
         secondaryText = {
-            Text(text = value.takeIf { it.isNotEmpty() } ?: "Instance URL")
+            Text(text = value.takeIf { it.isNotEmpty() } ?: stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_value))
         },
         modifier = Modifier.clickable {
             showUsageDialog = true
         }
     )
-    Column(modifier = Modifier.padding(start = 16.dp)) {
+    Column(modifier = Modifier.padding(start = NitterPreferenceDefaults.ContentPaddingStart)) {
         Divider()
-        Spacer(modifier = Modifier.padding(top = 5.dp))
+        Spacer(modifier = Modifier.height(NitterPreferenceDefaults.ContentVerticalSpacing))
         Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_description))
     }
+}
+
+private object NitterPreferenceDefaults {
+    object Loading {
+        val Size = 48.dp
+        val Padding = PaddingValues(12.dp)
+        val StrokeWidth = 2.dp
+    }
+    val ContentPaddingStart = 16.dp
+    val ContentVerticalSpacing = 8.dp
 }
 
 @Composable
@@ -413,8 +425,7 @@ fun NitterUsageDialog(
                         input = it
                     },
                     placeholder = {
-                        // TOOD LOCALIZE
-                        Text("Instance URL")
+                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_value),)
                     },
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent
@@ -423,9 +434,8 @@ fun NitterUsageDialog(
                 )
                 if (!isValid) {
                     Text(
-                        // TOOD LOCALIZE
-                        text = "Nitter instance URL is invalid, e.g. https://nitter.net",
-                        modifier = Modifier.padding(top = 8.dp),
+                        text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_invalid),
+                        modifier = Modifier.padding(NitterUsageDialogDefaults.InvalidTextPadding),
                         style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.error)
                     )
                 }
@@ -454,6 +464,10 @@ fun NitterUsageDialog(
             }
         }
     )
+}
+
+private object NitterUsageDialogDefaults {
+    val InvalidTextPadding = PaddingValues(top = 8.dp)
 }
 
 @Composable
