@@ -310,7 +310,7 @@ private fun StatusActions(status: UiStatus) {
         LocalContentAlpha provides ContentAlpha.medium,
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(start = UserAvatarDefaults.AvatarSize),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             ReplyButton(status = status)
