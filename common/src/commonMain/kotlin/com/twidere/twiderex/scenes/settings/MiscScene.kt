@@ -73,14 +73,16 @@ import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.preferences.model.MiscPreferences
+import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.settings.MiscViewModel
 
 @Composable
 fun MiscScene() {
     val viewModel: MiscViewModel = getViewModel()
-
+    val account = LocalActiveAccount.current
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -114,7 +116,9 @@ fun MiscScene() {
                             rememberScrollState()
                         )
                 ) {
-                    NitterPreference(viewModel)
+                    if (account?.type == PlatformType.Twitter) {
+                        NitterPreference(viewModel)
+                    }
                     ProxyPreference(
                         viewModel = viewModel,
                         showProxyInputDialog = showProxyInputDialog,
