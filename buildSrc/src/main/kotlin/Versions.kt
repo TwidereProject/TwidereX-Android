@@ -13,8 +13,8 @@ object Versions {
     }
 
     const val ksp = "${Kotlin.lang}-1.0.2"
-    const val agp = "7.0.3"
-    const val spotless = "6.0.4"
+    const val agp = "7.0.4"
+    const val spotless = "6.0.5"
     const val ktlint = "0.43.2"
     const val okhttp = "4.9.1"
     const val retrofit2 = "2.9.0"
@@ -30,7 +30,7 @@ object Versions {
     const val work = "2.7.1"
     const val startup = "1.1.0"
     const val coil = "2.0.0-alpha05"
-    const val accompanist = "0.21.4-beta"
+    const val accompanist = "0.21.5-rc"
     const val accompanist_jb = "0.18.1"
     const val androidx_exifinterface = "1.3.3"
     const val exoplayer = "2.16.1"
