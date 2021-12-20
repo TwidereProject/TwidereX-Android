@@ -612,6 +612,7 @@ object StatusBodyMediaDefaults {
 fun MediaPreviewButton(onClick: () -> Unit) {
     val contentColor = LocalContentColor.current
     val colorAlpha = ContentAlpha.medium
+    // fixed height of MediaPreviewButton to avoid parent height by cutting
     Row(
         modifier = Modifier
             .background(contentColor.copy(alpha = 0.04f), shape = MaterialTheme.shapes.small)
