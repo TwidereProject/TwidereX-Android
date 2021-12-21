@@ -43,7 +43,7 @@ jobs:
         run: ./gradlew :common:assembleAndroidTest
 
       - name: Run tests
-        uses: reactivecircus/android-emulator-runner@v2.21.0
+        uses: reactivecircus/android-emulator-runner@v2.20.0
         timeout-minutes: 40
         with:
           api-level: ${{ matrix.api-level }}
