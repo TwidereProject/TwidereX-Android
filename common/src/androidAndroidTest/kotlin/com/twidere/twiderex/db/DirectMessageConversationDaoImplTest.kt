@@ -118,17 +118,17 @@ internal class DirectMessageConversationDaoImplTest : CacheDatabaseDaoTest() {
         assert(invalidate)
     }
 
-    @Test
-    fun findWithConversationKeyFlow() = runBlocking {
-        val cacheDatabase = CacheDatabaseImpl(roomDatabase)
-        val conversation = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
-            .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)).toConversation()
-        val conversationFlow = cacheDatabase.directMessageConversationDao().findWithConversationKeyFlow(
-            accountKey = accountKey,
-            conversationKey = conversation.conversationKey
-        )
-        assertNull(conversationFlow.firstOrNull())
-        cacheDatabase.directMessageConversationDao().insertAll(listOf(conversation))
-        assertEquals(conversation.conversationKey, conversationFlow.firstOrNull()?.conversationKey)
-    }
+    // @Test
+    // fun findWithConversationKeyFlow() = runBlocking {
+    //     val cacheDatabase = CacheDatabaseImpl(roomDatabase)
+    //     val conversation = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
+    //         .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)).toConversation()
+    //     val conversationFlow = cacheDatabase.directMessageConversationDao().findWithConversationKeyFlow(
+    //         accountKey = accountKey,
+    //         conversationKey = conversation.conversationKey
+    //     )
+    //     assertNull(conversationFlow.firstOrNull())
+    //     cacheDatabase.directMessageConversationDao().insertAll(listOf(conversation))
+    //     assertEquals(conversation.conversationKey, conversationFlow.firstOrNull()?.conversationKey)
+    // }
 }
