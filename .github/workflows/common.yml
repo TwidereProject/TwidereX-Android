@@ -27,7 +27,7 @@ jobs:
         include:
           - api-level: 29
             target: default
-            device: Pixel 2
+            profile: Pixel 2
     steps:
       - uses: actions/checkout@v2
       
