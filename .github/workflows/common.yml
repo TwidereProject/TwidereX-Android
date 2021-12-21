@@ -16,36 +16,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  unit-test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 17
-
-      - name: Set up Android SDK License
-        run: yes | /usr/local/lib/android/sdk/tools/bin/sdkmanager --licenses
-
-      - name: Run test in commonTest and androidTest
-        run: ./gradlew :common:test
-
-      - name: Run test in desktopTest
-        run: ./gradlew :common:desktopTest
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: unit-test-result
-          path: "**/build/test-results/**/*.xml"
-
   connected-android-test:
     runs-on: macOS-11
-    needs: unit-test
     timeout-minutes: 60
     
     strategy:
@@ -55,6 +27,7 @@ jobs:
         include:
           - api-level: 29
             target: default
+            device: Pixel 2
     steps:
       - uses: actions/checkout@v2
       
