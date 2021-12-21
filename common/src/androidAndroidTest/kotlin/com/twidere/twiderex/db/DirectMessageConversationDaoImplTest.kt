@@ -28,8 +28,10 @@ import com.twidere.twiderex.mock.model.mockIDirectMessage
 import com.twidere.twiderex.mock.model.mockIUser
 import com.twidere.twiderex.mock.model.toConversation
 import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -118,8 +120,9 @@ internal class DirectMessageConversationDaoImplTest : CacheDatabaseDaoTest() {
         assert(invalidate)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun findWithConversationKeyFlow() = runBlocking {
+    fun findWithConversationKeyFlow() = runTest {
         val cacheDatabase = CacheDatabaseImpl(roomDatabase)
         val conversation = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
             .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)).toConversation()
