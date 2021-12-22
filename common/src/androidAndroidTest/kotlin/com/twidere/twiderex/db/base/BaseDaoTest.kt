@@ -36,16 +36,18 @@ internal abstract class BaseDaoTest<DB : RoomDatabase> {
     protected lateinit var roomDatabase: DB
     @get:Rule
     val rule = InstantTaskExecutorRule()
+    private val testExecutor = Executors.newSingleThreadExecutor()
 
     @Before
     open fun setUp() {
         roomDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), getDBClass())
-            .setTransactionExecutor(Executors.newSingleThreadExecutor()).build()
+            .setTransactionExecutor(testExecutor).build()
     }
 
     @After
     open fun tearDown() {
         roomDatabase.close()
+        testExecutor.shutdownNow()
     }
 
     abstract fun getDBClass(): Class<DB>
