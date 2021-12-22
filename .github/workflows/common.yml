@@ -46,8 +46,9 @@ jobs:
         timeout-minutes: 40
         with:
           api-level: ${{ matrix.api-level }}
-          profile: Nexus 6
+          profile: 4in WVGA (Nexus S)
           target: ${{ matrix.target }}
+          ram-size: 2048M
           script:  |
             adb logcat > logcat.txt &
             ./gradlew :common:connectedCheck
