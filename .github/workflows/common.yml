@@ -27,7 +27,6 @@ jobs:
         include:
           - api-level: 29
             target: default
-            profile: Pixel 2
     steps:
       - uses: actions/checkout@v2
       
@@ -50,9 +49,7 @@ jobs:
           profile: 4in WVGA (Nexus S)
           target: ${{ matrix.target }}
           ram-size: 2048M
-          script: |
-            adb logcat > logcat.txt &
-            ./gradlew :common:connectedCheck
+          script: ./gradlew :common:connectedCheck
 
       - name: Upload logs
         if: always()
