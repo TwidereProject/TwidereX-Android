@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -22,7 +22,6 @@ package com.twidere.route.processor
 
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
-import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
@@ -37,7 +36,6 @@ import java.io.OutputStream
 
 internal class RouteProcessor(
     private val codeGenerator: CodeGenerator,
-    private val logger: KSPLogger,
 ) : SymbolProcessor {
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val routeSymbol = resolver
@@ -63,10 +61,7 @@ internal class RouteProcessor(
             val schema = annotation.getStringValue(AppRoute::schema.name) ?: ""
             val packageName = annotation.getStringValue(AppRoute::packageName.name)
                 ?: node.packageName.asString()
-            val routeClassName = annotation.getStringValue(AppRoute::routeClassName.name)
-                ?: "${node.qualifiedName?.getShortName()}Route"
-            val definitionClassName = annotation.getStringValue(AppRoute::definitionClassName.name)
-                ?: "${node.qualifiedName?.getShortName()}RouteDefinition"
+            val className = node.qualifiedName?.getShortName() ?: "<ERROR>"
 
             val route = generateRoute(declaration = node)
                 .takeIf {
@@ -75,8 +70,7 @@ internal class RouteProcessor(
                     PrefixRouteDefinition(
                         schema = schema,
                         child = it as NestedRouteDefinition,
-                        routeClassName = routeClassName,
-                        definitionClassName = definitionClassName,
+                        className = className,
                     )
                 } ?: return
 
@@ -87,14 +81,8 @@ internal class RouteProcessor(
             generateFile(
                 dependencies,
                 packageName,
-                routeClassName,
+                className,
                 route.generateRoute()
-            )
-            generateFile(
-                dependencies,
-                packageName,
-                definitionClassName,
-                route.generateDefinition()
             )
         }
 
@@ -122,15 +110,18 @@ internal class RouteProcessor(
             val name = declaration.simpleName.getShortName()
             return when (declaration) {
                 is KSClassDeclaration -> {
+                    val superQualifiedName = declaration.superTypes.firstOrNull()?.resolve()
+                        ?.declaration?.qualifiedName?.asString()
+
                     NestedRouteDefinition(
                         name = name,
                         parent = parent,
-                        fullName = declaration.qualifiedName?.asString() ?: "<ERROR>"
+                        superQualifiedName = superQualifiedName.orEmpty()
                     ).also { nestedRouteDefinition ->
                         nestedRouteDefinition.childRoute.addAll(
-                            declaration.declarations.map {
-                                generateRoute(it, nestedRouteDefinition)
-                            }
+                            declaration.declarations
+                                .filter { it.simpleName.getShortName() != "<init>" }
+                                .map { generateRoute(it, nestedRouteDefinition) }
                         )
                     }
                 }

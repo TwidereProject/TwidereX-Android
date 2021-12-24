@@ -1,6 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     id("com.diffplug.spotless").version(Versions.spotless)
+    id("com.github.ben-manes.versions").version("0.39.0")
 }
 buildscript {
     repositories {
@@ -9,6 +10,7 @@ buildscript {
     dependencies {
         classpath(kotlin("gradle-plugin", version = Versions.Kotlin.lang))
         classpath("com.android.tools.build:gradle:${Versions.agp}")
+        classpath("com.squareup.sqldelight:gradle-plugin:${Versions.sqlDelight}")
     }
 }
 
@@ -21,6 +23,7 @@ allprojects {
             allWarningsAsErrors = true
             freeCompilerArgs = listOf(
                 "-Xopt-in=kotlin.RequiresOptIn",
+                "-Xjvm-default=all",
             )
         }
     }
@@ -40,6 +43,12 @@ allprojects {
             target("**/*.java")
             targetExclude("$buildDir/**/*.java", "bin/**/*.java")
             licenseHeaderFile(rootProject.file("spotless/license"))
+        }
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            force("org.objenesis:objenesis:3.2")
         }
     }
 }

@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -327,6 +327,14 @@ class TwitterService(
         }
     }
 
+    override suspend fun searchMedia(query: String, count: Int, nextPage: String?): ISearchResponse {
+        return try {
+            searchV2("$query has:media -is:retweet", count = count, nextPage = nextPage)
+        } catch (e: TwitterApiExceptionV2) {
+            searchV1("$query filter:media -filter:retweets", count = count, max_id = nextPage)
+        }
+    }
+
     suspend fun searchV2(
         query: String,
         count: Int,
@@ -428,7 +436,7 @@ class TwitterService(
 
     override suspend fun delete(id: String) = resources.destroy(id)
 
-    private val BULK_SIZE: Long = 512 * 1024 // 512 Kib
+    private val BULK_SIZE: Long = 512 * 1024L // 512 Kib
 
     suspend fun update(
         status: String,

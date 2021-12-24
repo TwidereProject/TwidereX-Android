@@ -1,0 +1,27 @@
+import com.twidere.twiderex.model.MicroBlogKey;
+import com.twidere.twiderex.model.ui.UiDMConversation;
+
+CREATE TABLE IF NOT EXISTS DbDMConversation (
+    accountKey TEXT AS MicroBlogKey NOT NULL,
+    conversationKey TEXT AS MicroBlogKey NOT NULL,
+    recipientKey TEXT AS MicroBlogKey NOT NULL,
+    conversationId TEXT NOT NULL,
+    conversationAvatar TEXT NOT NULL,
+    conversationName TEXT NOT NULL,
+    conversationSubName TEXT NOT NULL,
+    conversationType TEXT  AS UiDMConversation.Type NOT NULL
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS index_accountKey_conversationKey ON DbDMConversation (accountKey, conversationKey);
+
+insert:
+INSERT OR REPLACE INTO DbDMConversation(
+    accountKey, conversationKey, recipientKey, conversationId, conversationAvatar,
+    conversationName, conversationSubName, conversationType
+) VALUES ?;
+
+findWithConversationKey:
+SELECT * FROM DbDMConversation WHERE accountKey == :accountKey AND conversationKey == :conversationKey;
+
+delete:
+DELETE FROM DbDMConversation WHERE accountKey == :accountKey AND conversationKey == :conversationKey;

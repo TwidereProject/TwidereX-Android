@@ -1,0 +1,47 @@
+import com.twidere.twiderex.db.sqldelight.model.DbCard;
+import com.twidere.twiderex.db.sqldelight.model.DbGeo;
+import com.twidere.twiderex.db.sqldelight.model.DbPoll;
+import com.twidere.twiderex.db.sqldelight.model.DbStatusMetrics;
+import com.twidere.twiderex.db.sqldelight.model.DbStatusReferenceList;
+import com.twidere.twiderex.model.MicroBlogKey;
+import com.twidere.twiderex.model.enums.PlatformType;
+import java.lang.Boolean;
+
+CREATE TABLE IF NOT EXISTS DbStatus (
+    statusId TEXT NOT NULL,
+    statusKey TEXT AS MicroBlogKey NOT NULL,
+    userKey TEXT AS MicroBlogKey NOT NULL,
+    htmlText TEXT NOT NULL,
+    rawText TEXT NOT NULL,
+    timestamp INTEGER NOT NULL,
+    metrics TEXT AS DbStatusMetrics NOT NULL,
+    sensitive INTEGER AS Boolean NOT NULL,
+    geo TEXT AS DbGeo NOT NULL,
+    hasMedia INTEGER AS Boolean NOT NULL,
+    source TEXT NOT NULL,
+    isGap INTEGER AS Boolean NOT NULL,
+    platformType TEXT AS PlatformType NOT NULL,
+    spoilerText TEXT,
+    card TEXT AS DbCard,
+    poll TEXT AS DbPoll,
+    refrenceStatus TEXT AS DbStatusReferenceList NOT NULL,
+    inReplyToUserId TEXT,
+    inReplyToStatusId TEXT,
+    extra TEXT
+);
+
+
+CREATE UNIQUE INDEX IF NOT EXISTS index_statusKey ON DbStatus (statusKey);
+
+insert:
+INSERT OR REPLACE INTO DbStatus(
+    statusId, statusKey, userKey, htmlText, rawText, timestamp, metrics, sensitive,
+    geo, hasMedia, source, isGap, platformType, spoilerText, card, poll, refrenceStatus,
+    inReplyToStatusId, inReplyToUserId, extra
+) VALUES ?;
+
+findWithStatusKey:
+SELECT * FROM DbStatus WHERE statusKey == :statusKey;
+
+delete:
+DELETE FROM DbStatus WHERE statusKey == :statusKey;

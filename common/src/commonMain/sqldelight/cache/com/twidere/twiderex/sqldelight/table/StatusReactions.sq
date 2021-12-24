@@ -1,0 +1,32 @@
+import com.twidere.twiderex.model.MicroBlogKey;
+import java.lang.Boolean;
+
+CREATE TABLE IF NOT EXISTS DbStatusReactions (
+    statusKey TEXT AS MicroBlogKey NOT NULL,
+    accountKey TEXT AS MicroBlogKey NOT NULL,
+    liked INTEGER AS Boolean NOT NULL,
+    retweeted INTEGER AS Boolean NOT NULL
+);
+
+
+CREATE UNIQUE INDEX IF NOT EXISTS index_statusKey_accountKey ON DbStatusReactions (statusKey, accountKey);
+
+insert:
+INSERT OR REPLACE INTO DbStatusReactions(
+    statusKey, accountKey, liked, retweeted
+) VALUES ?;
+
+findWithStatusKey:
+SELECT * FROM DbStatusReactions WHERE accountKey == :accountKey AND statusKey ==:statusKey;
+--
+-- getPagingList:
+-- SELECT * FROM DbList WHERE accountKey == :accountKey LIMIT :limit OFFSET :offSet;
+--
+-- getPagingCount:
+-- SELECT COUNT(*) FROM DbList WHERE accountKey == :accountKey;
+--
+-- delete:
+-- DELETE FROM DbList WHERE accountKey == :accountKey AND listKey == :listKey;
+--
+-- clearAll:
+-- DELETE FROM DbList WHERE accountKey == :accountKey;

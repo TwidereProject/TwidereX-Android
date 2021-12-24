@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -26,7 +26,6 @@ private const val RouteDivider = "/"
 internal interface RouteDefinition {
     val name: String
     val parent: RouteDefinition?
-    fun generateDefinition(): String
     fun generateRoute(): String
 }
 
@@ -52,8 +51,7 @@ internal val RouteDefinition.indent
 internal data class PrefixRouteDefinition(
     val schema: String,
     val child: NestedRouteDefinition,
-    val routeClassName: String,
-    val definitionClassName: String,
+    val className: String,
 ) : RouteDefinition {
     override val name: String
         get() = if (schema.isEmpty()) "" else "$schema:$RouteDivider"
@@ -64,30 +62,43 @@ internal data class PrefixRouteDefinition(
         child.parent = this
     }
 
-    override fun generateDefinition(): String {
-        return child.copy(name = definitionClassName).generateDefinition()
-    }
-
     override fun generateRoute(): String {
-        return child.copy(name = routeClassName).generateRoute()
+        return child.copy(name = className).generateRoute()
     }
 }
 
 internal data class NestedRouteDefinition(
     override val name: String,
     override var parent: RouteDefinition? = null,
-    val fullName: String,
+    val superQualifiedName: String,
     val childRoute: ArrayList<RouteDefinition> = arrayListOf(),
 ) : RouteDefinition {
-    override fun generateDefinition(): String {
-        return "${indent}object $name {${System.lineSeparator()}" +
-            childRoute.joinToString(System.lineSeparator()) { it.generateDefinition() } +
+
+    override fun generateRoute(): String {
+        return if (superQualifiedName.isEmpty()) generateRootRoute() else generateIRoute()
+    }
+
+    private fun generateRootRoute(): String {
+        return "${indent}actual object $name {${System.lineSeparator()}" +
+            childRoute.joinToString(System.lineSeparator()) { it.generateRoute() } +
             System.lineSeparator() +
             "$indent}"
     }
 
-    override fun generateRoute(): String {
-        return "${indent}object $name: $fullName {${System.lineSeparator()}" +
+    private fun generateIRoute(): String {
+        var overrideRoute = ""
+
+        val functions = childRoute.find { it is FunctionRouteDefinition } as? FunctionRouteDefinition
+        if (functions != null) {
+            val pathWithParameter = functions.parameters
+                .filter { !it.isNullable }
+                .joinToString(RouteDivider) { "{${it.name}}" }
+                .let { if (it.isNotEmpty()) RouteDivider + it else it }
+            overrideRoute = "override val route = \"${functions.parentPath}$pathWithParameter\""
+        }
+
+        return "${indent}actual object $name: $superQualifiedName {${System.lineSeparator()}" +
+            "${indent}$StandardIndent$overrideRoute${System.lineSeparator()}" +
             childRoute.joinToString(System.lineSeparator()) { it.generateRoute() } +
             System.lineSeparator() +
             "$indent}"
@@ -98,12 +109,8 @@ internal data class ConstRouteDefinition(
     override val name: String,
     override val parent: RouteDefinition? = null,
 ) : RouteDefinition {
-    override fun generateDefinition(): String {
-        return "${indent}const val $name = \"$parentPath$RouteDivider${name}\""
-    }
-
     override fun generateRoute(): String {
-        return "${indent}override val $name = \"$parentPath$RouteDivider${name}\""
+        return "${indent}actual val $name = \"$parentPath$RouteDivider${name}\""
     }
 }
 
@@ -112,22 +119,6 @@ internal data class FunctionRouteDefinition(
     override val parent: RouteDefinition? = null,
     val parameters: List<RouteParameter>,
 ) : RouteDefinition {
-    override fun generateDefinition(): String {
-        val path = parameters
-            .filter { !it.isNullable }
-            .joinToString(RouteDivider) { parameter ->
-                "{${parameter.name}}"
-            }
-            .let {
-                if (it.isNotEmpty()) {
-                    "$RouteDivider$it"
-                } else {
-                    it
-                }
-            }
-        return "${indent}const val $name = \"$parentPath$RouteDivider$name$path\""
-    }
-
     override fun generateRoute(): String {
         val query = parameters
             .filter { it.isNullable }
@@ -177,7 +168,7 @@ internal data class FunctionRouteDefinition(
                 }
             }
 
-        return "${indent}override fun $name($parameterStr) = \"$parentPath$RouteDivider$name$pathWithParameter${query}\""
+        return "${indent}actual operator fun $name($parameterStr) = \"$parentPath$pathWithParameter${query}\""
     }
 
     private fun encode(value: String) = "\${java.net.URLEncoder.encode($value, \"UTF-8\")}"

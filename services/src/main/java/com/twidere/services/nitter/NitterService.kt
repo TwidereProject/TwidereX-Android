@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -23,15 +23,23 @@ package com.twidere.services.nitter
 import com.twidere.services.http.HttpClientFactory
 import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.nitter.model.ConversationTimeline
+import com.twidere.services.nitter.model.Profile
 import com.twidere.services.nitter.model.TweetNotFound
+import com.twidere.services.utils.DEBUG
 import com.twidere.services.utils.await
 import moe.tlaster.hson.Hson
 import okhttp3.Request
+import okhttp3.logging.HttpLoggingInterceptor
 
 class NitterService(
     private val host: String,
     private val httpClientFactory: HttpClientFactory,
 ) {
+    suspend fun verifyInstance(screenName: String) {
+        val target = "$host/$screenName"
+        if (request<Profile>(target) == null) throw TweetNotFoundException()
+    }
+
     suspend fun conversation(
         screenName: String,
         statusId: String,
@@ -44,12 +52,24 @@ class NitterService(
                 it
             }
         }
+        return request(target)
+    }
+
+    private suspend inline fun <reified T> request(target: String): T? {
         return httpClientFactory.createHttpClientBuilder()
             .addNetworkInterceptor {
-                it.proceed(it.request()).also {
-                    if (it.code != 200) {
-                        throw MicroBlogHttpException(it.code)
+                it.proceed(it.request()).also { response ->
+                    if (response.code != 200) {
+                        throw MicroBlogHttpException(response.code)
                     }
+                }
+            }.apply {
+                if (DEBUG) {
+                    addInterceptor(
+                        HttpLoggingInterceptor().apply {
+                            setLevel(HttpLoggingInterceptor.Level.BODY)
+                        }
+                    )
                 }
             }
             .build()

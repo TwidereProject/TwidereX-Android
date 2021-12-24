@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -256,6 +256,17 @@ class MastodonService(
             offset = (page ?: 0) * count,
             following = following,
         ).accounts ?: emptyList()
+    }
+
+    override suspend fun searchMedia(
+        query: String,
+        count: Int,
+        nextPage: String?
+    ): ISearchResponse {
+        return BasicSearchResponse(
+            nextPage = null,
+            status = emptyList()
+        )
     }
 
     suspend fun hashtagTimeline(

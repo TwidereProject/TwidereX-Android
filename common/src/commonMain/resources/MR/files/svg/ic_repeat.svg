@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns:android="http://schemas.android.com/apk/res/android" height="24" width="24" xmlns="http://www.w3.org/2000/svg">
+  <path android:strokeLineCap="round" android:strokeLineJoin="round" d="M4,12V9C4,8.2044 4.3161,7.4413 4.8787,6.8787C5.4413,6.3161 6.2043,6 7,6H20M20,6L17,3M20,6L17,9" fill="#000000" fill-opacity="0.0" stroke="#000000" stroke-width="2"/>
+  <path android:strokeLineCap="round" android:strokeLineJoin="round" d="M20,12V15C20,15.7956 19.6839,16.5587 19.1213,17.1213C18.5587,17.6839 17.7956,18 17,18H4M4,18L7,21M4,18L7,15" fill="#000000" fill-opacity="0.0" stroke="#000000" stroke-width="2"/>
+</svg>
