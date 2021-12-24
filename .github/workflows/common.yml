@@ -54,7 +54,7 @@ jobs:
       matrix:
         include:
           - api-level: 30
-            target: default
+            target: google_apis
           - api-level: 28
             target: default
           - api-level: 26
