@@ -39,8 +39,8 @@ fun DependencyHandlerScope.okhttp() {
 
 fun DependencyHandlerScope.junit5() {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
 }
 
 fun DependencyHandlerScope.junit4() {
@@ -53,88 +53,6 @@ fun DependencyHandlerScope.hson() {
 
 fun DependencyHandlerScope.kspApi() {
     implementation("com.google.devtools.ksp:symbol-processing-api", Versions.ksp)
-}
-
-fun DependencyHandlerScope.paging() {
-    implementation("androidx.paging:paging-common", Versions.paging)
-    implementation("androidx.paging:paging-compose", Versions.paging_compose)
-}
-
-fun DependencyHandlerScope.activity() {
-    implementation("androidx.activity:activity-ktx", Versions.activity)
-    implementation("androidx.activity:activity-compose", Versions.activity)
-}
-
-fun DependencyHandlerScope.datastore() {
-    implementation("androidx.datastore:datastore", Versions.datastore)
-    implementation("androidx.datastore:datastore-preferences", Versions.datastore)
-}
-
-fun DependencyHandlerScope.hilt() {
-    implementation("com.google.dagger:hilt-android", Versions.hilt)
-    kapt("com.google.dagger:hilt-android-compiler", Versions.hilt)
-    implementation("androidx.hilt:hilt-work", Versions.androidx_hilt)
-    kapt("androidx.hilt:hilt-compiler", Versions.androidx_hilt)
-}
-
-fun DependencyHandlerScope.room() {
-    implementation("androidx.room:room-runtime", Versions.room)
-    implementation("androidx.room:room-ktx", Versions.room)
-    implementation("androidx.room:room-paging", Versions.room)
-    kapt("androidx.room:room-compiler", Versions.room)
-    androidTestImplementation("androidx.room:room-testing", Versions.room)
-}
-
-fun DependencyHandlerScope.lifecycle() {
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx", Versions.lifecycle)
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx", Versions.lifecycle)
-    // implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate", Versions.lifecycle)
-    implementation("androidx.lifecycle:lifecycle-common-java8", Versions.lifecycle)
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose", Versions.lifecycle_compose)
-}
-
-fun DependencyHandlerScope.android() {
-    work()
-    room()
-    lifecycle()
-    activity()
-    implementation("androidx.startup:startup-runtime", Versions.startup)
-    implementation("io.coil-kt:coil-compose", Versions.coil)
-    implementation("io.coil-kt:coil-gif", Versions.coil)
-    implementation("androidx.vectordrawable:vectordrawable:1.1.0")
-    implementation("androidx.exifinterface:exifinterface", Versions.androidx_exifinterface)
-    implementation("com.google.android.exoplayer:exoplayer", Versions.exoplayer)
-    implementation("com.google.android.exoplayer:extension-okhttp", Versions.exoplayer)
-    implementation("androidx.browser:browser", Versions.browser)
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
-}
-
-fun DependencyHandlerScope.accompanist() {
-    implementation("com.google.accompanist:accompanist-insets", Versions.accompanist)
-    implementation("com.google.accompanist:accompanist-pager", Versions.accompanist)
-    implementation("com.google.accompanist:accompanist-pager-indicators", Versions.accompanist)
-}
-
-fun DependencyHandlerScope.work() {
-    implementation("androidx.work:work-runtime-ktx", Versions.work)
-}
-
-fun DependencyHandlerScope.widget() {
-    implementation("com.mxalbert.zoomable:zoomable", Versions.zoomable)
-    implementation("com.github.Tlaster:NestedScrollView", Versions.nestedScrollView)
-    implementation("com.github.Tlaster:Swiper", Versions.swiper)
-    implementation("com.github.Tlaster:Placeholder", Versions.placeholder)
-}
-
-fun DependencyHandlerScope.misc() {
-    implementation("com.twitter.twittertext:twitter-text:3.1.0")
-    implementation("org.jsoup:jsoup:1.13.1")
-    implementation("com.google.protobuf:protobuf-javalite", Versions.protobuf)
-}
-
-fun DependencyHandlerScope.mockito() {
-    testImplementation("org.mockito:mockito-core:3.11.2")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
 }
 
 fun DependencyHandlerScope.androidTest() {

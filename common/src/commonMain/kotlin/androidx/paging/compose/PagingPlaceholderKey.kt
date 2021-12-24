@@ -18,24 +18,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package androidx.paging.compose
 
-import android.app.Application
-import com.twidere.twiderex.di.setupModules
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.androidx.workmanager.koin.workManagerFactory
-import org.koin.core.context.startKoin
-import org.koin.core.logger.Level
-
-abstract class TwidereApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        startKoin {
-            androidLogger(Level.NONE)
-            androidContext(this@TwidereApplication)
-            workManagerFactory()
-            setupModules()
-        }
-    }
+expect class PagingPlaceholderKey(index: Int) {
+    val index: Int
 }

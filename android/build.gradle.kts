@@ -138,7 +138,6 @@ dependencies {
     implementation(projects.common)
     implementation("com.google.accompanist:accompanist-insets:${Versions.accompanist}")
     implementation("androidx.startup:startup-runtime:${Versions.startup}")
-    work()
 
     if (enableGoogleVariant) {
         // START Non-FOSS component
@@ -151,6 +150,5 @@ dependencies {
     }
 
     junit4()
-    mockito()
     androidTest()
 }

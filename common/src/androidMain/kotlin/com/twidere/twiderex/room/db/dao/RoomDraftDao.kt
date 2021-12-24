@@ -43,5 +43,5 @@ internal interface RoomDraftDao {
     suspend fun remove(draft: DbDraft)
 
     @Query("SELECT COUNT(*) FROM draft")
-    fun getDraftCount(): Flow<Long>
+    fun getDraftCount(): Flow<Int>
 }

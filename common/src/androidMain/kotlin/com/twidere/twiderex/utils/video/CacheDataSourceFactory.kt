@@ -23,7 +23,7 @@ package com.twidere.twiderex.utils.video
 import android.content.Context
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.FileDataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSink
@@ -40,7 +40,7 @@ class CacheDataSourceFactory(
         VideoCache.getInstance(context)
     }
 
-    private val defaultDatasourceFactory: DefaultDataSourceFactory
+    private val defaultDatasourceFactory: DefaultDataSource.Factory
     override fun createDataSource(): DataSource {
         return CacheDataSource(
             simpleCache, defaultDatasourceFactory.createDataSource(),
@@ -55,12 +55,11 @@ class CacheDataSourceFactory(
             BuildConfig.APPLICATION_NAME
         )
         val bandwidthMeter = DefaultBandwidthMeter.Builder(context).build()
-        defaultDatasourceFactory = DefaultDataSourceFactory(
+        defaultDatasourceFactory = DefaultDataSource.Factory(
             this.context,
-            bandwidthMeter,
             DefaultHttpDataSource.Factory()
                 .setUserAgent(userAgent)
                 .setTransferListener(bandwidthMeter)
-        )
+        ).setTransferListener(bandwidthMeter)
     }
 }

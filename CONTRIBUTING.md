@@ -19,8 +19,8 @@ For those able & willing to help fix issues and/or implement features ...
 ### Development environment
 
 Make sure you have
- - Android Studio Arctic Fox 2020.3.1 or later
- - JDK 11  
+ - Android Studio Arctic Fox 2020.3.1 or IntelliJ IDEA 2021.3
+ - JDK 17  
 
 ### Working branch
 

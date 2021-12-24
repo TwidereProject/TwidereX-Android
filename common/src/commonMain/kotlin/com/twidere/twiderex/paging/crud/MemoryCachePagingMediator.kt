@@ -47,6 +47,7 @@ abstract class MemoryCachePagingMediator<Key : Any, Value : Any>(protected val m
                 is PagingSource.LoadResult.Error -> {
                     throw result.throwable
                 }
+                is PagingSource.LoadResult.Invalid -> Unit
             }
             MediatorResult.Success(paging == null)
         } catch (e: Exception) {

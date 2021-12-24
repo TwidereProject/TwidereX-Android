@@ -21,12 +21,12 @@
 package com.twidere.twiderex.component.image
 
 data class ImageBlur(
-    val blurRadius: Float,
+    val blurRadius: Int,
     val bitmapScale: Float,
 ) {
     companion object {
         val Sensitive = ImageBlur(
-            blurRadius = 25f,
+            blurRadius = 25,
             bitmapScale = 0.4f
         )
     }

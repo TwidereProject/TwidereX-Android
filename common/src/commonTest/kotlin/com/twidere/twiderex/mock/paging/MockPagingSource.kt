@@ -27,7 +27,7 @@ import androidx.paging.PagingDataDiffer
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.jetbrains.annotations.TestOnly
 
 internal class MockPagingSource<T : Any> @TestOnly constructor(val data: List<T>) : PagingSource<Int, T>() {
@@ -69,7 +69,7 @@ internal suspend fun <T : Any> PagingData<T>.collectDataForTest(): List<T> {
         override fun onRemoved(position: Int, count: Int) {}
     }
     val items = mutableListOf<T>()
-    val dif = object : PagingDataDiffer<T>(dcb, TestCoroutineDispatcher()) {
+    val dif = object : PagingDataDiffer<T>(dcb, UnconfinedTestDispatcher()) {
         override suspend fun presentNewList(
             previousList: NullPaddedList<T>,
             newList: NullPaddedList<T>,

@@ -33,7 +33,7 @@ internal class DraftDaoImpl(private val roomDraftDao: RoomDraftDao) : DraftDao {
         it.map { dbDraft -> dbDraft.toUiDraft() }
     }
 
-    override fun getDraftCount() = roomDraftDao.getDraftCount()
+    override fun getDraftCount() = roomDraftDao.getDraftCount().map { it.toLong() }
 
     override suspend fun insert(it: UiDraft) = roomDraftDao.insertAll(it.toDbDraft())
 

@@ -28,7 +28,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
-import coil.Coil
+import coil.imageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.twidere.common.R
@@ -80,7 +80,7 @@ actual class AppNotificationManager(
                 )
             }
             appNotification.largeIcon?.let {
-                val result = Coil.execute(
+                val result = context.imageLoader.execute(
                     ImageRequest.Builder(context)
                         .data(it)
                         .build()

@@ -26,18 +26,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.StyledPlayerView
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.component.foundation.PlayerCallBack
 import com.twidere.twiderex.component.foundation.PlayerProgressCallBack
-import com.twidere.twiderex.component.foundation.RemainingTimeExoPlayer
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.utils.video.CacheDataSourceFactory
@@ -70,67 +69,66 @@ actual class PlatformPlayerView actual constructor(
         playerView.useController = false
         playerView.keepScreenOn = keepScreenOn
     }.apply {
-        player = RemainingTimeExoPlayer(
-            SimpleExoPlayer.Builder(context)
-                .apply {
-                    if (httpConfig.proxyConfig.enable) {
-                        // replace DataSource
-                        OkHttpDataSource.Factory(
-                            TwidereServiceFactory
-                                .createHttpClientFactory()
-                                .createHttpClientBuilder()
-                                .build()
-                        )
-                            .let {
-                                DefaultDataSourceFactory(context, it)
-                            }.let {
-                                DefaultMediaSourceFactory(it)
-                            }.let {
-                                setMediaSourceFactory(it)
+        player = ExoPlayer.Builder(context)
+            .apply {
+                if (httpConfig.proxyConfig.enable) {
+                    // replace DataSource
+                    OkHttpDataSource.Factory(
+                        TwidereServiceFactory
+                            .createHttpClientFactory()
+                            .createHttpClientBuilder()
+                            .build()
+                    )
+                        .let {
+                            DefaultDataSource.Factory(context, it)
+                        }.let {
+                            DefaultMediaSourceFactory(it)
+                        }.let {
+                            setMediaSourceFactory(it)
+                        }
+                }
+            }.build()
+            .apply {
+                repeatMode = Player.REPEAT_MODE_ALL
+                addListener(object : Player.Listener {
+                    override fun onPlaybackStateChanged(state: Int) {
+                        when (state) {
+                            Player.STATE_BUFFERING -> {
+                                playerCallBack?.onBuffering()
                             }
-                    }
-                }
-        ).apply {
-            repeatMode = Player.REPEAT_MODE_ALL
-            addListener(object : Player.Listener {
-                override fun onPlaybackStateChanged(state: Int) {
-                    when (state) {
-                        Player.STATE_BUFFERING -> {
-                            playerCallBack?.onBuffering()
+                            Player.STATE_READY -> {
+                                playerCallBack?.onReady()
+                            }
+                            else -> {}
                         }
-                        Player.STATE_READY -> {
-                            playerCallBack?.onReady()
-                        }
-                        else -> {}
                     }
-                }
 
-                override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    playerCallBack?.onIsPlayingChanged(isPlaying)
-                    job?.cancel()
-                    if (isPlaying) {
-                        job = scope.launch {
-                            while (true) {
-                                delay(1000)
-                                playerProgressCallBack?.onTimeChanged(contentPosition())
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        playerCallBack?.onIsPlayingChanged(isPlaying)
+                        job?.cancel()
+                        if (isPlaying) {
+                            job = scope.launch {
+                                while (true) {
+                                    delay(1000)
+                                    playerProgressCallBack?.onTimeChanged(contentPosition())
+                                }
                             }
                         }
                     }
-                }
-            })
+                })
 
-            ProgressiveMediaSource.Factory(
-                CacheDataSourceFactory(
-                    context,
-                    5L * 1024L * 1024L,
-                )
-            ).createMediaSource(MediaItem.fromUri(url)).also {
-                setMediaSource(it)
+                ProgressiveMediaSource.Factory(
+                    CacheDataSourceFactory(
+                        context,
+                        5L * 1024L * 1024L,
+                    )
+                ).createMediaSource(MediaItem.fromUri(url)).also {
+                    setMediaSource(it)
+                }
+                playerCallBack?.onPrepareStart()
+                prepare()
+                seekTo(VideoPool.get(url))
             }
-            playerCallBack?.onPrepareStart()
-            prepare()
-            seekTo(VideoPool.get(url))
-        }
     }
 
     actual fun play() {
