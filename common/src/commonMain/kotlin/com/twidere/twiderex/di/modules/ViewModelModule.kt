@@ -186,7 +186,7 @@ private fun Module.settings() {
     viewModel { AppearanceViewModel(get<PreferencesHolder>().appearancePreferences) }
     viewModel { DisplayViewModel(get<PreferencesHolder>().displayPreferences) }
     viewModel { LayoutViewModel(get()) }
-    viewModel { MiscViewModel(get<PreferencesHolder>().miscPreferences) }
+    viewModel { MiscViewModel(get<PreferencesHolder>().miscPreferences, get(), get()) }
     viewModel { NotificationViewModel(get<PreferencesHolder>().notificationPreferences) }
     viewModel { StorageViewModel(get()) }
 }

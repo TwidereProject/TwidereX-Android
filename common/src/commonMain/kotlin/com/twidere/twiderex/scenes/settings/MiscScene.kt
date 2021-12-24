@@ -24,16 +24,23 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
 import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
@@ -53,6 +60,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.AlertDialog
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -65,14 +73,16 @@ import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.preferences.model.MiscPreferences
+import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.settings.MiscViewModel
 
 @Composable
 fun MiscScene() {
     val viewModel: MiscViewModel = getViewModel()
-
+    val account = LocalActiveAccount.current
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -106,7 +116,9 @@ fun MiscScene() {
                             rememberScrollState()
                         )
                 ) {
-                    NitterPreference(viewModel)
+                    if (account?.type == PlatformType.Twitter) {
+                        NitterPreference(viewModel)
+                    }
                     ProxyPreference(
                         viewModel = viewModel,
                         showProxyInputDialog = showProxyInputDialog,
@@ -285,6 +297,9 @@ fun ItemProxy(
 @Composable
 fun NitterPreference(viewModel: MiscViewModel) {
     val value by viewModel.nitter.observeAsState(initial = "")
+    val nitterVerify by viewModel.nitterVerify.observeAsState(initial = false)
+    val nitterVerifyLoading by viewModel.nitterVerifyLoading.observeAsState(initial = false)
+    val isNitterInputValid by viewModel.isNitterInputValid.observeAsState(initial = false)
     var showInformationDialog by remember {
         mutableStateOf(false)
     }
@@ -295,7 +310,15 @@ fun NitterPreference(viewModel: MiscViewModel) {
         NitterUsageDialog(
             onDismissRequest = {
                 showUsageDialog = false
-            }
+            },
+            value = value,
+            onConfirm = {
+                viewModel.setNitterInstance(it)
+            },
+            onValidCheck = {
+                viewModel.checkIfNitterInputValid(it)
+            },
+            isValid = isNitterInputValid
         )
     }
     if (showInformationDialog) {
@@ -323,51 +346,114 @@ fun NitterPreference(viewModel: MiscViewModel) {
     }
     ListItem(
         text = {
-            OutlinedTextField(
-                value = value,
-                onValueChange = { viewModel.setNitterInstance(it) },
-                placeholder = {
-                    Text(
-                        text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_placeholder)
-                    )
-                },
-                trailingIcon = {
-                    IconButton(
-                        onClick = {
-                            showUsageDialog = true
-                        }
-                    ) {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_placeholder))
+        },
+        trailing = {
+            if (nitterVerifyLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(NitterPreferenceDefaults.Loading.Size)
+                        .padding(NitterPreferenceDefaults.Loading.Padding),
+                    strokeWidth = NitterPreferenceDefaults.Loading.StrokeWidth
+                )
+            } else if (value.isNotEmpty()) {
+                IconButton(
+                    onClick = {
+                        viewModel.verifyNitterInstance()
+                    }
+                ) {
+                    if (nitterVerify) {
                         Icon(
-                            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_info_circle),
+                            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_link_success),
                             contentDescription = null,
+                            tint = MaterialTheme.colors.primary
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_link_error),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.error
                         )
                     }
                 }
-            )
+            }
         },
         secondaryText = {
-            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_description))
+            Text(text = value.takeIf { it.isNotEmpty() } ?: stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_value))
+        },
+        modifier = Modifier.clickable {
+            showUsageDialog = true
         }
     )
+    Column(modifier = Modifier.padding(start = NitterPreferenceDefaults.ContentPaddingStart)) {
+        Divider()
+        Spacer(modifier = Modifier.height(NitterPreferenceDefaults.ContentVerticalSpacing))
+        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_description))
+    }
+}
+
+private object NitterPreferenceDefaults {
+    object Loading {
+        val Size = 48.dp
+        val Padding = PaddingValues(12.dp)
+        val StrokeWidth = 2.dp
+    }
+    val ContentPaddingStart = 16.dp
+    val ContentVerticalSpacing = 8.dp
 }
 
 @Composable
 fun NitterUsageDialog(
     onDismissRequest: () -> Unit,
+    value: String,
+    onConfirm: (String) -> Unit,
+    onValidCheck: (String) -> Unit,
+    isValid: Boolean
 ) {
     val navigator = LocalNavigator.current
+    var input by remember {
+        mutableStateOf(value)
+    }
+
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_dialog_usage_title))
         },
         text = {
-            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_dialog_usage_content))
+            Column {
+                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_dialog_usage_content))
+                TextField(
+                    value = input,
+                    onValueChange = {
+                        onValidCheck.invoke(it)
+                        input = it
+                    },
+                    placeholder = {
+                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_value),)
+                    },
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent
+                    ),
+                    isError = !isValid,
+                )
+                if (!isValid) {
+                    Text(
+                        text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_invalid),
+                        modifier = Modifier.padding(NitterUsageDialogDefaults.InvalidTextPadding),
+                        style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.error)
+                    )
+                }
+            }
         },
         confirmButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_ok))
-            }
+            TextButton(onClick = {
+                if (isValid) {
+                    onConfirm.invoke(input)
+                    onDismissRequest.invoke()
+                }
+            }, enabled = isValid) {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_ok))
+        }
         },
         dismissButton = {
             TextButton(
@@ -382,6 +468,10 @@ fun NitterUsageDialog(
             }
         }
     )
+}
+
+private object NitterUsageDialogDefaults {
+    val InvalidTextPadding = PaddingValues(top = 8.dp)
 }
 
 @Composable
