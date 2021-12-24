@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
@@ -75,7 +76,7 @@ fun ColumnScope.StatusText(
                 },
         ) {
             Icon(
-                modifier = Modifier.padding(StatusTextDefaults.Mastodon.SpoilerButtonPadding),
+                modifier = Modifier.size(width = StatusTextDefaults.Mastodon.MoreButton.Width, height = StatusTextDefaults.Mastodon.MoreButton.Height).padding(StatusTextDefaults.Mastodon.SpoilerButtonPadding),
                 painter = painterResource(res = com.twidere.twiderex.MR.files.ic_expand_more),
                 contentDescription = null,
                 tint = MaterialTheme.colors.primary,
@@ -105,6 +106,10 @@ fun ColumnScope.StatusText(
 
 object StatusTextDefaults {
     object Mastodon {
+        object MoreButton {
+            val Width = 46.dp
+            val Height = 20.dp
+        }
         val SpoilerSpacing = 2.dp
         val SpoilerButtonPadding = PaddingValues(
             2.dp
