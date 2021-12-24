@@ -3,8 +3,8 @@ import org.gradle.api.JavaVersion
 object Versions {
     object Kotlin {
         const val lang = "1.6.10"
-        const val coroutines = "1.6.0-RC3"
-        const val serialization = "1.3.1"
+        const val coroutines = "1.6.0"
+        const val serialization = "1.3.2"
     }
 
     object Java {
@@ -19,7 +19,7 @@ object Versions {
     const val okhttp = "4.9.1"
     const val retrofit2 = "2.9.0"
     const val hson = "0.1.4"
-    const val compose_jb = "1.0.1-rc2"
+    const val compose_jb = "1.0.1"
     const val paging = "3.1.0"
     const val activity = "1.4.0"
     const val datastore = "1.0.0"
@@ -30,7 +30,7 @@ object Versions {
     const val work = "2.7.1"
     const val startup = "1.1.0"
     const val coil = "2.0.0-alpha05"
-    const val accompanist = "0.21.5-rc"
+    const val accompanist = "0.22.0-rc"
     const val accompanist_jb = "0.18.1"
     const val androidx_exifinterface = "1.3.3"
     const val exoplayer = "2.16.1"
