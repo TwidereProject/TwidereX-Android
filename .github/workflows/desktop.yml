@@ -2,6 +2,8 @@ name: Desktop CI
 
 on:
   push:
+    tags:
+      - '**'
     branches:
       - master
       - develop
