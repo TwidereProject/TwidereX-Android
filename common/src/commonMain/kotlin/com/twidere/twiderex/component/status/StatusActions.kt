@@ -334,7 +334,13 @@ fun ShareButton(
             DropdownMenuItem(
                 onClick = {
                     expanded = false
-                    remoteNavigator.shareText(status.generateShareLink())
+                    remoteNavigator.shareText(
+                        buildString {
+                            append(text)
+                            append("\n\n")
+                            append(status.generateShareLink())
+                        }
+                    )
                 }
             ) {
                 Text(
