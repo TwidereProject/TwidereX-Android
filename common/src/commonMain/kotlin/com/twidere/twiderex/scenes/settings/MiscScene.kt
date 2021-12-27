@@ -452,8 +452,8 @@ fun NitterUsageDialog(
                     onDismissRequest.invoke()
                 }
             }, enabled = isValid) {
-            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_ok))
-        }
+                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_ok))
+            }
         },
         dismissButton = {
             TextButton(

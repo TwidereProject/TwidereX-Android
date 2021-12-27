@@ -131,7 +131,11 @@ private object LazyUiDMEventListDefaults {
 }
 
 @Composable
-private fun DMOutComeEvent(onResend: (event: UiDMEvent) -> Unit = {}, event: UiDMEvent, onItemLongClick: (event: UiDMEvent) -> Unit) {
+private fun DMOutComeEvent(
+    onResend: (event: UiDMEvent) -> Unit = {},
+    event: UiDMEvent,
+    onItemLongClick: (event: UiDMEvent) -> Unit
+) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
         Column(horizontalAlignment = Alignment.End) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -178,6 +182,7 @@ private object DMOutComeEventDefaults {
         val size = 24.dp
         val width = 2.dp
     }
+
     object Error {
         val size = 24.dp
         val ContentPadding = PaddingValues(3.dp)
@@ -206,6 +211,7 @@ private fun DMInComeEvent(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) 
 
 private object DMEventDefaults {
     val ContentSpacing = 10.dp
+
     object Time {
         val paddingTop = 8.dp
         val paddingStart = UserAvatarDefaults.AvatarSize + ContentSpacing
@@ -246,7 +252,11 @@ private fun MessageBody(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) ->
                     navController.navigate(Root.Media.Pure(event.messageKey, 0))
                 }
             )
-            if (event.media.isNotEmpty() && event.htmlText.isNotEmpty()) Spacer(modifier = Modifier.height(MessageBodyDefaults.ContentSpacing))
+            if (event.media.isNotEmpty() && event.htmlText.isNotEmpty()) Spacer(
+                modifier = Modifier.height(
+                    MessageBodyDefaults.ContentSpacing
+                )
+            )
             val textColor = if (event.isInCome) MaterialTheme.colors.onSurface else MaterialTheme.colors.onPrimary
             val textStyle = MaterialTheme.typography.body1.copy(textColor)
             val linkStyle = textStyle.copy(
