@@ -51,6 +51,10 @@ class TwitterComposeJob constructor(
     remoteNavigator,
     resLoader,
 ) {
+    companion object {
+        private const val MaxImageSize = 3 * 1024 * 1024
+    }
+
     override suspend fun compose(
         service: TwitterService,
         composeData: ComposeData,
@@ -97,5 +101,20 @@ class TwitterComposeJob constructor(
                 size ?: it.available().toLong()
             )
         } ?: throw Error()
+    }
+
+    override suspend fun imageCompression(file: String): Int {
+        println("exif ==> getImage Compression:$file")
+        return fileResolver.getFileSize(file)?.let {
+            println("exif ==> origin size: $it, maxImageSize: $MaxImageSize")
+            if (it > MaxImageSize) {
+                (MaxImageSize/it.toFloat()) * 100
+            } else {
+                100
+            }.toInt().apply {
+                println("exif ==> compress size: $this")
+            }
+        } ?: 100
+
     }
 }

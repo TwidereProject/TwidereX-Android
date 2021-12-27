@@ -63,7 +63,8 @@ abstract class ComposeJob<T : MicroBlogService>(
             val mediaIds = arrayListOf<String>()
             val images = composeData.images
             images.forEachIndexed { index, uri ->
-                val scramblerUri = exifScrambler.removeExifData(uri)
+                val scramblerUri = exifScrambler.removeExifData(uri, compress = imageCompression(uri))
+                if (true)throw Error("")
                 val id = uploadImage(uri, scramblerUri, service)
                 id?.let { mediaIds.add(it) }
                 builder.setProgress(
@@ -114,4 +115,8 @@ abstract class ComposeJob<T : MicroBlogService>(
         scramblerUri: String,
         service: T
     ): String?
+
+    protected abstract suspend fun imageCompression(
+        file: String,
+    ): Int
 }

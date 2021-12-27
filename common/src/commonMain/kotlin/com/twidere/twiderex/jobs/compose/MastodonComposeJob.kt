@@ -100,4 +100,8 @@ class MastodonComposeJob(
         } ?: throw Error()
         return id.id
     }
+
+    override suspend fun imageCompression(file: String): Int {
+        return 100
+    }
 }

@@ -41,6 +41,7 @@ actual class ExifScrambler(private val context: Context) {
             } catch (oom: OutOfMemoryError) {
                 return file
             }
+            println("exif ==> file:$uri, size:${(contentResolver.openFileDescriptor(uri, "r")?.statSize ?: 0) /(1024.0 * 1024)}， compress$compress")
             // create an cache image
             val mimeType = contentResolver.getType(uri) ?: ""
             val imageType = getImageType(mimeType)
@@ -72,6 +73,7 @@ actual class ExifScrambler(private val context: Context) {
                     return uri.toString()
                 }
             }
+            println("exif ==> imageCache:${imageCache.absolutePath}, size:${imageCache.length() /(1024.0 * 1024)}")
             return imageCache.toUri().toString()
         }
         return uri.toString()
