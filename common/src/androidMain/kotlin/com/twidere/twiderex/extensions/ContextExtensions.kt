@@ -50,13 +50,16 @@ fun Context.shareText(content: String) {
     )
 }
 
-fun Context.shareMedia(uri: Uri, mimeType: String) {
+fun Context.shareMedia(uri: Uri, mimeType: String, extraText: String) {
     startActivity(
         Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_STREAM, uri)
             type = mimeType
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            if (extraText.isNotEmpty()) {
+                putExtra(Intent.EXTRA_TEXT, extraText)
+            }
         }.let {
             Intent.createChooser(it, null).apply {
                 if (this@shareMedia !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

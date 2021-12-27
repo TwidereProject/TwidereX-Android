@@ -39,10 +39,16 @@ actual class RemoteNavigator(private val context: Context) {
         )
     }
 
-    actual fun shareMedia(filePath: String, mimeType: String, fromBackground: Boolean) {
+    actual fun shareMedia(
+        filePath: String,
+        mimeType: String,
+        fromBackground: Boolean,
+        extraText: String,
+    ) {
         context.shareMedia(
             uri = Uri.parse(filePath),
             mimeType = mimeType,
+            extraText = extraText,
         )
     }
 

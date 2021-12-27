@@ -61,6 +61,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.mxalbert.zoomable.Zoomable
 import com.twidere.twiderex.component.bottomInsetsHeight
@@ -86,6 +87,8 @@ import com.twidere.twiderex.component.status.StatusText
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
+import com.twidere.twiderex.component.status.renderContentAnnotatedString
+import com.twidere.twiderex.component.status.resolveLink
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.component.topInsetsPadding
 import com.twidere.twiderex.di.ext.getViewModel
@@ -329,6 +332,7 @@ private fun StatusMediaBottomContent(
     }
 }
 
+@OptIn(ExperimentalUnitApi::class)
 @Composable
 private fun StatusMediaInfo(
     videoPlayerState: VideoPlayerState?,
@@ -337,6 +341,10 @@ private fun StatusMediaInfo(
     currentMedia: UiMedia,
 ) {
     val scope = rememberCoroutineScope()
+    val text = renderContentAnnotatedString(
+        htmlText = status.htmlText,
+        linkResolver = { status.resolveLink(it) },
+    )
     Column(
         modifier = Modifier
             .padding(StatusMediaInfoDefaults.ContentPadding),
@@ -384,7 +392,12 @@ private fun StatusMediaInfo(
                         currentMedia.fileName?.let {
                             scope.launch {
                                 viewModel.shareMedia(
-                                    currentMedia = currentMedia
+                                    currentMedia = currentMedia,
+                                    extraText = buildString {
+                                        append(text)
+                                        append("\n\n")
+                                        append(status.generateShareLink())
+                                    }
                                 )
                             }
                         }
