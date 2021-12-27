@@ -34,7 +34,7 @@ actual class RemoteNavigator(private val context: Context) {
                 Intent.ACTION_VIEW,
                 Uri.parse(deeplink).normalizeScheme()
             ).apply {
-                if (fromBackground) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
         )
     }
