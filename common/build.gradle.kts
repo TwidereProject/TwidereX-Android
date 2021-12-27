@@ -91,8 +91,6 @@ kotlin {
                 implementation("io.coil-kt:coil-svg:${Versions.coil}")
                 implementation("com.google.android.exoplayer:exoplayer:${Versions.exoplayer}")
                 implementation("com.google.android.exoplayer:extension-okhttp:${Versions.exoplayer}")
-                implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
-                implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
                 implementation("androidx.datastore:datastore:${Versions.datastore}")
                 implementation("androidx.datastore:datastore-preferences:${Versions.datastore}")
                 implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
@@ -112,9 +110,14 @@ kotlin {
                 implementation("androidx.test.ext:junit-ktx:${Versions.extJUnitVersion}")
                 implementation("androidx.test.espresso:espresso-core:${Versions.espressoVersion}")
                 implementation("androidx.room:room-testing:${Versions.room}")
+                implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
             }
         }
-        val androidTest by getting
+        val androidTest by getting {
+            dependencies {
+                implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
+            }
+        }
         val desktopMain by getting {
             dependencies {
                 implementation("uk.co.caprica:vlcj:4.7.1")
