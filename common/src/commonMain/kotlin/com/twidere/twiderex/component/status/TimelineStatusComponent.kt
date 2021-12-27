@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -430,45 +430,41 @@ fun StatusContent(
                 modifier = Modifier
                     .weight(1f)
             ) {
-                Row {
-                    Column {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Row(
-                                modifier = Modifier.weight(1f),
-                            ) {
-                                UserName(status.user, fontWeight = FontWeight.W600)
-                                if (type == StatusContentType.Normal) {
-                                    Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
-                                    UserScreenName(status.user)
-                                }
-                            }
-                            CompositionLocalProvider(
-                                LocalContentAlpha provides ContentAlpha.disabled
-                            ) {
-                                val mastodonExtra = status.mastodonExtra
-                                if (status.platformType == PlatformType.Mastodon && mastodonExtra != null) {
-                                    Icon(
-                                        modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
-                                        painter = mastodonExtra.visibility.icon(),
-                                        contentDescription = mastodonExtra.visibility.name
-                                    )
-                                    Spacer(modifier = Modifier.width(StatusContentDefaults.Mastodon.VisibilitySpacing))
-                                }
-                                if (type == StatusContentType.Normal) {
-                                    HumanizedTime(time = status.timestamp)
-                                }
-                            }
-                        }
-                        when (type) {
-                            StatusContentType.Normal -> {
-                                Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
-                                StatusBody(status, type = type)
-                            }
-                            StatusContentType.Extend -> UserScreenName(status.user)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Row(
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        UserName(status.user, fontWeight = FontWeight.W600)
+                        if (type == StatusContentType.Normal) {
+                            Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
+                            UserScreenName(status.user)
                         }
                     }
+                    CompositionLocalProvider(
+                        LocalContentAlpha provides ContentAlpha.disabled
+                    ) {
+                        val mastodonExtra = status.mastodonExtra
+                        if (status.platformType == PlatformType.Mastodon && mastodonExtra != null) {
+                            Icon(
+                                modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
+                                painter = mastodonExtra.visibility.icon(),
+                                contentDescription = mastodonExtra.visibility.name
+                            )
+                            Spacer(modifier = Modifier.width(StatusContentDefaults.Mastodon.VisibilitySpacing))
+                        }
+                        if (type == StatusContentType.Normal) {
+                            HumanizedTime(time = status.timestamp)
+                        }
+                    }
+                }
+                when (type) {
+                    StatusContentType.Normal -> {
+                        Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
+                        StatusBody(status, type = type)
+                    }
+                    StatusContentType.Extend -> UserScreenName(status.user)
                 }
                 if (type == StatusContentType.Extend) {
                     Column {

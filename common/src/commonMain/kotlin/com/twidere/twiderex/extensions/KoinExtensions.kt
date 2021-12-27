@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -21,6 +21,7 @@
 package com.twidere.twiderex.extensions
 
 import moe.tlaster.precompose.viewmodel.ViewModel
+import org.koin.core.annotation.KoinReflectAPI
 import org.koin.core.definition.Definition
 import org.koin.core.instance.InstanceFactory
 import org.koin.core.instance.newInstance
@@ -34,6 +35,7 @@ inline fun <reified T : ViewModel> Module.viewModel(
     return factory(qualifier, definition)
 }
 
+@KoinReflectAPI
 inline fun <reified T : ViewModel> Module.viewModel(
     qualifier: Qualifier? = null
 ): Pair<Module, InstanceFactory<T>> {

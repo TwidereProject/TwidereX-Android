@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -44,7 +44,7 @@ fun Context.shareText(content: String) {
             type = "text/plain"
         }.let {
             Intent.createChooser(it, null).apply {
-                if (this !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (this@shareText !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
         }
     )
@@ -59,7 +59,7 @@ fun Context.shareMedia(uri: Uri, mimeType: String) {
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }.let {
             Intent.createChooser(it, null).apply {
-                if (this !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (this@shareMedia !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
         }
     )

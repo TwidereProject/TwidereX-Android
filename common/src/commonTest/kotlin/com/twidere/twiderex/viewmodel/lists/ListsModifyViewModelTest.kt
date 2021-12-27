@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -212,7 +212,7 @@ internal class ListsModifyViewModelTest : AccountViewModelTestBase() {
         success: Boolean
     ) {
         verify(exactly = 1) { loadingObserver.onChanged(true) }
-        verify(exactly = 2) { loadingObserver.onChanged(false) }
+        verify(exactly = 1) { loadingObserver.onChanged(false) }
         verify(exactly = if (success) 1 else 2) { successObserver.onChanged(success) }
     }
 }

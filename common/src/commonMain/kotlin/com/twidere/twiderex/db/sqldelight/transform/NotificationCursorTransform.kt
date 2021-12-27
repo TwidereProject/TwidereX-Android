@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -27,7 +27,7 @@ internal fun NotificationCursor.toDb() = DbNotificationCursor(
     id = _id,
     accountKey = accountKey,
     type = type,
-    value = value,
+    value_ = value,
     timestamp = timestamp
 )
 
@@ -35,6 +35,6 @@ internal fun DbNotificationCursor.toUi() = NotificationCursor(
     _id = id,
     accountKey = accountKey,
     type = type,
-    value = value,
+    value = value_,
     timestamp = timestamp
 )

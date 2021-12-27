@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -18,11 +18,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.twitter
+package androidx.paging.compose
 
-object TwitterErrorCodes {
-    const val AlreadyFavorited = 139
-    const val TemporarilyLocked = 326
-    const val AlreadyRetweeted = 327
-    const val RateLimitExceeded = 88
+expect class PagingPlaceholderKey(index: Int) {
+    val index: Int
 }

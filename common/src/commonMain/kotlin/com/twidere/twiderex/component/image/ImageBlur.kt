@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -21,12 +21,12 @@
 package com.twidere.twiderex.component.image
 
 data class ImageBlur(
-    val blurRadius: Float,
+    val blurRadius: Int,
     val bitmapScale: Float,
 ) {
     companion object {
         val Sensitive = ImageBlur(
-            blurRadius = 25f,
+            blurRadius = 25,
             bitmapScale = 0.4f
         )
     }

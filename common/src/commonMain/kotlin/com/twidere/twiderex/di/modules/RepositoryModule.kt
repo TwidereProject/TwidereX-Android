@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -28,6 +28,7 @@ import com.twidere.twiderex.repository.GifRepository
 import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.repository.ListsUsersRepository
 import com.twidere.twiderex.repository.MediaRepository
+import com.twidere.twiderex.repository.NitterRepository
 import com.twidere.twiderex.repository.NotificationRepository
 import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.SearchRepository
@@ -54,4 +55,5 @@ val repositoryModule = module {
     single { UserListRepository() }
     single { UserRepository(get(), get()) }
     single { GifRepository(get()) }
+    single { NitterRepository() }
 }

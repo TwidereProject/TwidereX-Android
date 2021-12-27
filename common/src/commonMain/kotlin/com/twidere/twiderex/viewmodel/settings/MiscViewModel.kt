@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -22,17 +22,39 @@ package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
 import com.twidere.twiderex.preferences.model.MiscPreferences
+import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.repository.NitterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class MiscViewModel(
     private val miscPreferences: DataStore<MiscPreferences>,
+    private val accountRepository: AccountRepository,
+    private val nitterRepository: NitterRepository,
 ) : ViewModel() {
+
+    private val account by lazy {
+        accountRepository.activeAccount.mapNotNull { it }
+    }
+
     val nitter by lazy {
         MutableStateFlow("")
+    }
+
+    val isNitterInputValid by lazy {
+        MutableStateFlow(true)
+    }
+
+    val nitterVerifyLoading by lazy {
+        MutableStateFlow(false)
+    }
+
+    val nitterVerify by lazy {
+        MutableStateFlow(false)
     }
 
     val useProxy by lazy {
@@ -69,13 +91,44 @@ class MiscViewModel(
             proxyPassword.value = miscPreferences.data.first().proxyPassword
             proxyType.value = miscPreferences.data.first().proxyType
         }
+        verifyNitterInstance()
+    }
+
+    fun checkIfNitterInputValid(value: String) {
+        isNitterInputValid.value = value.isEmpty() ||
+            (
+                (value.startsWith("http://") || value.startsWith("https://")) &&
+                    !value.endsWith("/")
+                )
     }
 
     fun setNitterInstance(value: String) {
+        if (nitter.value == value) return
         nitter.value = value
         viewModelScope.launch {
             miscPreferences.updateData {
                 it.copy(nitterInstance = value)
+            }
+        }
+        verifyNitterInstance()
+    }
+
+    fun verifyNitterInstance() {
+        if (nitter.value.isEmpty()) {
+            nitterVerify.value = false
+            nitterVerifyLoading.value = false
+            return
+        }
+        viewModelScope.launch {
+            try {
+                nitterVerifyLoading.value = true
+                nitterRepository.verifyInstance(account.first().user.screenName, instance = nitter.value)
+                nitterVerify.value = true
+            } catch (e: Exception) {
+                e.printStackTrace()
+                nitterVerify.value = false
+            } finally {
+                nitterVerifyLoading.value = false
             }
         }
     }

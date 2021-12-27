@@ -39,7 +39,9 @@ compose {
             nativeDistributions {
                 targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
                 packageName = Package.name
-                packageVersion = Package.versionName.split("-").firstOrNull()
+                packageVersion = "${Package.Version.main}.${Package.Version.mirror}.${Package.versionCode}"
+                copyright = Package.copyright
+                licenseFile.set(rootProject.file("LICENSE"))
                 modules("java.sql") // https://github.com/JetBrains/compose-jb/issues/381
                 modules("jdk.unsupported")
                 modules("jdk.unsupported.desktop")

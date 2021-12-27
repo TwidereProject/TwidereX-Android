@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.kmp
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -35,7 +34,7 @@ actual class RemoteNavigator(private val context: Context) {
                 Intent.ACTION_VIEW,
                 Uri.parse(deeplink).normalizeScheme()
             ).apply {
-                if (this !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (fromBackground) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
         )
     }

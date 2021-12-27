@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -298,8 +298,4 @@ public fun <T : Any> LazyListScope.itemsIndexed(
     ) { index ->
         itemContent(index, items[index])
     }
-}
-
-expect class PagingPlaceholderKey(index: Int) {
-    val index: Int
 }

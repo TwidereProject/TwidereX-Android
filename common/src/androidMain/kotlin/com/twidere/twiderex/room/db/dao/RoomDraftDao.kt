@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -43,5 +43,5 @@ internal interface RoomDraftDao {
     suspend fun remove(draft: DbDraft)
 
     @Query("SELECT COUNT(*) FROM draft")
-    fun getDraftCount(): Flow<Long>
+    fun getDraftCount(): Flow<Int>
 }

@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -18,6 +18,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package androidx.paging.compose
+package com.twidere.twiderex.model.enums
 
-actual data class PagingPlaceholderKey actual constructor(actual val index: Int)
+enum class TwitterReplySettings {
+    Everyone,
+    MentionedUsers,
+    FollowingUsers,
+}

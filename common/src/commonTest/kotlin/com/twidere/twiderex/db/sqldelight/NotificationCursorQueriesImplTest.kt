@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -41,21 +41,21 @@ internal class NotificationCursorQueriesImplTest : BaseCacheDatabaseTest() {
     )
     @Test
     fun insert_ReplaceWhenPrimaryKeyEquals() = runBlocking {
-        database.notificationCursorQueries.insert(cursor.toDb().copy(value = "insert"))
+        database.notificationCursorQueries.insert(cursor.toDb().copy(value_ = "insert"))
         assertEquals(
             "insert",
             database.notificationCursorQueries.find(
                 accountKey = cursor.accountKey,
                 type = cursor.type
-            ).executeAsOneOrNull()?.value
+            ).executeAsOneOrNull()?.value_
         )
-        database.notificationCursorQueries.insert(cursor.toDb().copy(value = "replace"))
+        database.notificationCursorQueries.insert(cursor.toDb().copy(value_ = "replace"))
         assertEquals(
             "replace",
             database.notificationCursorQueries.find(
                 accountKey = cursor.accountKey,
                 type = cursor.type
-            ).executeAsOneOrNull()?.value
+            ).executeAsOneOrNull()?.value_
         )
     }
 }

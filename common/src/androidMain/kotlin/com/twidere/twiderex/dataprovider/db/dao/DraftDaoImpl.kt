@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -33,7 +33,7 @@ internal class DraftDaoImpl(private val roomDraftDao: RoomDraftDao) : DraftDao {
         it.map { dbDraft -> dbDraft.toUiDraft() }
     }
 
-    override fun getDraftCount() = roomDraftDao.getDraftCount()
+    override fun getDraftCount() = roomDraftDao.getDraftCount().map { it.toLong() }
 
     override suspend fun insert(it: UiDraft) = roomDraftDao.insertAll(it.toDbDraft())
 

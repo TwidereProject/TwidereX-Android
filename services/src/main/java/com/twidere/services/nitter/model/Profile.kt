@@ -18,10 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model.enums
+package com.twidere.services.nitter.model
 
-enum class TwitterReplySettings {
-    Everyone,
-    MentionedUsers,
-    FollowingUsers,
-}
+import moe.tlaster.hson.annotations.HtmlSerializable
+
+data class Profile(
+    @HtmlSerializable(".profile-card-username",)
+    val username: String,
+)

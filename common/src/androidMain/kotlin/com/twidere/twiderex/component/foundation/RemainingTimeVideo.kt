@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -20,10 +20,12 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import com.google.android.exoplayer2.SimpleExoPlayer
-
-class RemainingTimeExoPlayer(builder: Builder) : SimpleExoPlayer(builder) {
-    override fun getContentPosition(): Long {
-        return super.getContentPosition() - contentDuration
-    }
-}
+// TODO: RemainingTimeExoPlayer
+// import com.google.android.exoplayer2.ExoPlayer
+// import com.google.android.exoplayer2.SimpleExoPlayer
+//
+// class RemainingTimeExoPlayer(builder: ExoPlayer.Builder) : SimpleExoPlayer(builder) {
+//     override fun getContentPosition(): Long {
+//         return super.getContentPosition() - contentDuration
+//     }
+// }
