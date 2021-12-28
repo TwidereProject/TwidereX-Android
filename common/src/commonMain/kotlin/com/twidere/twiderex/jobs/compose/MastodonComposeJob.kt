@@ -101,7 +101,6 @@ class MastodonComposeJob(
         return id.id
     }
 
-    override suspend fun imageCompression(file: String): Int {
-        return 100
-    }
+    override val imageMaxSize: Long
+        get() = 100 * 1024 * 1024
 }

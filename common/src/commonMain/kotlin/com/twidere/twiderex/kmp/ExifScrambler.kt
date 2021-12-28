@@ -21,7 +21,7 @@
 package com.twidere.twiderex.kmp
 
 expect class ExifScrambler {
-    fun removeExifData(file: String, compress: Int = 100): String
+    fun removeExifData(file: String, maxImageSize: Long): String
 
     fun deleteCacheFile(file: String)
 }
