@@ -40,7 +40,7 @@ class MemoryCachePagingSource<Value : Any>(
             LoadResult.Page(
                 data = result,
                 null,
-                if (result.isEmpty()) null else page + 1
+                if (result.isEmpty() || result.size < count) null else page + 1
             )
         } catch (e: Exception) {
             LoadResult.Error(e)
