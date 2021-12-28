@@ -341,6 +341,8 @@ private fun StatusMediaInfo(
     currentMedia: UiMedia,
 ) {
     val scope = rememberCoroutineScope()
+
+    val shareWithContent = LocalDisplayPreferences.current.shareWithContent
     val text = renderContentAnnotatedString(
         htmlText = status.htmlText,
         linkResolver = { status.resolveLink(it) },
@@ -393,11 +395,13 @@ private fun StatusMediaInfo(
                             scope.launch {
                                 viewModel.shareMedia(
                                     currentMedia = currentMedia,
-                                    extraText = buildString {
-                                        append(text)
-                                        append("\n\n")
-                                        append(status.generateShareLink())
-                                    }
+                                    extraText = if (shareWithContent) {
+                                        buildString {
+                                            append(text)
+                                            append("\n\n")
+                                            append(status.generateShareLink())
+                                        }
+                                    } else ""
                                 )
                             }
                         }

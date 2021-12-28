@@ -65,6 +65,7 @@ import com.twidere.twiderex.kmp.LocalRemoteNavigator
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 
 private val rippleSize = 24.dp
@@ -259,6 +260,7 @@ fun ShareButton(
     )
     val clipboardManager = LocalClipboardManager.current
     val contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_more)
+    val shareWithContent = LocalDisplayPreferences.current.shareWithContent
     Box(
         modifier = modifier,
     ) {
@@ -335,10 +337,14 @@ fun ShareButton(
                 onClick = {
                     expanded = false
                     remoteNavigator.shareText(
-                        buildString {
-                            append(text)
-                            append("\n\n")
-                            append(status.generateShareLink())
+                        if (shareWithContent) {
+                            buildString {
+                                append(text)
+                                append("\n\n")
+                                append(status.generateShareLink())
+                            }
+                        } else {
+                            status.generateShareLink()
                         }
                     )
                 }
