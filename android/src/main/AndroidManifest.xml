@@ -23,32 +23,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TwidereX">
         <provider
-            android:name="androidx.startup.InitializationProvider"
-            android:authorities="${applicationId}.androidx-startup"
-            android:exported="false"
-            tools:node="merge">
-            <meta-data
-                android:name="androidx.work.WorkManagerInitializer"
-                android:value="androidx.startup"
-                tools:node="remove" />
-            <meta-data
-                android:name="com.twidere.twiderex.initializer.NotificationChannelInitializer"
-                android:value="androidx.startup"
-                tools:node="remove" />
-            <meta-data
-                android:name="com.twidere.twiderex.initializer.DirectMessageInitializer"
-                android:value="androidx.startup"
-                tools:node="remove"/>
-            <meta-data
-                android:name="com.twidere.twiderex.initializer.NotificationInitializer"
-                android:value="androidx.startup"
-                tools:node="remove" />
-            <meta-data
-                android:name="com.twidere.twiderex.initializer.TwidereServiceInitializer"
-                android:value="androidx.startup"
-                tools:node="remove" />
-        </provider>
-        <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.twidere.twiderex.fileprovider"
             android:exported="false"

@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: build-mapping
-          path: ./app/build/outputs/mapping
+          path: ./android/build/outputs/mapping
 
   unit-test:
     runs-on: ubuntu-latest

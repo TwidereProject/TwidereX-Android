@@ -16,7 +16,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  spotless-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Set up Android SDK License
+        run: yes | /usr/local/lib/android/sdk/tools/bin/sdkmanager --licenses
+
+      - name: spotlessCheck with Gradle
+        run: ./gradlew :common:spotlessCheck :common:lint
+
+
   unit-test:
+    needs: spotless-check
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
