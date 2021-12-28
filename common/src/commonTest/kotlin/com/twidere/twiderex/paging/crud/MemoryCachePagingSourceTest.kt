@@ -34,11 +34,12 @@ class MemoryCachePagingSourceTest {
         val source = MemoryCachePagingSource(pagingMemoryCache)
         var result = source.load(PagingSource.LoadParams.Refresh(null, 2, placeholdersEnabled = false)) as PagingSource.LoadResult.Page
         assert(result.data.isNotEmpty())
-        assertEquals(1, result.nextKey)
+        // index of next item
+        assertEquals(2, result.nextKey)
 
         result = source.load(PagingSource.LoadParams.Append(result.nextKey!!, 2, placeholdersEnabled = false)) as PagingSource.LoadResult.Page
         assert(result.data.isNotEmpty())
-        assertEquals(2, result.nextKey)
+        assertEquals(4, result.nextKey)
 
         result = source.load(PagingSource.LoadParams.Append(result.nextKey!!, 2, placeholdersEnabled = false)) as PagingSource.LoadResult.Page
         assert(result.data.isEmpty())
