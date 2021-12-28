@@ -62,7 +62,7 @@ actual class ExifScrambler(private val context: Context) {
                     }
                     ImageType.PNG -> {
                         imageCache.outputStream().use {
-                            compressImage(contentResolver, uri, maxImageSize,  it)
+                            compressImage(contentResolver, uri, maxImageSize, it)
                         }
                     }
                     ImageType.UNKNOWN -> {
@@ -77,7 +77,7 @@ actual class ExifScrambler(private val context: Context) {
         return uri.toString()
     }
 
-    private fun compressImage(contentResolver: ContentResolver, uri: Uri,  maxImageSize: Long, fos: FileOutputStream) {
+    private fun compressImage(contentResolver: ContentResolver, uri: Uri, maxImageSize: Long, fos: FileOutputStream) {
         contentResolver.openInputStream(uri)?.use {
             val bitmap = try {
                 BitmapFactory.decodeStream(it)
@@ -93,9 +93,9 @@ actual class ExifScrambler(private val context: Context) {
                 bitmap.compress(Bitmap.CompressFormat.JPEG, currQuality, stream)
                 currSize = stream.toByteArray().size
                 currQuality -= 5
-            } while (currSize >= maxImageSize && currQuality >= 80 )
+            } while (currSize >= maxImageSize && currQuality >= 80)
             stream.toByteArray()
-        }?.apply{
+        }?.apply {
             fos.write(this)
             fos.flush()
         } ?: throw Error("Failed to open input stream")
