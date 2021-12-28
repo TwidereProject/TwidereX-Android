@@ -70,4 +70,10 @@ class DisplayViewModel(
             it.copy(muteByDefault = value)
         }
     }
+
+    fun setLoadItemLimit(value: Int) = viewModelScope.launch {
+        displayPreferences.updateData {
+            it.copy(loadItemLimit = value)
+        }
+    }
 }
