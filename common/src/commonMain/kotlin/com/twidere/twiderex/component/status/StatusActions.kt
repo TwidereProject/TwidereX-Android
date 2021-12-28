@@ -340,7 +340,8 @@ fun ShareButton(
                         if (shareWithContent) {
                             buildString {
                                 append(text)
-                                append("\n\n")
+                                append(System.lineSeparator())
+                                append(System.lineSeparator())
                                 append(status.generateShareLink())
                             }
                         } else {

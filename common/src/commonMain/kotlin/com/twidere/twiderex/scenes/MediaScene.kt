@@ -398,7 +398,8 @@ private fun StatusMediaInfo(
                                     extraText = if (shareWithContent) {
                                         buildString {
                                             append(text)
-                                            append("\n\n")
+                                            append(System.lineSeparator())
+                                            append(System.lineSeparator())
                                             append(status.generateShareLink())
                                         }
                                     } else ""
