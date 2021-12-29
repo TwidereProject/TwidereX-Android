@@ -37,9 +37,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.GraphicsLayerScope
@@ -76,15 +73,13 @@ val fadeResumeTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor 
 fun SearchInputScene(initial: String? = null) {
     val viewModel: SearchInputViewModel = getViewModel()
     val source by viewModel.source.observeAsState(initial = emptyList())
-    val initialText = initial ?: ""
-    var textFieldValue by remember {
-        mutableStateOf(
-            TextFieldValue(
-                text = initialText,
-                selection = TextRange(initialText.length),
-            )
-        )
-    }
+    val textFieldValue by viewModel.searchInput.observeAsState(
+        initial = if (initial != null) {
+            TextFieldValue(text = initial, selection = TextRange(initial.length))
+        } else {
+            TextFieldValue()
+        }
+    )
     val navigator = LocalNavigator.current
     TwidereScene {
         InAppNotificationScaffold(
@@ -98,7 +93,7 @@ fun SearchInputScene(initial: String? = null) {
                             TextInput(
                                 value = textFieldValue,
                                 onValueChange = {
-                                    textFieldValue = it
+                                    viewModel.updateSearchInput(it)
                                 },
                                 maxLines = 1,
                                 placeholder = {
