@@ -34,15 +34,21 @@ actual class RemoteNavigator(private val context: Context) {
                 Intent.ACTION_VIEW,
                 Uri.parse(deeplink).normalizeScheme()
             ).apply {
-                if (fromBackground) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
         )
     }
 
-    actual fun shareMedia(filePath: String, mimeType: String, fromBackground: Boolean) {
+    actual fun shareMedia(
+        filePath: String,
+        mimeType: String,
+        fromBackground: Boolean,
+        extraText: String,
+    ) {
         context.shareMedia(
             uri = Uri.parse(filePath),
             mimeType = mimeType,
+            extraText = extraText,
         )
     }
 

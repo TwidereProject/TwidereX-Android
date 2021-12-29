@@ -37,10 +37,12 @@ class ShareMediaWorker(
     companion object {
         fun create(
             target: Uri,
+            extraText: String = "",
         ) = OneTimeWorkRequestBuilder<ShareMediaWorker>()
             .setInputData(
                 Data.Builder()
                     .putString("target", target.toString())
+                    .putString("extraText", extraText)
                     .build()
             )
             .build()
@@ -48,10 +50,9 @@ class ShareMediaWorker(
 
     override suspend fun doWork(): Result {
         val target = inputData.getString("target") ?: return Result.failure()
+        val extraText = inputData.getString("extraText").orEmpty()
         return try {
-            shareMediaJob.execute(
-                target
-            )
+            shareMediaJob.execute(target, extraText)
             Result.success()
         } catch (e: Throwable) {
             e.printStackTrace()

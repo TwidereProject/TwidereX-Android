@@ -31,6 +31,7 @@ data class DisplayPreferences(
     val autoPlayback: AutoPlayback = AutoPlayback.Auto,
     val urlPreview: Boolean = false,
     val muteByDefault: Boolean = false,
+    val shareWithContent: Boolean = false,
     val loadItemLimit: Int = 20,
 ) {
     @Serializable

@@ -71,6 +71,12 @@ class DisplayViewModel(
         }
     }
 
+    fun setShareWithContent(value: Boolean) = viewModelScope.launch {
+        displayPreferences.updateData {
+            it.copy(shareWithContent = value)
+        }
+    }
+
     fun setLoadItemLimit(value: Int) = viewModelScope.launch {
         displayPreferences.updateData {
             it.copy(loadItemLimit = value)

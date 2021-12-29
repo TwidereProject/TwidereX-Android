@@ -32,15 +32,14 @@ class MemoryCachePagingSource<Value : Any>(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Value> {
         return try {
-            val page = params.key ?: 0
             val count = params.loadSize
-            val startIndex = page * count
+            val startIndex = params.key ?: 0
             val endIndex = startIndex + count
             val result = memoryCache.find(startIndex, endIndex)
             LoadResult.Page(
                 data = result,
                 null,
-                if (result.isEmpty()) null else page + 1
+                if (result.isEmpty() || result.size < count) null else startIndex + result.size
             )
         } catch (e: Exception) {
             LoadResult.Error(e)

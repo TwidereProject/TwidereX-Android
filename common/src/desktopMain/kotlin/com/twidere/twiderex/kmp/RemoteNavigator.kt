@@ -31,7 +31,8 @@ actual class RemoteNavigator {
     actual fun shareMedia(
         filePath: String,
         mimeType: String,
-        fromBackground: Boolean
+        fromBackground: Boolean,
+        extraText: String,
     ) {
         // TODO: Show native UI for sharing
     }
