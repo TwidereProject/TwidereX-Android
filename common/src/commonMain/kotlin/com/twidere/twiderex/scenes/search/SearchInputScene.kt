@@ -141,6 +141,7 @@ fun SearchInputScene(initial: String? = null) {
                         modifier = Modifier.clickable(
                             onClick = {
                                 viewModel.addOrUpgrade(it.content)
+                                viewModel.updateSearchInput(TextFieldValue(it.content, TextRange(it.content.length)))
                                 navigator.search(it.content)
                             }
                         ),
