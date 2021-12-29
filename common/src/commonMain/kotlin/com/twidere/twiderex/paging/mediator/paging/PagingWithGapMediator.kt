@@ -124,7 +124,7 @@ abstract class PagingWithGapMediator(
                 result.saveToDb(database)
             }
             return MediatorResult.Success(
-                endOfPaginationReached = result.isEmpty()
+                endOfPaginationReached = !hasMore(result, max_id),
             )
         } catch (e: Throwable) {
             return MediatorResult.Error(e)
@@ -147,4 +147,9 @@ abstract class PagingWithGapMediator(
         max_id: String? = null,
         since_id: String? = null,
     ): List<IStatus>
+
+    protected open suspend fun hasMore(result: List<PagingTimeLineWithStatus>, max_id: String?): Boolean {
+        // Twitter API returns single status with max_id  when there is no more data
+        return result.size > 1 || result.firstOrNull()?.status?.statusId != max_id
+    }
 }
