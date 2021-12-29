@@ -34,13 +34,13 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert
-import org.junit.Test
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlin.test.Test
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 internal class ListsModifyViewModelTest : AccountViewModelTestBase() {
     override val mockService: MicroBlogService
@@ -84,7 +84,7 @@ internal class ListsModifyViewModelTest : AccountViewModelTestBase() {
     @Test
     fun updateList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        Assert.assertNull(errorNotification)
+        assertNull(errorNotification)
         suspendCoroutine<Boolean> {
             modifyViewModel.editList(
                 listId = "error",
@@ -96,7 +96,7 @@ internal class ListsModifyViewModelTest : AccountViewModelTestBase() {
             }
         }
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
-        Assert.assertNotNull(errorNotification)
+        assertNotNull(errorNotification)
     }
 
     @Test
@@ -114,7 +114,7 @@ internal class ListsModifyViewModelTest : AccountViewModelTestBase() {
     @Test
     fun deleteList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        Assert.assertNull(errorNotification)
+        assertNull(errorNotification)
         suspendCoroutine<Boolean> {
             modifyViewModel.deleteList(listId = "error", MicroBlogKey.Empty) { success, _ ->
                 mockSuccessObserver.onChanged(success)
@@ -122,7 +122,7 @@ internal class ListsModifyViewModelTest : AccountViewModelTestBase() {
             }
         }
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
-        Assert.assertNotNull(errorNotification)
+        assertNotNull(errorNotification)
     }
 
     @Test
@@ -140,7 +140,7 @@ internal class ListsModifyViewModelTest : AccountViewModelTestBase() {
     @Test
     fun subscribeList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        Assert.assertNull(errorNotification)
+        assertNull(errorNotification)
         suspendCoroutine<Boolean> {
             modifyViewModel.subscribeList(MicroBlogKey.twitter("error")) { success, _ ->
                 mockSuccessObserver.onChanged(success)
@@ -148,7 +148,7 @@ internal class ListsModifyViewModelTest : AccountViewModelTestBase() {
             }
         }
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
-        Assert.assertNotNull(errorNotification)
+        assertNotNull(errorNotification)
     }
 
     @Test
@@ -167,7 +167,7 @@ internal class ListsModifyViewModelTest : AccountViewModelTestBase() {
     fun unsubscribeList_failedExpectFalseAndShowNotification(): Unit =
         runBlocking(Dispatchers.Main) {
             verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-            Assert.assertNull(errorNotification)
+            assertNull(errorNotification)
             suspendCoroutine<Boolean> {
                 modifyViewModel.unsubscribeList(MicroBlogKey.twitter("error")) { success, _ ->
                     mockSuccessObserver.onChanged(success)
@@ -175,7 +175,7 @@ internal class ListsModifyViewModelTest : AccountViewModelTestBase() {
                 }
             }
             verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
-            Assert.assertNotNull(errorNotification)
+            assertNotNull(errorNotification)
         }
 
     override fun setUp() {
