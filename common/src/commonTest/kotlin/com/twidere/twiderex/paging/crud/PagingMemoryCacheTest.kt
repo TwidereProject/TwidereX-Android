@@ -31,7 +31,7 @@ class PagingMemoryCacheTest {
     fun find() {
         pagingMemoryCache.insert(listOf("1", "2", "3", "4"))
         // check if
-        assertEquals("3", pagingMemoryCache.find(2, 3)[0])
+        assertEquals("3", pagingMemoryCache.find(2, 1)[0])
 
         // check if index out of bound
         assertEquals(4, pagingMemoryCache.find(0, 10).size)

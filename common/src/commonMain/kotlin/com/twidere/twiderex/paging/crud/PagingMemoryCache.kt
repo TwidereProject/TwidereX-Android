@@ -69,7 +69,8 @@ class PagingMemoryCache<Value> : InvalidateTracker {
         cacheList.clear()
     }
 
-    fun find(startIndex: Int, endIndex: Int): List<Value> {
+    fun find(startIndex: Int, limit: Int): List<Value> {
+        val endIndex = startIndex + limit // exclusive
         return when {
             endIndex <= cacheList.size -> {
                 cacheList.subList(startIndex, endIndex)
