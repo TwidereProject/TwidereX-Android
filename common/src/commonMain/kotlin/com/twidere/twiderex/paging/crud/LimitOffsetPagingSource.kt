@@ -37,7 +37,7 @@ internal abstract class LimitOffsetPagingSource<Value : Any> : PagingSource<Int,
 
     protected abstract suspend fun queryItemCount(): Int
 
-    protected abstract suspend fun queryData(offset: Int,  limit: Int): List<Value>
+    protected abstract suspend fun queryData(offset: Int, limit: Int): List<Value>
 
     private val registeredObserver: AtomicBoolean = AtomicBoolean(false)
 
@@ -67,7 +67,7 @@ internal abstract class LimitOffsetPagingSource<Value : Any> : PagingSource<Int,
             // Refreshed key could be any where in the list, so we need both prevKey and nextKey
             // in order to load more data both before and after the current key
             val prevKey = if (offset <= 0 || data.isEmpty()) null else offset
-            val loadResult =  LoadResult.Page(
+            val loadResult = LoadResult.Page(
                 data = data,
                 prevKey = prevKey,
                 nextKey = nextKey,
@@ -78,7 +78,6 @@ internal abstract class LimitOffsetPagingSource<Value : Any> : PagingSource<Int,
             if (invalid) INVALID as LoadResult.Invalid<Int, Value> else loadResult
         }
     }
-
 
     /**
      * Calculates query limit based on LoadType.

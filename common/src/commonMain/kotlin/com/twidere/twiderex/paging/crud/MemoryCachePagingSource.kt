@@ -26,9 +26,9 @@ internal class MemoryCachePagingSource<Value : Any>(
 
     override fun registerInvalidateObserver() = memoryCache.addWeakObserver(this)
 
-    override suspend fun queryItemCount() =  memoryCache.size()
+    override suspend fun queryItemCount() = memoryCache.size()
 
     override suspend fun queryData(offset: Int, limit: Int) = memoryCache.find(offset, limit)
 
-    override fun onInvalidate() =  invalidate()
+    override fun onInvalidate() = invalidate()
 }
