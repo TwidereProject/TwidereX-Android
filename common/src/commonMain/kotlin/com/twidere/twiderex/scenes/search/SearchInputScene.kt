@@ -54,6 +54,7 @@ import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
+import org.koin.core.parameter.parametersOf
 
 val fadeCreateTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
     alpha = factor
@@ -71,15 +72,12 @@ val fadeResumeTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun SearchInputScene(initial: String? = null) {
-    val viewModel: SearchInputViewModel = getViewModel()
+
+    val viewModel: SearchInputViewModel = getViewModel {
+        parametersOf(initial ?: "")
+    }
     val source by viewModel.source.observeAsState(initial = emptyList())
-    val textFieldValue by viewModel.searchInput.observeAsState(
-        initial = if (initial != null) {
-            TextFieldValue(text = initial, selection = TextRange(initial.length))
-        } else {
-            TextFieldValue()
-        }
-    )
+    val textFieldValue by viewModel.searchInput.observeAsState(TextFieldValue())
     val navigator = LocalNavigator.current
     TwidereScene {
         InAppNotificationScaffold(

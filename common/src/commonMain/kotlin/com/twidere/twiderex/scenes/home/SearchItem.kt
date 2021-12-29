@@ -63,6 +63,7 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 import com.twidere.twiderex.viewmodel.trend.TrendViewModel
+import org.koin.core.parameter.parametersOf
 
 class SearchItem : HomeNavigationItem() {
 
@@ -107,7 +108,9 @@ fun SearchScene() {
 @Composable
 fun SearchSceneContent() {
     val account = LocalActiveAccount.current ?: return
-    val viewModel: SearchInputViewModel = getViewModel()
+    val viewModel: SearchInputViewModel = getViewModel {
+        parametersOf("")
+    }
     val trendViewModel: TrendViewModel = getViewModel()
     val source by viewModel.savedSource.observeAsState(initial = emptyList())
     val trends = trendViewModel.source.collectAsLazyPagingItems()
