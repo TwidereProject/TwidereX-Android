@@ -20,9 +20,13 @@
  */
 package com.twidere.twiderex.paging.crud
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+
 internal class MemoryCachePagingSource<Value : Any>(
     private val memoryCache: PagingMemoryCache<Value>,
-) : LimitOffsetPagingSource<Value>(), OnInvalidateObserver {
+    dispatcher: CoroutineDispatcher = Dispatchers.IO
+) : LimitOffsetPagingSource<Value>(dispatcher), OnInvalidateObserver {
 
     override fun registerInvalidateObserver() = memoryCache.addWeakObserver(this)
 

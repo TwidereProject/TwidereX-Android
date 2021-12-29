@@ -30,7 +30,7 @@ class MemoryCachePagingSourceTest {
 
     @Test
     fun load_loadFromMemoryCache() = runBlocking {
-        pagingMemoryCache.insert(listOf("1", "2", "3", "4"))
+        pagingMemoryCache.insert(listOf("1", "2", "3", "4", "5"))
         val source = MemoryCachePagingSource(pagingMemoryCache)
         var result = source.load(PagingSource.LoadParams.Refresh(null, 2, placeholdersEnabled = false)) as PagingSource.LoadResult.Page
         assert(result.data.isNotEmpty())
@@ -42,7 +42,7 @@ class MemoryCachePagingSourceTest {
         assertEquals(4, result.nextKey)
 
         result = source.load(PagingSource.LoadParams.Append(result.nextKey!!, 2, placeholdersEnabled = false)) as PagingSource.LoadResult.Page
-        assert(result.data.isEmpty())
+        assert(result.data.isNotEmpty())
         assertEquals(null, result.nextKey)
     }
 }

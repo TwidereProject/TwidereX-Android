@@ -22,14 +22,16 @@ package com.twidere.twiderex.paging.crud
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
 private val INVALID = PagingSource.LoadResult.Invalid<Any, Any>()
 
-internal abstract class LimitOffsetPagingSource<Value : Any> : PagingSource<Int, Value>() {
+internal abstract class LimitOffsetPagingSource<Value : Any>(
+    private val dispatcher: CoroutineDispatcher
+) : PagingSource<Int, Value>() {
 
     protected val itemCount: AtomicInteger = AtomicInteger(-1)
 
@@ -39,10 +41,12 @@ internal abstract class LimitOffsetPagingSource<Value : Any> : PagingSource<Int,
 
     protected abstract suspend fun queryData(offset: Int, limit: Int): List<Value>
 
+    protected open suspend fun processResult(result: LoadResult<Int, Value>): LoadResult<Int, Value> = result
+
     private val registeredObserver: AtomicBoolean = AtomicBoolean(false)
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Value> {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcher) {
             registerObserverIfNecessary()
             // When Invalidated, Paging will create a new PagingSource, so itemCount will be reset to -1
             var tempCount = itemCount.get()
@@ -51,7 +55,6 @@ internal abstract class LimitOffsetPagingSource<Value : Any> : PagingSource<Int,
                 tempCount = queryItemCount()
                 itemCount.set(tempCount)
             }
-            println("Desktop ==> load: $tempCount")
             // loadData
             val key = params.key ?: 0
             val limit: Int = getLimit(params, key)
@@ -67,12 +70,14 @@ internal abstract class LimitOffsetPagingSource<Value : Any> : PagingSource<Int,
             // Refreshed key could be any where in the list, so we need both prevKey and nextKey
             // in order to load more data both before and after the current key
             val prevKey = if (offset <= 0 || data.isEmpty()) null else offset
-            val loadResult = LoadResult.Page(
-                data = data,
-                prevKey = prevKey,
-                nextKey = nextKey,
-                itemsBefore = offset,
-                itemsAfter = maxOf(0, tempCount - nextPosToLoad)
+            val loadResult = processResult(
+                LoadResult.Page(
+                    data = data,
+                    prevKey = prevKey,
+                    nextKey = nextKey,
+                    itemsBefore = offset,
+                    itemsAfter = maxOf(0, tempCount - nextPosToLoad)
+                )
             )
             @Suppress("UNCHECKED_CAST")
             if (invalid) INVALID as LoadResult.Invalid<Int, Value> else loadResult
