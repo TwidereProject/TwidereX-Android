@@ -56,19 +56,29 @@ class ListsMediator(
     }
 
     fun pager(
-        config: PagingConfig = PagingConfig(
-            pageSize = defaultLoadCount,
-            enablePlaceholders = false
-        ),
-        pagingSourceFactory: () -> PagingSource<Int, UiList> = {
-            database.listsDao().getPagingSource(accountKey = accountKey)
-        }
+        config: PagingConfig,
+        pagingSourceFactory: () -> PagingSource<Int, UiList> = defaultPagingSourceFactory
     ): Pager<Int, UiList> {
         return Pager(
             config = config,
             remoteMediator = this,
             pagingSourceFactory = pagingSourceFactory,
         )
+    }
+
+    fun pager(
+        pageSize: Int = defaultLoadCount,
+        pagingSourceFactory: () -> PagingSource<Int, UiList> = defaultPagingSourceFactory
+    ): Pager<Int, UiList> = pager(
+        config = PagingConfig(
+            pageSize = pageSize,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = pagingSourceFactory
+    )
+
+    private val defaultPagingSourceFactory: () -> PagingSource<Int, UiList> = {
+        database.listsDao().getPagingSource(accountKey = accountKey)
     }
 
     companion object {

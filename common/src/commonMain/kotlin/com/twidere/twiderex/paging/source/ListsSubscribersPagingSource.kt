@@ -22,7 +22,6 @@ package com.twidere.twiderex.paging.source
 
 import com.twidere.services.microblog.ListsService
 import com.twidere.services.microblog.model.IUser
-import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 
 class ListsSubscribersPagingSource(
@@ -32,6 +31,6 @@ class ListsSubscribersPagingSource(
 ) : UserPagingSource(userKey) {
 
     override suspend fun loadUsers(params: LoadParams<String>): List<IUser> {
-        return service.listSubscribers(listId = listId, count = defaultLoadCount, params.key)
+        return service.listSubscribers(listId = listId, count = params.loadSize, params.key)
     }
 }

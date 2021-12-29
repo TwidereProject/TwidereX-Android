@@ -192,11 +192,11 @@ private fun Module.settings() {
 }
 
 private fun Module.timeline() {
-    viewModel { NotificationTimelineViewModel(get(), get(), get(), get()) }
-    viewModel { MentionsTimelineViewModel(get(), get(), get(), get()) }
-    viewModel { HomeTimelineViewModel(get(), get(), get()) }
-    viewModel { LocalTimelineViewModel(get(), get(), get()) }
-    viewModel { FederatedTimelineViewModel(get(), get(), get()) }
+    viewModel { NotificationTimelineViewModel(get(), get(), get(), get(), get<PreferencesHolder>().displayPreferences) }
+    viewModel { MentionsTimelineViewModel(get(), get(), get(), get(), get<PreferencesHolder>().displayPreferences) }
+    viewModel { HomeTimelineViewModel(get(), get(), get(), get<PreferencesHolder>().displayPreferences) }
+    viewModel { LocalTimelineViewModel(get(), get(), get(), get<PreferencesHolder>().displayPreferences) }
+    viewModel { FederatedTimelineViewModel(get(), get(), get(), get<PreferencesHolder>().displayPreferences) }
 }
 
 private fun Module.trend() {

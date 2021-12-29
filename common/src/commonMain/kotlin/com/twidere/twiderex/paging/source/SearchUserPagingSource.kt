@@ -24,7 +24,6 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.dataprovider.mapper.toUi
-import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 
@@ -37,13 +36,13 @@ class SearchUserPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UiUser> {
         return try {
             val page = params.key ?: 0
-            val result = service.searchUsers(query, page = page, count = defaultLoadCount, following = following).map {
+            val result = service.searchUsers(query, page = page, count = params.loadSize, following = following).map {
                 it.toUi(accountKey)
             }
             LoadResult.Page(
                 data = result,
                 prevKey = null,
-                nextKey = if (result.size == defaultLoadCount) page + 1 else null
+                nextKey = if (result.size == params.loadSize) page + 1 else null
             )
         } catch (e: Exception) {
             LoadResult.Error(e)

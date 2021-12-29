@@ -24,11 +24,13 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.SearchService
-import com.twidere.twiderex.defaultLoadCount
+import com.twidere.twiderex.maxSearchUserCount
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.paging.source.SearchUserPagingSource
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterNot
@@ -41,7 +43,7 @@ class ListsSearchUserViewModel(
     private val accountRepository: AccountRepository,
     following: Boolean = false,
 ) : ViewModel() {
-    private val account by lazy {
+    private val account: Flow<AccountDetails> by lazy {
         accountRepository.activeAccount.mapNotNull { it }
     }
 
@@ -52,7 +54,8 @@ class ListsSearchUserViewModel(
         account.flatMapLatest { account ->
             Pager(
                 config = PagingConfig(
-                    pageSize = defaultLoadCount,
+                    pageSize = maxSearchUserCount,
+                    initialLoadSize = maxSearchUserCount,
                     enablePlaceholders = false,
                 )
             ) {

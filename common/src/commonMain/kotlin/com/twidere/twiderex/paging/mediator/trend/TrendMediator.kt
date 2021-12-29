@@ -31,7 +31,6 @@ import androidx.paging.RemoteMediator
 import com.twidere.services.microblog.TrendService
 import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiTrend
 import kotlinx.coroutines.flow.Flow
@@ -63,19 +62,29 @@ class TrendMediator(
     }
 
     fun pager(
-        config: PagingConfig = PagingConfig(
-            pageSize = defaultLoadCount,
-            enablePlaceholders = false
-        ),
-        pagingSourceFactory: () -> PagingSource<Int, UiTrend> = {
-            database.trendDao().getPagingSource(accountKey = accountKey)
-        }
+        config: PagingConfig,
+        pagingSourceFactory: () -> PagingSource<Int, UiTrend> = defaultPagingSourceFactory
     ): Pager<Int, UiTrend> {
         return Pager(
             config = config,
             remoteMediator = this,
             pagingSourceFactory = pagingSourceFactory,
         )
+    }
+
+    fun pager(
+        pageSize: Int,
+        pagingSourceFactory: () -> PagingSource<Int, UiTrend> = defaultPagingSourceFactory
+    ): Pager<Int, UiTrend> = pager(
+        config = PagingConfig(
+            pageSize = pageSize,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = pagingSourceFactory
+    )
+
+    private val defaultPagingSourceFactory: () -> PagingSource<Int, UiTrend> = {
+        database.trendDao().getPagingSource(accountKey = accountKey)
     }
 
     companion object {

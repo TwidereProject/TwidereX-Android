@@ -20,18 +20,27 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.datastore.core.DataStore
 import androidx.paging.PagingData
 import com.twidere.services.microblog.ListsService
 import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.ListsMode
 import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.paging.mediator.list.ListsMediator
 import com.twidere.twiderex.paging.mediator.list.ListsMediator.Companion.toUi
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 
-class ListsRepository(private val database: CacheDatabase) {
+class ListsRepository(
+    private val database: CacheDatabase,
+    private val preferences: DataStore<DisplayPreferences>?,
+) {
 
     fun findListWithListKey(accountKey: MicroBlogKey, listKey: MicroBlogKey): Flow<UiList?> {
         return database.listsDao().findWithListKeyWithFlow(listKey = listKey, accountKey = accountKey)
@@ -43,7 +52,9 @@ class ListsRepository(private val database: CacheDatabase) {
             accountKey = accountKey,
             service = service,
         )
-        return mediator.pager().toUi()
+        return flow {
+            emitAll(mediator.pager(pageSize = getPageSize()).toUi())
+        }
     }
 
     suspend fun createLists(
@@ -139,5 +150,9 @@ class ListsRepository(private val database: CacheDatabase) {
             database.listsDao().update(listOf(updateItem.copy(isFollowed = true)))
         } ?: database.listsDao().insertAll(listOf(result))
         return result
+    }
+
+    private suspend fun getPageSize(): Int {
+        return preferences?.data?.first()?.loadItemLimit ?: defaultLoadCount
     }
 }

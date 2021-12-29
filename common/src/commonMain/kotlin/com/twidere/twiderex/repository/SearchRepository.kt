@@ -20,20 +20,26 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.datastore.core.DataStore
 import androidx.paging.flatMap
 import androidx.paging.map
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiSearch
-import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.search.SearchMediaMediator
+import com.twidere.twiderex.preferences.model.DisplayPreferences
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 class SearchRepository(
     private val database: AppDatabase,
     private val cacheDatabase: CacheDatabase,
+    private val preferences: DataStore<DisplayPreferences>?,
 ) {
     fun searchHistory(accountKey: MicroBlogKey) = database.searchDao().getAllHistory(accountKey)
 
@@ -41,10 +47,16 @@ class SearchRepository(
 
     fun media(keyword: String, accountKey: MicroBlogKey, service: SearchService) =
         SearchMediaMediator(keyword, cacheDatabase, accountKey, service)
-            .pager()
-            .flow.map { it.map { it.status } }
-            .map {
-                it.flatMap {
+            .run {
+                flow {
+                    emitAll(pager(pageSize = getPageSize()).flow)
+                }
+            }
+            .map { timeline ->
+                timeline.map { it.status }
+            }
+            .map { statue ->
+                statue.flatMap {
                     it.media.map { media -> media to it }
                 }
             }
@@ -57,7 +69,7 @@ class SearchRepository(
         val search = database.searchDao().get(content, accountKey)?.let {
             it.copy(
                 lastActive = System.currentTimeMillis(),
-                saved = if (it.saved) it.saved else saved
+                saved = it.saved || saved
             )
         } ?: UiSearch(
             content = content,
@@ -76,5 +88,9 @@ class SearchRepository(
 
     suspend fun get(content: String, accountKey: MicroBlogKey): UiSearch? {
         return database.searchDao().get(content, accountKey)
+    }
+
+    private suspend fun getPageSize(): Int {
+        return preferences?.data?.first()?.loadItemLimit ?: defaultLoadCount
     }
 }

@@ -25,9 +25,13 @@ import androidx.datastore.preferences.core.Preferences
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.extensions.asStateIn
+import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.timeline.mastodon.FederatedTimelineMediator
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -36,12 +40,13 @@ class FederatedTimelineViewModel(
     dataStore: DataStore<Preferences>,
     database: CacheDatabase,
     private val accountRepository: AccountRepository,
-) : TimelineViewModel(dataStore) {
-    private val account by lazy {
+    preferences: DataStore<DisplayPreferences>,
+) : TimelineViewModel(dataStore, preferences) {
+    private val account: Flow<AccountDetails> by lazy {
         accountRepository.activeAccount.mapNotNull { it }
     }
 
-    override val pagingMediator by lazy {
+    override val pagingMediator: Flow<PagingWithGapMediator?> by lazy {
         account.map {
             FederatedTimelineMediator(
                 it.service as MastodonService,
@@ -51,7 +56,7 @@ class FederatedTimelineViewModel(
         }.asStateIn(viewModelScope, null)
     }
 
-    override val savedStateKey by lazy {
+    override val savedStateKey: Flow<String?> by lazy {
         account.map {
             "${it.accountKey}_federated"
         }.asStateIn(viewModelScope, null)

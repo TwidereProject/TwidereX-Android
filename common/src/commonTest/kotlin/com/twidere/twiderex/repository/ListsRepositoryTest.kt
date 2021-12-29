@@ -36,7 +36,7 @@ internal class ListsRepositoryTest {
     @Test
     fun saveToDbAfterCreateListSuccess() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val repo = ListsRepository(MockCacheDatabase())
+        val repo = ListsRepository(MockCacheDatabase(), null)
         val listKey = repo.createLists(
             accountKey = accountKey,
             service = MockListsService(),
@@ -55,7 +55,7 @@ internal class ListsRepositoryTest {
     @Test
     fun saveToDbAfterUpdateListSuccess() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val repo = ListsRepository(MockCacheDatabase())
+        val repo = ListsRepository(MockCacheDatabase(), null)
         val listId = repo.prepare(accountKey).id
 
         val listKey = repo.updateLists(
@@ -77,7 +77,7 @@ internal class ListsRepositoryTest {
     @Test
     fun deleteFromDbAfterDeleteListSuccess() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val repo = ListsRepository(MockCacheDatabase())
+        val repo = ListsRepository(MockCacheDatabase(), null)
         val list = repo.prepare(accountKey)
         assertNotNull(
             repo.deleteLists(
@@ -93,7 +93,7 @@ internal class ListsRepositoryTest {
     @Test
     fun updateStatusToDbAfterSubscribeOrUnsubscribe() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val repo = ListsRepository(MockCacheDatabase())
+        val repo = ListsRepository(MockCacheDatabase(), null)
         val list = repo.prepare(accountKey)
         assertEquals(true, list.isFollowed)
 

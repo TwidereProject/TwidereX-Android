@@ -21,6 +21,9 @@
 package com.twidere.twiderex
 
 const val defaultLoadCount = 20
+
+const val maxSearchUserCount = 20
+
 val twitterHosts = listOf(
     "https://twitter.com",
     "https://mobile.twitter.com",

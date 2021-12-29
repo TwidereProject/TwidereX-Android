@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.datastore.core.DataStore
 import androidx.paging.PagingData
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
@@ -28,6 +29,7 @@ import com.twidere.services.twitter.model.DirectMessageEvent
 import com.twidere.services.twitter.model.exceptions.TwitterApiException
 import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiDMConversation
@@ -38,10 +40,15 @@ import com.twidere.twiderex.paging.mediator.dm.DMConversationMediator
 import com.twidere.twiderex.paging.mediator.dm.DMConversationMediator.Companion.toUi
 import com.twidere.twiderex.paging.mediator.dm.DMEventMediator
 import com.twidere.twiderex.paging.mediator.dm.DMEventMediator.Companion.toUi
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 
 class DirectMessageRepository(
-    private val database: CacheDatabase
+    private val database: CacheDatabase,
+    private val preferences: DataStore<DisplayPreferences>?,
 ) {
     fun dmConversation(
         accountKey: MicroBlogKey,
@@ -59,13 +66,16 @@ class DirectMessageRepository(
         service: DirectMessageService,
         lookupService: LookupService
     ): Flow<PagingData<UiDMConversationWithLatestMessage>> {
-        return DMConversationMediator(
+        val mediator =  DMConversationMediator(
             database = database,
             accountKey = accountKey,
             realFetch = { key ->
                 fetchEventAndSaveToDataBase(key, accountKey, service, lookupService)
             }
-        ).pager().toUi()
+        )
+        return flow {
+            emitAll(mediator.pager(pageSize = getPageSize()).toUi())
+        }
     }
 
     fun dmEventListSource(
@@ -74,14 +84,17 @@ class DirectMessageRepository(
         service: DirectMessageService,
         lookupService: LookupService,
     ): Flow<PagingData<UiDMEvent>> {
-        return DMEventMediator(
+        val mediator = DMEventMediator(
             database = database,
             conversationKey = conversationKey,
             accountKey = accountKey,
             realFetch = { key ->
                 fetchEventAndSaveToDataBase(key, accountKey, service, lookupService)
             }
-        ).pager().toUi()
+        )
+        return flow {
+            emitAll(mediator.pager(pageSize = getPageSize()).toUi())
+        }
     }
 
     suspend fun createNewConversation(
@@ -202,5 +215,9 @@ class DirectMessageRepository(
             database.userDao().insertAll(listOf(user))
             user
         }
+    }
+
+    private suspend fun getPageSize(): Int {
+        return preferences?.data?.first()?.loadItemLimit ?: defaultLoadCount
     }
 }

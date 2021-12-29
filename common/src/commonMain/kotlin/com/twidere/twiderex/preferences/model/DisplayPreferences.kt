@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.preferences.model
 
+import com.twidere.twiderex.defaultLoadCount
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -32,7 +33,7 @@ data class DisplayPreferences(
     val urlPreview: Boolean = false,
     val muteByDefault: Boolean = false,
     val shareWithContent: Boolean = false,
-    val loadItemLimit: Int = 20,
+    val loadItemLimit: Int = defaultLoadCount,
 ) {
     @Serializable
     enum class AvatarStyle {

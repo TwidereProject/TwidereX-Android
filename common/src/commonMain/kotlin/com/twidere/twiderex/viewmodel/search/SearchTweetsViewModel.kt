@@ -20,14 +20,17 @@
  */
 package com.twidere.twiderex.viewmodel.search
 
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.paging.mediator.paging.pager
+import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.paging.mediator.search.SearchStatusMediator
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -39,12 +42,13 @@ class SearchTweetsViewModel(
     private val accountRepository: AccountRepository,
     keyword: String,
 ) : ViewModel() {
-    private val account by lazy {
+
+    private val account: Flow<AccountDetails> by lazy {
         accountRepository.activeAccount.mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val source by lazy {
+    val source: Flow<PagingData<UiStatus>> by lazy {
         account.flatMapLatest { account ->
             SearchStatusMediator(
                 keyword,

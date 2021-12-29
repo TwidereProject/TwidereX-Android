@@ -41,18 +41,59 @@ import org.koin.dsl.module
 
 val repositoryModule = module {
     single { CacheRepository(get(), get(), get()) }
-    single { DirectMessageRepository(get()) }
+    single {
+        DirectMessageRepository(
+            get(),
+            get<PreferencesHolder>().displayPreferences
+        )
+    }
     single { DraftRepository(get()) }
-    single { ListsRepository(get()) }
-    single { ListsUsersRepository() }
+    single {
+        ListsRepository(
+            get(),
+            get<PreferencesHolder>().displayPreferences
+        )
+    }
+    single {
+        ListsUsersRepository(
+            mutableMapOf(),
+            get<PreferencesHolder>().displayPreferences
+        )
+    }
     single { MediaRepository(get()) }
     single { NotificationRepository(get()) }
     single { ReactionRepository(get()) }
-    single { SearchRepository(get(), get()) }
-    single { StatusRepository(get(), get<PreferencesHolder>().miscPreferences) }
-    single { TimelineRepository(get()) }
-    single { TrendRepository(get()) }
-    single { UserListRepository() }
+    single {
+        SearchRepository(
+            get(),
+            get(),
+            get<PreferencesHolder>().displayPreferences
+        )
+    }
+    single {
+        StatusRepository(
+            get(),
+            get<PreferencesHolder>().miscPreferences,
+            get<PreferencesHolder>().displayPreferences
+        )
+    }
+    single {
+        TimelineRepository(
+            get(),
+            get<PreferencesHolder>().displayPreferences
+        )
+    }
+    single {
+        TrendRepository(
+            get(),
+            get<PreferencesHolder>().displayPreferences
+        )
+    }
+    single {
+        UserListRepository(
+            get<PreferencesHolder>().displayPreferences
+        )
+    }
     single { UserRepository(get(), get()) }
     single { GifRepository(get()) }
     single { NitterRepository() }

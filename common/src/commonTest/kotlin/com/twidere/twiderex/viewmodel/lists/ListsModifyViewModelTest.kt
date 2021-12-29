@@ -46,7 +46,7 @@ internal class ListsModifyViewModelTest : AccountViewModelTestBase() {
     override val mockService: MicroBlogService
         get() = MockListsService()
 
-    private var mockRepository: ListsRepository = ListsRepository(MockCacheDatabase())
+    private var mockRepository: ListsRepository = ListsRepository(MockCacheDatabase(), null)
 
     @MockK
     private lateinit var mockAppNotification: InAppNotification

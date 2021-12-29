@@ -36,21 +36,31 @@ abstract class PagingMediator(
     val accountKey: MicroBlogKey,
 ) : RemoteMediator<Int, PagingTimeLineWithStatus>() {
     abstract val pagingKey: String
-}
 
-@OptIn(ExperimentalPagingApi::class)
-fun PagingMediator.pager(
-    config: PagingConfig = PagingConfig(
-        pageSize = defaultLoadCount,
-        enablePlaceholders = true,
-    ),
-    pagingSourceFactory: () -> PagingSource<Int, PagingTimeLineWithStatus> = {
-        database.pagingTimelineDao().getPagingSource(pagingKey = pagingKey, accountKey = accountKey)
+    fun pager(
+        config: PagingConfig,
+        pagingSourceFactory: () -> PagingSource<Int, PagingTimeLineWithStatus> = defaultPagingSourceFactory
+    ): Pager<Int, PagingTimeLineWithStatus> {
+        return Pager(
+            config = config,
+            remoteMediator = this,
+            pagingSourceFactory = pagingSourceFactory,
+        )
     }
-): Pager<Int, PagingTimeLineWithStatus> {
-    return Pager(
-        config = config,
-        remoteMediator = this,
-        pagingSourceFactory = pagingSourceFactory,
+
+    fun pager(
+        pageSize: Int = defaultLoadCount,
+        pagingSourceFactory: () -> PagingSource<Int, PagingTimeLineWithStatus> = defaultPagingSourceFactory
+    ) = pager(
+        config = PagingConfig(
+            pageSize = pageSize,
+            enablePlaceholders = true,
+        ),
+        pagingSourceFactory = pagingSourceFactory
     )
+
+    private val defaultPagingSourceFactory: () -> PagingSource<Int, PagingTimeLineWithStatus>
+        get() = {
+            database.pagingTimelineDao().getPagingSource(pagingKey = pagingKey, accountKey = accountKey)
+        }
 }

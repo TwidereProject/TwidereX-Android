@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.datastore.core.DataStore
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import com.twidere.services.microblog.RelationshipService
@@ -27,35 +28,52 @@ import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.source.FollowersPagingSource
 import com.twidere.twiderex.paging.source.FollowingPagingSource
+import com.twidere.twiderex.preferences.model.DisplayPreferences
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 
-class UserListRepository {
+class UserListRepository(
+    private val preferences: DataStore<DisplayPreferences>?,
+) {
+
     fun following(
         userKey: MicroBlogKey,
         service: RelationshipService,
-    ) = Pager(
-        config = PagingConfig(
-            pageSize = defaultLoadCount,
-            enablePlaceholders = false,
-        )
-    ) {
-        FollowingPagingSource(
-            userKey = userKey,
-            service = service,
-        )
-    }.flow
+    ) = flow {
+        val pager = Pager(
+            config = PagingConfig(
+                pageSize = getPageSize(),
+                enablePlaceholders = false,
+            )
+        ) {
+            FollowingPagingSource(
+                userKey = userKey,
+                service = service,
+            )
+        }
+        emitAll(pager.flow)
+    }
 
     fun followers(
         userKey: MicroBlogKey,
         service: RelationshipService
-    ) = Pager(
-        config = PagingConfig(
-            pageSize = defaultLoadCount,
-            enablePlaceholders = false,
-        )
-    ) {
-        FollowersPagingSource(
-            userKey = userKey,
-            service = service,
-        )
-    }.flow
+    ) = flow {
+        val pager = Pager(
+            config = PagingConfig(
+                pageSize = getPageSize(),
+                enablePlaceholders = false,
+            )
+        ) {
+            FollowersPagingSource(
+                userKey = userKey,
+                service = service,
+            )
+        }
+        emitAll(pager.flow)
+    }
+
+    private suspend fun getPageSize(): Int {
+        return preferences?.data?.first()?.loadItemLimit ?: defaultLoadCount
+    }
 }

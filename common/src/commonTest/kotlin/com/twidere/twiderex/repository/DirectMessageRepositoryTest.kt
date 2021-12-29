@@ -44,7 +44,7 @@ internal class DirectMessageRepositoryTest {
 
     @Test
     fun fetchList_FetchEventAndStoreToDB() = runBlocking {
-        val repo = DirectMessageRepository(mockDataBase)
+        val repo = DirectMessageRepository(mockDataBase, null)
         mockService.errorMsg = null
         assert(mockDataBase.directMessageConversationDao().find(accountKey).isEmpty())
         assert((mockDataBase.userDao() as MockUserDao).datas.isEmpty())
@@ -64,7 +64,7 @@ internal class DirectMessageRepositoryTest {
 
     @Test
     fun createConversation_StoreNewConversationToDbIFNotExists() = runBlocking {
-        val repo = DirectMessageRepository(mockDataBase)
+        val repo = DirectMessageRepository(mockDataBase, null)
         assert(mockDataBase.directMessageConversationDao().find(accountKey).isEmpty())
         val user = mockLookUpService.lookupUser("123").toUi(accountKey)
         val conversationKey = repo.createNewConversation(user, accountKey, PlatformType.Twitter)
@@ -77,7 +77,7 @@ internal class DirectMessageRepositoryTest {
 
     @Test
     fun createConversation_ReturnsExistsConversationKeyIfConversationExists() = runBlocking {
-        val repo = DirectMessageRepository(mockDataBase)
+        val repo = DirectMessageRepository(mockDataBase, null)
         val user = mockLookUpService.lookupUser("123").toUi(accountKey)
         val existsKey = repo.createNewConversation(user, accountKey, PlatformType.Twitter)
 
@@ -87,7 +87,7 @@ internal class DirectMessageRepositoryTest {
 
     @Test
     fun checkNewMessage_ReturnsConversationsThatContainsNewMessages() = runBlocking {
-        val repo = DirectMessageRepository(mockDataBase)
+        val repo = DirectMessageRepository(mockDataBase, null)
         val originMessage = mutableListOf<IDirectMessage>()
         for (i in 0 until 10) {
             originMessage.add(mockIDirectMessage(accountId = accountKey.id, otherUserID = i.toString()))
@@ -111,7 +111,7 @@ internal class DirectMessageRepositoryTest {
 
     @Test
     fun deleteMessage_DeleteFromBothDbAndApi() = runBlocking {
-        val repo = DirectMessageRepository(mockDataBase)
+        val repo = DirectMessageRepository(mockDataBase, null)
         mockService.messages = listOf(
             mockIDirectMessage(accountId = accountKey.id, otherUserID = "test"),
             mockIDirectMessage(accountId = accountKey.id, otherUserID = "test")

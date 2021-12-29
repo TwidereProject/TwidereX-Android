@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.datastore.core.DataStore
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -32,9 +33,16 @@ import com.twidere.twiderex.paging.crud.MemoryCachePagingSource
 import com.twidere.twiderex.paging.crud.PagingMemoryCache
 import com.twidere.twiderex.paging.mediator.list.ListsMembersMediator
 import com.twidere.twiderex.paging.source.ListsSubscribersPagingSource
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 
-class ListsUsersRepository(private val membersCaches: MutableMap<String, PagingMemoryCache<UiUser>> = mutableMapOf()) {
+class ListsUsersRepository(
+    private val membersCaches: MutableMap<String, PagingMemoryCache<UiUser>>,
+    private val preferences: DataStore<DisplayPreferences>?
+) {
 
     @OptIn(ExperimentalPagingApi::class)
     fun fetchMembers(
@@ -42,22 +50,26 @@ class ListsUsersRepository(private val membersCaches: MutableMap<String, PagingM
         service: ListsService,
         listId: String
     ): Flow<PagingData<UiUser>> {
-        val cache = membersCaches[listId] ?: PagingMemoryCache()
-        membersCaches[listId] = cache
-        return Pager(
-            config = PagingConfig(
-                pageSize = defaultLoadCount,
-                enablePlaceholders = false,
-            ),
-            remoteMediator = ListsMembersMediator(
-                cache,
-                accountKey,
-                service,
-                listId
-            )
-        ) {
-            MemoryCachePagingSource(cache)
-        }.flow
+        return flow {
+            val cache = membersCaches[listId] ?: PagingMemoryCache()
+            membersCaches[listId] = cache
+
+            val pager = Pager(
+                config = PagingConfig(
+                    pageSize = getPageSize(),
+                    enablePlaceholders = false,
+                ),
+                remoteMediator = ListsMembersMediator(
+                    cache,
+                    accountKey,
+                    service,
+                    listId
+                )
+            ) {
+                MemoryCachePagingSource(cache)
+            }
+            emitAll(pager.flow)
+        }
     }
 
     fun fetchSubscribers(
@@ -65,18 +77,21 @@ class ListsUsersRepository(private val membersCaches: MutableMap<String, PagingM
         service: ListsService,
         listId: String
     ): Flow<PagingData<UiUser>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = defaultLoadCount,
-                enablePlaceholders = false,
-            ),
-        ) {
-            ListsSubscribersPagingSource(
-                userKey = accountKey,
-                service = service,
-                listId = listId
-            )
-        }.flow
+        return flow {
+            val pager = Pager(
+                config = PagingConfig(
+                    pageSize = getPageSize(),
+                    enablePlaceholders = false,
+                ),
+            ) {
+                ListsSubscribersPagingSource(
+                    userKey = accountKey,
+                    service = service,
+                    listId = listId
+                )
+            }
+            emitAll(pager.flow)
+        }
     }
 
     suspend fun addMember(
@@ -105,5 +120,9 @@ class ListsUsersRepository(private val membersCaches: MutableMap<String, PagingM
             userId = user.id,
             screenName = user.screenName
         )
+    }
+
+    private suspend fun getPageSize(): Int {
+        return preferences?.data?.first()?.loadItemLimit ?: defaultLoadCount
     }
 }

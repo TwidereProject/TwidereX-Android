@@ -22,12 +22,16 @@ package com.twidere.twiderex.viewmodel.search
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.SearchService
-import com.twidere.twiderex.defaultLoadCount
+import com.twidere.twiderex.maxSearchUserCount
+import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.paging.source.SearchUserPagingSource
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -38,16 +42,17 @@ class SearchUserViewModel(
     keyword: String,
     following: Boolean = false,
 ) : ViewModel() {
-    private val account by lazy {
+    private val account: Flow<AccountDetails> by lazy {
         accountRepository.activeAccount.mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val source by lazy {
+    val source: Flow<PagingData<UiUser>> by lazy {
         account.flatMapLatest { account ->
             Pager(
                 config = PagingConfig(
-                    pageSize = defaultLoadCount,
+                    pageSize = maxSearchUserCount,
+                    initialLoadSize = maxSearchUserCount,
                     enablePlaceholders = false,
                 )
             ) {

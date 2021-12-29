@@ -36,7 +36,7 @@ internal class ListsUsersRepositoryTest {
     fun addMembers_updateToMemoryCacheWhenSuccess() = runBlocking {
         val memoryCache = mutableMapOf<String, PagingMemoryCache<UiUser>>()
         val accountKey = MicroBlogKey.twitter("test")
-        val repository = ListsUsersRepository(memoryCache)
+        val repository = ListsUsersRepository(memoryCache, null)
         val user = mockIUser().toUi(accountKey)
         repository.addMember(MockListsService(), "fake listId", user)
         assertEquals(user.id, memoryCache["fake listId"]?.find(0, 1)?.get(0)?.id)
@@ -46,7 +46,7 @@ internal class ListsUsersRepositoryTest {
     fun removeMembers_updateToMemoryCacheWhenSuccess() = runBlocking {
         val memoryCache = mutableMapOf<String, PagingMemoryCache<UiUser>>()
         val accountKey = MicroBlogKey.twitter("test")
-        val repository = ListsUsersRepository(memoryCache)
+        val repository = ListsUsersRepository(memoryCache, null)
         val mockListsService = MockListsService()
         val user = mockIUser().toUi(accountKey)
         repository.addMember(mockListsService, "fake listId", user)

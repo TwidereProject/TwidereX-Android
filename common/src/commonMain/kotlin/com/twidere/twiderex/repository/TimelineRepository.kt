@@ -20,29 +20,35 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.datastore.core.DataStore
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingData
 import androidx.paging.flatMap
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.paging.mediator.list.ListsTimelineMediator
-import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.paging.toUi
 import com.twidere.twiderex.paging.mediator.timeline.MastodonHashtagTimelineMediator
 import com.twidere.twiderex.paging.mediator.user.UserFavouriteMediator
 import com.twidere.twiderex.paging.mediator.user.UserMediaMediator
 import com.twidere.twiderex.paging.mediator.user.UserStatusMediator
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalPagingApi::class)
 class TimelineRepository(
     private val database: CacheDatabase,
+    private val preferences: DataStore<DisplayPreferences>?,
 ) {
     fun favouriteTimeline(
         userKey: MicroBlogKey,
@@ -57,7 +63,9 @@ class TimelineRepository(
             accountKey = accountKey,
             service = service,
         )
-        return mediator.pager().toUi()
+        return flow {
+            emitAll(mediator.pager(pageSize = getPageSize()).toUi())
+        }
     }
 
     fun userTimeline(
@@ -66,13 +74,16 @@ class TimelineRepository(
         service: TimelineService,
         exclude_replies: Boolean,
     ): Flow<PagingData<UiStatus>> {
-        return UserStatusMediator(
+        val mediator = UserStatusMediator(
             userKey = userKey,
             database = database,
             accountKey = accountKey,
             service = service,
             exclude_replies = exclude_replies,
-        ).pager().toUi()
+        )
+        return flow {
+            emitAll(mediator.pager(pageSize = getPageSize()).toUi())
+        }
     }
 
     fun listTimeline(
@@ -80,12 +91,15 @@ class TimelineRepository(
         service: TimelineService,
         listKey: MicroBlogKey,
     ): Flow<PagingData<UiStatus>> {
-        return ListsTimelineMediator(
+        val mediator = ListsTimelineMediator(
             accountKey = accountKey,
             database = database,
             listKey = listKey,
             service = service
-        ).pager().toUi()
+        )
+        return flow {
+            emitAll(mediator.pager(pageSize = getPageSize()).toUi())
+        }
     }
 
     fun mastodonHashtagTimeline(
@@ -99,7 +113,9 @@ class TimelineRepository(
             accountKey = accountKey,
             database = database
         )
-        return mediator.pager().toUi()
+        return flow {
+            emitAll(mediator.pager(pageSize = getPageSize()).toUi())
+        }
     }
 
     fun mediaTimeline(
@@ -113,10 +129,16 @@ class TimelineRepository(
             accountKey = accountKey,
             service = service
         )
-        return mediator.pager().toUi().map {
-            it.flatMap {
+        return flow {
+            emitAll(mediator.pager(pageSize = getPageSize()).toUi())
+        }.map { data ->
+            data.flatMap {
                 it.media.map { media -> media to it }
             }
         }
+    }
+
+    private suspend fun getPageSize(): Int {
+        return preferences?.data?.first()?.loadItemLimit ?: defaultLoadCount
     }
 }

@@ -41,19 +41,29 @@ class DMConversationMediator(
     override fun reverse() = false
 
     fun pager(
-        config: PagingConfig = PagingConfig(
-            pageSize = defaultLoadCount,
-            enablePlaceholders = false
-        ),
-        pagingSourceFactory: () -> PagingSource<Int, UiDMConversationWithLatestMessage> = {
-            database.directMessageConversationDao().getPagingSource(accountKey = accountKey)
-        }
+        config: PagingConfig,
+        pagingSourceFactory: () -> PagingSource<Int, UiDMConversationWithLatestMessage> = defaultPagingSourceFactory
     ): Pager<Int, UiDMConversationWithLatestMessage> {
         return Pager(
             config = config,
             remoteMediator = this,
             pagingSourceFactory = pagingSourceFactory,
         )
+    }
+
+    fun pager(
+        pageSize: Int = defaultLoadCount,
+        pagingSourceFactory: () -> PagingSource<Int, UiDMConversationWithLatestMessage> = defaultPagingSourceFactory
+    ): Pager<Int, UiDMConversationWithLatestMessage> = pager(
+        config = PagingConfig(
+            pageSize = pageSize,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = pagingSourceFactory
+    )
+
+    private val defaultPagingSourceFactory: () -> PagingSource<Int, UiDMConversationWithLatestMessage> = {
+        database.directMessageConversationDao().getPagingSource(accountKey = accountKey)
     }
 
     companion object {

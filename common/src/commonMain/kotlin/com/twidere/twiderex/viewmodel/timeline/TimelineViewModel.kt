@@ -24,16 +24,19 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
-import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.paging.toUi
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
@@ -42,15 +45,16 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 abstract class TimelineViewModel(
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    private val preferences: DataStore<DisplayPreferences>,
 ) : ViewModel() {
     abstract val pagingMediator: Flow<PagingWithGapMediator?>
     abstract val savedStateKey: Flow<String?>
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    val source by lazy {
+    val source: Flow<PagingData<UiStatus>> by lazy {
         pagingMediator.mapNotNull { it }.flatMapLatest {
-            it.pager().toUi()
+            it.pager(pageSize = preferences.data.first().loadItemLimit).toUi()
         }.cachedIn(viewModelScope)
     }
 

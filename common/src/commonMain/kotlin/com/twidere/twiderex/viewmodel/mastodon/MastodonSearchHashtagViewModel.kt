@@ -22,12 +22,16 @@ package com.twidere.twiderex.viewmodel.mastodon
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.twidere.services.mastodon.MastodonService
-import com.twidere.twiderex.defaultLoadCount
+import com.twidere.services.mastodon.model.Hashtag
+import com.twidere.twiderex.maxSearchUserCount
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.paging.source.MastodonSearchHashtagPagingSource
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -37,16 +41,17 @@ class MastodonSearchHashtagViewModel(
     private val accountRepository: AccountRepository,
     keyword: String,
 ) : ViewModel() {
-    private val account by lazy {
+    private val account: Flow<AccountDetails> by lazy {
         accountRepository.activeAccount.mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val source by lazy {
+    val source: Flow<PagingData<Hashtag>> by lazy {
         account.flatMapLatest {
             Pager(
                 config = PagingConfig(
-                    pageSize = defaultLoadCount,
+                    pageSize = maxSearchUserCount,
+                    initialLoadSize = maxSearchUserCount,
                     enablePlaceholders = false,
                 )
             ) {

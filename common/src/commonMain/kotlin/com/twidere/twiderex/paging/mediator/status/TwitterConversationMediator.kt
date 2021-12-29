@@ -31,7 +31,6 @@ import com.twidere.services.twitter.model.Status
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.exceptions.TwitterApiExceptionV2
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagination
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingMediator
@@ -70,7 +69,7 @@ class TwitterConversationMediator(
         return list.reversed()
     }
 
-    private suspend fun loadConversation(nextPage: String? = null): ISearchResponse {
+    private suspend fun loadConversation(nextPage: String? = null, pageSize: Int): ISearchResponse {
         if (nitterService != null) {
             try {
                 val nitterResult = nitterService.conversation(statusKey.id, statusKey.id, nextPage)
@@ -90,13 +89,13 @@ class TwitterConversationMediator(
         return try {
             service.searchV2(
                 "conversation_id:${_targetTweet?.conversationID}",
-                count = defaultLoadCount,
+                count = pageSize,
                 nextPage = nextPage
             )
         } catch (e: TwitterApiExceptionV2) {
             service.searchV1(
                 "to:${_targetTweet?.user?.username} since_id:${_targetTweet?.id}",
-                count = defaultLoadCount,
+                count = pageSize,
                 max_id = nextPage
             )
         }.let {
@@ -123,7 +122,7 @@ class TwitterConversationMediator(
         } else {
             emptyList()
         }
-        val descendantsResult = loadConversation(paging?.cursor)
+        val descendantsResult = loadConversation(paging?.cursor, pageSize)
         val result = (ancestors + descendantsResult.status)
 
         return CursorWithCustomOrderPagingResult(

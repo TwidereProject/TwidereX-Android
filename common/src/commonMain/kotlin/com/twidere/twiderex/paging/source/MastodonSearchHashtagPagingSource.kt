@@ -37,11 +37,11 @@ class MastodonSearchHashtagPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Hashtag> {
         return try {
             val offset = params.key ?: 0
-            val result = service.searchHashTag(query, offset = offset, count = defaultLoadCount)
+            val result = service.searchHashTag(query, offset = offset, count = params.loadSize)
             LoadResult.Page(
                 data = result,
                 prevKey = null,
-                nextKey = if (result.size == defaultLoadCount) {
+                nextKey = if (result.size == params.loadSize) {
                     result.size + offset
                 } else {
                     null

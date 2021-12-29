@@ -20,16 +20,25 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.datastore.core.DataStore
 import androidx.paging.PagingData
 import com.twidere.services.microblog.TrendService
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiTrend
 import com.twidere.twiderex.paging.mediator.trend.TrendMediator
 import com.twidere.twiderex.paging.mediator.trend.TrendMediator.Companion.toUi
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 
-class TrendRepository(private val database: CacheDatabase) {
+class TrendRepository(
+    private val database: CacheDatabase,
+    private val preferences: DataStore<DisplayPreferences>?,
+) {
     private val worldWideId = "1"
 
     fun trendsSource(
@@ -37,11 +46,18 @@ class TrendRepository(private val database: CacheDatabase) {
         service: TrendService,
         locationId: String = worldWideId
     ): Flow<PagingData<UiTrend>> {
-        return TrendMediator(
+        val mediator = TrendMediator(
             database = database,
             service = service,
             accountKey = accountKey,
             locationId = locationId
-        ).pager().toUi()
+        )
+        return flow {
+            emitAll(mediator.pager(pageSize = getPageSize()).toUi())
+        }
+    }
+
+    private suspend fun getPageSize(): Int {
+        return preferences?.data?.first()?.loadItemLimit ?: defaultLoadCount
     }
 }

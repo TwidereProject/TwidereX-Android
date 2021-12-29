@@ -20,12 +20,16 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.RelationshipService
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.UserListRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -35,12 +39,12 @@ class FollowingViewModel(
     private val accountRepository: AccountRepository,
     private val userKey: MicroBlogKey,
 ) : UserListViewModel() {
-    private val account by lazy {
+    private val account: Flow<AccountDetails> by lazy {
         accountRepository.activeAccount.mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override val source by lazy {
+    override val source: Flow<PagingData<UiUser>> by lazy {
         account.flatMapLatest { account ->
             repository.following(userKey, account.service as RelationshipService)
         }.cachedIn(viewModelScope)

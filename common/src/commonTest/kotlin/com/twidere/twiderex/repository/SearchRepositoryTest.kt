@@ -32,7 +32,7 @@ internal class SearchRepositoryTest {
     @Test
     fun addToSearchHistoryWhenSavedIsFalse() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
+        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase(), null)
         repo.addOrUpgrade(content = "query1", accountKey = accountKey)
         repo.addOrUpgrade(content = "query2", accountKey = accountKey)
         repo.addOrUpgrade(content = "query3", accountKey = accountKey, saved = true)
@@ -46,7 +46,7 @@ internal class SearchRepositoryTest {
     @Test
     fun addOrUpdateToSavedSearchWhenSavedIsTrue() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
+        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase(), null)
         repo.addOrUpgrade(content = "query1", accountKey = accountKey, saved = false)
         assert(repo.savedSearch(accountKey).first().isEmpty())
         repo.addOrUpgrade(content = "query1", accountKey = accountKey, saved = true)
@@ -61,7 +61,7 @@ internal class SearchRepositoryTest {
     @Test
     fun canNotSetSavedToFalseOnSavedSearch() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
+        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase(), null)
         repo.addOrUpgrade(content = "query", accountKey = accountKey, saved = true)
         repo.addOrUpgrade(content = "query", accountKey = accountKey, saved = false)
         val savedSearch = repo.savedSearch(accountKey).first()
@@ -71,7 +71,7 @@ internal class SearchRepositoryTest {
     @Test
     fun deleteFromDbAfterRemove() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
+        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase(), null)
         val savedSearchFlow = repo.savedSearch(accountKey)
         val searchHistoryFlow = repo.searchHistory(accountKey)
         repo.addOrUpgrade(content = "query saved", accountKey = accountKey, saved = true)

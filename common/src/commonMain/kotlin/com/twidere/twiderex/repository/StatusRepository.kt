@@ -30,24 +30,26 @@ import com.twidere.services.nitter.NitterService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.paging.toUi
 import com.twidere.twiderex.paging.mediator.status.MastodonStatusContextMediator
 import com.twidere.twiderex.paging.mediator.status.TwitterConversationMediator
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.preferences.model.MiscPreferences
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flattenMerge
 import kotlinx.coroutines.flow.flow
 
 class StatusRepository(
     private val database: CacheDatabase,
-    private val preferences: DataStore<MiscPreferences>?,
+    private val miscPreferences: DataStore<MiscPreferences>?,
+    private val displayPreferences: DataStore<DisplayPreferences>?,
 ) {
     fun loadStatus(
         statusKey: MicroBlogKey,
@@ -101,7 +103,7 @@ class StatusRepository(
         val remoteMediator = when (platformType) {
             PlatformType.Twitter -> TwitterConversationMediator(
                 service = service as TwitterService,
-                nitterService = preferences?.data?.first()?.nitterInstance?.takeIf { it.isNotEmpty() }
+                nitterService = miscPreferences?.data?.first()?.nitterInstance?.takeIf { it.isNotEmpty() }
                     ?.let {
                         NitterService(
                             it.trimEnd('/'),
@@ -121,6 +123,10 @@ class StatusRepository(
                 database = database,
             )
         }
-        emit(remoteMediator.pager().toUi())
-    }.flattenMerge()
+        emitAll(remoteMediator.pager(pageSize = getPageSize()).toUi())
+    }
+
+    private suspend fun getPageSize(): Int {
+        return displayPreferences?.data?.first()?.loadItemLimit ?: defaultLoadCount
+    }
 }

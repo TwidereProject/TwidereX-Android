@@ -43,20 +43,30 @@ class DMEventMediator(
     override fun reverse() = true
 
     fun pager(
-        config: PagingConfig = PagingConfig(
-            pageSize = defaultLoadCount,
-            enablePlaceholders = false
-        ),
-        pagingSourceFactory: () -> PagingSource<Int, UiDMEvent> = {
-            database.directMessageDao()
-                .getPagingSource(accountKey = accountKey, conversationKey = conversationKey)
-        }
+        config: PagingConfig,
+        pagingSourceFactory: () -> PagingSource<Int, UiDMEvent> = defaultPagingSourceFactory
     ): Pager<Int, UiDMEvent> {
         return Pager(
             config = config,
             remoteMediator = this,
             pagingSourceFactory = pagingSourceFactory,
         )
+    }
+
+    fun pager(
+        pageSize: Int = defaultLoadCount,
+        pagingSourceFactory: () -> PagingSource<Int, UiDMEvent> = defaultPagingSourceFactory
+    ): Pager<Int, UiDMEvent> = pager(
+        config = PagingConfig(
+            pageSize = pageSize,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = pagingSourceFactory
+    )
+
+    private val defaultPagingSourceFactory: () -> PagingSource<Int, UiDMEvent> = {
+        database.directMessageDao()
+            .getPagingSource(accountKey = accountKey, conversationKey = conversationKey)
     }
 
     companion object {
