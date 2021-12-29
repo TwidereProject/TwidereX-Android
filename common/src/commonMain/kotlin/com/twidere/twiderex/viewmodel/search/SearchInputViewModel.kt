@@ -20,11 +20,14 @@
  */
 package com.twidere.twiderex.viewmodel.search
 
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import com.twidere.twiderex.model.ui.UiSearch
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.SearchRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
@@ -35,6 +38,7 @@ import moe.tlaster.precompose.viewmodel.viewModelScope
 class SearchInputViewModel(
     private val repository: SearchRepository,
     private val accountRepository: AccountRepository,
+    keyword: String
 ) : ViewModel() {
     private val account by lazy {
         accountRepository.activeAccount.mapNotNull { it }
@@ -52,6 +56,13 @@ class SearchInputViewModel(
         account.flatMapLatest {
             repository.savedSearch(it.accountKey)
         }
+    }
+
+    private val _searchInput = MutableStateFlow(TextFieldValue(keyword, TextRange(keyword.length)))
+    val searchInput = _searchInput.asStateFlow()
+
+    fun updateSearchInput(searchInput: TextFieldValue) {
+        _searchInput.value = searchInput
     }
 
     val expandSearch = MutableStateFlow(false)

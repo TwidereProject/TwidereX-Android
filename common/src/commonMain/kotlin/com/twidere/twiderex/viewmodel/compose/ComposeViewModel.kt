@@ -216,24 +216,24 @@ open class ComposeViewModel(
 
     val replyToUser by lazy {
         combine(account.mapNotNull { it }, replyToUserName) { account, list ->
-        if (list.isNotEmpty()) {
-            loadingReplyUser.value = true
-            try {
-                userRepository.lookupUsersByName(
-                    list,
-                    accountKey = account.accountKey,
-                    lookupService = account.service as LookupService,
-                )
-            } catch (e: Throwable) {
-                inAppNotification.notifyError(e)
+            if (list.isNotEmpty()) {
+                loadingReplyUser.value = true
+                try {
+                    userRepository.lookupUsersByName(
+                        list,
+                        accountKey = account.accountKey,
+                        lookupService = account.service as LookupService,
+                    )
+                } catch (e: Throwable) {
+                    inAppNotification.notifyError(e)
+                    emptyList()
+                } finally {
+                    loadingReplyUser.value = false
+                }
+            } else {
                 emptyList()
-            } finally {
-                loadingReplyUser.value = false
             }
-        } else {
-            emptyList()
-        }
-    }.asStateIn(viewModelScope, emptyList())
+        }.asStateIn(viewModelScope, emptyList())
     }
 
     val voteState = MutableStateFlow<VoteState?>(null)

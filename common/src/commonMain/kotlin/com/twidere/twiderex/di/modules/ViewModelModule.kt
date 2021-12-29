@@ -175,7 +175,7 @@ private fun Module.mastodon() {
 }
 
 private fun Module.search() {
-    viewModel { SearchInputViewModel(get(), get()) }
+    viewModel { (keyword: String) -> SearchInputViewModel(get(), get(), keyword) }
     viewModel { (content: String) -> SearchSaveViewModel(get(), get(), content) }
     viewModel { (keyword: String) -> SearchTweetsViewModel(get(), get(), keyword) }
     viewModel { (keyword: String) -> SearchUserViewModel(get(), keyword) }
