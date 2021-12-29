@@ -27,12 +27,13 @@ class ShareMediaJob(
     private val fileResolver: FileResolver,
     private val remoteNavigator: RemoteNavigator
 ) {
-    fun execute(target: String) {
+    fun execute(target: String, extraText: String) {
         fileResolver.getMimeType(target)?.let { type ->
             remoteNavigator.shareMedia(
                 filePath = target,
                 mimeType = type,
-                fromBackground = true
+                fromBackground = true,
+                extraText = extraText,
             )
             true
         } ?: throw Error("Unresolved file:$target")

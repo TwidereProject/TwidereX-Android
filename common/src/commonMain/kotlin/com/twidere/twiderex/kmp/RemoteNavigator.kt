@@ -25,7 +25,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 expect class RemoteNavigator {
     fun openDeepLink(deeplink: String, fromBackground: Boolean = false)
 
-    fun shareMedia(filePath: String, mimeType: String, fromBackground: Boolean = false)
+    fun shareMedia(filePath: String, mimeType: String, fromBackground: Boolean = false, extraText: String = "")
 
     fun shareText(content: String, fromBackground: Boolean = false)
 

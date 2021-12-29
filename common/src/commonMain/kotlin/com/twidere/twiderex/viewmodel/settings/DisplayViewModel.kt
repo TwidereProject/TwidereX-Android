@@ -70,4 +70,10 @@ class DisplayViewModel(
             it.copy(muteByDefault = value)
         }
     }
+
+    fun setShareWithContent(value: Boolean) = viewModelScope.launch {
+        displayPreferences.updateData {
+            it.copy(shareWithContent = value)
+        }
+    }
 }
