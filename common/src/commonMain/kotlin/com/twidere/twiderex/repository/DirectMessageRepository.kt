@@ -66,7 +66,7 @@ class DirectMessageRepository(
         service: DirectMessageService,
         lookupService: LookupService
     ): Flow<PagingData<UiDMConversationWithLatestMessage>> {
-        val mediator =  DMConversationMediator(
+        val mediator = DMConversationMediator(
             database = database,
             accountKey = accountKey,
             realFetch = { key ->

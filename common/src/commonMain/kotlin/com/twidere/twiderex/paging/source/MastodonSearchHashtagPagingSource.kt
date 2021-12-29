@@ -24,7 +24,6 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.mastodon.model.Hashtag
-import com.twidere.twiderex.defaultLoadCount
 
 class MastodonSearchHashtagPagingSource(
     private val query: String,
