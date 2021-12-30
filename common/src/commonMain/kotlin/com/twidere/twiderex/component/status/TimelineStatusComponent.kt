@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.component.status
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -629,17 +629,16 @@ private fun ColumnScope.StatusBodyMedia(
     val navigator = LocalNavigator.current
     if (status.media.any()) {
         Spacer(modifier = Modifier.height(StatusBodyMediaDefaults.Spacing))
-        AnimatedVisibility(visible = LocalDisplayPreferences.current.mediaPreview) {
-            StatusMediaComponent(
-                status = status,
-            )
-        }
-        AnimatedVisibility(visible = !LocalDisplayPreferences.current.mediaPreview) {
-            CompositionLocalProvider(
-                LocalContentAlpha provides ContentAlpha.medium
-            ) {
-                MediaPreviewButton {
-                    navigator.media(statusKey = status.statusKey)
+        AnimatedContent(LocalDisplayPreferences.current.mediaPreview) { mediaPreview ->
+            if (mediaPreview) {
+                StatusMediaComponent(status = status)
+            } else {
+                CompositionLocalProvider(
+                    LocalContentAlpha provides ContentAlpha.medium
+                ) {
+                    MediaPreviewButton {
+                        navigator.media(statusKey = status.statusKey)
+                    }
                 }
             }
         }
