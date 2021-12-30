@@ -31,7 +31,6 @@ data class DisplayPreferences(
     val autoPlayback: AutoPlayback = AutoPlayback.Auto,
     val urlPreview: Boolean = false,
     val muteByDefault: Boolean = false,
-    val shareWithContent: Boolean = false,
 ) {
     @Serializable
     enum class AvatarStyle {
