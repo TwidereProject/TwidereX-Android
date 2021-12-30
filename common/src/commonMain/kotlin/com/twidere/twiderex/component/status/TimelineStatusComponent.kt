@@ -666,7 +666,8 @@ fun MediaPreviewButton(
                     onClick.invoke()
                 }
             )
-            .padding(4.dp)
+            .padding(horizontal = 4.dp)
+            .height(30.dp)
     ) {
         Icon(
             painter = painterResource(res = com.twidere.twiderex.MR.files.ic_photo),
