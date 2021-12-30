@@ -131,7 +131,7 @@ fun StatusMediaComponent(
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxSize(),
-                            sensitive = sensitive,
+                            sensitive = sensitive && status.platformType === PlatformType.Mastodon,
                             onClick = onItemClick,
                         )
                     }
@@ -148,7 +148,7 @@ fun StatusMediaComponent(
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxSize(),
-                                sensitive = sensitive,
+                                sensitive = sensitive && status.platformType === PlatformType.Mastodon,
                                 onClick = onItemClick,
                             )
                             if (it != media.last()) {
@@ -169,7 +169,7 @@ fun StatusMediaComponent(
                         StatusMediaPreviewItem(
                             media = it,
                             onClick = onItemClick,
-                            sensitive = sensitive
+                            sensitive = sensitive && status.platformType === PlatformType.Mastodon
                         )
                     }
                 }
@@ -250,6 +250,7 @@ object StatusMediaDefaults {
     object Mastodon {
         val IconSpacing = 8.dp
     }
+
     object Icon {
         val ContentPadding = 6.dp
     }
