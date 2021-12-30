@@ -54,7 +54,8 @@ import com.twidere.twiderex.model.ui.UiStatus
 fun ColumnScope.StatusText(
     status: UiStatus,
     maxLines: Int = Int.MAX_VALUE,
-    showMastodonPoll: Boolean = true
+    showMastodonPoll: Boolean = true,
+    isSelectionAble: Boolean = true,
 ) {
     val expandable = status.platformType == PlatformType.Mastodon &&
         status.spoilerText != null
@@ -85,7 +86,19 @@ fun ColumnScope.StatusText(
     }
     AnimatedVisibility(visible = expanded) {
         Column {
-            SelectionContainer {
+            if (isSelectionAble) {
+                SelectionContainer {
+                    HtmlText(
+                        modifier = Modifier.fillMaxWidth(),
+                        htmlText = status.htmlText,
+                        maxLines = maxLines,
+                        linkResolver = { href ->
+                            status.resolveLink(href)
+                        },
+                        positionWrapper = it
+                    )
+                }
+            } else {
                 HtmlText(
                     modifier = Modifier.fillMaxWidth(),
                     htmlText = status.htmlText,
@@ -93,7 +106,7 @@ fun ColumnScope.StatusText(
                     linkResolver = { href ->
                         status.resolveLink(href)
                     },
-                    positionWrapper = it
+                    positionWrapper = null
                 )
             }
             if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.poll != null) {

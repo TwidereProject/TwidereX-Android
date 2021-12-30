@@ -161,7 +161,8 @@ private fun NormalStatus(
                         Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
                     }
                 }
-            }
+            },
+            isSelectionAble = false,
         )
     }
 }
@@ -368,6 +369,7 @@ fun StatusContent(
     lineUp: Boolean = false,
     threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
     footer: @Composable () -> Unit = {},
+    isSelectionAble: Boolean = true,
 ) {
     val layoutDirection = LocalLayoutDirection.current
     val status = data.retweet ?: data
@@ -462,14 +464,22 @@ fun StatusContent(
                 when (type) {
                     StatusContentType.Normal -> {
                         Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
-                        StatusBody(status, type = type)
+                        StatusBody(
+                            status = status,
+                            type = type,
+                            isSelectionAble = isSelectionAble,
+                        )
                     }
                     StatusContentType.Extend -> UserScreenName(status.user)
                 }
                 if (type == StatusContentType.Extend) {
                     Column {
                         Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
-                        StatusBody(status = status, type = type)
+                        StatusBody(
+                            status = status,
+                            type = type,
+                            isSelectionAble = isSelectionAble
+                        )
                     }
                 }
                 Column {
@@ -530,9 +540,11 @@ object StatusContentDefaults {
 fun ColumnScope.StatusBody(
     status: UiStatus,
     type: StatusContentType,
+    isSelectionAble: Boolean,
 ) {
     StatusText(
         status = status,
+        isSelectionAble = isSelectionAble
     )
 
     StatusBodyMedia(status)
@@ -703,6 +715,7 @@ fun StatusQuote(quote: UiStatus) {
         StatusText(
             status = quote,
             maxLines = 5,
+            isSelectionAble = false
         )
         StatusBodyMedia(status = quote)
     }
