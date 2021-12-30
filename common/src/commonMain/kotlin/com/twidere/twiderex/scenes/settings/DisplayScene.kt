@@ -218,19 +218,6 @@ fun DisplayScene() {
                         }
                     )
                 }
-                ItemDivider()
-                ItemHeader() {
-                    Text(text = stringResource(com.twidere.twiderex.MR.strings.common_controls_status_actions_share))
-                }
-                switchItem(
-                    value = display.shareWithContent,
-                    onChanged = {
-                        viewModel.setShareWithContent(it)
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_share_with_content))
-                    }
-                )
             }
         }
     }
