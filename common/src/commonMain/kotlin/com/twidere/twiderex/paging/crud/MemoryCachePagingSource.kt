@@ -20,37 +20,19 @@
  */
 package com.twidere.twiderex.paging.crud
 
-import androidx.paging.PagingSource
-import androidx.paging.PagingState
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 
-class MemoryCachePagingSource<Value : Any>(
+internal class MemoryCachePagingSource<Value : Any>(
     private val memoryCache: PagingMemoryCache<Value>,
-) : PagingSource<Int, Value>(), OnInvalidateObserver {
-    init {
-        memoryCache.addWeakObserver(this)
-    }
+    dispatcher: CoroutineDispatcher = Dispatchers.IO
+) : LimitOffsetPagingSource<Value>(dispatcher), OnInvalidateObserver {
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Value> {
-        return try {
-            val count = params.loadSize
-            val startIndex = params.key ?: 0
-            val endIndex = startIndex + count
-            val result = memoryCache.find(startIndex, endIndex)
-            LoadResult.Page(
-                data = result,
-                null,
-                if (result.isEmpty() || result.size < count) null else startIndex + result.size
-            )
-        } catch (e: Exception) {
-            LoadResult.Error(e)
-        }
-    }
+    override fun registerInvalidateObserver() = memoryCache.addWeakObserver(this)
 
-    override fun onInvalidate() {
-        invalidate()
-    }
+    override suspend fun queryItemCount() = memoryCache.size()
 
-    override fun getRefreshKey(state: PagingState<Int, Value>): Int? {
-        return null
-    }
+    override suspend fun queryData(offset: Int, limit: Int) = memoryCache.find(offset, limit)
+
+    override fun onInvalidate() = invalidate()
 }
