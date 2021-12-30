@@ -24,6 +24,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -153,10 +154,7 @@ private fun NormalStatus(
             footer = {
                 Column {
                     if (showActions) {
-                        Row {
-                            Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize))
-                            StatusActions(data)
-                        }
+                        StatusActions(data)
                     } else {
                         Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
                     }
@@ -323,10 +321,13 @@ private fun StatusActions(status: UiStatus) {
     CompositionLocalProvider(
         LocalContentAlpha provides ContentAlpha.medium,
     ) {
-        Row {
-            ReplyButton(modifier = Modifier.weight(1f), status = status)
-            RetweetButton(modifier = Modifier.weight(1f), status = status)
-            LikeButton(modifier = Modifier.weight(1f), status = status)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            ReplyButton(status = status)
+            RetweetButton(status = status)
+            LikeButton(status = status)
             ShareButton(status = status, compat = true)
         }
     }
