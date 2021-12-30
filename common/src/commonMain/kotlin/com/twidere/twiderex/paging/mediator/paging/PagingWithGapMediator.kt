@@ -150,6 +150,8 @@ abstract class PagingWithGapMediator(
 
     protected open suspend fun hasMore(result: List<PagingTimeLineWithStatus>, max_id: String?): Boolean {
         // Twitter API returns single status with max_id  when there is no more data
-        return result.size > 1 || result.firstOrNull()?.status?.statusId != max_id
+        return result.size > 1 || result.firstOrNull()?.let {
+            it.status.statusId != max_id
+        } ?: false
     }
 }
