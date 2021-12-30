@@ -21,9 +21,11 @@
 package com.twidere.twiderex.scenes.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -287,8 +289,14 @@ private fun LoadItemLimitSliderDialog(
             Text(stringResource(com.twidere.twiderex.MR.strings.scene_settings_display_content_load_item_limit))
         },
         text = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+            ) {
                 Slider(
+                    // slider needs fixed size in desktop
+                    modifier = Modifier.size(240.dp, 50.dp),
                     value = sliderPosition,
                     valueRange = 10f..100f,
                     onValueChange = { sliderPosition = it },
@@ -300,7 +308,6 @@ private fun LoadItemLimitSliderDialog(
                         activeTickColor = Color.Transparent,
                         inactiveTickColor = Color.Transparent,
                     ),
-                    modifier = Modifier.weight(1f),
                 )
                 Spacer(Modifier.width(LoadItemLimitSliderDialog.ItemsSpacing))
                 Text(
