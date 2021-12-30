@@ -21,6 +21,7 @@
 package com.twidere.twiderex.repository
 
 import androidx.paging.PagingData
+import com.twidere.services.http.MicroBlogNotFoundException
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.model.IDirectMessage
@@ -43,6 +44,7 @@ import kotlinx.coroutines.flow.Flow
 class DirectMessageRepository(
     private val database: CacheDatabase
 ) {
+    private val userNotFound = mutableListOf<MicroBlogKey>()
     fun dmConversation(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey
@@ -155,7 +157,8 @@ class DirectMessageRepository(
             }
             // if conversation is empty, delete conversation too
             if (database.directMessageDao().getMessageCount(accountKey, conversationKey) == 0L) {
-                val conversation = database.directMessageConversationDao().findWithConversationKey(accountKey, conversationKey)
+                val conversation =
+                    database.directMessageConversationDao().findWithConversationKey(accountKey, conversationKey)
                 conversation?.let {
                     database.directMessageConversationDao().delete(it)
                 }
@@ -165,29 +168,38 @@ class DirectMessageRepository(
 
     suspend fun fetchEventAndSaveToDataBase(key: String?, accountKey: MicroBlogKey, service: DirectMessageService, lookupService: LookupService): List<IDirectMessage> {
         val result = service.getDirectMessages(key, 50)
-        val events = result.map {
+        val events = result.mapNotNull {
             if (it is DirectMessageEvent) {
-                it.toUi(accountKey, lookupUser(accountKey, MicroBlogKey.twitter(it.messageCreate?.senderId ?: ""), lookupService))
-            } else throw NotImplementedError()
+                // check if sender and receiver is not null
+                lookupUser(
+                    accountKey,
+                    MicroBlogKey.twitter(it.messageCreate?.senderId ?: ""),
+                    lookupService
+                )?.let { sender ->
+                    it.toUi(accountKey, sender)
+                }?.let { event ->
+                    if (lookupUser(accountKey, event.recipientAccountKey, lookupService) != null) event else null
+                }
+            } else null
         }
         // save message, media
         database.withTransaction {
             database.directMessageDao().insertAll(events)
             events.groupBy { it.conversationKey }
-                .map { entry ->
+                .mapNotNull { entry ->
                     val msgWithData = entry.value.first()
-                    val chatUser =
-                        lookupUser(accountKey, msgWithData.conversationUserKey, lookupService)
-                    UiDMConversation(
-                        accountKey = accountKey,
-                        conversationId = msgWithData.conversationKey.id,
-                        conversationKey = msgWithData.conversationKey,
-                        conversationAvatar = chatUser.profileImage.toString(),
-                        conversationName = chatUser.name,
-                        conversationSubName = chatUser.screenName,
-                        conversationType = UiDMConversation.Type.ONE_TO_ONE,
-                        recipientKey = msgWithData.conversationUserKey
-                    )
+                    lookupUser(accountKey, msgWithData.conversationUserKey, lookupService)?.let {
+                        UiDMConversation(
+                            accountKey = accountKey,
+                            conversationId = msgWithData.conversationKey.id,
+                            conversationKey = msgWithData.conversationKey,
+                            conversationAvatar = it.profileImage.toString(),
+                            conversationName = it.name,
+                            conversationSubName = it.screenName,
+                            conversationType = UiDMConversation.Type.ONE_TO_ONE,
+                            recipientKey = msgWithData.conversationUserKey
+                        )
+                    }
                 }.let {
                     database.directMessageConversationDao().insertAll(it)
                 }
@@ -195,12 +207,18 @@ class DirectMessageRepository(
         return result
     }
 
-    private suspend fun lookupUser(accountKey: MicroBlogKey, userKey: MicroBlogKey, service: LookupService): UiUser {
+    private suspend fun lookupUser(accountKey: MicroBlogKey, userKey: MicroBlogKey, service: LookupService): UiUser? {
         return database.userDao().findWithUserKey(userKey) ?: let {
-            val user = service.lookupUser(userKey.id)
-                .toUi(accountKey)
-            database.userDao().insertAll(listOf(user))
-            user
+            try {
+                if (userNotFound.contains(userKey)) return null
+                val user = service.lookupUser(userKey.id)
+                    .toUi(accountKey)
+                database.userDao().insertAll(listOf(user))
+                user
+            } catch (e: MicroBlogNotFoundException) {
+                userNotFound.add(userKey)
+                null
+            }
         }
     }
 }

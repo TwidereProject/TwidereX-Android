@@ -249,7 +249,7 @@ class TwitterService(
             if (user.errors != null && user.errors.any()) {
                 throw TwitterApiException(
                     errors = user.errors.map {
-                        if (it.title == "Not Found Error") throw MicroBlogNotFoundException(it.detail)
+                        if ("Not Found Error".equals(it.title, true)) throw MicroBlogNotFoundException(it.detail)
                         Errors(
                             code = null,
                             message = null,
