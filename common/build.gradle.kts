@@ -63,7 +63,7 @@ kotlin {
                 implementation("app.cash.turbine:turbine:0.7.0")
                 implementation("ca.gosyer:accompanist-pager:${Versions.accompanist_jb}")
                 implementation("ca.gosyer:accompanist-pager-indicators:${Versions.accompanist_jb}")
-                api("com.github.Tlaster.KFilePicker:KFilePicker:1.0.2")
+                api("com.github.Tlaster.KFilePicker:KFilePicker:${Versions.kFilePicker}")
             }
         }
         val commonTest by getting {

@@ -43,4 +43,5 @@ object Versions {
     const val moko = "0.17.3"
     const val sqlDelight = "1.5.3"
     const val javafx = "0.0.10"
+    const val kFilePicker = "1.0.4"
 }

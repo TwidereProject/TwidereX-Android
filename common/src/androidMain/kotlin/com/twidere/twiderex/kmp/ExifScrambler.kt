@@ -20,61 +20,85 @@
  */
 package com.twidere.twiderex.kmp
 
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
+import com.twidere.twiderex.di.ext.get
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.util.UUID
 
 actual class ExifScrambler(private val context: Context) {
-    actual fun removeExifData(file: String, compress: Int): String {
-        // first get input stream
+
+    actual fun removeExifData(file: String, maxImageSize: Long): String {
         val uri = Uri.parse(file)
         val contentResolver = context.contentResolver
-        contentResolver.openInputStream(uri)?.use { input ->
-            // decode to bitmap because bitmap won't store exif meta data
-            val bitmap = try {
-                BitmapFactory.decodeStream(input)
-            } catch (oom: OutOfMemoryError) {
-                return file
-            }
-            // create an cache image
-            val mimeType = contentResolver.getType(uri) ?: ""
-            val imageType = getImageType(mimeType)
-            val imageCache = File(context.externalCacheDir, "${UUID.randomUUID()}.${imageType.name.lowercase()}")
-            if (!imageCache.exists()) imageCache.createNewFile()
-            // write to disk without exif meta data
-            when (imageType) {
-                ImageType.JPG -> {
-                    val originExif = ExifInterface(input)
-                    imageCache.outputStream().use {
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, compress, it)
-                        it.flush()
-                    }
-                    // keep origin images orientation
-                    originExif.getAttribute(ExifInterface.TAG_ORIENTATION)?.let {
-                        ExifInterface(imageCache.absolutePath).apply {
-                            setAttribute(ExifInterface.TAG_ORIENTATION, it)
-                            saveAttributes()
+        try {
+            contentResolver.openInputStream(uri)?.use { input ->
+                // create an cache image
+                val mimeType = contentResolver.getType(uri) ?: ""
+                val imageType = getImageType(mimeType)
+                val imageCache = File(get<StorageProvider>().appFiles.mediaDir, "${UUID.randomUUID()}.${imageType.name.lowercase()}")
+                if (!imageCache.exists()) imageCache.createNewFile()
+                // write to disk without exif meta data
+                when (imageType) {
+                    ImageType.JPG -> {
+                        imageCache.outputStream().use {
+                            compressImage(contentResolver, uri, maxImageSize, it)
+                        }
+                        val originExif = ExifInterface(input)
+                        // keep origin images orientation
+                        originExif.getAttribute(ExifInterface.TAG_ORIENTATION)?.let {
+                            ExifInterface(imageCache.absolutePath).apply {
+                                setAttribute(ExifInterface.TAG_ORIENTATION, it)
+                                saveAttributes()
+                            }
                         }
                     }
-                }
-                ImageType.PNG -> {
-                    imageCache.outputStream().use {
-                        bitmap.compress(Bitmap.CompressFormat.PNG, compress, it)
-                        it.flush()
+                    ImageType.PNG -> {
+                        imageCache.outputStream().use {
+                            compressImage(contentResolver, uri, maxImageSize, it)
+                        }
+                    }
+                    ImageType.UNKNOWN -> {
+                        return uri.toString()
                     }
                 }
-                ImageType.UNKNOWN -> {
-                    return uri.toString()
-                }
+                return imageCache.toUri().toString()
             }
-            return imageCache.toUri().toString()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         return uri.toString()
+    }
+
+    private fun compressImage(contentResolver: ContentResolver, uri: Uri, maxImageSize: Long, fos: FileOutputStream) {
+        contentResolver.openInputStream(uri)?.use {
+            val bitmap = try {
+                BitmapFactory.decodeStream(it)
+            } catch (oom: OutOfMemoryError) {
+                throw oom
+            }
+            var currSize: Int
+            var currQuality = 100
+            val stream = ByteArrayOutputStream()
+            do {
+                stream.flush()
+                stream.reset()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, currQuality, stream)
+                currSize = stream.toByteArray().size
+                currQuality -= 5
+            } while (currSize >= maxImageSize && currQuality >= 80)
+            stream.toByteArray()
+        }?.apply {
+            fos.write(this)
+            fos.flush()
+        } ?: throw Error("Failed to open input stream")
     }
 
     actual fun deleteCacheFile(file: String) {

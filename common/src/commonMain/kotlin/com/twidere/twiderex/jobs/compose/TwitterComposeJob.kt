@@ -98,4 +98,7 @@ class TwitterComposeJob constructor(
             )
         } ?: throw Error()
     }
+
+    override val imageMaxSize: Long
+        get() = 5 * 1024 * 1024 // https://help.twitter.com/en/using-twitter/tweeting-gifs-and-pictures
 }

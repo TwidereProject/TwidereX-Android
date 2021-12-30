@@ -100,4 +100,7 @@ class MastodonComposeJob(
         } ?: throw Error()
         return id.id
     }
+
+    override val imageMaxSize: Long
+        get() = 100 * 1024 * 1024
 }
