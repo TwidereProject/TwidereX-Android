@@ -44,7 +44,11 @@ actual class FileResolver {
     }
 
     actual fun openOutputStream(file: String): OutputStream? {
-        return File(file).takeIf { it.exists() && it.isFile }?.outputStream()
+        return File(file).apply {
+            if (!exists()) {
+                createNewFile()
+            }
+        }.takeIf { it.exists() && it.isFile }?.outputStream()
     }
 
     actual fun getMediaSize(file: String): MediaSize {
