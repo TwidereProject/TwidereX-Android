@@ -23,6 +23,7 @@ package com.twidere.services.twitter
 import com.twidere.services.http.AuthorizationInterceptor
 import com.twidere.services.http.Errors
 import com.twidere.services.http.HttpClientFactory
+import com.twidere.services.http.MicroBlogNotFoundException
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.DownloadMediaService
@@ -248,6 +249,7 @@ class TwitterService(
             if (user.errors != null && user.errors.any()) {
                 throw TwitterApiException(
                     errors = user.errors.map {
+                        if ("Not Found Error".equals(it.title, true)) throw MicroBlogNotFoundException(it.detail)
                         Errors(
                             code = null,
                             message = null,
