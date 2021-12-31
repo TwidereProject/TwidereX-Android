@@ -20,10 +20,11 @@
  */
 package com.twidere.twiderex.component.status
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -153,15 +154,13 @@ private fun NormalStatus(
             footer = {
                 Column {
                     if (showActions) {
-                        Row {
-                            Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize))
-                            StatusActions(data)
-                        }
+                        StatusActions(data)
                     } else {
                         Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
                     }
                 }
-            }
+            },
+            isSelectionAble = false,
         )
     }
 }
@@ -322,10 +321,13 @@ private fun StatusActions(status: UiStatus) {
     CompositionLocalProvider(
         LocalContentAlpha provides ContentAlpha.medium,
     ) {
-        Row {
-            ReplyButton(modifier = Modifier.weight(1f), status = status)
-            RetweetButton(modifier = Modifier.weight(1f), status = status)
-            LikeButton(modifier = Modifier.weight(1f), status = status)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            ReplyButton(status = status)
+            RetweetButton(status = status)
+            LikeButton(status = status)
             ShareButton(status = status, compat = true)
         }
     }
@@ -368,6 +370,7 @@ fun StatusContent(
     lineUp: Boolean = false,
     threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
     footer: @Composable () -> Unit = {},
+    isSelectionAble: Boolean = true,
 ) {
     val layoutDirection = LocalLayoutDirection.current
     val status = data.retweet ?: data
@@ -462,14 +465,22 @@ fun StatusContent(
                 when (type) {
                     StatusContentType.Normal -> {
                         Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
-                        StatusBody(status, type = type)
+                        StatusBody(
+                            status = status,
+                            type = type,
+                            isSelectionAble = isSelectionAble,
+                        )
                     }
                     StatusContentType.Extend -> UserScreenName(status.user)
                 }
                 if (type == StatusContentType.Extend) {
                     Column {
                         Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
-                        StatusBody(status = status, type = type)
+                        StatusBody(
+                            status = status,
+                            type = type,
+                            isSelectionAble = isSelectionAble
+                        )
                     }
                 }
                 Column {
@@ -530,9 +541,11 @@ object StatusContentDefaults {
 fun ColumnScope.StatusBody(
     status: UiStatus,
     type: StatusContentType,
+    isSelectionAble: Boolean,
 ) {
     StatusText(
         status = status,
+        isSelectionAble = isSelectionAble
     )
 
     StatusBodyMedia(status)
@@ -616,17 +629,16 @@ private fun ColumnScope.StatusBodyMedia(
     val navigator = LocalNavigator.current
     if (status.media.any()) {
         Spacer(modifier = Modifier.height(StatusBodyMediaDefaults.Spacing))
-        AnimatedVisibility(visible = LocalDisplayPreferences.current.mediaPreview) {
-            StatusMediaComponent(
-                status = status,
-            )
-        }
-        AnimatedVisibility(visible = !LocalDisplayPreferences.current.mediaPreview) {
-            CompositionLocalProvider(
-                LocalContentAlpha provides ContentAlpha.medium
-            ) {
-                MediaPreviewButton {
-                    navigator.media(statusKey = status.statusKey)
+        AnimatedContent(LocalDisplayPreferences.current.mediaPreview) { mediaPreview ->
+            if (mediaPreview) {
+                StatusMediaComponent(status = status)
+            } else {
+                CompositionLocalProvider(
+                    LocalContentAlpha provides ContentAlpha.medium
+                ) {
+                    MediaPreviewButton {
+                        navigator.media(statusKey = status.statusKey)
+                    }
                 }
             }
         }
@@ -654,7 +666,8 @@ fun MediaPreviewButton(
                     onClick.invoke()
                 }
             )
-            .padding(4.dp)
+            .padding(horizontal = 4.dp)
+            .height(30.dp)
     ) {
         Icon(
             painter = painterResource(res = com.twidere.twiderex.MR.files.ic_photo),
@@ -703,6 +716,7 @@ fun StatusQuote(quote: UiStatus) {
         StatusText(
             status = quote,
             maxLines = 5,
+            isSelectionAble = false
         )
         StatusBodyMedia(status = quote)
     }

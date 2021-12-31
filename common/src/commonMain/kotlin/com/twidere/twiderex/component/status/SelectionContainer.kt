@@ -45,8 +45,13 @@ class PositionWrapper {
 @Composable
 fun SelectionContainer(
     modifier: Modifier = Modifier,
+    enable: Boolean = true,
     content: @Composable (PositionWrapper?) -> Unit,
 ) {
+    if (!enable) {
+        content.invoke(null)
+        return
+    }
     val positionWrapper = remember {
         if (currentPlatform != Platform.Android) PositionWrapper() else null
     }
