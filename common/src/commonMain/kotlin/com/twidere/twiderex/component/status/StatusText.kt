@@ -86,19 +86,7 @@ fun ColumnScope.StatusText(
     }
     AnimatedVisibility(visible = expanded) {
         Column {
-            if (isSelectionAble) {
-                SelectionContainer {
-                    HtmlText(
-                        modifier = Modifier.fillMaxWidth(),
-                        htmlText = status.htmlText,
-                        maxLines = maxLines,
-                        linkResolver = { href ->
-                            status.resolveLink(href)
-                        },
-                        positionWrapper = it
-                    )
-                }
-            } else {
+            SelectionContainer(enable = isSelectionAble) {
                 HtmlText(
                     modifier = Modifier.fillMaxWidth(),
                     htmlText = status.htmlText,
@@ -106,7 +94,7 @@ fun ColumnScope.StatusText(
                     linkResolver = { href ->
                         status.resolveLink(href)
                     },
-                    positionWrapper = null
+                    positionWrapper = it
                 )
             }
             if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.poll != null) {
