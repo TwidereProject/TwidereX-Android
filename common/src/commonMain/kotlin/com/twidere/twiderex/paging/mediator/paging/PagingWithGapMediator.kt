@@ -82,7 +82,11 @@ abstract class PagingWithGapMediator(
             }
         }
         return loadBetween(
-            pageSize = state.config.pageSize,
+            pageSize = if (loadType === LoadType.REFRESH) {
+                state.config.initialLoadSize
+            } else {
+                state.config.pageSize
+            },
             maxStatusKey = maxStatusKey,
             sinceStatusKey = sinceStatueKey
         )
