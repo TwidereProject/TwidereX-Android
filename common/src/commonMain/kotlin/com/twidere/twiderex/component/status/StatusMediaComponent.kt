@@ -131,7 +131,7 @@ fun StatusMediaComponent(
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxSize(),
-                            sensitive = sensitive && status.platformType === PlatformType.Mastodon,
+                            sensitive = sensitive,
                             onClick = onItemClick,
                         )
                     }
@@ -148,7 +148,7 @@ fun StatusMediaComponent(
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxSize(),
-                                sensitive = sensitive && status.platformType === PlatformType.Mastodon,
+                                sensitive = sensitive,
                                 onClick = onItemClick,
                             )
                             if (it != media.last()) {
@@ -169,7 +169,7 @@ fun StatusMediaComponent(
                         StatusMediaPreviewItem(
                             media = it,
                             onClick = onItemClick,
-                            sensitive = sensitive && status.platformType === PlatformType.Mastodon
+                            sensitive = sensitive
                         )
                     }
                 }
@@ -352,3 +352,4 @@ fun StatusMediaPreviewItem(
         }
     }
 }
+
