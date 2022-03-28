@@ -81,6 +81,7 @@ kotlin {
                 implementation("androidx.core:core-ktx:1.8.0-alpha02")
                 implementation("io.insert-koin:koin-android:${Versions.koin}")
                 implementation("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
+                implementation("androidx.work:work-runtime-ktx:${Versions.work}")
                 implementation("androidx.room:room-runtime:${Versions.room}")
                 implementation("androidx.room:room-ktx:${Versions.room}")
                 implementation("androidx.room:room-paging:${Versions.room}")
