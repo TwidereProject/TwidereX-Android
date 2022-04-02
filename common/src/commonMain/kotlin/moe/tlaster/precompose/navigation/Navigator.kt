@@ -21,6 +21,8 @@
 package moe.tlaster.precompose.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 
 /**
@@ -92,16 +94,7 @@ class NavController {
         get() = stackManager?.canGoBack ?: false
 }
 
-// @Composable
-// fun NavController.currentBackStackEntryAsState(): State<BackStackEntry?> {
-//     val currentNavBackStackEntry = remember { mutableStateOf(stackManager.currentBackStackEntry) }
-//     // setup the onDestinationChangedListener responsible for detecting when the
-//     // current back stack entry changes
-//     DisposableEffect(this) {
-//         addOnDestinationChangedListener(callback)
-//         onDispose {
-//             removeOnDestinationChangedListener(callback)
-//         }
-//     }
-//     return currentNavBackStackEntry
-// }
+@Composable
+fun NavController.currentBackStackEntryAsState(): State<BackStackEntry?>? {
+    return stackManager?.currentStack?.currentBackStackEntryFlow?.collectAsState(null)
+}
