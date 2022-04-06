@@ -21,8 +21,11 @@
 package com.twidere.twiderex.navigation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
@@ -34,10 +37,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import moe.tlaster.precompose.navigation.NavController
 import moe.tlaster.precompose.navigation.currentBackStackEntryAsState
+import kotlin.math.roundToInt
 
 @Composable
 fun ComposeDebugTool(
@@ -60,21 +67,36 @@ fun ComposeDebugTool(
     var debugOpen by remember {
         mutableStateOf(false)
     }
-    Column(modifier = Modifier.fillMaxSize()) {
-        Button(
-            modifier = Modifier.padding(top = 56.dp),
-            onClick = {
-                debugOpen = !debugOpen
-            }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        var offsetX by remember { mutableStateOf(0f) }
+        var offsetY by remember { mutableStateOf(0f) }
+        Column(
+            modifier = Modifier
+                .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
+                .pointerInput(Unit) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consumeAllChanges()
+                        offsetX += dragAmount.x
+                        offsetY += dragAmount.y
+                    }
+                }
         ) {
-            Text("Debug")
-        }
-        if (debugOpen) {
-            Text(
-                modifier = Modifier.background(MaterialTheme.colors.surface),
-                text = state?.route?.route ?: "UnKnow route",
-                color = MaterialTheme.colors.primary
-            )
+            Button(
+                modifier = Modifier.padding(top = 56.dp),
+                onClick = {
+                    debugOpen = !debugOpen
+                }
+            ) {
+                Text("Debug")
+            }
+            if (debugOpen) {
+                Text(
+                    modifier = Modifier.background(MaterialTheme.colors.surface),
+                    text = state?.route?.route ?: "UnKnow route",
+                    color = MaterialTheme.colors.primary
+                )
+            }
         }
     }
 }
