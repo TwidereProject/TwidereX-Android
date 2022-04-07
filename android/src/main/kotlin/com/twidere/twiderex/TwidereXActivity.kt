@@ -187,7 +187,8 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
                     windowInsetsAnimationsEnabled = true
                 ) {
                     Router(
-                        navController = navController
+                        navController = navController,
+                        isDebug = moe.tlaster.kfilepicker.BuildConfig.DEBUG
                     )
                 }
             }
