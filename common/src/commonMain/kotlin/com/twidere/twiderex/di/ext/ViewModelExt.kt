@@ -73,7 +73,10 @@ fun <T : ViewModel> ViewModelStoreOwner.getViewModel(
     clazz: KClass<T>,
     parameters: ParametersDefinition? = null,
 ): T {
-    return this.viewModelStore.getViewModel(qualifier?.value ?: clazz.toString(), clazz) {
+    return this.viewModelStore.getViewModel(
+        key = qualifier?.value ?: clazz.toString() + parameters?.invoke(),
+        clazz = clazz
+    ) {
         KoinPlatformTools.defaultContext().get().get(clazz, qualifier, parameters)
     }
 }
