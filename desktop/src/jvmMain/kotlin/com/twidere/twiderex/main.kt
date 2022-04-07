@@ -23,9 +23,11 @@ package com.twidere.twiderex
 import androidx.compose.ui.ExperimentalComposeUiApi
 import com.twidere.twiderex.component.foundation.DesktopMediaPlayerHelper
 import com.twidere.twiderex.media.DesktopMediaPlayerFactoryImpl
+import kotlinx.coroutines.Dispatchers
 
 @ExperimentalComposeUiApi
 fun main(args: Array<String>) {
     DesktopMediaPlayerHelper.register(DesktopMediaPlayerFactoryImpl())
+    Dispatchers
     runDesktopApp(args)
 }

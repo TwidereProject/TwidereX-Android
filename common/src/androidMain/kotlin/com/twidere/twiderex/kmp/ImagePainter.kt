@@ -27,11 +27,11 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
-import coil.compose.LocalImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.disk.DiskCache
+import coil.imageLoader
 import coil.request.ErrorResult
 import coil.request.ImageRequest
 import coil.request.SuccessResult
@@ -112,9 +112,8 @@ internal actual fun rememberNetworkImagePainter(
 @OptIn(ExperimentalCoilApi::class)
 @Composable
 private fun buildImageLoader(cacheDir: String): ImageLoader {
-    val context = LocalContext.current
     val httpConfig = LocalHttpConfig.current
-    return LocalImageLoader.current
+    return LocalContext.current.imageLoader
         .newBuilder()
         .apply {
             if (httpConfig.proxyConfig.enable &&
@@ -126,7 +125,7 @@ private fun buildImageLoader(cacheDir: String): ImageLoader {
                         .build()
                 }
                 diskCache {
-                    DiskCache.Builder(context)
+                    DiskCache.Builder()
                         .directory(File(cacheDir))
                         .build()
                 }
