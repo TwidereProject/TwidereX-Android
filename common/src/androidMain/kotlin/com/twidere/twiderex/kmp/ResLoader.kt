@@ -23,9 +23,10 @@ package com.twidere.twiderex.kmp
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
-import coil.compose.LocalImageLoader
+import androidx.compose.ui.platform.LocalContext
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
+import coil.imageLoader
 import dev.icerock.moko.resources.FileResource
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.StringResource
@@ -46,7 +47,7 @@ actual class ResLoader(
         val data = "android.resource://${context.packageName}/raw/${context.resources.getResourceEntryName(res.rawResId)}"
         return rememberAsyncImagePainter(
             model = data,
-            imageLoader = LocalImageLoader.current.newBuilder()
+            imageLoader = LocalContext.current.imageLoader.newBuilder()
                 .components { add(SvgDecoder.Factory()) }
                 .build(),
         )
@@ -58,7 +59,7 @@ actual class ResLoader(
         val data = "android.resource://${context.packageName}/drawable/${context.resources.getResourceEntryName(res.drawableResId)}"
         return rememberAsyncImagePainter(
             model = data,
-            imageLoader = LocalImageLoader.current.newBuilder()
+            imageLoader = LocalContext.current.imageLoader.newBuilder()
                 .components { add(SvgDecoder.Factory()) }
                 .build(),
         )

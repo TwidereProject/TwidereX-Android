@@ -48,6 +48,7 @@ kotlin {
                 api(compose.materialIconsExtended)
                 implementation(projects.services)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Kotlin.coroutines}")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:${Versions.Kotlin.coroutines}")
                 api("androidx.paging:paging-common:${Versions.paging}")
                 api("androidx.datastore:datastore-core:${Versions.datastore}")
                 api("androidx.datastore:datastore-preferences-core:${Versions.datastore}")
