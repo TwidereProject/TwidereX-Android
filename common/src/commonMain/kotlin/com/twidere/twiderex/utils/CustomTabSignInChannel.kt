@@ -28,8 +28,9 @@ object CustomTabSignInChannel {
     private var waiting = false
     private val channel: Channel<String> = Channel()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun send(uri: String) {
-        if (waiting) {
+        if (waiting && !channel.isClosedForSend) {
             channel.send(uri)
         }
         waiting = false
