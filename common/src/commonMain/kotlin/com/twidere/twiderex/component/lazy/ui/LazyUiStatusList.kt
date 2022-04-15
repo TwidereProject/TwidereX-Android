@@ -77,7 +77,6 @@ import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapNotNull
@@ -86,11 +85,17 @@ import kotlinx.coroutines.flow.mapNotNull
 class LazyUiStatusListState(
     initialStatusKey: MicroBlogKey? = null,
     initialShowCursor: Boolean = false,
+    initialIsAutoLoadMore: Boolean = false,
 ) {
-    private var _statusKey by mutableStateOf(initialStatusKey)
-    private var _showCursor by mutableStateOf(initialShowCursor)
+    private var _statusKey: MicroBlogKey? by mutableStateOf(initialStatusKey)
+    private var _showCursor: Boolean by mutableStateOf(initialShowCursor)
+
     val showCursor get() = _showCursor
     val statusKey get() = _statusKey
+
+    var isAutoLoadMore: Boolean = initialIsAutoLoadMore
+        private set
+
     fun update(newKey: MicroBlogKey) {
         if (!showCursor) {
             _showCursor = statusKey != null && statusKey != newKey
@@ -102,13 +107,26 @@ class LazyUiStatusListState(
         _showCursor = false
     }
 
+    fun autoLoadMore() {
+        isAutoLoadMore = true
+    }
+
     companion object {
         val Saver: Saver<LazyUiStatusListState, *> = listSaver(
-            save = { listOfNotNull<Any>(it.showCursor, it.statusKey?.toString()) },
+            save = {
+                listOfNotNull<Any>(
+                    it.showCursor,
+                    it.isAutoLoadMore,
+                    it.statusKey?.toString()
+                )
+            },
             restore = {
                 LazyUiStatusListState(
                     initialShowCursor = it[0] as Boolean,
-                    initialStatusKey = it.getOrNull(1)?.let { MicroBlogKey.valueOf(it.toString()) }
+                    initialIsAutoLoadMore = it[1] as Boolean,
+                    initialStatusKey = it.getOrNull(2)?.let { key ->
+                        MicroBlogKey.valueOf(key.toString())
+                    }
                 )
             }
         )
@@ -184,7 +202,22 @@ fun LazyUiStatusList(
                                     Divider()
                                 }
                                 item.isGap -> {
-                                    LoadMoreButton(items, index, onLoadBetweenClicked, item)
+                                    fun onLoadBetweenClicked() {
+                                        items.peek(index + 1)?.let { next ->
+                                            onLoadBetweenClicked(item.statusKey, next.statusKey)
+                                        }
+                                    }
+
+                                    if (listState.isAutoLoadMore) {
+                                        LaunchedEffect(item.statusKey) {
+                                            onLoadBetweenClicked()
+                                        }
+                                    } else {
+                                        LoadMoreButton {
+                                            onLoadBetweenClicked()
+                                            listState.autoLoadMore()
+                                        }
+                                    }
                                 }
                                 else -> {
                                     StatusDivider()
@@ -227,25 +260,11 @@ fun LazyUiStatusList(
 }
 
 @Composable
-private fun LoadMoreButton(
-    items: LazyPagingItems<UiStatus>,
-    index: Int,
-    onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit,
-    item: UiStatus
-) {
+private fun LoadMoreButton(onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .background(LocalContentColor.current.copy(alpha = 0.04f))
-            .clickable {
-                items
-                    .peek(index + 1)
-                    ?.let { next ->
-                        onLoadBetweenClicked(
-                            item.statusKey,
-                            next.statusKey,
-                        )
-                    }
-            }
+            .clickable { onClick() }
             .fillMaxWidth(),
         contentAlignment = Alignment.Center,
     ) {
