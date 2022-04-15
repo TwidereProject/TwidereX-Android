@@ -36,7 +36,7 @@ compose {
     desktop {
         application {
             mainClass = "com.twidere.twiderex.MainKt"
-            jvmArgs += listOf("--add-opens", "java.base/java.lang=ALL-UNNAMED") 
+            jvmArgs += listOf("--add-opens", "java.base/java.lang=ALL-UNNAMED")
             nativeDistributions {
                 targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
                 packageName = Package.name
