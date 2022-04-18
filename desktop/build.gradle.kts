@@ -17,7 +17,7 @@ kotlin {
             kotlinOptions.jvmTarget = Versions.Java.jvmTarget
         }
         javafx {
-            version = Versions.Java.jvmTarget
+            version = "15" // MediaPlayer doesn't work well with 11, use Versions.Java.jvmTarget after Versions.Java.jvmTarget updated
             modules = listOf("javafx.controls", "javafx.swing", "javafx.media")
         }
     }
@@ -36,6 +36,7 @@ compose {
     desktop {
         application {
             mainClass = "com.twidere.twiderex.MainKt"
+            jvmArgs += listOf("--add-opens", "java.base/java.lang=ALL-UNNAMED")
             nativeDistributions {
                 targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
                 packageName = Package.name
