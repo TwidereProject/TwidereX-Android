@@ -39,9 +39,10 @@ import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.viewmodel.timeline.TimelineScrollState
 import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -62,17 +63,12 @@ fun TimelineComponent(
     ) {
         val listState = rememberLazyListState()
         LaunchedEffect(Unit) {
-            var inited = false
-            val scrollState = viewModel.provideScrollState()
-            snapshotFlow { listState.layoutInfo.totalItemsCount }
-                .distinctUntilChanged()
-                .filter { it != 0 }
-                .filter { !inited }
-                .collect {
-                    inited = true
+            viewModel.provideScrollState()
+                .filterNotNull()
+                .collectLatest {
                     listState.scrollToItem(
-                        scrollState.firstVisibleItemIndex,
-                        scrollState.firstVisibleItemScrollOffset
+                        it.firstVisibleItemIndex,
+                        it.firstVisibleItemScrollOffset
                     )
                 }
         }
