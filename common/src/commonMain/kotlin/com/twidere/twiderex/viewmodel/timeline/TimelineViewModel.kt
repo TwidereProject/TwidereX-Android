@@ -38,6 +38,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -67,8 +68,9 @@ abstract class TimelineViewModel(
             .asStateIn(viewModelScope, emptyList())
     }
 
-    suspend fun provideScrollState(): TimelineScrollState {
-        return savedStateKey.firstOrNull()?.let {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    suspend fun provideScrollState(): Flow<TimelineScrollState?> {
+        return savedStateKey.mapLatest {
             val firstVisibleItemIndexKey = intPreferencesKey("${it}_firstVisibleItemIndex")
             val firstVisibleItemScrollOffsetKey =
                 intPreferencesKey("${it}_firstVisibleItemScrollOffset")
@@ -80,7 +82,7 @@ abstract class TimelineViewModel(
                     firstVisibleItemScrollOffset = firstVisibleItemScrollOffset,
                 )
             }
-        } ?: TimelineScrollState.Zero
+        }
     }
 
     @OptIn(androidx.paging.ExperimentalPagingApi::class)
