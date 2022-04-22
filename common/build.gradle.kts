@@ -179,6 +179,11 @@ android {
         testInstrumentationRunnerArguments["notPackage"] = "com.twidere.twiderex.viewmodel"
     }
 
+    lint {
+        disable.add("MissingTranslation")
+        disable.add("JavascriptInterface")
+    }
+
     compileOptions {
         sourceCompatibility = Versions.Java.java
         targetCompatibility = Versions.Java.java

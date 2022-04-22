@@ -2,6 +2,7 @@
 plugins {
     id("com.diffplug.spotless").version(Versions.spotless)
     id("com.github.ben-manes.versions").version("0.39.0")
+    id("com.dipien.byebyejetifier") version "1.2.2"
 }
 buildscript {
     repositories {

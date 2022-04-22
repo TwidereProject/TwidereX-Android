@@ -17,7 +17,7 @@ kotlin {
             kotlinOptions.jvmTarget = Versions.Java.jvmTarget
         }
         javafx {
-            version = "15" // MediaPlayer doesn't work well with 11, use Versions.Java.jvmTarget after Versions.Java.jvmTarget updated
+            version = Versions.Java.jvmTarget
             modules = listOf("javafx.controls", "javafx.swing", "javafx.media")
         }
     }

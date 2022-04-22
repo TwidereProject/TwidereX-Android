@@ -50,7 +50,7 @@ android {
     }
 
     lint {
-        disable("MissingTranslation")
+        disable.add("MissingTranslation")
     }
 
     flavorDimensions.add("channel")
