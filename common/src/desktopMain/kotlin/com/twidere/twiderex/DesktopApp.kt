@@ -24,7 +24,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
 import com.twidere.twiderex.init.Initializer
@@ -166,6 +168,10 @@ private fun startDesktopApp() {
                     stopKoin()
                     exitApplication()
                 },
+                state = rememberWindowState(
+                    width = 400.dp,
+                    height = 900.dp
+                ),
                 title = "Twidere X",
                 icon = painterResource(MR.files.ic_launcher.filePath),
             ) {
