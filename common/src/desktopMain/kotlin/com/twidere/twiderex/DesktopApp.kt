@@ -25,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.application
+import com.twidere.twiderex.component.NativeWindow
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
 import com.twidere.twiderex.init.Initializer
@@ -46,7 +47,6 @@ import it.sauronsoftware.junique.JUnique
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
-import moe.tlaster.precompose.PreComposeWindow
 import moe.tlaster.precompose.navigation.NavController
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -161,7 +161,7 @@ private fun startDesktopApp() {
             .add(TwidereServiceFactoryInitialTask())
             .execute()
         ProvidePreferences(preferencesHolder) {
-            PreComposeWindow(
+            NativeWindow(
                 onCloseRequest = {
                     stopKoin()
                     exitApplication()
