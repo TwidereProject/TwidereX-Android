@@ -22,7 +22,6 @@ package com.twidere.twiderex.ui
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.Colors
 import androidx.compose.material.LocalElevationOverlay
@@ -127,6 +126,7 @@ fun TwidereScene(
                 extendToBottom = extendViewIntoNavigationBar,
                 extendToStart = extendViewIntoNavigationBar,
                 extendToEnd = extendViewIntoNavigationBar,
+                darkTheme = darkTheme,
             ),
             color = NativeInsetsColor(
                 top = statusBarColor,

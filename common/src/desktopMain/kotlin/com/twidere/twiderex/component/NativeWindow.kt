@@ -20,14 +20,17 @@
  */
 package com.twidere.twiderex.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -37,14 +40,29 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.contentColorFor
+import androidx.compose.material.darkColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Minimize
+import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,11 +76,47 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowScope
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
-import com.twidere.twiderex.ui.TwidereTheme
-import com.twidere.twiderex.ui.isDarkTheme
+import androidx.compose.ui.zIndex
+import com.twidere.twiderex.kmp.LocalPlatformWindow
+import com.twidere.twiderex.kmp.PlatformWindow
 import com.twidere.twiderex.utils.OperatingSystem
 import com.twidere.twiderex.utils.currentOperatingSystem
 import moe.tlaster.precompose.PreComposeWindow
+
+@Stable
+class NativeWindowController(
+    initialIsAppearanceLightTitleBar: Boolean = false,
+) {
+    companion object {
+        fun Saver(): Saver<NativeWindowController, *> = listSaver(
+            save = {
+                listOf(it.isAppearanceLightTitleBar)
+            },
+            restore = {
+                NativeWindowController(
+                    initialIsAppearanceLightTitleBar = it[0],
+                )
+            }
+        )
+    }
+
+    var isAppearanceLightTitleBar: Boolean by mutableStateOf(initialIsAppearanceLightTitleBar)
+}
+
+@Composable
+fun rememberNativeWindowController(): NativeWindowController {
+    val saver = remember {
+        NativeWindowController.Saver()
+    }
+    return rememberSaveable(
+        saver = saver
+    ) {
+        NativeWindowController()
+    }
+}
+
+val LocalNativeWindowController =
+    staticCompositionLocalOf<NativeWindowController> { error("No NativeWindowController") }
 
 @Composable
 fun NativeWindow(
@@ -79,44 +133,61 @@ fun NativeWindow(
     onKeyEvent: (KeyEvent) -> Boolean = { false },
     content: @Composable FrameWindowScope.() -> Unit,
 ) {
-    PreComposeWindow(
-        state = state,
-        visible = visible,
-        title = title,
-        icon = icon,
-        undecorated = true,
-        transparent = true,
-        resizable = resizable,
-        enabled = enabled,
-        focusable = focusable,
-        alwaysOnTop = alwaysOnTop,
-        onPreviewKeyEvent = onPreviewKeyEvent,
-        onKeyEvent = onKeyEvent,
-        onCloseRequest = onCloseRequest,
-        content = {
-            Column(
-                modifier = Modifier.clip(RoundedCornerShape(8.dp)),
-            ) {
-                PlatformTitleBar(
-                    title = title,
-                    icon = icon,
-                    operatingSystem = currentOperatingSystem,
-                    onCloseRequest = onCloseRequest,
-                    onMinimizeRequest = { state.isMinimized = true },
-                    onMaximizeRequest = { state.placement = WindowPlacement.Maximized },
-                    onUndoMaximizeRequest = { state.placement = WindowPlacement.Floating },
-                    isMaximized = state.placement == WindowPlacement.Maximized,
-                )
-                content.invoke(this@PreComposeWindow)
-            }
-        },
-    )
+    val nativeWindowController = rememberNativeWindowController()
+    CompositionLocalProvider(
+        LocalNativeWindowController provides nativeWindowController,
+        LocalPlatformWindow provides PlatformWindow(),
+    ) {
+        PreComposeWindow(
+            state = state,
+            visible = visible,
+            title = title,
+            icon = icon,
+            undecorated = true,
+            transparent = true,
+            resizable = resizable,
+            enabled = enabled,
+            focusable = focusable,
+            alwaysOnTop = alwaysOnTop,
+            onPreviewKeyEvent = onPreviewKeyEvent,
+            onKeyEvent = onKeyEvent,
+            onCloseRequest = onCloseRequest,
+            content = {
+                Box(
+                    modifier = Modifier.clip(RoundedCornerShape(8.dp)),
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        content.invoke(this@PreComposeWindow)
+                    }
+                    Box(
+                        modifier = Modifier.fillMaxWidth().zIndex(Float.MAX_VALUE),
+                        contentAlignment = Alignment.TopCenter,
+                    ) {
+                        PlatformTitleBar(
+                            title = title,
+                            icon = icon,
+                            isAppearanceLightTitleBar = nativeWindowController.isAppearanceLightTitleBar,
+                            operatingSystem = currentOperatingSystem,
+                            onCloseRequest = onCloseRequest,
+                            onMinimizeRequest = { state.isMinimized = true },
+                            onMaximizeRequest = { state.placement = WindowPlacement.Maximized },
+                            onUndoMaximizeRequest = { state.placement = WindowPlacement.Floating },
+                            isMaximized = state.placement == WindowPlacement.Maximized,
+                        )
+                    }
+                }
+            },
+        )
+    }
 }
 
 @Composable
 private fun WindowScope.PlatformTitleBar(
     title: String,
     icon: Painter?,
+    isAppearanceLightTitleBar: Boolean,
     operatingSystem: OperatingSystem,
     onCloseRequest: () -> Unit,
     onMinimizeRequest: () -> Unit,
@@ -124,31 +195,45 @@ private fun WindowScope.PlatformTitleBar(
     onUndoMaximizeRequest: () -> Unit,
     isMaximized: Boolean = false,
 ) {
+    val platformWindow = LocalPlatformWindow.current
+    val windowBarVisibility by platformWindow.windowBarVisibility.collectAsState(initial = true)
     WindowDraggableArea {
-        TwidereTheme(isDarkTheme()) {
+        MaterialTheme(
+            colors = if (isAppearanceLightTitleBar) {
+                lightColors()
+            } else {
+                darkColors()
+            }
+        ) {
             Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
+                color = Color.Transparent,
+                contentColor = contentColorFor(MaterialTheme.colors.background),
             ) {
-                when (operatingSystem) {
-                    OperatingSystem.MacOS -> OSXTitleBar(
-                        title = title,
-                        icon = icon,
-                        onCloseRequest = onCloseRequest,
-                        onMinimizeRequest = onMinimizeRequest,
-                        onMaximizeRequest = onMaximizeRequest,
-                        onUndoMaximizeRequest = onUndoMaximizeRequest,
-                        isMaximized = isMaximized
-                    )
-                    else -> WindowsTitleBar(
-                        title = title,
-                        icon = icon,
-                        onCloseRequest = onCloseRequest,
-                        onMinimizeRequest = onMinimizeRequest,
-                        onMaximizeRequest = onMaximizeRequest,
-                        onUndoMaximizeRequest = onUndoMaximizeRequest,
-                        isMaximized = isMaximized
-                    )
+                AnimatedVisibility(
+                    windowBarVisibility,
+                    enter = expandVertically(),
+                    exit = shrinkVertically(),
+                ) {
+                    when (operatingSystem) {
+                        OperatingSystem.MacOS -> OSXTitleBar(
+                            title = title,
+                            icon = icon,
+                            onCloseRequest = onCloseRequest,
+                            onMinimizeRequest = onMinimizeRequest,
+                            onMaximizeRequest = onMaximizeRequest,
+                            onUndoMaximizeRequest = onUndoMaximizeRequest,
+                            isMaximized = isMaximized
+                        )
+                        else -> WindowsTitleBar(
+                            title = title,
+                            icon = icon,
+                            onCloseRequest = onCloseRequest,
+                            onMinimizeRequest = onMinimizeRequest,
+                            onMaximizeRequest = onMaximizeRequest,
+                            onUndoMaximizeRequest = onUndoMaximizeRequest,
+                            isMaximized = isMaximized
+                        )
+                    }
                 }
             }
         }
@@ -260,9 +345,11 @@ private fun OSXTitleBar(
 ) {
     Box(
         modifier = Modifier
-            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .fillMaxWidth()
+            .padding(vertical = 8.dp, horizontal = 16.dp),
     ) {
         OSXWindowButtons(
+            modifier = Modifier.align(Alignment.CenterStart),
             onCloseRequest = onCloseRequest,
             onMinimizeRequest = onMinimizeRequest,
             onMaximizeRequest = onMaximizeRequest,
@@ -270,8 +357,7 @@ private fun OSXTitleBar(
             isMaximized = isMaximized
         )
         Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center,
+            modifier = Modifier.align(Alignment.Center),
         ) {
             WindowTitle(
                 title = title,
@@ -283,13 +369,17 @@ private fun OSXTitleBar(
 
 @Composable
 private fun OSXWindowButtons(
+    modifier: Modifier = Modifier,
     onCloseRequest: () -> Unit,
     onMinimizeRequest: () -> Unit,
     onMaximizeRequest: () -> Unit,
     onUndoMaximizeRequest: () -> Unit,
     isMaximized: Boolean = false,
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
         Box(
             modifier = Modifier
                 .size(12.dp)
@@ -319,3 +409,5 @@ private fun OSXWindowButtons(
         )
     }
 }
+
+val titleBarHeight = 8.dp * 2 + 24.dp

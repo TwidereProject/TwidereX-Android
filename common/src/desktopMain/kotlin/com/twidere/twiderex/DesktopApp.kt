@@ -30,8 +30,6 @@ import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
 import com.twidere.twiderex.init.Initializer
 import com.twidere.twiderex.init.TwidereServiceFactoryInitialTask
-import com.twidere.twiderex.kmp.LocalPlatformWindow
-import com.twidere.twiderex.kmp.PlatformWindow
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
@@ -171,7 +169,6 @@ private fun startDesktopApp() {
             ) {
                 FilePicker.init(window)
                 CompositionLocalProvider(
-                    LocalPlatformWindow provides PlatformWindow(),
                     LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
                 ) {
                     App(navController = navController)

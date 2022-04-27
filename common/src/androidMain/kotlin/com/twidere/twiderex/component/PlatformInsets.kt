@@ -189,7 +189,7 @@ actual fun ImeHeightWithInsets(
 }
 
 @Composable
-actual fun ImeBottomInsets(): Dp {
+actual fun imeBottomInsets(): Dp {
     val navigation = LocalWindowInsets.current.navigationBars
     val ime = LocalWindowInsets.current.ime
     ime.bottom.coerceAtLeast(navigation.bottom)
