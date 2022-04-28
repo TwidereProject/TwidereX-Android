@@ -30,7 +30,15 @@ typealias CodeVerifier = String
 typealias CodeChallenge = String
 
 private val stateAllowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
-private val codeAllowedChars = stateAllowedChars // + listOf('-', '_', '.', '~')
+private val codeAllowedChars = stateAllowedChars + listOf('-', '_', '.', '~')
+
+fun generateState(random: Random = SecureRandom().asKotlinRandom()): String {
+    return buildString(10) {
+        repeat(10) {
+            append(stateAllowedChars.random(random))
+        }
+    }
+}
 
 fun generateCodeVerifier(random: Random = SecureRandom().asKotlinRandom()): String {
     val size = (43..128).random(random)
@@ -51,12 +59,4 @@ fun generateCodeChallenge(verifier: CodeVerifier): CodeChallenge {
         .replace('+', '-')
         .replace('/', '_')
         .replace("=", "")
-}
-
-fun generateState(random: Random = SecureRandom().asKotlinRandom()): String {
-    return buildString(10) {
-        repeat(10) {
-            append(stateAllowedChars.random(random))
-        }
-    }
 }

@@ -68,8 +68,8 @@ fun NetworkImage(
                 account?.let {
                     (it.credentials as OAuthCredentials).let { oauth ->
                         OAuth2Authorization(
-                            tokenType = oauth.tokenType,
-                            accessToken = oauth.accessToken,
+                            tokenType = oauth.oauth2TokenType,
+                            accessToken = oauth.oauth2AccessToken,
                         )
                     }
                 } ?: EmptyAuthorization()

@@ -92,7 +92,7 @@ class TwitterSignInViewModel(
                 pinCodeProvider.invoke(webOAuthUrl)
             }
             if (!pinCode.isNullOrBlank()) {
-                val accessToken = service.getAccessToken(
+                val accessTokenV2 = service.getAccessToken(
                     codeVerifier = codeVerifier,
                     code = pinCode,
                 )
@@ -100,12 +100,16 @@ class TwitterSignInViewModel(
                     TwidereServiceFactory.createApiService(
                         type = PlatformType.Twitter,
                         credentials = OAuthCredentials(
-                            tokenType = accessToken.tokenType,
-                            accessToken = accessToken.accessToken,
-                            idToken = accessToken.idToken,
-                            refreshToken = accessToken.refreshToken,
-                            scope = accessToken.scope,
-                            expiresIn = accessToken.expiresIn,
+                            oauth1ConsumerKey = "",
+                            oauth1ConsumerSecret = "",
+                            oauth1AccessToken = "",
+                            oauth1AccessTokenSecret = "",
+                            oauth2AccessToken = accessTokenV2.tokenType,
+                            oauth2TokenType = accessTokenV2.accessToken,
+                            oauth2IdToken = accessTokenV2.idToken,
+                            oauth2RefreshToken = accessTokenV2.refreshToken,
+                            oauth2Scope = accessTokenV2.scope,
+                            oauth2ExpiresIn = accessTokenV2.expiresIn,
                         ),
                         accountKey = MicroBlogKey.Empty
                     ) as TwitterService
@@ -116,17 +120,21 @@ class TwitterSignInViewModel(
                     if (name != null && id != null) {
                         val displayKey = MicroBlogKey.twitter(name)
                         val internalKey = MicroBlogKey.twitter(id)
-                        val credentials_json = OAuthCredentials(
-                            tokenType = accessToken.tokenType,
-                            accessToken = accessToken.accessToken,
-                            idToken = accessToken.idToken,
-                            refreshToken = accessToken.refreshToken,
-                            scope = accessToken.scope,
-                            expiresIn = accessToken.expiresIn,
+                        val credentialsJson = OAuthCredentials(
+                            oauth1ConsumerKey = "",
+                            oauth1ConsumerSecret = "",
+                            oauth1AccessToken = "",
+                            oauth1AccessTokenSecret = "",
+                            oauth2AccessToken = accessTokenV2.tokenType,
+                            oauth2TokenType = accessTokenV2.accessToken,
+                            oauth2IdToken = accessTokenV2.idToken,
+                            oauth2RefreshToken = accessTokenV2.refreshToken,
+                            oauth2Scope = accessTokenV2.scope,
+                            oauth2ExpiresIn = accessTokenV2.expiresIn,
                         ).json()
                         if (repository.containsAccount(internalKey)) {
                             repository.findByAccountKey(internalKey)?.let {
-                                it.credentials_json = credentials_json
+                                it.credentials_json = credentialsJson
                                 repository.updateAccount(it)
                             }
                         } else {
@@ -135,7 +143,7 @@ class TwitterSignInViewModel(
                                 type = PlatformType.Twitter,
                                 accountKey = internalKey,
                                 credentials_type = CredentialsType.OAuth,
-                                credentials_json = credentials_json,
+                                credentials_json = credentialsJson,
                                 extras_json = "",
                                 user = user.toUi(accountKey = internalKey).toAmUser(),
                                 lastActive = System.currentTimeMillis()

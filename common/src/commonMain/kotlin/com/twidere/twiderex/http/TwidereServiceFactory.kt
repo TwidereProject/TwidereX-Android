@@ -51,8 +51,8 @@ class TwidereServiceFactory(private val configProvider: TwidereHttpConfigProvide
                             it as OAuthCredentials
                         }.let {
                             TwitterService(
-                                tokenType = it.tokenType,
-                                accessToken = it.accessToken,
+                                tokenType = it.oauth2TokenType,
+                                accessToken = it.oauth2AccessToken,
                                 httpClientFactory = createHttpClientFactory(),
                                 accountId = accountKey.id
                             )
