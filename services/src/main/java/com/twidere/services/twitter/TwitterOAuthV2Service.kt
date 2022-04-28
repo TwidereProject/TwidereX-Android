@@ -25,6 +25,7 @@ import com.twidere.services.http.authorization.EmptyAuthorization
 import com.twidere.services.twitter.api.TwitterOAuthV2Resources
 import com.twidere.services.twitter.model.AccessTokenV2
 import com.twidere.services.utils.queryString
+import java.net.URLEncoder
 
 class TwitterOAuthV2Service(
     private val clientId: String,
@@ -56,7 +57,7 @@ class TwitterOAuthV2Service(
         return "https://twitter.com/i/oauth2/authorize" +
             "?response_type=code" +
             "&client_id=$clientId" +
-            "&redirect_uri=$redirectUri" +
+            "&redirect_uri=${URLEncoder.encode(redirectUri, "UTF-8")}" +
             "&scope=$scopes" +
             "&state=$state" +
             "&code_challenge=$codeChallenge" +
