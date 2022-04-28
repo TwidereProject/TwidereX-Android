@@ -22,7 +22,7 @@ package com.twidere.services.twitter
 
 import com.twidere.services.http.HttpClientFactory
 import com.twidere.services.http.authorization.EmptyAuthorization
-import com.twidere.services.twitter.api.TwitterOAuthV2Resources
+import com.twidere.services.twitter.api.TwitterOAuthResources
 import com.twidere.services.twitter.model.AccessTokenV2
 import java.net.URLEncoder
 
@@ -37,10 +37,10 @@ class TwitterOAuthV2Service(
         redirectUri: String,
     ): AccessTokenV2 {
         return httpClientFactory.createResources(
-            TwitterOAuthV2Resources::class.java,
+            TwitterOAuthResources::class.java,
             TWITTER_BASE_URL,
             EmptyAuthorization(),
-        ).token(
+        ).accessTokenV2(
             clientId = clientId,
             code = code,
             codeVerifier = codeVerifier,
