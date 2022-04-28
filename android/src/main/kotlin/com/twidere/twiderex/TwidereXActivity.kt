@@ -76,6 +76,7 @@ import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.utils.IsActiveNetworkMeteredLiveData
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.precompose.lifecycle.PreComposeActivity
@@ -214,6 +215,7 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
     override fun onResume() {
         super.onResume()
         lifecycleScope.launchWhenResumed {
+            delay(500)
             CustomTabSignInChannel.onClose()
         }
     }

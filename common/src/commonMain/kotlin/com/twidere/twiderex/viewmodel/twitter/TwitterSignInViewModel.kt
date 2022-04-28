@@ -77,9 +77,10 @@ class TwitterSignInViewModel(
                 clientId,
                 TwidereServiceFactory.createHttpClientFactory()
             )
+            val redirectUri = if (isBuiltInKey()) RootDeepLinks.Callback.SignIn.Twitter else "oob"
             val webOAuthUrl = service.getWebOAuthUrl(
                 codeChallenge = codeChallenge,
-                redirectUri = if (isBuiltInKey()) RootDeepLinks.Callback.SignIn.Twitter else "oob",
+                redirectUri = redirectUri,
                 state = state,
             )
             val pinCode = if (isBuiltInKey()) {
@@ -95,6 +96,7 @@ class TwitterSignInViewModel(
                 val accessTokenV2 = service.getAccessToken(
                     codeVerifier = codeVerifier,
                     code = pinCode,
+                    redirectUri = redirectUri,
                 )
                 val user = (
                     TwidereServiceFactory.createApiService(
@@ -106,7 +108,6 @@ class TwitterSignInViewModel(
                             oauth1AccessTokenSecret = "",
                             oauth2AccessToken = accessTokenV2.tokenType,
                             oauth2TokenType = accessTokenV2.accessToken,
-                            oauth2IdToken = accessTokenV2.idToken,
                             oauth2RefreshToken = accessTokenV2.refreshToken,
                             oauth2Scope = accessTokenV2.scope,
                             oauth2ExpiresIn = accessTokenV2.expiresIn,
@@ -127,7 +128,6 @@ class TwitterSignInViewModel(
                             oauth1AccessTokenSecret = "",
                             oauth2AccessToken = accessTokenV2.tokenType,
                             oauth2TokenType = accessTokenV2.accessToken,
-                            oauth2IdToken = accessTokenV2.idToken,
                             oauth2RefreshToken = accessTokenV2.refreshToken,
                             oauth2Scope = accessTokenV2.scope,
                             oauth2ExpiresIn = accessTokenV2.expiresIn,

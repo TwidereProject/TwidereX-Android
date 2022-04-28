@@ -20,6 +20,7 @@
  */
 package com.twidere.services.twitter.api
 
+import com.twidere.services.twitter.model.AccessTokenV2
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
@@ -34,5 +35,5 @@ interface TwitterOAuthV2Resources {
         @Field("code_verifier") codeVerifier: String,
         @Field("grant_type") grantType: String,
         @Field("redirect_uri") redirectUri: String,
-    ): String
+    ): AccessTokenV2
 }

@@ -24,7 +24,6 @@ import com.twidere.services.http.HttpClientFactory
 import com.twidere.services.http.authorization.EmptyAuthorization
 import com.twidere.services.twitter.api.TwitterOAuthV2Resources
 import com.twidere.services.twitter.model.AccessTokenV2
-import com.twidere.services.utils.queryString
 import java.net.URLEncoder
 
 class TwitterOAuthV2Service(
@@ -35,6 +34,7 @@ class TwitterOAuthV2Service(
     suspend fun getAccessToken(
         codeVerifier: String,
         code: String,
+        redirectUri: String,
     ): AccessTokenV2 {
         return httpClientFactory.createResources(
             TwitterOAuthV2Resources::class.java,
@@ -45,8 +45,8 @@ class TwitterOAuthV2Service(
             code = code,
             codeVerifier = codeVerifier,
             grantType = "authorization_code",
-            redirectUri = "",
-        ).queryString()
+            redirectUri = redirectUri,
+        )
     }
 
     fun getWebOAuthUrl(

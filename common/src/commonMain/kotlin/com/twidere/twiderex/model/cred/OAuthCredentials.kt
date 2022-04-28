@@ -32,7 +32,6 @@ data class OAuthCredentials(
     // oauth2
     val oauth2AccessToken: String,
     val oauth2TokenType: String,
-    val oauth2IdToken: String,
     val oauth2RefreshToken: String?,
     val oauth2Scope: String,
     val oauth2ExpiresIn: String,

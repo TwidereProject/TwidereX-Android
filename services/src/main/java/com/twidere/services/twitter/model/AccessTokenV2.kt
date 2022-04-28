@@ -27,7 +27,6 @@ import kotlinx.serialization.Serializable
 data class AccessTokenV2(
     @SerialName("access_token") val accessToken: String,
     @SerialName("expires_in") val expiresIn: String,
-    @SerialName("id_token") val idToken: String,
     @SerialName("refresh_token") val refreshToken: String? = null,
     @SerialName("scope") val scope: String,
     @SerialName("token_type") val tokenType: String,
