@@ -20,8 +20,11 @@
  */
 package com.twidere.twiderex.viewmodel.twitter
 
-import com.twidere.services.twitter.TwitterOAuthService
+import com.twidere.services.twitter.TwitterOAuthV2Service
 import com.twidere.services.twitter.TwitterService
+import com.twidere.services.utils.generateCodeChallenge
+import com.twidere.services.utils.generateCodeVerifier
+import com.twidere.services.utils.generateState
 import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.dataprovider.mapper.toAmUser
 import com.twidere.twiderex.dataprovider.mapper.toUi
@@ -47,8 +50,7 @@ typealias OnResult = (success: Boolean) -> Unit
 class TwitterSignInViewModel(
     private val repository: AccountRepository,
     private val inAppNotification: InAppNotification,
-    private val consumerKey: String,
-    private val consumerSecret: String,
+    private val clientId: String,
     private val oAuthLauncher: OAuthLauncher,
     private val pinCodeProvider: PinCodeProvider,
     private val onResult: OnResult,
@@ -67,33 +69,43 @@ class TwitterSignInViewModel(
     private suspend fun beginOAuth(): Boolean {
         loading.value = true
         try {
-            val service = TwitterOAuthService(
-                consumerKey,
-                consumerSecret,
+            val codeVerifier = generateCodeVerifier()
+            val codeChallenge = generateCodeChallenge(codeVerifier)
+            val state = generateState()
+
+            val service = TwitterOAuthV2Service(
+                clientId,
                 TwidereServiceFactory.createHttpClientFactory()
             )
-            val token = service.getOAuthToken(
-                if (isBuiltInKey()) {
-                    RootDeepLinks.Callback.SignIn.Twitter
-                } else {
-                    "oob"
-                }
+            val webOAuthUrl = service.getWebOAuthUrl(
+                codeChallenge = codeChallenge,
+                redirectUri = if (isBuiltInKey()) RootDeepLinks.Callback.SignIn.Twitter else "oob",
+                state = state,
             )
             val pinCode = if (isBuiltInKey()) {
-                oAuthLauncher.launchOAuth(service.getWebOAuthUrl(token), "oauth_verifier")
+                val (code, authState) = oAuthLauncher.launchOAuth(webOAuthUrl, "code", "state")
+                if (authState != state) {
+                    throw Exception("Invalid state")
+                }
+                code
             } else {
-                pinCodeProvider.invoke(service.getWebOAuthUrl(token))
+                pinCodeProvider.invoke(webOAuthUrl)
             }
             if (!pinCode.isNullOrBlank()) {
-                val accessToken = service.getAccessToken(pinCode, token)
+                val accessToken = service.getAccessToken(
+                    codeVerifier = codeVerifier,
+                    code = pinCode,
+                )
                 val user = (
                     TwidereServiceFactory.createApiService(
                         type = PlatformType.Twitter,
                         credentials = OAuthCredentials(
-                            consumer_key = consumerKey,
-                            consumer_secret = consumerSecret,
-                            access_token = accessToken.oauth_token,
-                            access_token_secret = accessToken.oauth_token_secret
+                            tokenType = accessToken.tokenType,
+                            accessToken = accessToken.accessToken,
+                            idToken = accessToken.idToken,
+                            refreshToken = accessToken.refreshToken,
+                            scope = accessToken.scope,
+                            expiresIn = accessToken.expiresIn,
                         ),
                         accountKey = MicroBlogKey.Empty
                     ) as TwitterService
@@ -105,10 +117,12 @@ class TwitterSignInViewModel(
                         val displayKey = MicroBlogKey.twitter(name)
                         val internalKey = MicroBlogKey.twitter(id)
                         val credentials_json = OAuthCredentials(
-                            consumer_key = consumerKey,
-                            consumer_secret = consumerSecret,
-                            access_token = accessToken.oauth_token,
-                            access_token_secret = accessToken.oauth_token_secret,
+                            tokenType = accessToken.tokenType,
+                            accessToken = accessToken.accessToken,
+                            idToken = accessToken.idToken,
+                            refreshToken = accessToken.refreshToken,
+                            scope = accessToken.scope,
+                            expiresIn = accessToken.expiresIn,
                         ).json()
                         if (repository.containsAccount(internalKey)) {
                             repository.findByAccountKey(internalKey)?.let {
@@ -140,7 +154,7 @@ class TwitterSignInViewModel(
     }
 
     private fun isBuiltInKey(): Boolean {
-        return consumerKey == BuildConfig.CONSUMERKEY && consumerSecret == BuildConfig.CONSUMERSECRET
+        return clientId == BuildConfig.ClientID
     }
 
     fun cancel() {

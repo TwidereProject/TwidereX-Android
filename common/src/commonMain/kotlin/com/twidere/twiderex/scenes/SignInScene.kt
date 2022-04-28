@@ -142,8 +142,7 @@ private fun TwitterSignIn() {
             scope.launch {
                 navController.navigateForResult(
                     Root.SignIn.Twitter(
-                        BuildConfig.CONSUMERKEY,
-                        BuildConfig.CONSUMERSECRET,
+                        BuildConfig.ClientID,
                     )
                 )?.let {
                     it as Boolean
@@ -196,7 +195,7 @@ private fun TwitterCustomKeySignIn(
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
     var apiKey by remember { mutableStateOf("") }
-    var apiSecret by remember { mutableStateOf("") }
+    // var apiSecret by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = {
             onDismissRequest.invoke()
@@ -215,14 +214,14 @@ private fun TwitterCustomKeySignIn(
                         Text(text = "API key")
                     }
                 )
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = apiSecret,
-                    onValueChange = { apiSecret = it },
-                    placeholder = {
-                        Text(text = "API secret key")
-                    }
-                )
+                // OutlinedTextField(
+                //     modifier = Modifier.fillMaxWidth(),
+                //     value = apiSecret,
+                //     onValueChange = { apiSecret = it },
+                //     placeholder = {
+                //         Text(text = "API secret key")
+                //     }
+                // )
             }
         },
         dismissButton = {
@@ -241,7 +240,6 @@ private fun TwitterCustomKeySignIn(
                         navController.navigateForResult(
                             Root.SignIn.Twitter(
                                 apiKey,
-                                apiSecret,
                             )
                         )?.let {
                             it as Boolean
@@ -252,7 +250,7 @@ private fun TwitterCustomKeySignIn(
                         }
                     }
                 },
-                enabled = apiKey.isNotEmpty() && apiSecret.isNotEmpty()
+                enabled = apiKey.isNotEmpty() // && apiSecret.isNotEmpty()
             ) {
                 Text(text = stringResource(res = MR.strings.scene_drawer_sign_in))
             }

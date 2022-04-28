@@ -205,16 +205,14 @@ private fun Module.trend() {
 
 private fun Module.twitter() {
     viewModel { (
-        consumerKey: String,
-        consumerSecret: String,
+        clientId: String,
         pinCodeProvider: suspend (url: String) -> String?,
         onResult: (success: Boolean) -> Unit,
     ) ->
         TwitterSignInViewModel(
             get(),
             get(),
-            consumerKey,
-            consumerSecret,
+            clientId,
             get(),
             pinCodeProvider,
             onResult,

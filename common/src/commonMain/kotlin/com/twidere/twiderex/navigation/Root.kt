@@ -45,7 +45,7 @@ expect object Root {
         val General: String
 
         object Twitter : IRoute {
-            operator fun invoke(consumerKey: String, consumerSecret: String): String
+            operator fun invoke(clientId: String): String
         }
 
         val Mastodon: String

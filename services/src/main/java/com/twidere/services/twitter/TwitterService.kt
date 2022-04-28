@@ -24,7 +24,7 @@ import com.twidere.services.http.AuthorizationInterceptor
 import com.twidere.services.http.Errors
 import com.twidere.services.http.HttpClientFactory
 import com.twidere.services.http.MicroBlogNotFoundException
-import com.twidere.services.http.authorization.OAuth1Authorization
+import com.twidere.services.http.authorization.OAuth2Authorization
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.DownloadMediaService
 import com.twidere.services.microblog.ListsService
@@ -76,10 +76,8 @@ internal const val TWITTER_BASE_URL = "https://api.twitter.com/"
 internal const val UPLOAD_TWITTER_BASE_URL = "https://upload.twitter.com/"
 
 class TwitterService(
-    private val consumer_key: String,
-    private val consumer_secret: String,
-    private val access_token: String,
-    private val access_token_secret: String,
+    private val tokenType: String,
+    private val accessToken: String,
     private val httpClientFactory: HttpClientFactory,
     private val accountId: String = ""
 ) : MicroBlogService,
@@ -96,7 +94,7 @@ class TwitterService(
         get() = httpClientFactory.createResources(
             clazz = TwitterResources::class.java,
             baseUrl = TWITTER_BASE_URL,
-            authorization = createOAuth1Authorization(),
+            authorization = createOAuth2Authorization(),
             useCache = true,
         )
 
@@ -104,15 +102,13 @@ class TwitterService(
         get() = httpClientFactory.createResources(
             clazz = UploadResources::class.java,
             baseUrl = UPLOAD_TWITTER_BASE_URL,
-            authorization = createOAuth1Authorization(),
+            authorization = createOAuth2Authorization(),
             useCache = true
         )
 
-    private fun createOAuth1Authorization() = OAuth1Authorization(
-        consumer_key,
-        consumer_secret,
-        access_token,
-        access_token_secret,
+    private fun createOAuth2Authorization() = OAuth2Authorization(
+        tokenType = tokenType,
+        accessToken = accessToken,
     )
 
     override suspend fun homeTimeline(
@@ -529,7 +525,7 @@ class TwitterService(
 
     override suspend fun download(target: String): InputStream {
         return httpClientFactory.createHttpClientBuilder()
-            .addInterceptor(AuthorizationInterceptor(createOAuth1Authorization()))
+            .addInterceptor(AuthorizationInterceptor(createOAuth2Authorization()))
             .build()
             .newCall(
                 Request

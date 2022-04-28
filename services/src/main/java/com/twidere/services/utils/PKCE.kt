@@ -29,14 +29,15 @@ typealias CodeVerifier = String
 
 typealias CodeChallenge = String
 
-private const val CHALLENGE_FLAGS = Base64.URL_SAFE or Base64.NO_WRAP
-
-private val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9') + listOf('-', '_', '.', '~')
+private val stateAllowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+private val codeAllowedChars = stateAllowedChars // + listOf('-', '_', '.', '~')
 
 fun generateCodeVerifier(random: Random = SecureRandom().asKotlinRandom()): String {
     val size = (43..128).random(random)
     return buildString(size) {
-        repeat(size) { allowedChars.random(random) }
+        repeat(size) {
+            append(codeAllowedChars.random(random))
+        }
     }
 }
 
@@ -46,8 +47,16 @@ fun generateCodeChallenge(verifier: CodeVerifier): CodeChallenge {
     val messageDigest = MessageDigest.getInstance("SHA-256")
     messageDigest.update(bytes, 0, bytes.size)
     val digest = messageDigest.digest()
-    return Base64.encodeToString(digest, CHALLENGE_FLAGS)
+    return Base64.encodeToString(digest, Base64.URL_SAFE or Base64.NO_WRAP)
         .replace('+', '-')
         .replace('/', '_')
         .replace("=", "")
+}
+
+fun generateState(random: Random = SecureRandom().asKotlinRandom()): String {
+    return buildString(10) {
+        repeat(10) {
+            append(stateAllowedChars.random(random))
+        }
+    }
 }

@@ -31,7 +31,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import com.twidere.services.http.authorization.EmptyAuthorization
-import com.twidere.services.http.authorization.OAuth1Authorization
+import com.twidere.services.http.authorization.OAuth2Authorization
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.image.ImageEffects
 import com.twidere.twiderex.component.stringResource
@@ -67,11 +67,9 @@ fun NetworkImage(
             if (url.host == twitterTonApiHost) {
                 account?.let {
                     (it.credentials as OAuthCredentials).let { oauth ->
-                        OAuth1Authorization(
-                            consumerKey = oauth.consumer_key,
-                            consumerSecret = oauth.consumer_secret,
-                            accessToken = oauth.access_token,
-                            accessSecret = oauth.access_token_secret,
+                        OAuth2Authorization(
+                            tokenType = oauth.tokenType,
+                            accessToken = oauth.accessToken,
                         )
                     }
                 } ?: EmptyAuthorization()

@@ -18,24 +18,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.utils
+package com.twidere.services.twitter.model
 
-import com.twidere.twiderex.kmp.RemoteNavigator
-import moe.tlaster.precompose.navigation.QueryString
-import moe.tlaster.precompose.navigation.query
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-class OAuthLauncher(
-    private val navigator: RemoteNavigator
-) {
-    suspend fun launchOAuth(
-        uri: String,
-        vararg queryParameterNames: String,
-    ): List<String> {
-        navigator.launchOAuthUri(uri)
-        return QueryString(CustomTabSignInChannel.waitOne()).let { queryString ->
-            queryParameterNames.map {
-                queryString.query(it, "") ?: ""
-            }
-        }
-    }
-}
+@Serializable
+data class AccessTokenV2(
+    @SerialName("access_token") val accessToken: String,
+    @SerialName("expires_in") val expiresIn: String,
+    @SerialName("id_token") val idToken: String,
+    @SerialName("refresh_token") val refreshToken: String? = null,
+    @SerialName("scope") val scope: String,
+    @SerialName("token_type") val tokenType: String,
+)

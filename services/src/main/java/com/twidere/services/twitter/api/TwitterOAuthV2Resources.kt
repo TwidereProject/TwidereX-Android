@@ -18,24 +18,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.utils
+package com.twidere.services.twitter.api
 
-import com.twidere.twiderex.kmp.RemoteNavigator
-import moe.tlaster.precompose.navigation.QueryString
-import moe.tlaster.precompose.navigation.query
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
+import retrofit2.http.POST
 
-class OAuthLauncher(
-    private val navigator: RemoteNavigator
-) {
-    suspend fun launchOAuth(
-        uri: String,
-        vararg queryParameterNames: String,
-    ): List<String> {
-        navigator.launchOAuthUri(uri)
-        return QueryString(CustomTabSignInChannel.waitOne()).let { queryString ->
-            queryParameterNames.map {
-                queryString.query(it, "") ?: ""
-            }
-        }
-    }
+interface TwitterOAuthV2Resources {
+
+    @FormUrlEncoded
+    @POST("/2/oauth2/token")
+    suspend fun token(
+        @Field("client_id") clientId: String,
+        @Field("code") code: String,
+        @Field("code_verifier") codeVerifier: String,
+        @Field("grant_type") grantType: String,
+        @Field("redirect_uri") redirectUri: String,
+    ): String
 }

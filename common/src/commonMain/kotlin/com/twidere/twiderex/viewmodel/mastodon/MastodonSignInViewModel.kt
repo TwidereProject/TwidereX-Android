@@ -71,7 +71,7 @@ class MastodonSignInViewModel(
             )
             val application = service.createApplication()
             val target = service.getWebOAuthUrl(application)
-            val code = oAuthLauncher.launchOAuth(target, "code")
+            val (code) = oAuthLauncher.launchOAuth(target, "code")
             if (code.isNotBlank()) {
                 val accessTokenResponse = service.getAccessToken(code, application)
                 val accessToken = accessTokenResponse.accessToken

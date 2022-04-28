@@ -18,24 +18,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.utils
+package com.twidere.services.http.authorization
 
-import com.twidere.twiderex.kmp.RemoteNavigator
-import moe.tlaster.precompose.navigation.QueryString
-import moe.tlaster.precompose.navigation.query
+import okhttp3.Request
 
-class OAuthLauncher(
-    private val navigator: RemoteNavigator
-) {
-    suspend fun launchOAuth(
-        uri: String,
-        vararg queryParameterNames: String,
-    ): List<String> {
-        navigator.launchOAuthUri(uri)
-        return QueryString(CustomTabSignInChannel.waitOne()).let { queryString ->
-            queryParameterNames.map {
-                queryString.query(it, "") ?: ""
-            }
-        }
+class OAuth2Authorization(
+    private val tokenType: String,
+    private val accessToken: String,
+) : Authorization {
+
+    override val hasAuthorization: Boolean
+        get() = true
+
+    override fun getAuthorizationHeader(request: Request): String {
+        return "$tokenType $accessToken"
     }
 }

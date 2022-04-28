@@ -34,8 +34,7 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun TwitterSignInScene(
-    consumerKey: String,
-    consumerSecret: String,
+    clientId: String,
 ) {
     val navController = LocalNavController.current
     val navigator = LocalNavigator.current
@@ -44,8 +43,7 @@ fun TwitterSignInScene(
     }
     val viewModel: TwitterSignInViewModel = getViewModel {
         parametersOf(
-            consumerKey,
-            consumerSecret,
+            clientId,
             pinCodeProvider,
             { success: Boolean ->
                 navController.goBackWith(success)

@@ -24,8 +24,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OAuthCredentials(
-    val consumer_key: String,
-    val consumer_secret: String,
-    val access_token: String,
-    val access_token_secret: String,
+    val accessToken: String,
+    val tokenType: String,
+    val idToken: String,
+    val refreshToken: String?,
+    val scope: String,
+    val expiresIn: String,
 ) : Credentials

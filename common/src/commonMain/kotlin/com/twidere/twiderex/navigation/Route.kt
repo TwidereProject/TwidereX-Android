@@ -253,10 +253,11 @@ fun RouteBuilder.route(constraints: Constraints) {
     scene(
         Root.SignIn.Twitter,
     ) { backStackEntry ->
-        val consumerKey = backStackEntry.path<String>("consumerKey")
-        val consumerSecret = backStackEntry.path<String>("consumerSecret")
-        if (consumerKey != null && consumerSecret != null) {
-            TwitterSignInScene(consumerKey = consumerKey, consumerSecret = consumerSecret)
+        val clientId = backStackEntry.path<String>("clientId")
+        if (clientId != null) {
+            TwitterSignInScene(
+                clientId = clientId,
+            )
         }
     }
 

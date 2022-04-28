@@ -1,4 +1,5 @@
 
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type
 import org.jetbrains.compose.compose
 import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import org.jetbrains.kotlin.konan.properties.loadProperties
@@ -137,16 +138,17 @@ buildkonfig {
     packageName = Package.id
     objectName = "BuildConfig"
     defaultConfigs {
-        buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "VERSION_NAME", Package.versionName)
-        buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "APPLICATION_ID", Package.id)
-        buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "APPLICATION_NAME", Package.name)
+        buildConfigField(Type.STRING, "VERSION_NAME", Package.versionName)
+        buildConfigField(Type.STRING, "APPLICATION_ID", Package.id)
+        buildConfigField(Type.STRING, "APPLICATION_NAME", Package.name)
         val apiKeyProperties = rootProject.file("apiKey.properties")
         val hasApiKeyProps = apiKeyProperties.exists()
         if (hasApiKeyProps) {
             val apiKeyProp = loadProperties(apiKeyProperties.absolutePath)
-            buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "CONSUMERKEY", apiKeyProp.getProperty("ConsumerKey"))
-            buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "CONSUMERSECRET", apiKeyProp.getProperty("ConsumerSecret"))
-            buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "GIPHYKEY", apiKeyProp.getProperty("GiphyKey"))
+            buildConfigField(Type.STRING, "CONSUMERKEY", apiKeyProp.getProperty("ConsumerKey"))
+            buildConfigField(Type.STRING, "CONSUMERSECRET", apiKeyProp.getProperty("ConsumerSecret"))
+            buildConfigField(Type.STRING, "GIPHYKEY", apiKeyProp.getProperty("GiphyKey"))
+            buildConfigField(Type.STRING, "ClientID", apiKeyProp.getProperty("ClientID"))
         }
     }
 }
