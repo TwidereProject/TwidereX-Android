@@ -28,22 +28,13 @@ class DateSerializerTest {
 
     @Test
     fun test() {
-        val date1 = "2019-04-12T16:38:15Z"
-        assertNotNull(DateFormatUtils.parse(date1))
-
-        val date2 = "2019-04-12T16:38:15.123Z"
-        assertNotNull(DateFormatUtils.parse(date2))
-
-        val date3 = "Thu May 05 06:29:56 +0000 2022"
-        assertNotNull(DateFormatUtils.parse(date3))
-
-        val date4 = "Dec 2, 2017 8:45 AM UTC"
-        assertNotNull(DateFormatUtils.parse(date4))
-
-        val date5 = "Dec 2, 2017 · 8:45 AM UTC"
-        assertNotNull(DateFormatUtils.parse(date5))
-
-        val date6 = "2022-05-05T06:05:28.000Z"
-        assertNotNull(DateFormatUtils.parse(date6))
+        assertNotNull(DateFormatUtils.parse("2019-04-12T16:38:15"))
+        assertNotNull(DateFormatUtils.parse("2019-04-12T16:38:15Z"))
+        assertNotNull(DateFormatUtils.parse("2019-04-12T16:38:15.123"))
+        assertNotNull(DateFormatUtils.parse("2022-05-05T06:05:28.000Z"))
+        assertNotNull(DateFormatUtils.parse("Thu May 05 06:29:56 +0000 2022"))
+        assertNotNull(DateFormatUtils.parse("Dec 2, 2017 8:45 AM UTC"))
+        assertNotNull(DateFormatUtils.parse("Dec 2, 2017·8:45 AM UTC"))
+        assertNotNull(DateFormatUtils.parse("Dec 2, 2017 · 8:45 AM UTC"))
     }
 }

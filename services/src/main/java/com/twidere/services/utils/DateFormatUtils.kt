@@ -28,10 +28,13 @@ import java.util.Locale
 object DateFormatUtils {
 
     private val dateFormats = arrayOf(
+        "yyyy-MM-dd'T'HH:mm:ss",
         "yyyy-MM-dd'T'HH:mm:ssZ",
+        "yyyy-MM-dd'T'HH:mm:ss.SSS",
         "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
         "EEE MMM dd HH:mm:ss Z yyyy",
         "MMM d, yyyy H:mm aaa ZZZZ",
+        "MMM d, yyyy·H:mm aaa ZZZZ",
         "MMM d, yyyy · H:mm aaa ZZZZ",
     )
 
