@@ -23,7 +23,7 @@ package com.twidere.services.twitter.model
 import com.twidere.services.serializer.DateSerializerV2
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.util.Date
+import org.joda.time.DateTime
 
 @Serializable
 data class PollV2(
@@ -35,7 +35,7 @@ data class PollV2(
 
     @SerialName("end_datetime")
     @Serializable(with = DateSerializerV2::class)
-    val endDatetime: Date? = null,
+    val endDatetime: DateTime? = null,
 
     @SerialName("voting_status")
     val votingStatus: String? = null

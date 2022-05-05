@@ -25,7 +25,7 @@ import com.twidere.services.serializer.DateSerializerV2
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import java.util.Date
+import org.joda.time.DateTime
 
 @Serializable
 data class StatusV2(
@@ -52,7 +52,7 @@ data class StatusV2(
 
     @SerialName("created_at")
     @Serializable(with = DateSerializerV2::class)
-    val createdAt: Date? = null,
+    val createdAt: DateTime? = null,
 
     @SerialName("public_metrics")
     val publicMetrics: StatusV2PublicMetrics? = null,

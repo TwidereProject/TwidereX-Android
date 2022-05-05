@@ -142,7 +142,7 @@ internal fun StatusV2.toUiStatus(
         sensitive = possiblySensitive ?: false,
         rawText = text ?: "",
         htmlText = autolink.autoLink(text ?: ""),
-        timestamp = createdAt?.time ?: 0,
+        timestamp = createdAt?.millis ?: 0,
         metrics = StatusMetrics(
             retweet = publicMetrics?.retweetCount ?: 0,
             like = publicMetrics?.likeCount ?: 0,
@@ -246,7 +246,7 @@ internal fun Status.toUiStatus(
         sensitive = possiblySensitive ?: false,
         rawText = fullText ?: text ?: "",
         htmlText = autolink.autoLink(fullText ?: text ?: ""),
-        timestamp = createdAt?.time ?: 0,
+        timestamp = createdAt?.millis ?: 0,
         metrics = StatusMetrics(
             retweet = retweetCount ?: 0,
             like = favoriteCount ?: 0,

@@ -23,7 +23,7 @@ package com.twidere.services.mastodon.model
 import com.twidere.services.serializer.DateSerializerV2WithOffset
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.util.Date
+import org.joda.time.DateTime
 
 @Serializable
 data class Field(
@@ -31,5 +31,5 @@ data class Field(
     val value: String? = null,
     @SerialName("verified_at")
     @Serializable(with = DateSerializerV2WithOffset::class)
-    val verifiedAt: Date? = null,
+    val verifiedAt: DateTime? = null,
 )
