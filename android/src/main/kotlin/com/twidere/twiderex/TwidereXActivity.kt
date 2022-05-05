@@ -52,6 +52,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.twidere.twiderex.action.LocalStatusActions
@@ -73,10 +74,12 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.utils.CustomTabSignInChannel
-import com.twidere.twiderex.utils.IsActiveNetworkMeteredLiveData
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
+import com.twidere.twiderex.utils.asIsActiveNetworkFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.precompose.lifecycle.PreComposeActivity
 import moe.tlaster.precompose.lifecycle.setContent
@@ -103,9 +106,6 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
     private val remoteNavigator: RemoteNavigator by inject()
 
     private val isActiveNetworkMetered = MutableStateFlow(false)
-    private val isActiveNetworkMeteredLiveData by lazy {
-        IsActiveNetworkMeteredLiveData(connectivityManager = connectivityManager)
-    }
 
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -113,9 +113,10 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
         FilePicker.init(activityResultRegistry, this, contentResolver)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        isActiveNetworkMeteredLiveData.observe(this) {
-            isActiveNetworkMetered.value = it
-        }
+        connectivityManager.asIsActiveNetworkFlow()
+            .flowWithLifecycle(getLifecycle())
+            .onEach { isActiveNetworkMetered.value = it }
+            .launchIn(lifecycleScope)
         setContent {
             var showSplash by rememberSaveable { mutableStateOf(true) }
             LaunchedEffect(Unit) {
