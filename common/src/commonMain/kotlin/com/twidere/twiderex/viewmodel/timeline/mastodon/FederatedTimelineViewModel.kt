@@ -43,8 +43,9 @@ class FederatedTimelineViewModel(
 
     override val pagingMediator by lazy {
         account.map {
+            val mastodonService = it.service as? MastodonService ?: return@map null
             FederatedTimelineMediator(
-                it.service as MastodonService,
+                mastodonService,
                 it.accountKey,
                 database,
             )
