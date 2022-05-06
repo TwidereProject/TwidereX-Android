@@ -58,7 +58,7 @@ import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiSearch
 import com.twidere.twiderex.model.ui.UiUrlEntity
 import org.jetbrains.annotations.TestOnly
-import java.util.Date
+import org.joda.time.DateTime
 import java.util.UUID
 
 @TestOnly
@@ -141,7 +141,7 @@ fun mockIListModel(
         name = name,
         mode = mode,
         description = description,
-        createdAt = Date().apply { time = System.currentTimeMillis() }
+        createdAt = DateTime.now(),
     )
 }
 
@@ -156,7 +156,7 @@ fun mockIStatus(
     return StatusV2(
         id = id,
         authorID = authorId,
-        createdAt = Date().apply { time = System.currentTimeMillis() },
+        createdAt = DateTime.now(),
         attachments = if (hasMedia) AttachmentsV2(mediaKeys = listOf("mediaKey")).apply {
             media = listOf(MediaV2(url = "mediaUrl", type = "photo"))
         } else null,
@@ -186,7 +186,7 @@ fun mockINotification(id: String = UUID.randomUUID().toString()): INotification 
     return Notification(
         id = id,
         type = NotificationTypes.status,
-        createdAt = Date().apply { time = System.currentTimeMillis() },
+        createdAt = DateTime.now(),
         account = account,
         status = Status(
             id = id,
@@ -241,7 +241,7 @@ fun UiDMEvent.toConversation() = UiDMConversation(
     accountKey = accountKey,
     conversationId = conversationKey.id,
     conversationKey = conversationKey,
-    conversationAvatar = sender.profileImage.toString(),
+    conversationAvatar = sender.profileImage,
     conversationName = sender.name,
     conversationSubName = sender.screenName,
     conversationType = UiDMConversation.Type.ONE_TO_ONE,
