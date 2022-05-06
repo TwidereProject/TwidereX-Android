@@ -39,7 +39,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jetbrains.skia.Codec
 import org.jetbrains.skia.Data
-import java.io.Closeable
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
