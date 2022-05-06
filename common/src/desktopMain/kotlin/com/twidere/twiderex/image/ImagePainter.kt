@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toPainter
+import com.twidere.services.utils.await
 import com.twidere.twiderex.component.foundation.NetworkImageState
 import com.twidere.twiderex.component.image.ImageEffects
 import kotlinx.coroutines.CoroutineScope
@@ -34,11 +35,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.jetbrains.skia.Codec
 import org.jetbrains.skia.Data
+import java.io.Closeable
 import java.io.File
+import java.io.IOException
 import java.io.InputStream
-import java.net.HttpURLConnection
 import java.net.URL
 import javax.imageio.ImageIO
 
@@ -50,7 +54,8 @@ internal class ImagePainter(
     private val parentScope: CoroutineScope,
     private val imageCache: ImageCache,
     private val imageEffects: ImageEffects,
-    private val httpConnection: (URL) -> HttpURLConnection = { it.openConnection() as HttpURLConnection },
+    // private val httpConnection: (URL) -> HttpURLConnection = { it.openConnection() as HttpURLConnection },
+    private val callFactory: () -> OkHttpClient = { OkHttpClient() },
     private val onImageStateChanged: (NetworkImageState) -> Unit
 ) : Painter(), RememberObserver {
     private var painter = mutableStateOf<Painter?>(null)
@@ -111,11 +116,18 @@ internal class ImagePainter(
         var error: Throwable? = null
         try {
             if (mimeType == "image/gif") {
-                painter.value = GifPainter(Codec.makeFromData(Data.makeFromBytes(inputStream.readAllBytes())), parentScope)
+                painter.value = GifPainter(
+                    Codec.makeFromData(Data.makeFromBytes(inputStream.readAllBytes())),
+                    parentScope
+                )
             } else {
                 ImageIO.read(inputStream)?.let { image ->
                     imageEffects.blur?.let {
-                        ImageEffectsFilter.applyBlurFilter(image, it.blurRadius.toInt(), it.bitmapScale)
+                        ImageEffectsFilter.applyBlurFilter(
+                            image,
+                            it.blurRadius.toInt(),
+                            it.bitmapScale
+                        )
                     } ?: image
                 }?.let {
                     painter.value = it.toPainter()
@@ -145,32 +157,24 @@ internal class ImagePainter(
     }
 
     private suspend fun networkRequest(url: URL) {
-        var connection: HttpURLConnection? = null
         var error: Throwable? = null
         try {
+            val request = Request.Builder().url(url).build()
             var mimeType = ""
             val input = imageCache.fetch(url.toString())?.let {
                 mimeType = it.toURI().toURL().openConnection().contentType
                 it.inputStream()
-            } ?: httpConnection(url).let {
-                connection = it
-                it.setRequestProperty("Accept", "image/*")
-                it.connect()
-                mimeType = it.contentType
-                imageCache.store(url.toString(), it.inputStream)?.inputStream() ?: it.inputStream
-            }
+            } ?: callFactory().newCall(request).await().body?.use { body ->
+                mimeType = body.contentType().toString()
+                imageCache.store(url.toString(), body.byteStream())?.inputStream()
+                    ?: body.byteStream()
+            } ?: throw IOException("No response body")
             generatePainter(
                 inputStream = input,
                 mimeType = mimeType
             )
         } catch (e: Throwable) {
             error = e
-        } finally {
-            try {
-                connection?.disconnect()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
         }
         if (error != null) throw error
     }

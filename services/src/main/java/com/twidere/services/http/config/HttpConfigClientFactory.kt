@@ -124,41 +124,69 @@ class HttpConfigClientFactory(private val configProvider: HttpConfigProvider) : 
         return proxy(OkHttpClient.Builder(), config.proxyConfig)
     }
 
-    private fun proxy(builder: OkHttpClient.Builder, proxyConfig: ProxyConfig): OkHttpClient.Builder {
+    private fun proxy(
+        builder: OkHttpClient.Builder,
+        proxyConfig: ProxyConfig
+    ): OkHttpClient.Builder {
         return if (proxyConfig.enable) {
+
             when (proxyConfig.type) {
                 ProxyConfig.Type.HTTP -> {
-                    if (proxyConfig.port !in (0..65535)) {
-                        return builder
-                    }
-                    val address = InetSocketAddress.createUnresolved(
-                        proxyConfig.server,
-                        proxyConfig.port
+                    proxyOkHttpBuilder(
+                        builder,
+                        proxyType = Proxy.Type.HTTP,
+                        host = proxyConfig.server,
+                        port = proxyConfig.port,
+                        username = proxyConfig.userName,
+                        password = proxyConfig.password,
                     )
-                    builder.proxy(Proxy(Proxy.Type.HTTP, address))
-                        .proxyAuthenticator { _, response ->
-                            val b = response.request.newBuilder()
-                            if (response.code == 407) {
-                                if (proxyConfig.userName.isNotEmpty() &&
-                                    proxyConfig.password.isNotEmpty()
-                                ) {
-                                    val credential = Credentials.basic(
-                                        proxyConfig.userName,
-                                        proxyConfig.password
-                                    )
-                                    b.header("Proxy-Authorization", credential)
-                                }
-                            }
-                            b.build()
-                        }
+                }
+                ProxyConfig.Type.SOCKS -> {
+                    proxyOkHttpBuilder(
+                        builder,
+                        proxyType = Proxy.Type.SOCKS,
+                        host = proxyConfig.server,
+                        port = proxyConfig.port,
+                        username = proxyConfig.userName,
+                        password = proxyConfig.password,
+                    )
                 }
                 ProxyConfig.Type.REVERSE -> {
-                    builder.addInterceptor(ReverseProxyInterceptor(proxyConfig.server, proxyConfig.userName, proxyConfig.password))
+                    builder.addInterceptor(
+                        ReverseProxyInterceptor(
+                            proxyConfig.server,
+                            proxyConfig.userName,
+                            proxyConfig.password,
+                        )
+                    )
                 }
             }
         } else {
             builder
         }
+    }
+
+    private fun proxyOkHttpBuilder(
+        builder: OkHttpClient.Builder,
+        proxyType: Proxy.Type,
+        host: String,
+        port: Int,
+        username: String,
+        password: String,
+    ): OkHttpClient.Builder {
+        if (port !in (0..65535)) return builder
+        val address = InetSocketAddress.createUnresolved(host, port)
+        return builder.proxy(Proxy(proxyType, address))
+            .proxyAuthenticator { _, response ->
+                val b = response.request.newBuilder()
+                if (response.code == 407) {
+                    if (username.isNotEmpty() && password.isNotEmpty()) {
+                        val credential = Credentials.basic(username, password)
+                        b.header("Proxy-Authorization", credential)
+                    }
+                }
+                b.build()
+            }
     }
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -186,7 +214,8 @@ class HttpConfigClientFactory(private val configProvider: HttpConfigProvider) : 
                         addInterceptor {
                             it.proceed(
                                 it.request().let { request ->
-                                    request.newBuilder().url(request.url.toString().replace("%20", "+")).build()
+                                    request.newBuilder()
+                                        .url(request.url.toString().replace("%20", "+")).build()
                                 }
                             )
                         }

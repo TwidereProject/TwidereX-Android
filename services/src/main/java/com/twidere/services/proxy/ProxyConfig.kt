@@ -31,6 +31,7 @@ data class ProxyConfig(
 
     enum class Type {
         HTTP,
+        SOCKS,
         REVERSE
     }
 }

@@ -44,6 +44,7 @@ class TwidereHttpConfigProvider(
                         password = it.proxyPassword,
                         type = when (it.proxyType) {
                             MiscPreferences.ProxyType.REVERSE -> ProxyConfig.Type.REVERSE
+                            MiscPreferences.ProxyType.SOCKS -> ProxyConfig.Type.SOCKS
                             else -> ProxyConfig.Type.HTTP
                         }
                     )
