@@ -29,5 +29,4 @@ internal class SceneRoute(
     val navTransition: NavTransition?,
     val deepLinks: List<String>,
     content: @Composable (BackStackEntry) -> Unit,
-) : ComposeRoute(route, content) {
-}
+) : ComposeRoute(route, content)
