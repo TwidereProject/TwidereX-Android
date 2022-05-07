@@ -30,9 +30,9 @@ import java.util.Locale
 class DateQueryConverterFactory : Converter.Factory() {
     override fun stringConverter(
         type: Type,
-        annotations: Array<Annotation?>?,
-        retrofit: Retrofit?
-    ): Converter<*, String?>? {
+        annotations: Array<out Annotation>,
+        retrofit: Retrofit
+    ): Converter<*, String>? {
         return if (type == Date::class.java) {
             DateQueryConverter.INSTANCE
         } else {
@@ -40,16 +40,12 @@ class DateQueryConverterFactory : Converter.Factory() {
         }
     }
 
-    private class DateQueryConverter : Converter<Date?, String?> {
+    private class DateQueryConverter : Converter<Date, String> {
         val simpleDateFormat by lazy {
             SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH)
         }
-        override fun convert(date: Date?): String? {
-            return if (date == null) {
-                null
-            } else {
-                simpleDateFormat.format(date)
-            }
+        override fun convert(date: Date): String? {
+            return simpleDateFormat.format(date)
         }
         companion object {
             val INSTANCE = DateQueryConverter()

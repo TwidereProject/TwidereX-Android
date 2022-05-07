@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.notification.notificationChannelId
@@ -46,8 +47,9 @@ actual fun AccountNotificationChannelDetail(
     accountKey: MicroBlogKey,
 ) {
     val context = LocalContext.current
+    val resLoader = LocalResLoader.current
     NotificationChannelSpec.values().filter { it.grouped }
-        .sortedBy { stringResource(res = it.nameRes) }
+        .sortedBy { resLoader.getString(res = it.nameRes) }
         .forEach {
             ListItem(
                 modifier = Modifier.clickable(
