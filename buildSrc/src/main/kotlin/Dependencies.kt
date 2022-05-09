@@ -33,7 +33,7 @@ fun DependencyHandlerScope.retrofit() {
 }
 
 fun DependencyHandlerScope.okhttp() {
-    implementation("com.squareup.okhttp3:okhttp", Versions.okhttp)
+    api("com.squareup.okhttp3:okhttp", Versions.okhttp)
     implementation("com.squareup.okhttp3:logging-interceptor", Versions.okhttp)
 }
 

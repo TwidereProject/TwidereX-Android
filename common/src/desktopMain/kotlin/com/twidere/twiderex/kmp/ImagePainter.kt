@@ -26,21 +26,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.painter.Painter
 import com.twidere.services.http.authorization.Authorization
 import com.twidere.services.http.config.HttpConfig
-import com.twidere.services.proxy.ProxyConfig
-import com.twidere.services.proxy.ReverseProxyHandler
 import com.twidere.twiderex.component.foundation.NetworkImageState
 import com.twidere.twiderex.component.image.ImageEffects
+import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.image.ImageCacheImpl
 import com.twidere.twiderex.image.ImagePainter
 import kotlinx.coroutines.Dispatchers
-import okhttp3.Credentials
-import okhttp3.HttpUrl
-import okhttp3.Request
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.InetSocketAddress
-import java.net.Proxy
-import java.net.URL
 
 @Composable
 internal actual fun rememberNetworkImagePainter(
@@ -60,55 +51,13 @@ internal actual fun rememberNetworkImagePainter(
                 cacheDir = cacheDir,
             ),
             imageEffects = effects,
-            httpConnection = {
-                generateConnection(
-                    httpConfig = httpConfig,
-                    authorization = authorization,
-                    url = it
-                )
+            callFactory = {
+                TwidereServiceFactory
+                    .createHttpClientFactory()
+                    .createHttpClientBuilder()
+                    .build()
             },
             onImageStateChanged = onImageStateChanged
         )
     }
-}
-
-private fun generateConnection(httpConfig: HttpConfig, authorization: Authorization, url: URL): HttpURLConnection {
-    val proxyConfig = httpConfig.proxyConfig
-    val connection = if (proxyConfig.enable) {
-        when (proxyConfig.type) {
-            ProxyConfig.Type.HTTP -> {
-                val proxy = if (proxyConfig.port !in (0..65535)) {
-                    Proxy.NO_PROXY
-                } else {
-                    val address = InetSocketAddress.createUnresolved(
-                        proxyConfig.server,
-                        proxyConfig.port
-                    )
-                    Proxy(Proxy.Type.HTTP, address)
-                }
-                url.openConnection(proxy)
-            }
-            ProxyConfig.Type.REVERSE -> {
-                val con = HttpUrl.get(url)?.let {
-                    try {
-                        URL(ReverseProxyHandler.replaceUrl(it, proxyConfig.server))
-                    } catch (e: Throwable) {
-                        throw IOException("Invalid reverse proxy format")
-                    }
-                }?.openConnection() ?: url.openConnection()
-                if (proxyConfig.userName.isNotEmpty() && proxyConfig.password.isNotEmpty()) {
-                    val credential = Credentials.basic(
-                        proxyConfig.userName,
-                        proxyConfig.password
-                    )
-                    con.setRequestProperty("Proxy-Authorization", credential)
-                }
-                con
-            }
-        }
-    } else url.openConnection()
-    if (authorization.hasAuthorization) {
-        connection.setRequestProperty("Authorization", authorization.getAuthorizationHeader(Request.Builder().url(url).build()))
-    }
-    return connection as HttpURLConnection
 }

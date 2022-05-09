@@ -261,6 +261,7 @@ fun ColumnScope.ProxyPreference(
 fun proxyTypeValue(type: MiscPreferences.ProxyType): String {
     return when (type) {
         MiscPreferences.ProxyType.HTTP -> stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_type_http)
+        MiscPreferences.ProxyType.SOCKS -> stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_type_socks)
         MiscPreferences.ProxyType.REVERSE -> stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_type_reverse)
     }
 }
@@ -517,6 +518,7 @@ fun ProxyTypeSelectDialog(
                 RadioItem(
                     options = listOf(
                         MiscPreferences.ProxyType.HTTP,
+                        MiscPreferences.ProxyType.SOCKS,
                         MiscPreferences.ProxyType.REVERSE,
                     ),
                     value = selected,

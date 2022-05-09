@@ -35,6 +35,7 @@ data class MiscPreferences(
     @Serializable
     enum class ProxyType {
         HTTP,
+        SOCKS,
         REVERSE,
     }
 }
