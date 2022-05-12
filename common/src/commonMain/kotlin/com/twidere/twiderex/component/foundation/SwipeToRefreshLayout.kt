@@ -49,6 +49,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -56,7 +57,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
-import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalDensity
@@ -229,7 +229,7 @@ private class SwipeToRefreshState(
     private fun Offset.toFloat(): Float = this.y
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun SwipeToRefreshLayout(
     modifier: Modifier = Modifier,
@@ -266,7 +266,7 @@ fun SwipeToRefreshLayout(
                 detectVerticalDrag(
                     onVerticalDrag = { change, dragAmount ->
                         if (state.drag(dragAmount) != 0f) {
-                            change.consumePositionChange()
+                            if (change.positionChange() != Offset.Zero) change.consume()
                         }
                     },
                     onDragEnd = {

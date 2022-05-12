@@ -33,13 +33,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
-import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.layout
@@ -195,6 +195,7 @@ internal suspend fun PointerInputScope.detectTapAndDragGestures(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 private suspend fun PointerInputScope.detectDragGestures(
     state: ZoomableState,
     dismissGestureEnabled: State<Boolean>,
@@ -210,21 +211,21 @@ private suspend fun PointerInputScope.detectDragGestures(
                 var overSlop = Offset.Zero
                 val drag = if (state.isZooming) {
                     awaitTouchSlopOrCancellation(down.id) { change, over ->
-                        change.consumePositionChange()
+                        if (change.positionChange() != Offset.Zero) change.consume()
                         overSlop = over
                     }
                 } else {
                     awaitVerticalTouchSlopOrCancellation(down.id) { change, over ->
-                        change.consumePositionChange()
+                        if (change.positionChange() != Offset.Zero) change.consume()
                         overSlop = Offset(0f, over)
                     }
                 }
                 if (drag != null) {
                     onDrag(drag, overSlop)
                     if (
-                        !drag(drag.id) {
-                            onDrag(it, it.positionChange())
-                            it.consumePositionChange()
+                        !drag(drag.id) { change ->
+                            onDrag(change, change.positionChange())
+                            if (change.positionChange() != Offset.Zero) change.consume()
                         }
                     ) {
                         onDragCancel()

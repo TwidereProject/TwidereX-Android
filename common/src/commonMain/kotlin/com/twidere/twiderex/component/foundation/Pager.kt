@@ -40,11 +40,11 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
-import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
@@ -195,6 +195,7 @@ private data class PageData(val page: Int) : ParentDataModifier {
 private val Measurable.page: Int
     get() = (parentData as? PageData)?.page ?: error("no PageData for measurable $this")
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Pager(
     modifier: Modifier = Modifier,
@@ -235,7 +236,7 @@ fun Pager(
                                 val newPos =
                                     (pos + dragAmount).coerceIn(min.toFloat(), max.toFloat())
                                 if (newPos != 0f) {
-                                    change.consumePositionChange()
+                                    if (change.positionChange() != Offset.Zero) change.consume()
                                     addPosition(change.uptimeMillis, change.position)
                                     coroutineScope.launch {
                                         snapToOffset(newPos / pageSize)
