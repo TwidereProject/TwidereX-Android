@@ -1,5 +1,4 @@
 
-import org.jetbrains.compose.compose
 import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import org.jetbrains.kotlin.konan.properties.loadProperties
 
@@ -42,10 +41,10 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(compose.runtime)
-                api(compose.foundation)
-                api(compose.material)
-                api(compose.materialIconsExtended)
+                api("org.jetbrains.compose.runtime:runtime:${Versions.compose_jb}")
+                api("org.jetbrains.compose.foundation:foundation:${Versions.compose_jb}")
+                api("org.jetbrains.compose.material:material:${Versions.compose_jb}")
+                api("org.jetbrains.compose.material:material-icons-extended:${Versions.compose_jb}")
                 implementation(projects.services)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Kotlin.coroutines}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:${Versions.Kotlin.coroutines}")
@@ -77,8 +76,12 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
+                api("androidx.compose.runtime:runtime:${Versions.compose}")
+                api("androidx.compose.foundation:foundation:${Versions.compose}")
+                api("androidx.compose.material:material:${Versions.compose}")
+                api("androidx.compose.material:material-icons-extended:${Versions.compose}")
                 implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
-                implementation("androidx.savedstate:savedstate-ktx:1.1.0")
+                implementation("androidx.savedstate:savedstate-ktx:1.2.0-beta01")
                 implementation("androidx.core:core-ktx:1.8.0-alpha02")
                 implementation("io.insert-koin:koin-android:${Versions.koin}")
                 implementation("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
@@ -97,7 +100,6 @@ kotlin {
                 implementation("androidx.datastore:datastore-preferences:${Versions.datastore}")
                 implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
                 implementation("androidx.startup:startup-runtime:${Versions.startup}")
-                implementation("com.google.accompanist:accompanist-insets:${Versions.accompanist}")
                 implementation("androidx.browser:browser:${Versions.browser}")
                 implementation("androidx.vectordrawable:vectordrawable:1.2.0-alpha02")
                 implementation("androidx.activity:activity-compose:${Versions.activity}")

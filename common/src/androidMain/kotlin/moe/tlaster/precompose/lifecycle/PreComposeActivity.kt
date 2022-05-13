@@ -26,9 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
-import androidx.lifecycle.ViewTreeLifecycleOwner
-import androidx.savedstate.SavedStateRegistryOwner
-import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import moe.tlaster.precompose.ui.BackDispatcher
 import moe.tlaster.precompose.ui.BackDispatcherOwner
 import moe.tlaster.precompose.ui.LocalBackDispatcherOwner
@@ -42,7 +39,6 @@ open class PreComposeActivity :
     LifecycleOwner,
     ViewModelStoreOwner,
     androidx.lifecycle.LifecycleOwner,
-    SavedStateRegistryOwner,
     BackDispatcherOwner,
     androidx.lifecycle.LifecycleObserver {
     override val lifecycle by lazy {
@@ -99,20 +95,7 @@ fun PreComposeActivity.setContent(
         setContent {
             ContentInternal(content)
         }
-        // Set the view tree owners before setting the content view so that the inflation process
-        // and attach listeners will see them already present
-        setOwners()
         setContentView(this, DefaultActivityContentLayoutParams)
-    }
-}
-
-private fun PreComposeActivity.setOwners() {
-    val decorView = window.decorView
-    if (ViewTreeLifecycleOwner.get(decorView) == null) {
-        ViewTreeLifecycleOwner.set(decorView, this)
-    }
-    if (ViewTreeSavedStateRegistryOwner.get(decorView) == null) {
-        ViewTreeSavedStateRegistryOwner.set(decorView, this)
     }
 }
 
