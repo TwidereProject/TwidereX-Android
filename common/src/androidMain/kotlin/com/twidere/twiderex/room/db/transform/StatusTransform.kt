@@ -342,7 +342,7 @@ internal fun Poll.toUi() = id?.let {
             )
         } ?: emptyList(),
         expired = expired ?: false,
-        expiresAt = expiresAt?.time,
+        expiresAt = expiresAt?.millis,
         multiple = multiple ?: false,
         voted = voted ?: false,
         votersCount = votersCount,

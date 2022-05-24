@@ -73,6 +73,7 @@ kotlin {
                 implementation("io.insert-koin:koin-test:${Versions.koin}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.coroutines}")
                 implementation("io.mockk:mockk:1.12.1")
+                implementation("joda-time:joda-time:${Versions.jodaTime}")
             }
         }
         val androidMain by getting {

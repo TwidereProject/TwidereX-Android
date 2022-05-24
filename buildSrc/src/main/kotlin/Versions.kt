@@ -44,4 +44,5 @@ object Versions {
     const val sqlDelight = "1.5.3"
     const val javafx = "0.0.10"
     const val kFilePicker = "1.0.4"
+    const val jodaTime = "2.10.13"
 }

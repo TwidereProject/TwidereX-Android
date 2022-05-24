@@ -68,7 +68,7 @@ fun Notification.toPagingTimeline(
     return PagingTimeLineWithStatus(
         timeline = PagingTimeLine(
             accountKey = accountKey,
-            timestamp = createdAt?.time ?: 0,
+            timestamp = createdAt?.millis ?: 0,
             isGap = false,
             statusKey = status.statusKey,
             pagingKey = pagingKey,
@@ -95,7 +95,7 @@ fun Notification.toUiStatus(
         statusKey = statusKey,
         htmlText = "",
         rawText = "",
-        timestamp = this.createdAt?.time ?: 0,
+        timestamp = this.createdAt?.millis ?: 0,
         metrics = StatusMetrics(
             retweet = 0,
             like = 0,
@@ -193,7 +193,7 @@ internal fun Status.toUiStatus(
         }?.let {
             generateWithHashtag(content = it)
         } ?: "",
-        timestamp = createdAt?.time ?: 0,
+        timestamp = createdAt?.millis ?: 0,
         metrics = StatusMetrics(
             retweet = reblogsCount ?: 0,
             like = favouritesCount ?: 0,
@@ -274,7 +274,7 @@ fun Poll.toUi() = UiPoll(
             count = option.votesCount ?: 0
         )
     } ?: emptyList(),
-    expiresAt = expiresAt?.time,
+    expiresAt = expiresAt?.millis,
     expired = expired ?: false,
     multiple = multiple ?: false,
     voted = voted ?: false,
