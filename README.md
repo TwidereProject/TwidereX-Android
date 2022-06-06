@@ -35,7 +35,7 @@ Next generation of Twidere for Android 5.0+. **Still in early stage.**
 - [Mastodon] Add federated timeline and local timeline
 
 ### What is being planned for 1.6.0 - Aug 2021 Update
-For 1.6.0, we're planning to build an experimatal desktop version, this is a big step, you can check out our [milestore](https://github.com/TwidereProject/TwidereX-Android/milestone/4) for detail. Here is a shortlist:
+For 1.6.0, we're planning to build an experimatal desktop version, this is a big step, you can check out our [milestone](https://github.com/TwidereProject/TwidereX-Android/milestone/4) for detail. Here is a shortlist:
 
 - Experimatal desktop version.
 - Mute and block support.
