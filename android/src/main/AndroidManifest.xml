@@ -22,6 +22,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TwidereX">
+        <profileable
+            android:shell="true"
+            tools:targetApi="q" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.twidere.twiderex.fileprovider"

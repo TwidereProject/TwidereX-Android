@@ -3,6 +3,8 @@ plugins {
     id("com.diffplug.spotless").version(Versions.spotless)
     id("com.github.ben-manes.versions").version("0.39.0")
     id("com.dipien.byebyejetifier") version "1.2.2"
+    id("com.android.test") version Versions.agp apply false
+    id("org.jetbrains.kotlin.android") version Versions.Kotlin.lang apply false
 }
 buildscript {
     repositories {
