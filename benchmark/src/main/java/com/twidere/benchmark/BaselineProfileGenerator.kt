@@ -20,9 +20,8 @@
  */
 package com.twidere.benchmark
 
-import androidx.benchmark.macro.StartupMode
-import androidx.benchmark.macro.StartupTimingMetric
-import androidx.benchmark.macro.junit4.MacrobenchmarkRule
+import androidx.benchmark.macro.ExperimentalBaselineProfilesApi
+import androidx.benchmark.macro.junit4.BaselineProfileRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
 import org.junit.Test
@@ -40,17 +39,16 @@ import org.junit.runner.RunWith
  * Run this benchmark from Studio to see startup measurements, and captured system traces
  * for investigating your app's performance.
  */
+@OptIn(ExperimentalBaselineProfilesApi::class)
 @RunWith(AndroidJUnit4::class)
-class ExampleStartupBenchmark {
+class BaselineProfileGenerator {
+
     @get:Rule
-    val benchmarkRule = MacrobenchmarkRule()
+    val baselineProfileRule = BaselineProfileRule()
 
     @Test
-    fun startup() = benchmarkRule.measureRepeated(
+    fun startup() = baselineProfileRule.collectBaselineProfile(
         packageName = "com.twidere.twiderex",
-        metrics = listOf(StartupTimingMetric()),
-        iterations = 5,
-        startupMode = StartupMode.COLD
     ) {
         pressHome()
         startActivityAndWait()
