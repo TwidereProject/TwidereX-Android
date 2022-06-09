@@ -143,6 +143,8 @@ dependencies {
     implementation(projects.common)
     implementation("com.google.accompanist:accompanist-insets:${Versions.accompanist}")
     implementation("androidx.startup:startup-runtime:${Versions.startup}")
+    // write baseline.prof
+    implementation("androidx.profileinstaller:profileinstaller:1.2.0-beta03")
 
     if (enableGoogleVariant) {
         // START Non-FOSS component
