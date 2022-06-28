@@ -11,7 +11,6 @@ buildscript {
     dependencies {
         classpath(kotlin("gradle-plugin", version = Versions.Kotlin.lang))
         classpath("com.android.tools.build:gradle:${Versions.agp}")
-        classpath("com.squareup.sqldelight:gradle-plugin:${Versions.sqlDelight}")
     }
 }
 

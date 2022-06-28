@@ -96,7 +96,7 @@ public class LazyPagingItems<T : Any> internal constructor(
 
     private val pagingDataDiffer = object : PagingDataDiffer<T>(
         differCallback = differCallback,
-        mainDispatcher = mainDispatcher
+        mainContext = mainDispatcher
     ) {
         override suspend fun presentNewList(
             previousList: NullPaddedList<T>,

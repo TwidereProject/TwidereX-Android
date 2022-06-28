@@ -9,7 +9,7 @@ plugins {
     id("com.android.library")
     id("com.google.devtools.ksp").version(Versions.ksp)
     id("dev.icerock.mobile.multiplatform-resources") version Versions.moko
-    id("com.squareup.sqldelight")
+    id("com.squareup.sqldelight") version Versions.sqlDelight
     id("com.codingfeline.buildkonfig") version "0.11.0"
 }
 
@@ -41,10 +41,10 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api("org.jetbrains.compose.runtime:runtime:${Versions.compose_jb}")
-                api("org.jetbrains.compose.foundation:foundation:${Versions.compose_jb}")
-                api("org.jetbrains.compose.material:material:${Versions.compose_jb}")
-                api("org.jetbrains.compose.material:material-icons-extended:${Versions.compose_jb}")
+                api(compose.runtime)
+                api(compose.foundation)
+                api(compose.material)
+                api(compose.materialIconsExtended)
                 implementation(projects.services)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Kotlin.coroutines}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:${Versions.Kotlin.coroutines}")
@@ -82,8 +82,7 @@ kotlin {
                 api("androidx.compose.material:material:${Versions.compose}")
                 api("androidx.compose.material:material-icons-extended:${Versions.compose}")
                 implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
-                implementation("androidx.savedstate:savedstate-ktx:1.2.0-beta01")
-                implementation("androidx.core:core-ktx:1.8.0-alpha02")
+                implementation("androidx.core:core-ktx:1.9.0-alpha05")
                 implementation("io.insert-koin:koin-android:${Versions.koin}")
                 implementation("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
                 implementation("androidx.work:work-runtime-ktx:${Versions.work}")
@@ -102,7 +101,7 @@ kotlin {
                 implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
                 implementation("androidx.startup:startup-runtime:${Versions.startup}")
                 implementation("androidx.browser:browser:${Versions.browser}")
-                implementation("androidx.vectordrawable:vectordrawable:1.2.0-alpha02")
+                implementation("androidx.vectordrawable:vectordrawable:1.2.0-beta01")
                 implementation("androidx.activity:activity-compose:${Versions.activity}")
                 implementation("com.github.android:renderscript-intrinsics-replacement-toolkit:b6363490c3")
             }
