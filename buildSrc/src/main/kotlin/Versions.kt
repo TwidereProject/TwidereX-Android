@@ -15,7 +15,7 @@ object Versions {
     const val ksp = "${Kotlin.lang}-1.0.5"
     const val agp = "7.2.1"
     const val spotless = "6.7.2"
-    const val ktlint = "0.46.1"
+    const val ktlint = "0.45.2"
     const val okhttp = "4.10.0"
     const val retrofit2 = "2.9.0"
     const val hson = "0.1.4"
