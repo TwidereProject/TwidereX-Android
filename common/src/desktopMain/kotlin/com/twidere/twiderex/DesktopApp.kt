@@ -25,12 +25,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.application
+import com.twidere.twiderex.component.NativeWindow
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
 import com.twidere.twiderex.init.Initializer
 import com.twidere.twiderex.init.TwidereServiceFactoryInitialTask
-import com.twidere.twiderex.kmp.LocalPlatformWindow
-import com.twidere.twiderex.kmp.PlatformWindow
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
@@ -46,7 +45,6 @@ import it.sauronsoftware.junique.JUnique
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
-import moe.tlaster.precompose.PreComposeWindow
 import moe.tlaster.precompose.navigation.NavController
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -161,7 +159,7 @@ private fun startDesktopApp() {
             .add(TwidereServiceFactoryInitialTask())
             .execute()
         ProvidePreferences(preferencesHolder) {
-            PreComposeWindow(
+            NativeWindow(
                 onCloseRequest = {
                     stopKoin()
                     exitApplication()
@@ -171,7 +169,6 @@ private fun startDesktopApp() {
             ) {
                 FilePicker.init(window)
                 CompositionLocalProvider(
-                    LocalPlatformWindow provides PlatformWindow(),
                     LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
                 ) {
                     App(navController = navController)

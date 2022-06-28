@@ -70,4 +70,4 @@ expect fun ImeHeightWithInsets(
 )
 
 @Composable
-expect fun ImeBottomInsets(): Dp
+expect fun imeBottomInsets(): Dp

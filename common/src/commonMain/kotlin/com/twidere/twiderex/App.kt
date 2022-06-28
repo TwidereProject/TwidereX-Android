@@ -48,7 +48,6 @@ fun App(navController: NavController = NavController()) {
         LocalActiveAccountViewModel provides accountViewModel,
         LocalStatusActions provides get<StatusActions>(),
         LocalPlatformResolver provides get(),
-        LocalRemoteNavigator provides get(),
     ) {
         Router(
             navController = navController
