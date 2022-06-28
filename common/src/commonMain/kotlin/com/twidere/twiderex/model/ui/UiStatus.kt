@@ -88,7 +88,7 @@ data class UiStatus(
     }
 
     fun generateShareLink() = "https://${statusKey.host}" + when (platformType) {
-        PlatformType.Twitter -> "/${user.screenName}/status/$statusId"
+        PlatformType.Twitter -> (retweet ?: this).let { "/${it.user.screenName}/status/${it.statusId}" }
         PlatformType.StatusNet -> TODO()
         PlatformType.Fanfou -> TODO()
         PlatformType.Mastodon -> "/web/statuses/$statusId"
