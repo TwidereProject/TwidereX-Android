@@ -22,11 +22,13 @@ package com.twidere.twiderex.component.status
 
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.currentPlatform
 import kotlinx.coroutines.cancel
@@ -51,6 +53,14 @@ fun SelectionContainer(
     if (!enable) {
         content.invoke(null)
         return
+    }
+    val focusManager = LocalFocusManager.current
+    DisposableEffect(Unit) {
+        onDispose {
+            // clear focus after ui hide, otherwise:
+            // java.lang.IllegalStateException: KeyEvent can't be processed because this key input node is not active.
+            focusManager.clearFocus()
+        }
     }
     val positionWrapper = remember {
         if (currentPlatform != Platform.Android) PositionWrapper() else null

@@ -160,7 +160,7 @@ private fun NormalStatus(
                     }
                 }
             },
-            isSelectionAble = false,
+            isSelectionAble = true,
         )
     }
 }
