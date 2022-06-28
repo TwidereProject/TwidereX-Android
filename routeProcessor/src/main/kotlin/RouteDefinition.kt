@@ -75,7 +75,9 @@ internal data class NestedRouteDefinition(
 ) : RouteDefinition {
 
     override fun generateRoute(): String {
-        return if (superQualifiedName.isEmpty()) generateRootRoute() else generateIRoute()
+        return if (superQualifiedName.isEmpty() ||
+            superQualifiedName == "kotlin.Any"
+        ) generateRootRoute() else generateIRoute()
     }
 
     private fun generateRootRoute(): String {

@@ -22,8 +22,8 @@ allprojects {
         kotlinOptions {
             jvmTarget = Versions.Java.jvmTarget
             allWarningsAsErrors = true
-            freeCompilerArgs = listOf(
-                "-Xopt-in=kotlin.RequiresOptIn",
+            freeCompilerArgs = freeCompilerArgs + listOf(
+                "-opt-in=kotlin.RequiresOptIn",
                 "-Xjvm-default=all",
             )
         }
@@ -50,6 +50,25 @@ allprojects {
     configurations.all {
         resolutionStrategy {
             force("org.objenesis:objenesis:3.2")
+        }
+    }
+}
+
+subprojects {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            if (project.findProperty("myapp.enableComposeCompilerReports") == "true") {
+                freeCompilerArgs = freeCompilerArgs + listOf(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
+                        project.buildDir.absolutePath + "/compose_metrics"
+                )
+                freeCompilerArgs = freeCompilerArgs + listOf(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
+                        project.buildDir.absolutePath + "/compose_metrics"
+                )
+            }
         }
     }
 }

@@ -36,9 +36,9 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
@@ -135,7 +135,7 @@ fun HtmlText(
     }
 }
 
-@OptIn(ExperimentalUnitApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalUnitApi::class)
 @Composable
 private fun RenderContent(
     modifier: Modifier = Modifier,
@@ -192,9 +192,11 @@ private fun RenderContent(
                                     .firstOrNull()
                             }
                         if (annotation != null) {
-                            change.consumeDownChange()
+                            if (change.pressed != change.previousPressed) change.consume()
                             val up = awaitPointerEventScope {
-                                waitForUpOrCancellation()?.also { it.consumeDownChange() }
+                                waitForUpOrCancellation()?.also {
+                                    if (it.pressed != it.previousPressed) it.consume()
+                                }
                             }
                             if (up != null) {
                                 onLinkClicked.invoke(annotation.item)
