@@ -136,7 +136,6 @@ android {
 dependencies {
     implementation("androidx.activity:activity-ktx:${Versions.activity}")
     implementation(projects.common)
-    implementation("com.google.accompanist:accompanist-insets:${Versions.accompanist}")
     implementation("androidx.startup:startup-runtime:${Versions.startup}")
 
     if (enableGoogleVariant) {

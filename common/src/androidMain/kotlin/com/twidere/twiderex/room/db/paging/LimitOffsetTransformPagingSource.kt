@@ -37,11 +37,11 @@ internal class LimitOffsetTransformPagingSource<Value : Any>(
      */
     private val queryItemCount: suspend () -> Int,
     private val db: RoomDatabase,
-    vararg tables: String
+    tables: Array<String>,
 ) : LimitOffsetPagingSource<Value>(Dispatchers.IO) {
 
     private val observer = object : InvalidationTracker.Observer(tables) {
-        override fun onInvalidated(tables: MutableSet<String>) {
+        override fun onInvalidated(tables: Set<String>) {
             invalidate()
         }
     }

@@ -31,11 +31,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
@@ -54,7 +52,6 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.google.accompanist.insets.ProvideWindowInsets
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.LocalWindowInsetsController
@@ -146,17 +143,11 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
                 lightColors()
             }
         ) {
-            Scaffold {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_login_logo),
-                        contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_logo_twidere)
-                    )
-                }
+            Box(Modifier.fillMaxSize(), Alignment.Center) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_login_logo),
+                    contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_logo_twidere)
+                )
             }
         }
     }
@@ -184,14 +175,10 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
             ProvidePreferences(
                 preferencesHolder,
             ) {
-                ProvideWindowInsets(
-                    windowInsetsAnimationsEnabled = true
-                ) {
-                    Router(
-                        navController = navController,
-                        isDebug = moe.tlaster.kfilepicker.BuildConfig.DEBUG
-                    )
-                }
+                Router(
+                    navController = navController,
+                    isDebug = moe.tlaster.kfilepicker.BuildConfig.DEBUG
+                )
             }
         }
     }
@@ -207,6 +194,7 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
     }
 
     override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
         intent?.data?.let {
             onDeeplink(it)
         }
