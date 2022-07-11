@@ -194,6 +194,7 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
     }
 
     override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
         intent?.data?.let {
             onDeeplink(it)
         }
