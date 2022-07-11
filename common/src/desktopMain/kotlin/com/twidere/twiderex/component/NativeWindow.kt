@@ -20,41 +20,10 @@
  */
 package com.twidere.twiderex.component
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.window.WindowDraggableArea
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.contentColorFor
-import androidx.compose.material.darkColors
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Fullscreen
-import androidx.compose.material.icons.filled.FullscreenExit
-import androidx.compose.material.icons.filled.Minimize
-import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,20 +32,13 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.FrameWindowScope
-import androidx.compose.ui.window.WindowPlacement
-import androidx.compose.ui.window.WindowScope
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
-import androidx.compose.ui.zIndex
+import com.mayakapps.compose.windowstyler.WindowBackdrop
+import com.mayakapps.compose.windowstyler.WindowStyle
 import com.twidere.twiderex.kmp.LocalPlatformWindow
 import com.twidere.twiderex.kmp.PlatformWindow
 import com.twidere.twiderex.utils.OperatingSystem
@@ -143,8 +105,8 @@ fun NativeWindow(
             visible = visible,
             title = title,
             icon = icon,
-            undecorated = true,
-            transparent = true,
+            undecorated = false,
+            transparent = false,
             resizable = resizable,
             enabled = enabled,
             focusable = focusable,
@@ -153,261 +115,21 @@ fun NativeWindow(
             onKeyEvent = onKeyEvent,
             onCloseRequest = onCloseRequest,
             content = {
-                Box(
-                    modifier = Modifier.clip(RoundedCornerShape(8.dp)),
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        content.invoke(this@PreComposeWindow)
+                if (currentOperatingSystem == OperatingSystem.MacOS) {
+                    LaunchedEffect(Unit) {
+                        window.rootPane.apply {
+                            putClientProperty("apple.awt.fullWindowContent", true)
+                            putClientProperty("apple.awt.transparentTitleBar", true)
+                        }
                     }
-                    Box(
-                        modifier = Modifier.fillMaxWidth().zIndex(Float.MAX_VALUE),
-                        contentAlignment = Alignment.TopCenter,
-                    ) {
-                        PlatformTitleBar(
-                            title = title,
-                            icon = icon,
-                            isAppearanceLightTitleBar = nativeWindowController.isAppearanceLightTitleBar,
-                            operatingSystem = currentOperatingSystem,
-                            onCloseRequest = onCloseRequest,
-                            onMinimizeRequest = { state.isMinimized = true },
-                            onMaximizeRequest = { state.placement = WindowPlacement.Maximized },
-                            onUndoMaximizeRequest = { state.placement = WindowPlacement.Floating },
-                            isMaximized = state.placement == WindowPlacement.Maximized,
-                        )
-                    }
+                } else if (currentOperatingSystem == OperatingSystem.Windows) {
+                    WindowStyle(
+                        isDarkTheme = !nativeWindowController.isAppearanceLightTitleBar,
+                        backdropType = WindowBackdrop.Mica,
+                    )
                 }
+                content.invoke(this)
             },
         )
     }
 }
-
-@Composable
-private fun WindowScope.PlatformTitleBar(
-    title: String,
-    icon: Painter?,
-    isAppearanceLightTitleBar: Boolean,
-    operatingSystem: OperatingSystem,
-    onCloseRequest: () -> Unit,
-    onMinimizeRequest: () -> Unit,
-    onMaximizeRequest: () -> Unit,
-    onUndoMaximizeRequest: () -> Unit,
-    isMaximized: Boolean = false,
-) {
-    val platformWindow = LocalPlatformWindow.current
-    val windowBarVisibility by platformWindow.windowBarVisibility.collectAsState(initial = true)
-    WindowDraggableArea {
-        MaterialTheme(
-            colors = if (isAppearanceLightTitleBar) {
-                lightColors()
-            } else {
-                darkColors()
-            }
-        ) {
-            Surface(
-                color = Color.Transparent,
-                contentColor = contentColorFor(MaterialTheme.colors.background),
-            ) {
-                AnimatedVisibility(
-                    windowBarVisibility,
-                    enter = expandVertically(),
-                    exit = shrinkVertically(),
-                ) {
-                    when (operatingSystem) {
-                        OperatingSystem.MacOS -> OSXTitleBar(
-                            title = title,
-                            icon = icon,
-                            onCloseRequest = onCloseRequest,
-                            onMinimizeRequest = onMinimizeRequest,
-                            onMaximizeRequest = onMaximizeRequest,
-                            onUndoMaximizeRequest = onUndoMaximizeRequest,
-                            isMaximized = isMaximized
-                        )
-                        else -> WindowsTitleBar(
-                            title = title,
-                            icon = icon,
-                            onCloseRequest = onCloseRequest,
-                            onMinimizeRequest = onMinimizeRequest,
-                            onMaximizeRequest = onMaximizeRequest,
-                            onUndoMaximizeRequest = onUndoMaximizeRequest,
-                            isMaximized = isMaximized
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun WindowsTitleBar(
-    title: String,
-    icon: Painter?,
-    onCloseRequest: () -> Unit,
-    onMinimizeRequest: () -> Unit,
-    onMaximizeRequest: () -> Unit,
-    onUndoMaximizeRequest: () -> Unit,
-    isMaximized: Boolean = false,
-) {
-    Row(
-        modifier = Modifier
-            .padding(
-                start = 16.dp,
-                top = 8.dp,
-                end = 8.dp,
-                bottom = 8.dp
-            )
-    ) {
-        WindowTitle(
-            title = title,
-            icon = icon,
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        WindowsWindowButtons(
-            onCloseRequest = onCloseRequest,
-            onMinimizeRequest = onMinimizeRequest,
-            onMaximizeRequest = onMaximizeRequest,
-            onUndoMaximizeRequest = onUndoMaximizeRequest,
-            isMaximized = isMaximized
-        )
-    }
-}
-
-@Composable
-private fun WindowsWindowButtons(
-    onCloseRequest: () -> Unit,
-    onMinimizeRequest: () -> Unit,
-    onMaximizeRequest: () -> Unit,
-    onUndoMaximizeRequest: () -> Unit,
-    isMaximized: Boolean = false,
-) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        WindowButton(
-            icon = Icons.Filled.Minimize,
-            onClick = onMinimizeRequest
-        )
-        if (isMaximized) {
-            WindowButton(
-                icon = Icons.Filled.FullscreenExit,
-                onClick = onUndoMaximizeRequest
-            )
-        } else {
-            WindowButton(
-                icon = Icons.Filled.Fullscreen,
-                onClick = onMaximizeRequest
-            )
-        }
-        WindowButton(
-            icon = Icons.Filled.Close,
-            onClick = onCloseRequest
-        )
-    }
-}
-
-@Composable
-private fun WindowButton(icon: ImageVector, onClick: () -> Unit) {
-    IconButton(
-        onClick = onClick,
-        modifier = Modifier.size(24.dp)
-    ) {
-        Icon(icon, contentDescription = null)
-    }
-}
-
-@Composable
-private fun WindowTitle(
-    modifier: Modifier = Modifier,
-    title: String,
-    icon: Painter?,
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (icon != null) {
-            Image(painter = icon, contentDescription = null, modifier = Modifier.size(24.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-        }
-        Text(text = title)
-    }
-}
-
-@Composable
-private fun OSXTitleBar(
-    title: String,
-    icon: Painter?,
-    onCloseRequest: () -> Unit,
-    onMinimizeRequest: () -> Unit,
-    onMaximizeRequest: () -> Unit,
-    onUndoMaximizeRequest: () -> Unit,
-    isMaximized: Boolean = false,
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp),
-    ) {
-        OSXWindowButtons(
-            modifier = Modifier.align(Alignment.CenterStart),
-            onCloseRequest = onCloseRequest,
-            onMinimizeRequest = onMinimizeRequest,
-            onMaximizeRequest = onMaximizeRequest,
-            onUndoMaximizeRequest = onUndoMaximizeRequest,
-            isMaximized = isMaximized
-        )
-        Box(
-            modifier = Modifier.align(Alignment.Center),
-        ) {
-            WindowTitle(
-                title = title,
-                icon = icon,
-            )
-        }
-    }
-}
-
-@Composable
-private fun OSXWindowButtons(
-    modifier: Modifier = Modifier,
-    onCloseRequest: () -> Unit,
-    onMinimizeRequest: () -> Unit,
-    onMaximizeRequest: () -> Unit,
-    onUndoMaximizeRequest: () -> Unit,
-    isMaximized: Boolean = false,
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Box(
-            modifier = Modifier
-                .size(12.dp)
-                .background(Color(0xFFff5150), shape = CircleShape)
-                .clickable(onClick = onCloseRequest)
-                .clip(CircleShape)
-        )
-        Box(
-            modifier = Modifier
-                .size(12.dp)
-                .background(Color(0xFFffbc00), shape = CircleShape)
-                .clickable(onClick = onMinimizeRequest)
-                .clip(CircleShape)
-        )
-        Box(
-            modifier = Modifier
-                .size(12.dp)
-                .background(Color(0xFF00cd1d), shape = CircleShape)
-                .clickable(onClick = {
-                    if (isMaximized) {
-                        onUndoMaximizeRequest()
-                    } else {
-                        onMaximizeRequest()
-                    }
-                })
-                .clip(CircleShape)
-        )
-    }
-}
-
-val titleBarHeight = 8.dp * 2 + 24.dp

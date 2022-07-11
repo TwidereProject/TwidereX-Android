@@ -128,6 +128,7 @@ kotlin {
                 implementation("de.huxhorn.lilith:de.huxhorn.lilith.3rdparty.junique:1.0.4")
                 implementation("org.javassist:javassist:3.28.0-GA")
                 implementation("org.ocpsoft.prettytime:prettytime:5.0.2.Final")
+                implementation("com.mayakapps.compose:window-styler:0.3.2")
             }
         }
         val desktopTest by getting
