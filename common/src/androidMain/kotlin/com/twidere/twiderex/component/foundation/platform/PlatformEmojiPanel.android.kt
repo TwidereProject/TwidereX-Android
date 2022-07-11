@@ -35,8 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.component.ImeBottomInsets
 import com.twidere.twiderex.component.ImeHeightWithInsets
+import com.twidere.twiderex.component.imeBottomInsets
 import com.twidere.twiderex.model.ui.UiEmoji
 import com.twidere.twiderex.model.ui.UiEmojiCategory
 import kotlin.math.max
@@ -61,7 +61,7 @@ actual fun PlatformEmojiPanel(
     val targetHeight = with(LocalDensity.current) {
         height.toDp()
     }
-    val bottom = ImeBottomInsets()
+    val bottom = imeBottomInsets()
     var visibility by remember { mutableStateOf(false) }
     LaunchedEffect(showEmoji, bottom) {
         if (bottom == targetHeight || showEmoji) {

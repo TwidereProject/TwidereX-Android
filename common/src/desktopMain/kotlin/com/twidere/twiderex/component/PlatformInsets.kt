@@ -20,17 +20,26 @@
  */
 package com.twidere.twiderex.component
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 
-actual fun Modifier.topInsetsPadding(): Modifier = this
+actual fun Modifier.topInsetsPadding(): Modifier = this.padding(top = titleBarHeight)
 actual fun Modifier.bottomInsetsPadding(): Modifier = this
 actual fun Modifier.startInsetsPadding(): Modifier = this
 actual fun Modifier.endInsetsPadding(): Modifier = this
 
-actual fun Modifier.topInsetsHeight(): Modifier = this
+actual fun Modifier.topInsetsHeight(): Modifier = this.height(titleBarHeight)
 actual fun Modifier.bottomInsetsHeight(): Modifier = this
 actual fun Modifier.startInsetsWidth(): Modifier = this
 actual fun Modifier.endInsetsWidth(): Modifier = this
@@ -41,8 +50,37 @@ actual fun PlatformInsets(
     color: NativeInsetsColor,
     content: @Composable () -> Unit,
 ) {
-    // TODO: implementation
-    content.invoke()
+    val nativeWindowController = LocalNativeWindowController.current
+    val darkTheme = control.darkTheme
+    LaunchedEffect(darkTheme) {
+        nativeWindowController.isAppearanceLightTitleBar = !control.darkTheme
+    }
+    Box {
+        Box(
+            modifier = Modifier
+                .padding(
+                    top = if (control.extendToTop) {
+                        0.dp
+                    } else {
+                        titleBarHeight
+                    }
+                )
+                .align(Alignment.Center)
+        ) {
+            content()
+        }
+        Spacer(
+            modifier = if (!control.extendToTop) {
+                Modifier
+                    .height(titleBarHeight)
+                    .zIndex(999F)
+                    .fillMaxWidth()
+                    .background(color.top)
+            } else {
+                Modifier
+            }.align(Alignment.TopCenter)
+        )
+    }
 }
 
 @Composable
@@ -60,6 +98,6 @@ actual fun ImeHeightWithInsets(
 }
 
 @Composable
-actual fun ImeBottomInsets(): Dp {
+actual fun imeBottomInsets(): Dp {
     return 0.dp
 }

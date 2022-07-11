@@ -31,7 +31,6 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import moe.tlaster.precompose.lifecycle.Lifecycle
 import moe.tlaster.precompose.lifecycle.LifecycleOwner
@@ -52,13 +51,14 @@ fun PreComposeWindow(
     title: String = "Untitled",
     icon: Painter? = null,
     undecorated: Boolean = false,
+    transparent: Boolean = false,
     resizable: Boolean = true,
     enabled: Boolean = true,
     focusable: Boolean = true,
     alwaysOnTop: Boolean = false,
     onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
     onKeyEvent: (KeyEvent) -> Boolean = { false },
-    content: @Composable FrameWindowScope.() -> Unit
+    content: @Composable FrameWindowScope.() -> Unit,
 ) {
     val holder = remember {
         PreComposeWindowHolder()
@@ -87,6 +87,7 @@ fun PreComposeWindow(
             title = title,
             icon = icon,
             undecorated = undecorated,
+            transparent = transparent,
             resizable = resizable,
             enabled = enabled,
             focusable = focusable,
@@ -95,7 +96,7 @@ fun PreComposeWindow(
             onKeyEvent = onKeyEvent,
             content = {
                 content.invoke(this)
-            },
+            }
         )
     }
 }

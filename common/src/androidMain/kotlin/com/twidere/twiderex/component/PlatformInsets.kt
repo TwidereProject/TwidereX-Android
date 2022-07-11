@@ -168,7 +168,7 @@ actual fun ImeHeightWithInsets(
 }
 
 @Composable
-actual fun ImeBottomInsets(): Dp {
+actual fun imeBottomInsets(): Dp {
     val density = LocalDensity.current
     val ime = WindowInsets.ime
     val navigation = WindowInsets.navigationBars
