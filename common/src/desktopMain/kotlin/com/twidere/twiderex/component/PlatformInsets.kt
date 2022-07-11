@@ -33,7 +33,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.twidere.twiderex.utils.OperatingSystem
+import com.twidere.twiderex.utils.currentOperatingSystem
 
+private val titleBarHeight = when (currentOperatingSystem) {
+    OperatingSystem.MacOS -> 24.dp
+    else -> 0.dp
+}
 actual fun Modifier.topInsetsPadding(): Modifier = this.padding(top = titleBarHeight)
 actual fun Modifier.bottomInsetsPadding(): Modifier = this
 actual fun Modifier.startInsetsPadding(): Modifier = this
