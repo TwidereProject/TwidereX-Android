@@ -2,7 +2,7 @@ import org.gradle.api.JavaVersion
 
 object Versions {
     object Kotlin {
-        const val lang = "1.6.21"
+        const val lang = "1.7.0"
         const val coroutines = "1.6.3"
         const val serialization = "1.3.3"
     }
@@ -12,15 +12,15 @@ object Versions {
         val java = JavaVersion.VERSION_17
     }
 
-    const val ksp = "${Kotlin.lang}-1.0.5"
+    const val ksp = "${Kotlin.lang}-1.0.6"
     const val agp = "7.2.1"
     const val spotless = "6.7.2"
     const val ktlint = "0.45.2"
     const val okhttp = "4.10.0"
     const val retrofit2 = "2.9.0"
     const val hson = "0.1.4"
-    const val compose = "1.2.0-rc01"
-    const val compose_jb = "1.2.0-alpha01-dev725"
+    const val compose = "1.3.0-alpha01"
+    const val compose_jb = "1.2.0-alpha01-dev741"
     const val paging = "3.2.0-alpha01"
     const val activity = "1.6.0-alpha05"
     const val datastore = "1.0.0"
