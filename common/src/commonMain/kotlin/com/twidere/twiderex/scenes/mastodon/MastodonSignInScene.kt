@@ -53,7 +53,7 @@ import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
-import moe.tlaster.precompose.navigation.NavController
+import moe.tlaster.precompose.navigation.Navigator
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -127,7 +127,7 @@ fun MastodonSignInScene() {
 private fun signin(
     viewModel: MastodonSignInViewModel,
     host: TextFieldValue,
-    navController: NavController,
+    navController: Navigator,
 ) {
     viewModel.beginOAuth(
         host.text,

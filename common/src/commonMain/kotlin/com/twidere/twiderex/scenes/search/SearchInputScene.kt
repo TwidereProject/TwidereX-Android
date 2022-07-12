@@ -56,19 +56,6 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 import org.koin.core.parameter.parametersOf
 
-val fadeCreateTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
-    alpha = factor
-}
-val fadeDestroyTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
-    alpha = factor
-}
-val fadePauseTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
-    alpha = factor
-}
-val fadeResumeTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
-    alpha = factor
-}
-
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun SearchInputScene(initial: String? = null) {

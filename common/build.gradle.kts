@@ -64,6 +64,7 @@ kotlin {
                 implementation("ca.gosyer:accompanist-pager:${Versions.accompanist_jb}")
                 implementation("ca.gosyer:accompanist-pager-indicators:${Versions.accompanist_jb}")
                 api("com.github.Tlaster.KFilePicker:KFilePicker:${Versions.kFilePicker}")
+                api("moe.tlaster:precompose:${Versions.precompose}")
             }
         }
         val commonTest by getting {

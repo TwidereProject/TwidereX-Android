@@ -20,6 +20,13 @@
  */
 package com.twidere.twiderex.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -28,7 +35,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.unit.Constraints
 import com.twidere.twiderex.component.RequireAuthorization
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.MicroBlogKey
@@ -68,10 +74,6 @@ import com.twidere.twiderex.scenes.mastodon.MastodonHashtagScene
 import com.twidere.twiderex.scenes.mastodon.MastodonSignInScene
 import com.twidere.twiderex.scenes.search.SearchInputScene
 import com.twidere.twiderex.scenes.search.SearchScene
-import com.twidere.twiderex.scenes.search.fadeCreateTransition
-import com.twidere.twiderex.scenes.search.fadeDestroyTransition
-import com.twidere.twiderex.scenes.search.fadePauseTransition
-import com.twidere.twiderex.scenes.search.fadeResumeTransition
 import com.twidere.twiderex.scenes.settings.AboutScene
 import com.twidere.twiderex.scenes.settings.AccountManagementScene
 import com.twidere.twiderex.scenes.settings.AccountNotificationScene
@@ -98,8 +100,6 @@ import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.path
 import moe.tlaster.precompose.navigation.query
 import moe.tlaster.precompose.navigation.transition.NavTransition
-import moe.tlaster.precompose.navigation.transition.fadeScaleCreateTransition
-import moe.tlaster.precompose.navigation.transition.fadeScaleDestroyTransition
 import java.net.URLDecoder
 
 val initialRoute get() = Root.Home
@@ -209,7 +209,8 @@ fun RequirePlatformAccount(
 /**
  * Note: Path/Query key must be exactly the same as function's parameter's name in Root/RootDeepLinks
  */
-fun RouteBuilder.route(constraints: Constraints) {
+@OptIn(ExperimentalAnimationApi::class)
+fun RouteBuilder.route() {
     authorizedScene(
         Root.Home,
         deepLinks = twitterHosts.map { "$it/*" }
@@ -411,10 +412,10 @@ fun RouteBuilder.route(constraints: Constraints) {
     authorizedScene(
         Root.Search.Input,
         navTransition = NavTransition(
-            createTransition = fadeCreateTransition,
-            destroyTransition = fadeDestroyTransition,
-            pauseTransition = fadePauseTransition,
-            resumeTransition = fadeResumeTransition,
+            createTransition = fadeIn(),
+            destroyTransition = fadeOut(),
+            pauseTransition = fadeOut(),
+            resumeTransition = fadeIn(),
         ),
     ) { backStackEntry ->
         SearchInputScene(
@@ -428,10 +429,10 @@ fun RouteBuilder.route(constraints: Constraints) {
             "$it/search?q={keyword}"
         } + RootDeepLinks.Search,
         navTransition = NavTransition(
-            createTransition = fadeCreateTransition,
-            destroyTransition = fadeDestroyTransition,
-            pauseTransition = fadePauseTransition,
-            resumeTransition = fadeResumeTransition,
+            createTransition = fadeIn(),
+            destroyTransition = fadeOut(),
+            pauseTransition = fadeOut(),
+            resumeTransition = fadeIn(),
         ),
     ) { backStackEntry ->
         backStackEntry.path<String>("keyword")?.takeIf { it.isNotEmpty() }?.let {
@@ -442,16 +443,10 @@ fun RouteBuilder.route(constraints: Constraints) {
     authorizedScene(
         Root.Compose.Home,
         navTransition = NavTransition(
-            createTransition = {
-                translationY = constraints.maxHeight * (1 - it)
-                alpha = it
-            },
-            destroyTransition = {
-                translationY = constraints.maxHeight * (1 - it)
-                alpha = it
-            },
-            pauseTransition = fadeScaleDestroyTransition,
-            resumeTransition = fadeScaleCreateTransition,
+            createTransition = slideInVertically(initialOffsetY = { it }),
+            destroyTransition = slideOutVertically(targetOffsetY = { it }),
+            pauseTransition = scaleOut(targetScale = 0.9f),
+            resumeTransition = scaleIn(initialScale = 0.9f),
         ),
         deepLinks = listOf(
             RootDeepLinks.Compose

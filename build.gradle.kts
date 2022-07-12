@@ -24,6 +24,7 @@ allprojects {
             freeCompilerArgs = freeCompilerArgs + listOf(
                 "-opt-in=kotlin.RequiresOptIn",
                 "-Xjvm-default=all",
+                "-Xskip-prerelease-check",
             )
         }
     }
