@@ -45,7 +45,7 @@ internal class LimitOffsetTransformPagingSourceTest {
             count
         },
         db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), RoomCacheDatabase::class.java).build(),
-        tables = arrayOf("model"),
+        tables = arrayOf(),
     )
     @Test
     fun refreshReturnsResultPageWithCorrectParams() = runBlocking {
