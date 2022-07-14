@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -29,4 +29,6 @@ interface RelationshipService {
     suspend fun unfollow(user_id: String)
     suspend fun followers(user_id: String, nextPage: String? = null): List<IUser>
     suspend fun following(user_id: String, nextPage: String? = null): List<IUser>
+    suspend fun block(id: String): IRelationship
+    suspend fun unblock(id: String): IRelationship
 }

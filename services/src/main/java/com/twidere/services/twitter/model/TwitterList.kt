@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -24,13 +24,13 @@ import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.serializer.DateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.util.Date
+import org.joda.time.DateTime
 
 @Serializable
 data class TwitterList(
     @SerialName("created_at")
     @Serializable(with = DateSerializer::class)
-    val createdAt: Date? = null,
+    val createdAt: DateTime? = null,
 
     val id: Long? = null,
 

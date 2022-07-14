@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -24,7 +24,7 @@ import com.twidere.services.microblog.model.INotification
 import com.twidere.services.serializer.DateSerializerV2
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.util.Date
+import org.joda.time.DateTime
 
 @Serializable
 data class Notification(
@@ -33,7 +33,7 @@ data class Notification(
 
     @SerialName("created_at")
     @Serializable(with = DateSerializerV2::class)
-    val createdAt: Date? = null,
+    val createdAt: DateTime? = null,
 
     val account: Account? = null,
     val status: Status? = null

@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -23,9 +23,13 @@ package com.twidere.services.microblog.model
 interface IRelationship {
     val followedBy: Boolean
     val following: Boolean
+    val blocking: Boolean
+    val blockedBy: Boolean
 }
 
 data class Relationship(
     override val followedBy: Boolean,
     override val following: Boolean,
+    override val blocking: Boolean,
+    override val blockedBy: Boolean
 ) : IRelationship

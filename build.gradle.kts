@@ -1,6 +1,8 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     id("com.diffplug.spotless").version(Versions.spotless)
+    id("com.github.ben-manes.versions").version("0.39.0")
+    id("com.dipien.byebyejetifier") version "1.2.2"
 }
 buildscript {
     repositories {
@@ -19,8 +21,9 @@ allprojects {
         kotlinOptions {
             jvmTarget = Versions.Java.jvmTarget
             allWarningsAsErrors = true
-            freeCompilerArgs = listOf(
-                "-Xopt-in=kotlin.RequiresOptIn",
+            freeCompilerArgs = freeCompilerArgs + listOf(
+                "-opt-in=kotlin.RequiresOptIn",
+                "-Xjvm-default=all",
             )
         }
     }
@@ -40,6 +43,31 @@ allprojects {
             target("**/*.java")
             targetExclude("$buildDir/**/*.java", "bin/**/*.java")
             licenseHeaderFile(rootProject.file("spotless/license"))
+        }
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            force("org.objenesis:objenesis:3.2")
+        }
+    }
+}
+
+subprojects {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            if (project.findProperty("myapp.enableComposeCompilerReports") == "true") {
+                freeCompilerArgs = freeCompilerArgs + listOf(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
+                        project.buildDir.absolutePath + "/compose_metrics"
+                )
+                freeCompilerArgs = freeCompilerArgs + listOf(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
+                        project.buildDir.absolutePath + "/compose_metrics"
+                )
+            }
         }
     }
 }

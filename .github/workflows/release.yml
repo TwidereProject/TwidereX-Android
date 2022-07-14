@@ -1,0 +1,120 @@
+name: Release CI
+
+on:
+  push: 
+    tags:
+      - '**'
+
+jobs:
+  release-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Set up Android SDK License
+        run: yes | /usr/local/lib/android/sdk/tools/bin/sdkmanager --licenses
+
+      - name: Apply Signing
+        env:
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
+        run: ./.github/apply_signing.sh
+
+      - name: Build with Gradle
+        run: ./gradlew :android:assembleRelease :android:bundleRelease
+
+      - name: Archive android artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-release
+          path: |
+            **/*-release.aab
+            **/*-release.apk
+
+  release-windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      
+      - name: Build with Gradle
+        run: ./gradlew :desktop:packageMsi
+
+      - name: Archive windows artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-release
+          path: "**/*.msi"
+
+  release-macos:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      
+      - name: Build with Gradle
+        run: ./gradlew :desktop:packageDmg
+
+      - name: Archive macos artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: macos-release
+          path: "**/*.dmg"
+
+  release-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      
+      - name: Build with Gradle
+        run: ./gradlew :desktop:packageDeb
+
+      - name: Archive linux artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-release
+          path: "**/*.deb"
+            
+  upload-release:
+    runs-on: ubuntu-latest
+    needs: [release-android, release-linux, release-macos, release-windows]
+    timeout-minutes: 30
+    steps:
+      - uses: actions/download-artifact@v2
+
+      - name: Draft a new release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          files: |
+            **/*.deb
+            **/*.msi
+            **/*.dmg
+            **/*.apk
+            **/*.aab

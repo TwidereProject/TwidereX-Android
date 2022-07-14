@@ -1,0 +1,36 @@
+import com.twidere.twiderex.model.MicroBlogKey;
+import com.twidere.twiderex.model.enums.PlatformType;
+import java.lang.Boolean;
+
+CREATE TABLE IF NOT EXISTS DbUser (
+    id TEXT NOT NULL,
+    userKey TEXT  AS MicroBlogKey NOT NULL PRIMARY KEY,
+    acct TEXT AS MicroBlogKey NOT NULL,
+    name TEXT NOT NULL,
+    screenName TEXT NOT NULL,
+    profileImage TEXT NOT NULL,
+    profileBackgroundImage TEXT,
+    fans INTEGER NOT NULL,
+    follow INTEGER NOT NULL,
+    status INTEGER NOT NULL,
+    listed INTEGER NOT NULL,
+    rawDesc TEXT NOT NULL,
+    htmlDesc TEXT NOT NULL,
+    website TEXT,
+    location TEXT,
+    verified INTEGER AS Boolean NOT NULL,
+    protected INTEGER AS Boolean NOT NULL,
+    platformType TEXT AS PlatformType NOT NULL,
+    extra TEXT
+);
+
+insert:
+INSERT OR REPLACE INTO DbUser(
+    id, userKey, acct, name, screenName, profileImage,
+    profileBackgroundImage, fans, follow, status, listed,
+    rawDesc, htmlDesc, website,location, verified, protected,
+    platformType, extra
+) VALUES ?;
+
+findWithUserKey:
+SELECT * FROM DbUser WHERE userKey == :userKey;

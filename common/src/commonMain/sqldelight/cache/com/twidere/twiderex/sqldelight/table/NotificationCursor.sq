@@ -1,0 +1,18 @@
+import com.twidere.twiderex.model.MicroBlogKey;
+import com.twidere.twiderex.model.enums.NotificationCursorType;
+
+CREATE TABLE IF NOT EXISTS DbNotificationCursor (
+    id TEXT NOT NULL PRIMARY KEY,
+    accountKey TEXT AS MicroBlogKey NOT NULL,
+    type TEXT AS NotificationCursorType NOT NULL,
+    value TEXT NOT NULL,
+    timestamp INTEGER NOT NULL
+);
+
+insert:
+INSERT OR REPLACE INTO DbNotificationCursor(
+    id, accountKey, type, value, timestamp
+) VALUES ?;
+
+find:
+SELECT * FROM DbNotificationCursor WHERE accountKey == :accountKey AND type == :type AND timestamp = (SELECT max(timestamp) FROM DbNotificationCursor);

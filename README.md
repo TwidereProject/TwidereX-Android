@@ -23,26 +23,22 @@ Next generation of Twidere for Android 5.0+. **Still in early stage.**
 
 ## What's Happening
 
-### What's new in 1.5.0 - Aug 2021 Update
-
-- Proxy support, you can set a proxy for all the network request in settings.
-- Tabs column editing support, you can now modify the order and count of the home tab.
-- "Tweet sent" notification will be dismissed after showing once.
-- Screen will keep on when playing media in media scene.
-- Better RTL support for tweets.
-- Fix certain crashes when requesting network.
-- [Mastodon] Add support for gif avatar support and custom emoji in user name.
-- [Mastodon] Add federated timeline and local timeline
-
-### What is being planned for 1.6.0 - Aug 2021 Update
-For 1.6.0, we're planning to build an experimatal desktop version, this is a big step, you can check out our [milestore](https://github.com/TwidereProject/TwidereX-Android/milestone/4) for detail. Here is a shortlist:
+### What's new in 1.6.0 - July 2022 Update
 
 - Experimatal desktop version.
 - Mute and block support.
+- Gif insertion support
 - Optimizing video play for timeline.
-- Bug fixes.
-- UI/UX tweaking.
-- Stability.
+- Enable sensitive content blur for Twitter (by @enaix )
+- Fix startup crash in Android 12
+- Fix Clicking on the searchbar already with text (#304)
+- Fix DMs tab is killed by block/deleted account (#384)
+- Fix App crashes when viewing list members (#310)
+- Add Share button for Tweet (#344)
+- [Mastodon] Mastodon OAuth URL with spaces breaks when using DuckDuckGo as a browser (#326)
+
+### What is being planned for 1.7.0 - July 2022 Update
+For 1.7.0, we're forcusing on bug fix and performance enhancemant, there will be lots of internal code changes, you can check out our [milestone](https://github.com/TwidereProject/TwidereX-Android/milestone/6) for detail.
 
 ### Roadmap for 2.0 - Jun 2021 Update
 For 2.0, we're considering these options, but it is still an early thought and might change over time.
@@ -66,7 +62,7 @@ Twidere X is still in an early stage and will be periodically re-structuring/ref
 ```
                        Twidere X
 
-     Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+     Copyright (C) TwidereProject and Contributors
 
 Twidere X is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

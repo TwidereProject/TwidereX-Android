@@ -1,0 +1,91 @@
+name: Desktop CI
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  spotless-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: spotlessCheck with Gradle
+        run: ./gradlew :desktop:spotlessCheck
+
+  build-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      
+      - name: Build with Gradle
+        run: ./gradlew :desktop:packageDeb
+
+      - name: Upload build binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-binaries-ubuntu
+          path: '**/build/compose/binaries'
+
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      
+      - name: Build with Gradle
+        run: ./gradlew :desktop:packageMsi
+
+      - name: Upload build binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-binaries-windows
+          path: '**/build/compose/binaries'
+
+  build-macos:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      
+      - name: Build with Gradle
+        run: ./gradlew :desktop:packageDmg
+
+      - name: Upload build binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-binaries-macos
+          path: '**/build/compose/binaries'

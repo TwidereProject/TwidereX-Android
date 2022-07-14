@@ -19,4 +19,5 @@ dependencies {
     retrofit()
     okhttp()
     junit5()
+    api("joda-time:joda-time:${Versions.jodaTime}")
 }

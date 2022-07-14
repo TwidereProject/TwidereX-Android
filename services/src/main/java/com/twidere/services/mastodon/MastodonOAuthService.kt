@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -26,6 +26,7 @@ import com.twidere.services.http.authorization.EmptyAuthorization
 import com.twidere.services.mastodon.api.MastodonOAuthResources
 import com.twidere.services.mastodon.model.CreateApplicationResponse
 import com.twidere.services.mastodon.model.MastodonAuthScope
+import java.net.URLEncoder
 
 class MastodonOAuthService(
     private val host: String,
@@ -56,10 +57,14 @@ class MastodonOAuthService(
     )
 
     fun getWebOAuthUrl(response: CreateApplicationResponse) =
-        "$host/oauth/authorize?client_id=${response.clientID}&response_type=code&redirect_uri=${response.redirectURI}&scope=${
+        "$host/oauth/authorize?client_id=${response.clientID}&response_type=code&redirect_uri=${response.redirectURI.let {
+            URLEncoder.encode(it, "UTF-8")
+        }}&scope=${
         scopes.joinToString(
             " "
-        ) { it.name }
+        ) { it.name }.let {
+            URLEncoder.encode(it, "UTF-8")
+        }
         }"
 
     suspend fun getAccessToken(code: String, response: CreateApplicationResponse) =

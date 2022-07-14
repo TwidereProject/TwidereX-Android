@@ -1,0 +1,27 @@
+import com.twidere.twiderex.model.MicroBlogKey;
+
+CREATE TABLE IF NOT EXISTS DbTrend (
+    trendKey TEXT AS MicroBlogKey NOT NULL,
+    accountKey TEXT AS MicroBlogKey NOT NULL,
+    displayName TEXT NOT NULL,
+    url TEXT NOT NULL,
+    query TEXT NOT NULL,
+    volume INTEGER NOT NULL
+);
+
+
+CREATE UNIQUE INDEX IF NOT EXISTS index_trendKey_accountKey ON DbTrend (trendKey, accountKey);
+
+insert:
+INSERT OR REPLACE INTO DbTrend(
+    trendKey, accountKey, displayName, url, query, volume
+) VALUES ?;
+
+getTrendPagingList:
+SELECT * FROM DbTrend WHERE accountKey == :accountKey LIMIT :limit OFFSET :offset;
+
+getTrendPagingCount:
+SELECT COUNT(*) FROM DbTrend WHERE accountKey == :accountKey;
+
+clear:
+DELETE FROM DbTrend WHERE accountKey == :accountKey;

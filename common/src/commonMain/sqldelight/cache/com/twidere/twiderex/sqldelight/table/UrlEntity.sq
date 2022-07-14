@@ -1,0 +1,21 @@
+import com.twidere.twiderex.model.MicroBlogKey;
+
+CREATE TABLE IF NOT EXISTS DbUrlEntity (
+    id TEXT PRIMARY KEY NOT NULL,
+    belongToKey TEXT AS MicroBlogKey NOT NULL,
+    url TEXT NOT NULL,
+    expandedUrl TEXT NOT NULL,
+    displayUrl TEXT NOT NULL,
+    title TEXT,
+    description TEXT,
+    image TEXT
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS index_belongToKey_url ON DbUrlEntity (belongToKey, url);
+
+insert:
+INSERT OR REPLACE INTO DbUrlEntity(id, belongToKey, url, expandedUrl, displayUrl, title, description, image) VALUES ?;
+
+
+findByBelongToKey:
+SELECT * FROM DbUrlEntity WHERE belongToKey == :belongToKey;

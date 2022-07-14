@@ -1,0 +1,124 @@
+name: Common CI
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+concurrency:
+  group: common-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  spotless-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Set up Android SDK License
+        run: yes | /usr/local/lib/android/sdk/tools/bin/sdkmanager --licenses
+
+      - name: spotlessCheck with Gradle
+        run: ./gradlew :common:spotlessCheck :common:lint
+
+
+  unit-test:
+    needs: spotless-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Set up Android SDK License
+        run: yes | /usr/local/lib/android/sdk/tools/bin/sdkmanager --licenses
+
+      - name: Run test in commonTest and androidTest
+        run: ./gradlew :common:test
+
+      - name: Run test in desktopTest
+        run: ./gradlew :common:desktopTest
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: unit-test-result
+          path: "**/build/test-results/**/*.xml"
+
+  connected-android-test:
+    runs-on: macOS-11
+    needs: unit-test
+    timeout-minutes: 60
+    
+    strategy:
+      # Allow tests to continue on other devices if they fail on one device.
+      fail-fast: false
+      matrix:
+        include:
+          - api-level: 30
+            target: google_apis
+          - api-level: 28
+            target: default
+          - api-level: 26
+            target: default
+          - api-level: 24
+            target: default
+          - api-level: 22
+            target: default
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Set up Android SDK License
+        run: (while sleep 3; do echo "y"; done) | /Users/runner/Library/Android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+
+      - name: Build tests
+        run: ./gradlew :common:assembleAndroidTest
+
+      - name: Run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        timeout-minutes: 40
+        with:
+          api-level: ${{ matrix.api-level }}
+          profile: 4in WVGA (Nexus S)
+          target: ${{ matrix.target }}
+          ram-size: 2048M
+          script: |
+            adb logcat > logcat.txt &
+            ./gradlew :common:connectedCheck
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs-${{ matrix.api-level }}-${{ matrix.target }}
+          path: logcat.txt
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results-${{ matrix.api-level }}-${{ matrix.target }}
+          path: "**/build/outputs/**/connected/**/*.xml"

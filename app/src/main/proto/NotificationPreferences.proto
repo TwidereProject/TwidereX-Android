@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-option java_package = "com.twidere.twiderex.preferences.proto";
-option java_multiple_files = true;
-
-message NotificationPreferences {
-  bool enableNotification = 1;
-}

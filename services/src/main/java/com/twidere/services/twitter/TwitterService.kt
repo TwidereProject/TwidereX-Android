@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -23,6 +23,7 @@ package com.twidere.services.twitter
 import com.twidere.services.http.AuthorizationInterceptor
 import com.twidere.services.http.Errors
 import com.twidere.services.http.HttpClientFactory
+import com.twidere.services.http.MicroBlogNotFoundException
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.DownloadMediaService
@@ -42,6 +43,7 @@ import com.twidere.services.microblog.model.Relationship
 import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.api.UploadResources
 import com.twidere.services.twitter.model.Attachment
+import com.twidere.services.twitter.model.BlockV2Request
 import com.twidere.services.twitter.model.DirectMessageEvent
 import com.twidere.services.twitter.model.DirectMessageEventObject
 import com.twidere.services.twitter.model.MessageCreate
@@ -247,6 +249,7 @@ class TwitterService(
             if (user.errors != null && user.errors.any()) {
                 throw TwitterApiException(
                     errors = user.errors.map {
+                        if ("Not Found Error".equals(it.title, true)) throw MicroBlogNotFoundException(it.detail)
                         Errors(
                             code = null,
                             message = null,
@@ -326,6 +329,14 @@ class TwitterService(
         }
     }
 
+    override suspend fun searchMedia(query: String, count: Int, nextPage: String?): ISearchResponse {
+        return try {
+            searchV2("$query has:media -is:retweet", count = count, nextPage = nextPage)
+        } catch (e: TwitterApiExceptionV2) {
+            searchV1("$query filter:media -filter:retweets", count = count, max_id = nextPage)
+        }
+    }
+
     suspend fun searchV2(
         query: String,
         count: Int,
@@ -368,6 +379,8 @@ class TwitterService(
         return Relationship(
             followedBy = response.relationship?.target?.followedBy ?: false,
             following = response.relationship?.target?.following ?: false,
+            blocking = response.relationship?.source?.blocking ?: false,
+            blockedBy = response.relationship?.source?.blockedBy ?: false
         )
     }
 
@@ -425,7 +438,7 @@ class TwitterService(
 
     override suspend fun delete(id: String) = resources.destroy(id)
 
-    private val BULK_SIZE: Long = 512 * 1024 // 512 Kib
+    private val BULK_SIZE: Long = 512 * 1024L // 512 Kib
 
     suspend fun update(
         status: String,
@@ -493,6 +506,22 @@ class TwitterService(
     ).let {
         TwitterPaging(it.data ?: emptyList(), it.meta?.nextToken)
     }
+
+    override suspend fun block(
+        id: String
+    ) = resources.block(
+        sourceId = accountId,
+        target = BlockV2Request(targetUserId = id)
+    ).run {
+        showRelationship(target_id = id)
+    }
+
+    override suspend fun unblock(
+        id: String
+    ) = resources.unblock(sourceId = accountId, targetId = id)
+        .run {
+            showRelationship(target_id = id)
+        }
 
     suspend fun verifyCredentials(): User? {
         return resources.verifyCredentials()

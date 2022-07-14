@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -45,6 +45,8 @@ interface TimelineResources {
         @Query("trim_user") trim_user: Boolean? = null,
         @Query("exclude_replies") exclude_replies: Boolean? = null,
         @Query("include_entities") include_entities: Boolean? = null,
+        @Query("tweet_mode") tweet_mode: String = "extended",
+        @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
     ): List<Status>
 
     @GET("/1.1/statuses/user_timeline.json")
@@ -83,5 +85,7 @@ interface TimelineResources {
         @Query("max_id") max_id: String? = null,
         @Query("include_entities") include_entities: Boolean? = null,
         @Query("include_rts") include_rts: Boolean? = null,
+        @Query("tweet_mode") tweet_mode: String = "extended",
+        @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
     ): List<Status>
 }

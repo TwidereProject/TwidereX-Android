@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -20,6 +20,7 @@
  */
 package com.twidere.services.serializer
 
+import com.twidere.services.utils.DateFormatUtils
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializer
@@ -28,30 +29,20 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
+import org.joda.time.DateTime
 
 @OptIn(ExperimentalSerializationApi::class)
-@Serializer(forClass = Date::class)
-internal object DateSerializerV2WithOffset : KSerializer<Date> {
+@Serializer(forClass = DateTime::class)
+internal object DateSerializerV2WithOffset : KSerializer<DateTime> {
     override val descriptor: SerialDescriptor
-        get() = PrimitiveSerialDescriptor("Date", PrimitiveKind.STRING)
+        get() = PrimitiveSerialDescriptor("DateTime", PrimitiveKind.STRING)
 
-    override fun deserialize(decoder: Decoder): Date {
+    override fun deserialize(decoder: Decoder): DateTime {
         val str = decoder.decodeString()
-        return getDateFormat().parse(str)
+        return DateFormatUtils.parse(str)
     }
 
-    override fun serialize(encoder: Encoder, value: Date) {
-        encoder.encodeString(getDateFormat().format(value))
-    }
-
-    private fun getDateFormat(): SimpleDateFormat {
-        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.ENGLISH)
-        format.isLenient = true
-        format.timeZone = TimeZone.getTimeZone("UTC")
-        return format
+    override fun serialize(encoder: Encoder, value: DateTime) {
+        encoder.encodeString(DateFormatUtils.format(value))
     }
 }

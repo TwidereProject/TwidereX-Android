@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -20,10 +20,17 @@
  */
 package com.twidere.services.twitter.api
 
+import com.twidere.services.twitter.model.BlockV2
+import com.twidere.services.twitter.model.BlockV2Request
 import com.twidere.services.twitter.model.ProfileBanner
 import com.twidere.services.twitter.model.RelationshipResponse
+import com.twidere.services.twitter.model.TwitterResponseV2
 import com.twidere.services.twitter.model.User
+import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface UsersResources {
@@ -35,4 +42,16 @@ interface UsersResources {
 
     @GET("/1.1/friendships/show.json")
     suspend fun showFriendships(@Query("target_id") target_id: String): RelationshipResponse
+
+    @POST("/2/users/{sourceId}/blocking")
+    suspend fun block(
+        @Path(value = "sourceId") sourceId: String,
+        @Body target: BlockV2Request
+    ): TwitterResponseV2<BlockV2>
+
+    @DELETE("/2/users/{sourceId}/blocking/{targetId}")
+    suspend fun unblock(
+        @Path(value = "sourceId") sourceId: String,
+        @Path(value = "targetId") targetId: String,
+    ): TwitterResponseV2<BlockV2>
 }

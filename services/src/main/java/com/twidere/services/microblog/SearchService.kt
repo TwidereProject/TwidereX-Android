@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) TwidereProject and Contributors
  * 
  *  This file is part of Twidere X.
  * 
@@ -36,4 +36,10 @@ interface SearchService {
         count: Int = 20,
         following: Boolean = false
     ): List<IUser>
+
+    suspend fun searchMedia(
+        query: String,
+        count: Int = 20,
+        nextPage: String? = null,
+    ): ISearchResponse
 }

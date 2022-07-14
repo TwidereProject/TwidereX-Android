@@ -1,0 +1,35 @@
+import com.twidere.twiderex.model.MicroBlogKey;
+import java.lang.Boolean;
+
+CREATE TABLE IF NOT EXISTS DbPagingTimeline (
+    accountKey TEXT AS MicroBlogKey NOT NULL,
+    pagingKey TEXT NOT NULL,
+    statusKey TEXT AS MicroBlogKey NOT NULL,
+    timestamp INTEGER NOT NULL,
+    sortId INTEGER NOT NULL,
+    isGap INTEGER AS Boolean NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS index_accountKey_statusKey_pagingKey ON DbPagingTimeline (accountKey, statusKey, pagingKey);
+
+insert:
+INSERT OR REPLACE INTO DbPagingTimeline(
+    accountKey, pagingKey, statusKey, timestamp, sortId, isGap
+) VALUES ?;
+
+getPagingList:
+SELECT * FROM DbPagingTimeline WHERE accountKey == :accountKey AND pagingKey ==:pagingKey ORDER BY sortId DESC LIMIT :limit OFFSET :offset;
+
+getPagingCount:
+SELECT COUNT(*) FROM DbPagingTimeline WHERE accountKey == :accountKey AND pagingKey ==:pagingKey;
+
+findWithStatusKey:
+SELECT * FROM DbPagingTimeline WHERE accountKey == :accountKey AND statusKey ==:statusKey;
+
+getLatest:
+SELECT * FROM DbPagingTimeline WHERE accountKey == :accountKey AND pagingKey == :pagingKey ORDER BY sortId DESC LIMIT 1;
+
+delete:
+DELETE FROM DbPagingTimeline WHERE statusKey ==:statusKey;
+
+clearAll:
+DELETE FROM DbPagingTimeline WHERE accountKey == :accountKey AND pagingKey ==:pagingKey;
