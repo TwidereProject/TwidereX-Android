@@ -38,7 +38,7 @@ Next generation of Twidere for Android 5.0+. **Still in early stage.**
 - [Mastodon] Mastodon OAuth URL with spaces breaks when using DuckDuckGo as a browser (#326)
 
 ### What is being planned for 1.7.0 - July 2022 Update
-For 1.7.0, we're forcusing on bug fix and performance enhancemant, there will be lots of internal code changes.
+For 1.7.0, we're forcusing on bug fix and performance enhancemant, there will be lots of internal code changes, you can check out our [milestone](https://github.com/TwidereProject/TwidereX-Android/milestone/6) for detail.
 
 ### Roadmap for 2.0 - Jun 2021 Update
 For 2.0, we're considering these options, but it is still an early thought and might change over time.
