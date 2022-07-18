@@ -50,6 +50,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -72,6 +77,8 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.utils.PreviewResolver
+import kotlinx.coroutines.delay
 
 @Composable
 fun TimelineStatusComponent(
@@ -407,7 +414,10 @@ fun StatusContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxHeight()
             ) {
-                UserAvatar(user = status.user, modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing))
+                UserAvatar(
+                    user = status.user,
+                    modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing)
+                )
                 if (lineDown) {
                     AvatarConnectLine(
                         modifier = Modifier
@@ -551,7 +561,18 @@ fun ColumnScope.StatusBody(
     StatusBodyMedia(status)
 
     if (LocalDisplayPreferences.current.urlPreview && !status.media.any()) {
-        status.card?.let {
+        var card by remember {
+            mutableStateOf(PreviewResolver.getCached(status.card?.link) ?: status.card)
+        }
+        LaunchedEffect(Unit) {
+            delay(1000)
+            if (card?.image == null) {
+                PreviewResolver.parsePreview(card) {
+                    card = it
+                }
+            }
+        }
+        card?.let {
             Spacer(modifier = Modifier.height(StatusBodyDefaults.LinkPreviewSpacing))
             StatusLinkPreview(it)
         }
