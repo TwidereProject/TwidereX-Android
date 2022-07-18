@@ -22,12 +22,12 @@ package com.twidere.twiderex.utils
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.ui.UiCard
 import io.github.reactivecircus.cache4k.Cache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
@@ -58,13 +58,10 @@ object PreviewResolver {
     }
 
     private val previewClient: OkHttpClient by lazy {
-        OkHttpClient.Builder().apply {
-            dispatcher(
-                dispatcher = Dispatcher().apply {
-                    maxRequestsPerHost = 64
-                }
-            )
-        }.build()
+        TwidereServiceFactory
+            .createHttpClientFactory()
+            .createHttpClientBuilder()
+            .build()
     }
 
     private fun Document.getMeta(name: String): String? {
@@ -74,12 +71,14 @@ object PreviewResolver {
 
     fun parsePreview(card: UiCard): MutableState<UiCard> {
 
-        getCached(card.link)?.let {
-            return it
+        if (card.image != null || card.description != null || card.title != null) {
+            return mutableStateOf(card)
         }
 
-        val state = mutableStateOf(card)
-        cache.put(card.link, state)
+        val state = getCached(card.link) ?: mutableStateOf(card).apply {
+            cache.put(card.link, this)
+        }
+
         if (!isInLoading(card.link)) {
             scope.launch {
                 loadingList.add(card.link)
