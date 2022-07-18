@@ -50,9 +50,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -78,7 +76,6 @@ import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.utils.PreviewResolver
-import kotlinx.coroutines.delay
 
 @Composable
 fun TimelineStatusComponent(
@@ -560,22 +557,16 @@ fun ColumnScope.StatusBody(
 
     StatusBodyMedia(status)
 
-    if (LocalDisplayPreferences.current.urlPreview && !status.media.any()) {
-        var card by remember {
-            mutableStateOf(PreviewResolver.getCached(status.card?.link) ?: status.card)
+    if (
+        LocalDisplayPreferences.current.urlPreview &&
+        !status.media.any() &&
+        status.card != null
+    ) {
+        val card by remember {
+            PreviewResolver.parsePreview(status.card)
         }
-        LaunchedEffect(Unit) {
-            delay(1000)
-            if (card?.image == null) {
-                PreviewResolver.parsePreview(card) {
-                    card = it
-                }
-            }
-        }
-        card?.let {
-            Spacer(modifier = Modifier.height(StatusBodyDefaults.LinkPreviewSpacing))
-            StatusLinkPreview(it)
-        }
+        Spacer(modifier = Modifier.height(StatusBodyDefaults.LinkPreviewSpacing))
+        StatusLinkPreview(card)
     }
 
     if (status.geo.name.isNotEmpty() && type == StatusContentType.Normal) {

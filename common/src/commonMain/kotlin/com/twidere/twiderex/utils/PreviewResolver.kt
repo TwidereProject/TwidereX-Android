@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.utils
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import com.twidere.twiderex.model.ui.UiCard
 import io.github.reactivecircus.cache4k.Cache
 import kotlinx.coroutines.CoroutineScope
@@ -37,7 +39,7 @@ object PreviewResolver {
         mutableListOf()
     }
 
-    private val cache: Cache<String, UiCard> by lazy {
+    private val cache: Cache<String, MutableState<UiCard>> by lazy {
         Cache.Builder().apply {
             maximumCacheSize(300)
         }.build()
@@ -51,10 +53,7 @@ object PreviewResolver {
         CoroutineScope(Dispatchers.IO)
     }
 
-    fun getCached(url: String?): UiCard? {
-        if (url == null) {
-            return null
-        }
+    private fun getCached(url: String): MutableState<UiCard>? {
         return cache.get(url)
     }
 
@@ -73,53 +72,48 @@ object PreviewResolver {
             .firstOrNull { it.tagName() == "meta" }?.attributes()?.get("content")
     }
 
-    fun parsePreview(card: UiCard?, onSuccess: (UiCard) -> Unit) {
-
-        if (card?.link == null) {
-            return
-        }
-
-        if (isInLoading(card.link)) {
-            return
-        }
+    fun parsePreview(card: UiCard): MutableState<UiCard> {
 
         getCached(card.link)?.let {
-            onSuccess.invoke(it)
-            return
+            return it
         }
 
-        scope.launch {
-            loadingList.add(card.link)
-            val response = runCatching {
-                previewClient.newCall(
-                    Request
-                        .Builder()
-                        .url(
-                            card.link.replace(
-                                "http:",
-                                "https:"
+        val state = mutableStateOf(card)
+        cache.put(card.link, state)
+        if (!isInLoading(card.link)) {
+            scope.launch {
+                loadingList.add(card.link)
+                val response = runCatching {
+                    previewClient.newCall(
+                        Request
+                            .Builder()
+                            .url(
+                                card.link.replace(
+                                    "http:",
+                                    "https:"
+                                )
                             )
-                        )
-                        .build()
-                ).execute()
-            }.getOrNull()
+                            .build()
+                    ).execute()
+                }.getOrNull()
 
-            response?.body?.string()?.let {
-                Jsoup.parse(it)
-            }?.let { doc ->
-                val title = doc.getMeta("og:title") ?: doc.title()
-                val desc = doc.getMeta("og:description")
-                val img = doc.getMeta("og:image")
-                card.copy(
-                    title = title,
-                    description = desc,
-                    image = img
-                )
-            }?.also {
-                cache.put(card.link, it)
-                onSuccess.invoke(it)
+                response?.body?.string()?.let {
+                    Jsoup.parse(it)
+                }?.let { doc ->
+                    val title = doc.getMeta("og:title") ?: doc.title()
+                    val desc = doc.getMeta("og:description")
+                    val img = doc.getMeta("og:image")
+                    card.copy(
+                        title = title,
+                        description = desc,
+                        image = img
+                    )
+                }?.also {
+                    state.value = it
+                }
+                loadingList.remove(card.link)
             }
-            loadingList.remove(card.link)
         }
+        return state
     }
 }
