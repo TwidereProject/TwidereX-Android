@@ -29,6 +29,7 @@ import com.twidere.twiderex.paging.mediator.timeline.mastodon.LocalTimelineMedia
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -44,7 +45,7 @@ class LocalTimelineViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override val pagingMediator by lazy {
-        account.mapNotNull { it }.mapLatest {
+        account.filter { it.service is MastodonService }.mapNotNull { it }.mapLatest {
             LocalTimelineMediator(
                 it.service as MastodonService,
                 it.accountKey,

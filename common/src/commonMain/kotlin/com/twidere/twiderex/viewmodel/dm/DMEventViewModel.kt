@@ -34,6 +34,7 @@ import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
@@ -64,7 +65,7 @@ class DMEventViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
-        account.flatMapLatest { account ->
+        account.filter { it.service is DirectMessageService }.flatMapLatest { account ->
             repository.dmEventListSource(
                 accountKey = account.accountKey,
                 conversationKey = conversationKey,

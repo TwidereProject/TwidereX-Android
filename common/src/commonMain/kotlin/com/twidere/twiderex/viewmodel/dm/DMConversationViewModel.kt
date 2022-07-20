@@ -26,6 +26,7 @@ import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -41,7 +42,7 @@ class DMConversationViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
-        account.mapNotNull { it }.flatMapLatest { account ->
+        account.mapNotNull { it }.filter { it.service is DirectMessageService }.flatMapLatest { account ->
             repository.dmConversationListSource(
                 accountKey = account.accountKey,
                 service = account.service as DirectMessageService,
