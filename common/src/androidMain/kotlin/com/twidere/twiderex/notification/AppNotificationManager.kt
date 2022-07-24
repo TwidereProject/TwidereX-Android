@@ -43,8 +43,11 @@ actual class AppNotificationManager(
     private val context: Context,
     private val notificationManagerCompat: NotificationManagerCompat
 ) {
-    val scope = CoroutineScope(Dispatchers.IO)
+    private val scope = CoroutineScope(Dispatchers.IO)
     actual fun notify(notificationId: Int, appNotification: AppNotification) {
+        if (!notificationManagerCompat.areNotificationsEnabled()) {
+            return
+        }
         scope.launch {
             val builder = NotificationCompat.Builder(
                 context,
