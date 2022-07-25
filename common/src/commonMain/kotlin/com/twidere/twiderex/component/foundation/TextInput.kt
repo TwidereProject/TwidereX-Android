@@ -48,6 +48,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -127,6 +128,7 @@ fun TextInput(
     val keyboardController = LocalSoftwareKeyboardController.current
     LaunchedEffect(autoFocus) {
         if (autoFocus) {
+            delay(500)
             focusRequester.requestFocus()
             keyboardController?.show()
         }
