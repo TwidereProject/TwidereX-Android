@@ -19,7 +19,7 @@ object Versions {
     const val okhttp = "4.10.0"
     const val retrofit2 = "2.9.0"
     const val hson = "0.1.4"
-    const val compose = "1.3.0-alpha01"
+    const val compose = "1.2.0-rc03"
     const val compose_jb = "1.2.0-alpha01-dev741"
     const val paging = "3.2.0-alpha01"
     const val activity = "1.6.0-alpha05"
