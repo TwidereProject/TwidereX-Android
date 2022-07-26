@@ -24,8 +24,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TwitterResponseV2<T>(
-    val meta: Meta? = null,
-    val data: T? = null,
-    val errors: List<TwitterErrorV2>? = null,
-    val includes: IncludesV2? = null,
+  val meta: Meta? = null,
+  val data: T? = null,
+  val errors: List<TwitterErrorV2>? = null,
+  val includes: IncludesV2? = null,
 )

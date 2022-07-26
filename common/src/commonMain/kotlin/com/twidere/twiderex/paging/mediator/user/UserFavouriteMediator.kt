@@ -36,40 +36,40 @@ import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingRe
 
 @OptIn(ExperimentalPagingApi::class)
 class UserFavouriteMediator(
-    private val userKey: MicroBlogKey,
-    private val platformType: PlatformType,
-    database: CacheDatabase,
-    accountKey: MicroBlogKey,
-    private val service: TimelineService,
+  private val userKey: MicroBlogKey,
+  private val platformType: PlatformType,
+  database: CacheDatabase,
+  accountKey: MicroBlogKey,
+  private val service: TimelineService,
 ) : CursorWithCustomOrderPagingMediator(accountKey, database) {
-    override val pagingKey: String
-        get() = UserTimelineType.Favourite.pagingKey(userKey)
+  override val pagingKey: String
+    get() = UserTimelineType.Favourite.pagingKey(userKey)
 
-    override suspend fun load(
-        pageSize: Int,
-        paging: CursorWithCustomOrderPagination?
-    ): List<IStatus> {
-        val result = service.favorites(
-            user_id = userKey.id,
-            count = pageSize,
-            max_id = paging?.cursor,
-        )
-        return if (platformType == PlatformType.Mastodon && result is MastodonPaging<*>) {
-            CursorWithCustomOrderPagingResult(
-                result,
-                cursor = result.next,
-                nextOrder = paging?.nextOrder ?: 0
-            )
-        } else {
-            result
-        }
+  override suspend fun load(
+    pageSize: Int,
+    paging: CursorWithCustomOrderPagination?
+  ): List<IStatus> {
+    val result = service.favorites(
+      user_id = userKey.id,
+      count = pageSize,
+      max_id = paging?.cursor,
+    )
+    return if (platformType == PlatformType.Mastodon && result is MastodonPaging<*>) {
+      CursorWithCustomOrderPagingResult(
+        result,
+        cursor = result.next,
+        nextOrder = paging?.nextOrder ?: 0
+      )
+    } else {
+      result
     }
+  }
 
-    override fun hasMore(result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
-        return if (platformType == PlatformType.Mastodon) {
-            result.size == pageSize
-        } else {
-            super.hasMore(result, pageSize)
-        }
+  override fun hasMore(result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
+    return if (platformType == PlatformType.Mastodon) {
+      result.size == pageSize
+    } else {
+      super.hasMore(result, pageSize)
     }
+  }
 }

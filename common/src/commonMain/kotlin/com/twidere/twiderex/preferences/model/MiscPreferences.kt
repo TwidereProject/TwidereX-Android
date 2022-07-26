@@ -24,18 +24,18 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MiscPreferences(
-    val nitterInstance: String = "",
-    val useProxy: Boolean = false,
-    val proxyType: ProxyType = ProxyType.HTTP,
-    val proxyServer: String = "",
-    val proxyPort: Int = 0,
-    val proxyUserName: String = "",
-    val proxyPassword: String = "",
+  val nitterInstance: String = "",
+  val useProxy: Boolean = false,
+  val proxyType: ProxyType = ProxyType.HTTP,
+  val proxyServer: String = "",
+  val proxyPort: Int = 0,
+  val proxyUserName: String = "",
+  val proxyPassword: String = "",
 ) {
-    @Serializable
-    enum class ProxyType {
-        HTTP,
-        SOCKS,
-        REVERSE,
-    }
+  @Serializable
+  enum class ProxyType {
+    HTTP,
+    SOCKS,
+    REVERSE,
+  }
 }

@@ -30,104 +30,104 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class SearchDaoImplTest : AppDatabaseDaoTest() {
-    private val twitterAccountKey = MicroBlogKey.twitter("123")
-    private val mastodonAccountKey = MicroBlogKey("456", "mastodon.com")
+  private val twitterAccountKey = MicroBlogKey.twitter("123")
+  private val mastodonAccountKey = MicroBlogKey("456", "mastodon.com")
 
-    @Test
-    fun getAll_returnResultByAccountKey(): Unit = runBlocking {
-        val appDatabase = AppDatabaseImpl(roomDatabase)
-        appDatabase.searchDao().insertAll(
-            listOf(
-                mockUiSearch(content = "twitter", accountKey = twitterAccountKey),
-                mockUiSearch(content = "mastodon", accountKey = mastodonAccountKey)
-            )
-        )
-        val twitterSearch = appDatabase.searchDao().getAll(twitterAccountKey)
-        twitterSearch.firstOrNull()?.forEach {
-            assertEquals("twitter", it.content)
-        } ?: assert(false)
+  @Test
+  fun getAll_returnResultByAccountKey(): Unit = runBlocking {
+    val appDatabase = AppDatabaseImpl(roomDatabase)
+    appDatabase.searchDao().insertAll(
+      listOf(
+        mockUiSearch(content = "twitter", accountKey = twitterAccountKey),
+        mockUiSearch(content = "mastodon", accountKey = mastodonAccountKey)
+      )
+    )
+    val twitterSearch = appDatabase.searchDao().getAll(twitterAccountKey)
+    twitterSearch.firstOrNull()?.forEach {
+      assertEquals("twitter", it.content)
+    } ?: assert(false)
 
-        val mastodonSearch = appDatabase.searchDao().getAll(mastodonAccountKey)
-        mastodonSearch.firstOrNull()?.forEach {
-            assertEquals("mastodon", it.content)
-        } ?: assert(false)
-    }
+    val mastodonSearch = appDatabase.searchDao().getAll(mastodonAccountKey)
+    mastodonSearch.firstOrNull()?.forEach {
+      assertEquals("mastodon", it.content)
+    } ?: assert(false)
+  }
 
-    @Test
-    fun getAllHistory_returnResultsMatchAccountKeyAndNotSaved() = runBlocking {
-        val appDatabase = AppDatabaseImpl(roomDatabase)
-        appDatabase.searchDao().insertAll(
-            listOf(
-                mockUiSearch(content = "saved", accountKey = twitterAccountKey, saved = true),
-                mockUiSearch(content = "not saved", accountKey = twitterAccountKey)
-            )
-        )
-        val result = appDatabase.searchDao().getAllHistory(mastodonAccountKey).firstOrNull()
-        result?.forEach {
-            assert(!it.saved)
-            assertEquals("not saved", it.content)
-        } ?: assert(false)
-    }
+  @Test
+  fun getAllHistory_returnResultsMatchAccountKeyAndNotSaved() = runBlocking {
+    val appDatabase = AppDatabaseImpl(roomDatabase)
+    appDatabase.searchDao().insertAll(
+      listOf(
+        mockUiSearch(content = "saved", accountKey = twitterAccountKey, saved = true),
+        mockUiSearch(content = "not saved", accountKey = twitterAccountKey)
+      )
+    )
+    val result = appDatabase.searchDao().getAllHistory(mastodonAccountKey).firstOrNull()
+    result?.forEach {
+      assert(!it.saved)
+      assertEquals("not saved", it.content)
+    } ?: assert(false)
+  }
 
-    @Test
-    fun getAllSaved_returnResultsMatchAccountKeyAndSaved() = runBlocking {
-        val appDatabase = AppDatabaseImpl(roomDatabase)
-        appDatabase.searchDao().insertAll(
-            listOf(
-                mockUiSearch(content = "saved", accountKey = twitterAccountKey, saved = true),
-                mockUiSearch(content = "not saved", accountKey = twitterAccountKey)
-            )
-        )
-        val result = appDatabase.searchDao().getAllSaved(twitterAccountKey).firstOrNull()
-        result?.forEach {
-            assert(it.saved)
-            assertEquals("saved", it.content)
-        } ?: assert(false)
-    }
+  @Test
+  fun getAllSaved_returnResultsMatchAccountKeyAndSaved() = runBlocking {
+    val appDatabase = AppDatabaseImpl(roomDatabase)
+    appDatabase.searchDao().insertAll(
+      listOf(
+        mockUiSearch(content = "saved", accountKey = twitterAccountKey, saved = true),
+        mockUiSearch(content = "not saved", accountKey = twitterAccountKey)
+      )
+    )
+    val result = appDatabase.searchDao().getAllSaved(twitterAccountKey).firstOrNull()
+    result?.forEach {
+      assert(it.saved)
+      assertEquals("saved", it.content)
+    } ?: assert(false)
+  }
 
-    @Test
-    fun getSearch_returnResultsMatchContentAndAccountKey() = runBlocking {
-        val appDatabase = AppDatabaseImpl(roomDatabase)
-        appDatabase.searchDao().insertAll(listOf(mockUiSearch(content = "twitter", accountKey = twitterAccountKey)))
-        val result = appDatabase.searchDao().get("twitter", twitterAccountKey)
-        assertEquals("twitter", result?.content)
+  @Test
+  fun getSearch_returnResultsMatchContentAndAccountKey() = runBlocking {
+    val appDatabase = AppDatabaseImpl(roomDatabase)
+    appDatabase.searchDao().insertAll(listOf(mockUiSearch(content = "twitter", accountKey = twitterAccountKey)))
+    val result = appDatabase.searchDao().get("twitter", twitterAccountKey)
+    assertEquals("twitter", result?.content)
 
-        val errorResult = appDatabase.searchDao().get("twitter", mastodonAccountKey)
-        assert(errorResult == null)
-    }
+    val errorResult = appDatabase.searchDao().get("twitter", mastodonAccountKey)
+    assert(errorResult == null)
+  }
 
-    @Test
-    fun deleteSearch_getNullAfterDelete() = runBlocking {
-        val appDatabase = AppDatabaseImpl(roomDatabase)
-        appDatabase.searchDao().insertAll(listOf(mockUiSearch(content = "twitter", accountKey = twitterAccountKey)))
-        val result = appDatabase.searchDao().get("twitter", twitterAccountKey)
-        assertEquals("twitter", result?.content)
-        appDatabase.searchDao().remove(result!!)
-        assert(appDatabase.searchDao().get("twitter", twitterAccountKey) == null)
-    }
+  @Test
+  fun deleteSearch_getNullAfterDelete() = runBlocking {
+    val appDatabase = AppDatabaseImpl(roomDatabase)
+    appDatabase.searchDao().insertAll(listOf(mockUiSearch(content = "twitter", accountKey = twitterAccountKey)))
+    val result = appDatabase.searchDao().get("twitter", twitterAccountKey)
+    assertEquals("twitter", result?.content)
+    appDatabase.searchDao().remove(result!!)
+    assert(appDatabase.searchDao().get("twitter", twitterAccountKey) == null)
+  }
 
-    @Test
-    fun clearHistory_deleteSearchNotSaved() = runBlocking {
-        val appDatabase = AppDatabaseImpl(roomDatabase)
-        appDatabase.searchDao().insertAll(
-            listOf(
-                mockUiSearch(content = "twitter", accountKey = twitterAccountKey),
-                mockUiSearch(content = "twitter saved", accountKey = twitterAccountKey, saved = true),
-                mockUiSearch(content = "mastodon", accountKey = mastodonAccountKey),
-                mockUiSearch(content = "mastodon saved", accountKey = mastodonAccountKey, saved = true)
-            )
-        )
-        appDatabase.searchDao().clear()
-        val twitterResult = appDatabase.searchDao().getAll(twitterAccountKey).firstOrNull()
-        val mastodonResult = appDatabase.searchDao().getAll(mastodonAccountKey).firstOrNull()
-        twitterResult?.forEach {
-            assert(it.saved)
-            assertEquals("twitter saved", it.content)
-        } ?: assert(false)
+  @Test
+  fun clearHistory_deleteSearchNotSaved() = runBlocking {
+    val appDatabase = AppDatabaseImpl(roomDatabase)
+    appDatabase.searchDao().insertAll(
+      listOf(
+        mockUiSearch(content = "twitter", accountKey = twitterAccountKey),
+        mockUiSearch(content = "twitter saved", accountKey = twitterAccountKey, saved = true),
+        mockUiSearch(content = "mastodon", accountKey = mastodonAccountKey),
+        mockUiSearch(content = "mastodon saved", accountKey = mastodonAccountKey, saved = true)
+      )
+    )
+    appDatabase.searchDao().clear()
+    val twitterResult = appDatabase.searchDao().getAll(twitterAccountKey).firstOrNull()
+    val mastodonResult = appDatabase.searchDao().getAll(mastodonAccountKey).firstOrNull()
+    twitterResult?.forEach {
+      assert(it.saved)
+      assertEquals("twitter saved", it.content)
+    } ?: assert(false)
 
-        mastodonResult?.forEach {
-            assert(it.saved)
-            assertEquals("mastodon saved", it.content)
-        } ?: assert(false)
-    }
+    mastodonResult?.forEach {
+      assert(it.saved)
+      assertEquals("mastodon saved", it.content)
+    } ?: assert(false)
+  }
 }

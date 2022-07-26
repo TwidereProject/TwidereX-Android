@@ -31,9 +31,9 @@ import com.twidere.twiderex.utils.PlatformResolver
 import org.koin.dsl.module
 
 internal actual val platformModule = module {
-    single { AccountPreferencesFactory() }
-    single { AccountRepository(get<DataProvider>().realAppDatabase.accountQueries, get()) }
-    single { InAppNotification() }
-    single { TwidereHttpConfigProvider(get<PreferencesHolder>().miscPreferences) }
-    single { PlatformResolver(get()) }
+  single { AccountPreferencesFactory() }
+  single { AccountRepository(get<DataProvider>().realAppDatabase.accountQueries, get()) }
+  single { InAppNotification() }
+  single { TwidereHttpConfigProvider(get<PreferencesHolder>().miscPreferences) }
+  single { PlatformResolver(get()) }
 }

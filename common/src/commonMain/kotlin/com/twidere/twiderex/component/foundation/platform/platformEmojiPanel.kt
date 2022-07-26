@@ -40,64 +40,64 @@ import com.twidere.twiderex.model.ui.UiEmojiCategory
 
 @Composable
 expect fun PlatformEmojiPanel(
-    items: List<UiEmojiCategory>,
-    showEmoji: Boolean,
-    onEmojiSelected: (UiEmoji) -> Unit,
+  items: List<UiEmojiCategory>,
+  showEmoji: Boolean,
+  onEmojiSelected: (UiEmoji) -> Unit,
 )
 
 @ExperimentalFoundationApi
 @Composable
 internal fun EmojiList(
-    items: List<UiEmojiCategory>,
-    onEmojiSelected: (UiEmoji) -> Unit,
+  items: List<UiEmojiCategory>,
+  onEmojiSelected: (UiEmoji) -> Unit,
 ) {
-    BoxWithConstraints(modifier = Modifier.padding(EmojiListDefaults.ContentPadding)) {
-        val column = maxOf((maxWidth / EmojiListDefaults.Icon.Size).toInt(), 1)
-        LazyColumn {
-            items.forEach {
-                it.category?.let { category ->
-                    item {
-                        Text(
-                            text = category,
-                            style = MaterialTheme.typography.h6,
-                            modifier = Modifier.padding(EmojiListDefaults.Category.ContentPadding)
-                        )
-                    }
-                }
-                itemsGridIndexed(
-                    data = it.emoji,
-                    rowSize = column,
-                ) { _, item ->
-                    item.url?.let { it1 ->
-                        NetworkImage(
-                            modifier = Modifier
-                                .size(EmojiListDefaults.Icon.Size)
-                                .padding(EmojiListDefaults.Icon.ContentPadding)
-                                .clickable {
-                                    onEmojiSelected.invoke(item)
-                                },
-                            data = it1,
-                            contentScale = ContentScale.Fit,
-                        )
-                    }
-                }
-            }
+  BoxWithConstraints(modifier = Modifier.padding(EmojiListDefaults.ContentPadding)) {
+    val column = maxOf((maxWidth / EmojiListDefaults.Icon.Size).toInt(), 1)
+    LazyColumn {
+      items.forEach {
+        it.category?.let { category ->
+          item {
+            Text(
+              text = category,
+              style = MaterialTheme.typography.h6,
+              modifier = Modifier.padding(EmojiListDefaults.Category.ContentPadding)
+            )
+          }
         }
+        itemsGridIndexed(
+          data = it.emoji,
+          rowSize = column,
+        ) { _, item ->
+          item.url?.let { it1 ->
+            NetworkImage(
+              modifier = Modifier
+                .size(EmojiListDefaults.Icon.Size)
+                .padding(EmojiListDefaults.Icon.ContentPadding)
+                .clickable {
+                  onEmojiSelected.invoke(item)
+                },
+              data = it1,
+              contentScale = ContentScale.Fit,
+            )
+          }
+        }
+      }
     }
+  }
 }
 
 object EmojiListDefaults {
-    object Icon {
-        val Size = 48.dp
-        val ContentPadding = PaddingValues(4.dp)
-    }
+  object Icon {
+    val Size = 48.dp
+    val ContentPadding = PaddingValues(4.dp)
+  }
 
-    val ContentPadding = PaddingValues(
-        horizontal = 8.dp,
-        vertical = 0.dp
-    )
+  val ContentPadding = PaddingValues(
+    horizontal = 8.dp,
+    vertical = 0.dp
+  )
 
-    object Category {
-        val ContentPadding = PaddingValues(vertical = 16.dp, horizontal = 4.dp)
-    }
+  object Category {
+    val ContentPadding = PaddingValues(vertical = 16.dp, horizontal = 4.dp)
+  }
 }

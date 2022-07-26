@@ -24,13 +24,13 @@ import androidx.room.TypeConverter
 import com.twidere.twiderex.model.enums.PlatformType
 
 internal class PlatformTypeConverter {
-    @TypeConverter
-    fun fromPlatformType(platformType: PlatformType?): String? {
-        return platformType?.name
-    }
+  @TypeConverter
+  fun fromPlatformType(platformType: PlatformType?): String? {
+    return platformType?.name
+  }
 
-    @TypeConverter
-    fun fromString(string: String?): PlatformType? {
-        return string?.let { PlatformType.valueOf(it) }
-    }
+  @TypeConverter
+  fun fromString(string: String?): PlatformType? {
+    return string?.let { PlatformType.valueOf(it) }
+  }
 }

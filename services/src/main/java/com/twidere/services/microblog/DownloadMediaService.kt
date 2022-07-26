@@ -23,5 +23,5 @@ package com.twidere.services.microblog
 import java.io.InputStream
 
 interface DownloadMediaService {
-    suspend fun download(target: String): InputStream
+  suspend fun download(target: String): InputStream
 }

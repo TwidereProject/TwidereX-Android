@@ -36,60 +36,60 @@ import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.sqldelight.SqlDelightCacheDatabase
 
 internal class SqlDelightPagingTimelineDaoImpl(private val database: SqlDelightCacheDatabase) : PagingTimelineDao {
-    override fun getPagingSource(
-        pagingKey: String,
-        accountKey: MicroBlogKey
-    ): PagingSource<Int, PagingTimeLineWithStatus> {
-        return QueryPagingSource(
-            countQuery = database.pagingTimelineQueries.getPagingCount(accountKey = accountKey, pagingKey = pagingKey),
-            transacter = database.pagingTimelineQueries,
-            queryProvider = { limit, offset, relationQueryRegister ->
-                database.pagingTimelineQueries.getPagingList(
-                    accountKey = accountKey,
-                    pagingKey = pagingKey,
-                    limit = limit,
-                    offset = offset
-                ).flatMap {
-                    DbPagingTimelineWithStatus(
-                        timeline = it,
-                        status = database.statusQueries
-                            .findWithStatusKey(statusKey = it.statusKey)
-                            .also { query ->
-                                relationQueryRegister.addRelationQuery(query)
-                            }.executeAsOne()
-                            .withAttachments(database, accountKey = accountKey)
-                    ).toUi()
-                }
-            }
-        )
-    }
+  override fun getPagingSource(
+    pagingKey: String,
+    accountKey: MicroBlogKey
+  ): PagingSource<Int, PagingTimeLineWithStatus> {
+    return QueryPagingSource(
+      countQuery = database.pagingTimelineQueries.getPagingCount(accountKey = accountKey, pagingKey = pagingKey),
+      transacter = database.pagingTimelineQueries,
+      queryProvider = { limit, offset, relationQueryRegister ->
+        database.pagingTimelineQueries.getPagingList(
+          accountKey = accountKey,
+          pagingKey = pagingKey,
+          limit = limit,
+          offset = offset
+        ).flatMap {
+          DbPagingTimelineWithStatus(
+            timeline = it,
+            status = database.statusQueries
+              .findWithStatusKey(statusKey = it.statusKey)
+              .also { query ->
+                relationQueryRegister.addRelationQuery(query)
+              }.executeAsOne()
+              .withAttachments(database, accountKey = accountKey)
+          ).toUi()
+        }
+      }
+    )
+  }
 
-    override suspend fun clearAll(pagingKey: String, accountKey: MicroBlogKey) {
-        database.pagingTimelineQueries.clearAll(accountKey = accountKey, pagingKey = pagingKey)
-    }
+  override suspend fun clearAll(pagingKey: String, accountKey: MicroBlogKey) {
+    database.pagingTimelineQueries.clearAll(accountKey = accountKey, pagingKey = pagingKey)
+  }
 
-    override suspend fun getLatest(
-        pagingKey: String,
-        accountKey: MicroBlogKey
-    ): PagingTimeLineWithStatus? {
-        return database.pagingTimelineQueries.getLatest(accountKey = accountKey, pagingKey = pagingKey).executeAsOneOrNull()?.withStatus(database)?.toUi()
-    }
+  override suspend fun getLatest(
+    pagingKey: String,
+    accountKey: MicroBlogKey
+  ): PagingTimeLineWithStatus? {
+    return database.pagingTimelineQueries.getLatest(accountKey = accountKey, pagingKey = pagingKey).executeAsOneOrNull()?.withStatus(database)?.toUi()
+  }
 
-    override suspend fun findWithStatusKey(
-        maxStatusKey: MicroBlogKey,
-        accountKey: MicroBlogKey
-    ): PagingTimeLine? {
-        return database.pagingTimelineQueries.findWithStatusKey(
-            statusKey = maxStatusKey,
-            accountKey = accountKey
-        ).executeAsList().firstOrNull()?.toUi()
-    }
+  override suspend fun findWithStatusKey(
+    maxStatusKey: MicroBlogKey,
+    accountKey: MicroBlogKey
+  ): PagingTimeLine? {
+    return database.pagingTimelineQueries.findWithStatusKey(
+      statusKey = maxStatusKey,
+      accountKey = accountKey
+    ).executeAsList().firstOrNull()?.toUi()
+  }
 
-    override suspend fun insertAll(listOf: List<PagingTimeLine>) {
-        listOf.map { it.toDbPagingTimeline() }.saveToDb(database)
-    }
+  override suspend fun insertAll(listOf: List<PagingTimeLine>) {
+    listOf.map { it.toDbPagingTimeline() }.saveToDb(database)
+  }
 
-    override suspend fun delete(statusKey: MicroBlogKey) {
-        database.pagingTimelineQueries.delete(statusKey = statusKey)
-    }
+  override suspend fun delete(statusKey: MicroBlogKey) {
+    database.pagingTimelineQueries.delete(statusKey = statusKey)
+  }
 }

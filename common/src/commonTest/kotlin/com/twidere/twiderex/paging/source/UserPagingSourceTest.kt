@@ -32,49 +32,49 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class UserPagingSourceTest {
-    @Test
-    fun loadReturnsPageWhenOnSuccessfulLoadOfPageKeyedData() = runBlocking {
-        val pagingSource = MockUserPagingSource(MicroBlogKey.Empty)
-        assertEquals(
-            PagingSource.LoadResult.Page(
-                data = pagingSource.mockData.map { it.toUi(MicroBlogKey.Empty) },
-                prevKey = null,
-                nextKey = (pagingSource.mockData as IPaging).nextPage
-            ),
-            pagingSource.load(
-                PagingSource.LoadParams.Refresh(
-                    key = null,
-                    loadSize = 2,
-                    placeholdersEnabled = false
-                )
-            )
+  @Test
+  fun loadReturnsPageWhenOnSuccessfulLoadOfPageKeyedData() = runBlocking {
+    val pagingSource = MockUserPagingSource(MicroBlogKey.Empty)
+    assertEquals(
+      PagingSource.LoadResult.Page(
+        data = pagingSource.mockData.map { it.toUi(MicroBlogKey.Empty) },
+        prevKey = null,
+        nextKey = (pagingSource.mockData as IPaging).nextPage
+      ),
+      pagingSource.load(
+        PagingSource.LoadParams.Refresh(
+          key = null,
+          loadSize = 2,
+          placeholdersEnabled = false
         )
-    }
+      )
+    )
+  }
 
-    @Test
-    fun loadReturnsErrorWhenErrorOccurred() = runBlocking {
-        val pagingSource = MockUserPagingSource(MicroBlogKey.Empty)
-        pagingSource.errorMsg = "throw test errors"
-        assert(
-            pagingSource.load(
-                PagingSource.LoadParams.Refresh(
-                    key = null,
-                    loadSize = 2,
-                    placeholdersEnabled = false
-                )
-            ) is PagingSource.LoadResult.Error
+  @Test
+  fun loadReturnsErrorWhenErrorOccurred() = runBlocking {
+    val pagingSource = MockUserPagingSource(MicroBlogKey.Empty)
+    pagingSource.errorMsg = "throw test errors"
+    assert(
+      pagingSource.load(
+        PagingSource.LoadParams.Refresh(
+          key = null,
+          loadSize = 2,
+          placeholdersEnabled = false
         )
-    }
+      ) is PagingSource.LoadResult.Error
+    )
+  }
 }
 
 private class MockUserPagingSource(accountKey: MicroBlogKey) : UserPagingSource(
-    accountKey
+  accountKey
 ) {
-    var errorMsg: String? = null
-    val mockData = listOf(mockIUser()).toIPaging()
+  var errorMsg: String? = null
+  val mockData = listOf(mockIUser()).toIPaging()
 
-    override suspend fun loadUsers(params: LoadParams<String>): List<IUser> {
-        if (!errorMsg.isNullOrEmpty()) throw Error(errorMsg)
-        return mockData
-    }
+  override suspend fun loadUsers(params: LoadParams<String>): List<IUser> {
+    if (!errorMsg.isNullOrEmpty()) throw Error(errorMsg)
+    return mockData
+  }
 }

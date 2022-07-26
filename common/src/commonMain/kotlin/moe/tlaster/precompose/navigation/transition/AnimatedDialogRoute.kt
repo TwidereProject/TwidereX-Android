@@ -40,90 +40,90 @@ import moe.tlaster.precompose.navigation.RouteStack
 
 @Composable
 internal fun AnimatedDialogRoute(
-    stack: RouteStack,
-    modifier: Modifier = Modifier,
-    animationSpec: FiniteAnimationSpec<Float> = tween(),
-    dialogTransition: DialogTransition = remember { DialogTransition() },
-    content: @Composable (BackStackEntry) -> Unit
+  stack: RouteStack,
+  modifier: Modifier = Modifier,
+  animationSpec: FiniteAnimationSpec<Float> = tween(),
+  dialogTransition: DialogTransition = remember { DialogTransition() },
+  content: @Composable (BackStackEntry) -> Unit
 ) {
 
-    val items = remember { mutableStateListOf<AnimatedRouteItem<BackStackEntry>>() }
-    val stacks = stack.stacks
-    val targetState = remember(stack.stacks.size) {
-        stack.currentEntry
-    }
-    val transitionState = remember { MutableTransitionState(targetState) }
-    val targetChanged = (targetState != transitionState.targetState)
-    val previousState = transitionState.targetState
-    transitionState.targetState = targetState
-    val transition = updateTransition(transitionState, label = "AnimatedDialogRouteTransition")
+  val items = remember { mutableStateListOf<AnimatedRouteItem<BackStackEntry>>() }
+  val stacks = stack.stacks
+  val targetState = remember(stack.stacks.size) {
+    stack.currentEntry
+  }
+  val transitionState = remember { MutableTransitionState(targetState) }
+  val targetChanged = (targetState != transitionState.targetState)
+  val previousState = transitionState.targetState
+  transitionState.targetState = targetState
+  val transition = updateTransition(transitionState, label = "AnimatedDialogRouteTransition")
 
-    if (targetChanged || items.isEmpty()) {
-        val indexOfNew = stacks.indexOf(targetState).takeIf { it >= 0 } ?: Int.MAX_VALUE
-        val indexOfOld = stacks.indexOf(previousState)
-            .takeIf {
-                it >= 0 ||
-                    // Workaround for navOptions
-                    targetState?.lifecycle?.currentState == Lifecycle.State.Initialized &&
-                    previousState?.lifecycle?.currentState == Lifecycle.State.Active
-            } ?: Int.MAX_VALUE
-        // Only manipulate the list when the state is changed, or in the first run.
-        val keys = items.map {
-            val type = if (indexOfNew >= indexOfOld) AnimateType.Pause else AnimateType.Destroy
-            it.key to type
-        }.toMap().run {
-            toMutableMap().also {
-                val type = if (indexOfNew >= indexOfOld) {
-                    AnimateType.Create
-                } else {
-                    AnimateType.Resume
-                }
-                if (targetState != null) {
-                    it[targetState] = type
-                }
-            }
+  if (targetChanged || items.isEmpty()) {
+    val indexOfNew = stacks.indexOf(targetState).takeIf { it >= 0 } ?: Int.MAX_VALUE
+    val indexOfOld = stacks.indexOf(previousState)
+      .takeIf {
+        it >= 0 ||
+          // Workaround for navOptions
+          targetState?.lifecycle?.currentState == Lifecycle.State.Initialized &&
+          previousState?.lifecycle?.currentState == Lifecycle.State.Active
+      } ?: Int.MAX_VALUE
+    // Only manipulate the list when the state is changed, or in the first run.
+    val keys = items.map {
+      val type = if (indexOfNew >= indexOfOld) AnimateType.Pause else AnimateType.Destroy
+      it.key to type
+    }.toMap().run {
+      toMutableMap().also {
+        val type = if (indexOfNew >= indexOfOld) {
+          AnimateType.Create
+        } else {
+          AnimateType.Resume
         }
-        items.clear()
-        keys.mapTo(items) { (key, value) ->
-            AnimatedRouteItem(key, value) {
-                val factor by transition.animateFloat(
-                    transitionSpec = { animationSpec }
-                ) { if (it == key) 1f else 0f }
-                Box(
-                    Modifier.graphicsLayer {
-                        when (value) {
-                            AnimateType.Create -> dialogTransition.createTransition.invoke(
-                                this,
-                                factor
-                            )
-                            AnimateType.Destroy -> dialogTransition.destroyTransition.invoke(
-                                this,
-                                factor
-                            )
-                            else -> Unit
-                        }
-                    }
-                ) {
-                    content(key)
-                }
-            }
-        }.sortByDescending { it.animateType }
-    } else if (transitionState.currentState == transitionState.targetState) {
-        // Remove all the intermediate items from the list once the animation is finished.
-        items.removeAll { it.animateType == AnimateType.Destroy }
+        if (targetState != null) {
+          it[targetState] = type
+        }
+      }
     }
+    items.clear()
+    keys.mapTo(items) { (key, value) ->
+      AnimatedRouteItem(key, value) {
+        val factor by transition.animateFloat(
+          transitionSpec = { animationSpec }
+        ) { if (it == key) 1f else 0f }
+        Box(
+          Modifier.graphicsLayer {
+            when (value) {
+              AnimateType.Create -> dialogTransition.createTransition.invoke(
+                this,
+                factor
+              )
+              AnimateType.Destroy -> dialogTransition.destroyTransition.invoke(
+                this,
+                factor
+              )
+              else -> Unit
+            }
+          }
+        ) {
+          content(key)
+        }
+      }
+    }.sortByDescending { it.animateType }
+  } else if (transitionState.currentState == transitionState.targetState) {
+    // Remove all the intermediate items from the list once the animation is finished.
+    items.removeAll { it.animateType == AnimateType.Destroy }
+  }
 
-    Box(modifier) {
-        for (index in items.indices) {
-            val item = items[index]
-            key(item.key) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    item.content.invoke()
-                }
-            }
+  Box(modifier) {
+    for (index in items.indices) {
+      val item = items[index]
+      key(item.key) {
+        Box(
+          modifier = Modifier
+            .fillMaxSize()
+        ) {
+          item.content.invoke()
         }
+      }
     }
+  }
 }

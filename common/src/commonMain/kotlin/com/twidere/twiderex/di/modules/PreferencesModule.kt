@@ -35,37 +35,37 @@ import org.koin.dsl.module
 import java.io.File
 
 internal val preferencesModule = module {
-    single {
-        PreferencesHolder(
-            appearancePreferences = createDataStore(
-                "appearances.pb",
-                AppearancePreferencesSerializer
-            ),
-            displayPreferences = createDataStore("display.pb", DisplayPreferencesSerializer),
-            miscPreferences = createDataStore("misc.pb", MiscPreferencesSerializer),
-            notificationPreferences = createDataStore(
-                "notification.pb",
-                NotificationPreferencesSerializer
-            ),
-        )
+  single {
+    PreferencesHolder(
+      appearancePreferences = createDataStore(
+        "appearances.pb",
+        AppearancePreferencesSerializer
+      ),
+      displayPreferences = createDataStore("display.pb", DisplayPreferencesSerializer),
+      miscPreferences = createDataStore("misc.pb", MiscPreferencesSerializer),
+      notificationPreferences = createDataStore(
+        "notification.pb",
+        NotificationPreferencesSerializer
+      ),
+    )
+  }
+  single {
+    PreferenceDataStoreFactory.create {
+      createDataStoreFile("perferences.preferences_pb")
     }
-    single {
-        PreferenceDataStoreFactory.create {
-            createDataStoreFile("perferences.preferences_pb")
-        }
-    }
+  }
 }
 
 internal inline fun <reified T : Any> Scope.createDataStore(
-    name: String,
-    serializer: Serializer<T>,
+  name: String,
+  serializer: Serializer<T>,
 ) = DataStoreFactory.create(
-    serializer,
-    produceFile = {
-        createDataStoreFile(name)
-    },
+  serializer,
+  produceFile = {
+    createDataStoreFile(name)
+  },
 )
 
 private fun Scope.createDataStoreFile(name: String): File {
-    return File(get<StorageProvider>().appFiles.dataStoreFile(name))
+  return File(get<StorageProvider>().appFiles.dataStoreFile(name))
 }

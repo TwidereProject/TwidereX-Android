@@ -23,8 +23,8 @@ package com.twidere.services.nitter.model
 import moe.tlaster.hson.annotations.HtmlSerializable
 
 data class ConversationTimeline(
-    @HtmlSerializable(".replies .thread-line")
-    val items: List<ConversationThreadItem>,
-    @HtmlSerializable(".show-more:not(.timeline-item) a", attr = "href")
-    val nextPage: String? = null,
+  @HtmlSerializable(".replies .thread-line")
+  val items: List<ConversationThreadItem>,
+  @HtmlSerializable(".show-more:not(.timeline-item) a", attr = "href")
+  val nextPage: String? = null,
 )

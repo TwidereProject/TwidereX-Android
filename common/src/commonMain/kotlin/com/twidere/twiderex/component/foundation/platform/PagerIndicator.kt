@@ -62,51 +62,51 @@ import com.twidere.twiderex.component.foundation.PagerState
  */
 @Composable
 fun HorizontalPagerIndicator(
-    pagerState: PagerState,
-    modifier: Modifier = Modifier,
-    activeColor: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
-    inactiveColor: Color = activeColor.copy(ContentAlpha.disabled),
-    indicatorWidth: Dp = 8.dp,
-    indicatorHeight: Dp = indicatorWidth,
-    spacing: Dp = indicatorWidth,
-    indicatorShape: Shape = CircleShape,
+  pagerState: PagerState,
+  modifier: Modifier = Modifier,
+  activeColor: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
+  inactiveColor: Color = activeColor.copy(ContentAlpha.disabled),
+  indicatorWidth: Dp = 8.dp,
+  indicatorHeight: Dp = indicatorWidth,
+  spacing: Dp = indicatorWidth,
+  indicatorShape: Shape = CircleShape,
 ) {
 
-    val indicatorWidthPx = LocalDensity.current.run { indicatorWidth.roundToPx() }
-    val spacingPx = LocalDensity.current.run { spacing.roundToPx() }
+  val indicatorWidthPx = LocalDensity.current.run { indicatorWidth.roundToPx() }
+  val spacingPx = LocalDensity.current.run { spacing.roundToPx() }
+
+  Box(
+    modifier = modifier,
+    contentAlignment = Alignment.CenterStart
+  ) {
+    Row(
+      horizontalArrangement = Arrangement.spacedBy(spacing),
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      val indicatorModifier = Modifier
+        .size(width = indicatorWidth, height = indicatorHeight)
+        .background(color = inactiveColor, shape = indicatorShape)
+
+      repeat(pagerState.pageCount) {
+        Box(indicatorModifier)
+      }
+    }
 
     Box(
-        modifier = modifier,
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(spacing),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            val indicatorModifier = Modifier
-                .size(width = indicatorWidth, height = indicatorHeight)
-                .background(color = inactiveColor, shape = indicatorShape)
-
-            repeat(pagerState.pageCount) {
-                Box(indicatorModifier)
-            }
+      Modifier
+        .offset {
+          val scrollPosition = (pagerState.currentPage + pagerState.currentPageOffset)
+            .coerceIn(0f, (pagerState.pageCount - 1).coerceAtLeast(0).toFloat())
+          IntOffset(
+            x = ((spacingPx + indicatorWidthPx) * scrollPosition).toInt(),
+            y = 0
+          )
         }
-
-        Box(
-            Modifier
-                .offset {
-                    val scrollPosition = (pagerState.currentPage + pagerState.currentPageOffset)
-                        .coerceIn(0f, (pagerState.pageCount - 1).coerceAtLeast(0).toFloat())
-                    IntOffset(
-                        x = ((spacingPx + indicatorWidthPx) * scrollPosition).toInt(),
-                        y = 0
-                    )
-                }
-                .size(width = indicatorWidth, height = indicatorHeight)
-                .background(
-                    color = activeColor,
-                    shape = indicatorShape,
-                )
+        .size(width = indicatorWidth, height = indicatorHeight)
+        .background(
+          color = activeColor,
+          shape = indicatorShape,
         )
-    }
+    )
+  }
 }

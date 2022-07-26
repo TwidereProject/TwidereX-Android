@@ -24,7 +24,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class HashtagV2(
-    val start: Long? = null,
-    val end: Long? = null,
-    val tag: String? = null
+  val start: Long? = null,
+  val end: Long? = null,
+  val tag: String? = null
 )

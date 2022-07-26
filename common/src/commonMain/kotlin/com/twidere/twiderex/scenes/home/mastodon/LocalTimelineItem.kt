@@ -39,55 +39,55 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.mastodon.LocalTimelineViewModel
 
 class LocalTimelineItem : HomeNavigationItem() {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_local_title)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_local_title)
+  }
 
-    override val route: String
-        get() = Root.Mastodon.LocalTimeline
+  override val route: String
+    get() = Root.Mastodon.LocalTimeline
 
-    @Composable
-    override fun icon(): Painter {
-        return painterResource(res = com.twidere.twiderex.MR.files.ic_users)
-    }
+  @Composable
+  override fun icon(): Painter {
+    return painterResource(res = com.twidere.twiderex.MR.files.ic_users)
+  }
 
-    @Composable
-    override fun Content() {
-        LocalTimelineContent(
-            lazyListController = lazyListController
-        )
-    }
+  @Composable
+  override fun Content() {
+    LocalTimelineContent(
+      lazyListController = lazyListController
+    )
+  }
 }
 
 @Composable
 fun LocalTimelineScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = "Local")
-                    }
-                )
-            }
-        ) {
-            LocalTimelineContent()
-        }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = "Local")
+          }
+        )
+      }
+    ) {
+      LocalTimelineContent()
     }
+  }
 }
 
 @Composable
 fun LocalTimelineContent(
-    lazyListController: LazyListController? = null,
+  lazyListController: LazyListController? = null,
 ) {
-    val account = LocalActiveAccount.current ?: return
-    if (account.service !is MastodonService) {
-        return
-    }
-    val viewModel: LocalTimelineViewModel = getViewModel()
-    TimelineComponent(viewModel = viewModel, lazyListController = lazyListController)
+  val account = LocalActiveAccount.current ?: return
+  if (account.service !is MastodonService) {
+    return
+  }
+  val viewModel: LocalTimelineViewModel = getViewModel()
+  TimelineComponent(viewModel = viewModel, lazyListController = lazyListController)
 }

@@ -27,18 +27,18 @@ import com.twidere.twiderex.paging.SinceMaxPagination
 import com.twidere.twiderex.paging.mediator.paging.MaxIdPagingMediator
 
 class ListsTimelineMediator(
-    accountKey: MicroBlogKey,
-    database: CacheDatabase,
-    val listKey: MicroBlogKey,
-    val service: TimelineService
+  accountKey: MicroBlogKey,
+  database: CacheDatabase,
+  val listKey: MicroBlogKey,
+  val service: TimelineService
 ) : MaxIdPagingMediator(accountKey, database) {
 
-    override val pagingKey: String
-        get() = "lists:$listKey account:$accountKey"
+  override val pagingKey: String
+    get() = "lists:$listKey account:$accountKey"
 
-    override suspend fun load(pageSize: Int, paging: SinceMaxPagination?) = service.listTimeline(
-        count = pageSize,
-        list_id = listKey.id,
-        max_id = paging?.maxId,
-    )
+  override suspend fun load(pageSize: Int, paging: SinceMaxPagination?) = service.listTimeline(
+    count = pageSize,
+    list_id = listKey.id,
+    max_id = paging?.maxId,
+  )
 }

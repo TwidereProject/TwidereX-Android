@@ -24,6 +24,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TwidereAccount(
-    val name: String,
-    val type: String,
+  val name: String,
+  val type: String,
 )

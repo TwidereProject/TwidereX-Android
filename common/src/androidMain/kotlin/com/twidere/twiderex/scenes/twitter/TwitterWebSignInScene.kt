@@ -28,24 +28,24 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.utils.TwitterWebJavascriptInterface
 
 const val INJECT_CONTENT =
-    "javascript:window.injector.tryPinCode(document.querySelector('#oauth_pin code').textContent);"
+  "javascript:window.injector.tryPinCode(document.querySelector('#oauth_pin code').textContent);"
 
 @Composable
 fun TwitterWebSignInScene(target: String) {
-    val navController = LocalNavController.current
-    TwidereScene {
-        InAppNotificationScaffold {
-            WebComponent(
-                url = target,
-                onPageFinished = { view, _ ->
-                    view.loadUrl(INJECT_CONTENT)
-                },
-                javascriptInterface = mapOf(
-                    "injector" to TwitterWebJavascriptInterface(
-                        navController
-                    )
-                ),
-            )
-        }
+  val navController = LocalNavController.current
+  TwidereScene {
+    InAppNotificationScaffold {
+      WebComponent(
+        url = target,
+        onPageFinished = { view, _ ->
+          view.loadUrl(INJECT_CONTENT)
+        },
+        javascriptInterface = mapOf(
+          "injector" to TwitterWebJavascriptInterface(
+            navController
+          )
+        ),
+      )
     }
+  }
 }

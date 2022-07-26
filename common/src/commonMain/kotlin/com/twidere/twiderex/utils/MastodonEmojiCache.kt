@@ -28,22 +28,22 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 object MastodonEmojiCache {
-    private val items = hashMapOf<String, Flow<List<UiEmojiCategory>>>()
-    fun get(account: AccountDetails): Flow<List<UiEmojiCategory>> {
-        return items.getOrPut(account.accountKey.host) {
-            flow {
-                account.service.let {
-                    it as MastodonService
-                }.let {
-                    try {
-                        it.emojis().toUi()
-                    } catch (e: Throwable) {
-                        emptyList()
-                    }
-                }.let {
-                    emit(it)
-                }
-            }
+  private val items = hashMapOf<String, Flow<List<UiEmojiCategory>>>()
+  fun get(account: AccountDetails): Flow<List<UiEmojiCategory>> {
+    return items.getOrPut(account.accountKey.host) {
+      flow {
+        account.service.let {
+          it as MastodonService
+        }.let {
+          try {
+            it.emojis().toUi()
+          } catch (e: Throwable) {
+            emptyList()
+          }
+        }.let {
+          emit(it)
         }
+      }
     }
+  }
 }

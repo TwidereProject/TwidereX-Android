@@ -27,26 +27,26 @@ import org.joda.time.DateTime
 
 @Serializable
 data class Poll(
-    val id: String? = null,
+  val id: String? = null,
 
-    @SerialName("expires_at")
-    @Serializable(with = DateSerializerV2::class)
-    val expiresAt: DateTime? = null,
+  @SerialName("expires_at")
+  @Serializable(with = DateSerializerV2::class)
+  val expiresAt: DateTime? = null,
 
-    val expired: Boolean? = null,
-    val multiple: Boolean? = null,
+  val expired: Boolean? = null,
+  val multiple: Boolean? = null,
 
-    @SerialName("votes_count")
-    val votesCount: Long? = null,
+  @SerialName("votes_count")
+  val votesCount: Long? = null,
 
-    @SerialName("voters_count")
-    val votersCount: Long? = null,
+  @SerialName("voters_count")
+  val votersCount: Long? = null,
 
-    val voted: Boolean? = null,
+  val voted: Boolean? = null,
 
-    @SerialName("own_votes")
-    val ownVotes: List<Int>? = null,
+  @SerialName("own_votes")
+  val ownVotes: List<Int>? = null,
 
-    val options: List<Option>? = null,
-    val emojis: List<Emoji>? = null
+  val options: List<Option>? = null,
+  val emojis: List<Emoji>? = null
 )

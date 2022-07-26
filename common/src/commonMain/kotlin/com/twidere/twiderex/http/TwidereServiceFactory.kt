@@ -36,59 +36,59 @@ import com.twidere.twiderex.model.enums.PlatformType
 
 class TwidereServiceFactory(private val configProvider: TwidereHttpConfigProvider) {
 
-    companion object {
-        private var instance: TwidereServiceFactory? = null
+  companion object {
+    private var instance: TwidereServiceFactory? = null
 
-        fun initiate(configProvider: TwidereHttpConfigProvider) {
-            instance = TwidereServiceFactory(configProvider)
-        }
-
-        fun createApiService(type: PlatformType, credentials: Credentials, accountKey: MicroBlogKey): MicroBlogService {
-            return instance?.let {
-                when (type) {
-                    PlatformType.Twitter -> {
-                        credentials.let {
-                            it as OAuthCredentials
-                        }.let {
-                            TwitterService(
-                                consumer_key = it.consumer_key,
-                                consumer_secret = it.consumer_secret,
-                                access_token = it.access_token,
-                                access_token_secret = it.access_token_secret,
-                                httpClientFactory = createHttpClientFactory(),
-                                accountId = accountKey.id
-                            )
-                        }
-                    }
-                    PlatformType.StatusNet -> TODO()
-                    PlatformType.Fanfou -> TODO()
-                    PlatformType.Mastodon ->
-                        credentials.let {
-                            it as OAuth2Credentials
-                        }.let {
-                            MastodonService(
-                                accountKey.host,
-                                it.access_token,
-                                httpClientFactory = createHttpClientFactory()
-                            )
-                        }
-                }
-            } ?: throw Error("Factory needs to be initiate")
-        }
-
-        fun createHttpClientFactory(): HttpClientFactory {
-            return instance?.let {
-                HttpConfigClientFactory(it.configProvider)
-            } ?: throw Error("Factory needs to be initiate")
-        }
-
-        fun createGifService(): GifService {
-            return instance?.let {
-                GiphyService(
-                    apiKey = BuildConfig.GIPHYKEY,
-                    httpClientFactory = createHttpClientFactory()
-                )
-            } ?: throw Error("Factory needs to be initiate")
-        }
+    fun initiate(configProvider: TwidereHttpConfigProvider) {
+      instance = TwidereServiceFactory(configProvider)
     }
+
+    fun createApiService(type: PlatformType, credentials: Credentials, accountKey: MicroBlogKey): MicroBlogService {
+      return instance?.let {
+        when (type) {
+          PlatformType.Twitter -> {
+            credentials.let {
+              it as OAuthCredentials
+            }.let {
+              TwitterService(
+                consumer_key = it.consumer_key,
+                consumer_secret = it.consumer_secret,
+                access_token = it.access_token,
+                access_token_secret = it.access_token_secret,
+                httpClientFactory = createHttpClientFactory(),
+                accountId = accountKey.id
+              )
+            }
+          }
+          PlatformType.StatusNet -> TODO()
+          PlatformType.Fanfou -> TODO()
+          PlatformType.Mastodon ->
+            credentials.let {
+              it as OAuth2Credentials
+            }.let {
+              MastodonService(
+                accountKey.host,
+                it.access_token,
+                httpClientFactory = createHttpClientFactory()
+              )
+            }
+        }
+      } ?: throw Error("Factory needs to be initiate")
+    }
+
+    fun createHttpClientFactory(): HttpClientFactory {
+      return instance?.let {
+        HttpConfigClientFactory(it.configProvider)
+      } ?: throw Error("Factory needs to be initiate")
+    }
+
+    fun createGifService(): GifService {
+      return instance?.let {
+        GiphyService(
+          apiKey = BuildConfig.GIPHYKEY,
+          httpClientFactory = createHttpClientFactory()
+        )
+      } ?: throw Error("Factory needs to be initiate")
+    }
+  }
 }

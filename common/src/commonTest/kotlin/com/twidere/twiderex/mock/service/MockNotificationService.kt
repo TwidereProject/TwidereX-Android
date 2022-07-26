@@ -29,17 +29,17 @@ import kotlinx.coroutines.delay
 import org.jetbrains.annotations.TestOnly
 
 internal class MockNotificationService @TestOnly constructor() : NotificationService, ErrorService(), MicroBlogService {
-    override suspend fun notificationTimeline(
-        count: Int,
-        since_id: String?,
-        max_id: String?
-    ): List<INotification> {
-        checkError()
-        val list = mutableListOf<INotification>()
-        for (i in 0 until count) {
-            delay(1)
-            list.add(mockINotification())
-        }
-        return list.reversed().toIPaging()
+  override suspend fun notificationTimeline(
+    count: Int,
+    since_id: String?,
+    max_id: String?
+  ): List<INotification> {
+    checkError()
+    val list = mutableListOf<INotification>()
+    for (i in 0 until count) {
+      delay(1)
+      list.add(mockINotification())
     }
+    return list.reversed().toIPaging()
+  }
 }

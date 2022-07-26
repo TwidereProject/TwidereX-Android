@@ -24,13 +24,13 @@ import androidx.room.TypeConverter
 import com.twidere.twiderex.model.enums.TwitterReplySettings
 
 internal class TwitterReplySettingsConverter {
-    @TypeConverter
-    fun fromString(target: TwitterReplySettings?): String? {
-        return target?.name
-    }
+  @TypeConverter
+  fun fromString(target: TwitterReplySettings?): String? {
+    return target?.name
+  }
 
-    @TypeConverter
-    fun fromTwitterReplySettings(string: String?): TwitterReplySettings? {
-        return string?.let { TwitterReplySettings.valueOf(it) }
-    }
+  @TypeConverter
+  fun fromTwitterReplySettings(string: String?): TwitterReplySettings? {
+    return string?.let { TwitterReplySettings.valueOf(it) }
+  }
 }

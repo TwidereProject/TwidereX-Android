@@ -25,8 +25,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class StatusV2Geo(
-    val coordinates: Coordinates? = null,
+  val coordinates: Coordinates? = null,
 
-    @SerialName("place_id")
-    val placeID: String? = null
+  @SerialName("place_id")
+  val placeID: String? = null
 )

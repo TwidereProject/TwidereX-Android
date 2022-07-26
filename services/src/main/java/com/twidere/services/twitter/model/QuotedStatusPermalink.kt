@@ -24,7 +24,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class QuotedStatusPermalink(
-    val url: String? = null,
-    val expanded: String? = null,
-    val display: String? = null,
+  val url: String? = null,
+  val expanded: String? = null,
+  val display: String? = null,
 )

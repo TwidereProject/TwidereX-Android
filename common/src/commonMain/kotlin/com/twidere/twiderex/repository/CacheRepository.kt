@@ -28,31 +28,31 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 class CacheRepository(
-    private val storageProvider: StorageProvider,
-    private val cacheDatabase: CacheDatabase,
-    private val appDatabase: AppDatabase
+  private val storageProvider: StorageProvider,
+  private val cacheDatabase: CacheDatabase,
+  private val appDatabase: AppDatabase
 ) {
-    suspend fun clearDatabaseCache() = coroutineScope {
-        launch(Dispatchers.IO) {
-            cacheDatabase.clearAllTables()
-        }
+  suspend fun clearDatabaseCache() = coroutineScope {
+    launch(Dispatchers.IO) {
+      cacheDatabase.clearAllTables()
     }
+  }
 
-    suspend fun clearImageCache() = coroutineScope {
-        launch(Dispatchers.IO) {
-            storageProvider.clearCaches(dir = storageProvider.mediaCacheDir)
-        }
+  suspend fun clearImageCache() = coroutineScope {
+    launch(Dispatchers.IO) {
+      storageProvider.clearCaches(dir = storageProvider.mediaCacheDir)
     }
+  }
 
-    suspend fun clearCacheDir() = coroutineScope {
-        launch(Dispatchers.IO) {
-            storageProvider.clearCaches(dir = storageProvider.cacheDir)
-        }
+  suspend fun clearCacheDir() = coroutineScope {
+    launch(Dispatchers.IO) {
+      storageProvider.clearCaches(dir = storageProvider.cacheDir)
     }
+  }
 
-    suspend fun clearSearchHistory() = coroutineScope {
-        launch(Dispatchers.IO) {
-            appDatabase.searchDao().clear()
-        }
+  suspend fun clearSearchHistory() = coroutineScope {
+    launch(Dispatchers.IO) {
+      appDatabase.searchDao().clear()
     }
+  }
 }

@@ -30,53 +30,53 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 internal class SearchUserPagingSourceTest {
-    @Test
-    fun loadUserFromSearchServiceAndApplyRightKeys() = runBlocking {
-        val service = MockSearchService()
-        val pagingSource = SearchUserPagingSource(
-            MicroBlogKey.twitter("123"),
-            service = service,
-            query = "test"
-        )
-        val result = pagingSource.load(
-            PagingSource.LoadParams.Refresh(
-                key = null,
-                loadSize = 20,
-                placeholdersEnabled = false
-            )
-        )
-        assert(result is PagingSource.LoadResult.Page)
-        val nextKey = (result as PagingSource.LoadResult.Page).nextKey ?: 0
-        assertEquals(1, nextKey)
+  @Test
+  fun loadUserFromSearchServiceAndApplyRightKeys() = runBlocking {
+    val service = MockSearchService()
+    val pagingSource = SearchUserPagingSource(
+      MicroBlogKey.twitter("123"),
+      service = service,
+      query = "test"
+    )
+    val result = pagingSource.load(
+      PagingSource.LoadParams.Refresh(
+        key = null,
+        loadSize = 20,
+        placeholdersEnabled = false
+      )
+    )
+    assert(result is PagingSource.LoadResult.Page)
+    val nextKey = (result as PagingSource.LoadResult.Page).nextKey ?: 0
+    assertEquals(1, nextKey)
 
-        service.searchUser = listOf(mockIUser())
-        val resultAppend = pagingSource.load(
-            PagingSource.LoadParams.Append(
-                key = nextKey,
-                loadSize = 20,
-                placeholdersEnabled = false
-            )
-        )
-        assert(resultAppend is PagingSource.LoadResult.Page)
-        assertNull((resultAppend as PagingSource.LoadResult.Page).nextKey)
-    }
+    service.searchUser = listOf(mockIUser())
+    val resultAppend = pagingSource.load(
+      PagingSource.LoadParams.Append(
+        key = nextKey,
+        loadSize = 20,
+        placeholdersEnabled = false
+      )
+    )
+    assert(resultAppend is PagingSource.LoadResult.Page)
+    assertNull((resultAppend as PagingSource.LoadResult.Page).nextKey)
+  }
 
-    @Test
-    fun loadReturnErrorWhenErrorOccurred() = runBlocking {
-        val service = MockSearchService()
-        service.errorMsg = "throw test errors"
-        val pagingSource = SearchUserPagingSource(
-            MicroBlogKey.twitter("123"),
-            service = service,
-            query = "test"
-        )
-        val result = pagingSource.load(
-            PagingSource.LoadParams.Refresh(
-                key = null,
-                loadSize = 20,
-                placeholdersEnabled = false
-            )
-        )
-        assert(result is PagingSource.LoadResult.Error)
-    }
+  @Test
+  fun loadReturnErrorWhenErrorOccurred() = runBlocking {
+    val service = MockSearchService()
+    service.errorMsg = "throw test errors"
+    val pagingSource = SearchUserPagingSource(
+      MicroBlogKey.twitter("123"),
+      service = service,
+      query = "test"
+    )
+    val result = pagingSource.load(
+      PagingSource.LoadParams.Refresh(
+        key = null,
+        loadSize = 20,
+        placeholdersEnabled = false
+      )
+    )
+    assert(result is PagingSource.LoadResult.Error)
+  }
 }

@@ -24,6 +24,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GeoPoint(
-    val coordinates: List<Double>? = null,
-    val type: String? = null,
+  val coordinates: List<Double>? = null,
+  val type: String? = null,
 )

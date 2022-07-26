@@ -29,68 +29,68 @@ import com.twidere.twiderex.component.foundation.PlayerCallBack
 import com.twidere.twiderex.component.foundation.PlayerProgressCallBack
 
 actual class PlatformPlayerView actual constructor(
-    url: String,
-    httpConfig: HttpConfig,
-    zOrderMediaOverlay: Boolean,
-    keepScreenOn: Boolean,
-    backgroundColor: Color?,
-    onClick: (() -> Unit)?
+  url: String,
+  httpConfig: HttpConfig,
+  zOrderMediaOverlay: Boolean,
+  keepScreenOn: Boolean,
+  backgroundColor: Color?,
+  onClick: (() -> Unit)?
 ) {
-    private val mediaPlayer = DesktopMediaPlayerHelper.create(url, backgroundColor, onClick)
+  private val mediaPlayer = DesktopMediaPlayerHelper.create(url, backgroundColor, onClick)
 
-    actual fun registerPlayerCallback(callBack: PlayerCallBack) {
-        mediaPlayer.registerPlayerCallback(callBack)
-    }
+  actual fun registerPlayerCallback(callBack: PlayerCallBack) {
+    mediaPlayer.registerPlayerCallback(callBack)
+  }
 
-    actual fun registerProgressCallback(callBack: PlayerProgressCallBack) {
-        mediaPlayer.registerProgressCallback(callBack)
-    }
+  actual fun registerProgressCallback(callBack: PlayerProgressCallBack) {
+    mediaPlayer.registerProgressCallback(callBack)
+  }
 
-    actual fun removePlayerCallback(callback: PlayerCallBack) {
-        mediaPlayer.removePlayerCallback(callback)
-    }
+  actual fun removePlayerCallback(callback: PlayerCallBack) {
+    mediaPlayer.removePlayerCallback(callback)
+  }
 
-    actual fun removeProgressCallback(callback: PlayerProgressCallBack) {
-        mediaPlayer.removeProgressCallback(callback)
-    }
+  actual fun removeProgressCallback(callback: PlayerProgressCallBack) {
+    mediaPlayer.removeProgressCallback(callback)
+  }
 
-    actual fun play() {
-        mediaPlayer.play()
-    }
+  actual fun play() {
+    mediaPlayer.play()
+  }
 
-    actual fun pause() {
-        mediaPlayer.pause()
-    }
+  actual fun pause() {
+    mediaPlayer.pause()
+  }
 
-    actual fun contentPosition(): Long {
-        return mediaPlayer.currentPosition()
-    }
+  actual fun contentPosition(): Long {
+    return mediaPlayer.currentPosition()
+  }
 
-    actual fun duration(): Long {
-        return mediaPlayer.duration()
-    }
+  actual fun duration(): Long {
+    return mediaPlayer.duration()
+  }
 
-    actual fun seekTo(time: Long) {
-        mediaPlayer.seekTo(time)
-    }
+  actual fun seekTo(time: Long) {
+    mediaPlayer.seekTo(time)
+  }
 
-    actual fun setVolume(volume: Float) {
-        mediaPlayer.setVolume(volume)
-    }
+  actual fun setVolume(volume: Float) {
+    mediaPlayer.setVolume(volume)
+  }
 
-    actual fun setMute(mute: Boolean) {
-        mediaPlayer.setMute(mute)
-    }
+  actual fun setMute(mute: Boolean) {
+    mediaPlayer.setMute(mute)
+  }
 
-    actual fun release() {
-        mediaPlayer.release()
-    }
+  actual fun release() {
+    mediaPlayer.release()
+  }
 
-    @Composable
-    actual fun Content(modifier: Modifier, update: () -> Unit) {
-        mediaPlayer.Content(
-            modifier = modifier,
-            update = update
-        )
-    }
+  @Composable
+  actual fun Content(modifier: Modifier, update: () -> Unit) {
+    mediaPlayer.Content(
+      modifier = modifier,
+      update = update
+    )
+  }
 }

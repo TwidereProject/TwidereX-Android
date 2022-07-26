@@ -27,25 +27,25 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class TrendTransformTest {
-    @Test
-    fun transform() {
-        val ui = UiTrend(
-            accountKey = MicroBlogKey.twitter("account"),
-            trendKey = MicroBlogKey.twitter("trendKey"),
-            displayName = "displaName",
-            query = "query",
-            url = "url",
-            volume = 100,
-            history = listOf(
-                UiTrendHistory(
-                    trendKey = MicroBlogKey.twitter("trendKey"),
-                    day = 123,
-                    uses = 321,
-                    accounts = 111
-                )
-            )
+  @Test
+  fun transform() {
+    val ui = UiTrend(
+      accountKey = MicroBlogKey.twitter("account"),
+      trendKey = MicroBlogKey.twitter("trendKey"),
+      displayName = "displaName",
+      query = "query",
+      url = "url",
+      volume = 100,
+      history = listOf(
+        UiTrendHistory(
+          trendKey = MicroBlogKey.twitter("trendKey"),
+          day = 123,
+          uses = 321,
+          accounts = 111
         )
-        val db = ui.toDbTrendWithHistory()
-        assertEquals(ui, db.toUi())
-    }
+      )
+    )
+    val db = ui.toDbTrendWithHistory()
+    assertEquals(ui, db.toUi())
+  }
 }

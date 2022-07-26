@@ -25,30 +25,30 @@ import com.twidere.twiderex.room.db.model.DbList
 import java.util.UUID
 
 internal fun DbList.toUi() =
-    UiList(
-        id = listId,
-        ownerId = ownerId,
-        listKey = listKey,
-        accountKey = accountKey,
-        title = title,
-        descriptions = description,
-        mode = mode,
-        replyPolicy = replyPolicy,
-        isFollowed = isFollowed,
-        allowToSubscribe = allowToSubscribe,
-    )
+  UiList(
+    id = listId,
+    ownerId = ownerId,
+    listKey = listKey,
+    accountKey = accountKey,
+    title = title,
+    descriptions = description,
+    mode = mode,
+    replyPolicy = replyPolicy,
+    isFollowed = isFollowed,
+    allowToSubscribe = allowToSubscribe,
+  )
 
 internal fun UiList.toDbList(dbId: String = UUID.randomUUID().toString()) =
-    DbList(
-        listId = id,
-        ownerId = ownerId,
-        listKey = listKey,
-        accountKey = accountKey,
-        title = title,
-        description = descriptions,
-        mode = mode,
-        replyPolicy = replyPolicy,
-        isFollowed = isFollowed,
-        allowToSubscribe = allowToSubscribe,
-        _id = dbId
-    )
+  DbList(
+    listId = id,
+    ownerId = ownerId,
+    listKey = listKey,
+    accountKey = accountKey,
+    title = title,
+    description = descriptions,
+    mode = mode,
+    replyPolicy = replyPolicy,
+    isFollowed = isFollowed,
+    allowToSubscribe = allowToSubscribe,
+    _id = dbId
+  )

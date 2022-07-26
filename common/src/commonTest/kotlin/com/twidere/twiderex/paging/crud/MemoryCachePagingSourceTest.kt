@@ -26,23 +26,23 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class MemoryCachePagingSourceTest {
-    private val pagingMemoryCache = PagingMemoryCache<String>()
+  private val pagingMemoryCache = PagingMemoryCache<String>()
 
-    @Test
-    fun load_loadFromMemoryCache() = runBlocking {
-        pagingMemoryCache.insert(listOf("1", "2", "3", "4", "5"))
-        val source = MemoryCachePagingSource(pagingMemoryCache)
-        var result = source.load(PagingSource.LoadParams.Refresh(null, 2, placeholdersEnabled = false)) as PagingSource.LoadResult.Page
-        assert(result.data.isNotEmpty())
-        // index of next item
-        assertEquals(2, result.nextKey)
+  @Test
+  fun load_loadFromMemoryCache() = runBlocking {
+    pagingMemoryCache.insert(listOf("1", "2", "3", "4", "5"))
+    val source = MemoryCachePagingSource(pagingMemoryCache)
+    var result = source.load(PagingSource.LoadParams.Refresh(null, 2, placeholdersEnabled = false)) as PagingSource.LoadResult.Page
+    assert(result.data.isNotEmpty())
+    // index of next item
+    assertEquals(2, result.nextKey)
 
-        result = source.load(PagingSource.LoadParams.Append(result.nextKey!!, 2, placeholdersEnabled = false)) as PagingSource.LoadResult.Page
-        assert(result.data.isNotEmpty())
-        assertEquals(4, result.nextKey)
+    result = source.load(PagingSource.LoadParams.Append(result.nextKey!!, 2, placeholdersEnabled = false)) as PagingSource.LoadResult.Page
+    assert(result.data.isNotEmpty())
+    assertEquals(4, result.nextKey)
 
-        result = source.load(PagingSource.LoadParams.Append(result.nextKey!!, 2, placeholdersEnabled = false)) as PagingSource.LoadResult.Page
-        assert(result.data.isNotEmpty())
-        assertEquals(null, result.nextKey)
-    }
+    result = source.load(PagingSource.LoadParams.Append(result.nextKey!!, 2, placeholdersEnabled = false)) as PagingSource.LoadResult.Page
+    assert(result.data.isNotEmpty())
+    assertEquals(null, result.nextKey)
+  }
 }

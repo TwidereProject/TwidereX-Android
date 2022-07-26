@@ -23,7 +23,7 @@ package com.twidere.twiderex.model.ui
 import com.twidere.twiderex.model.enums.MediaType
 
 data class UiMediaInsert(
-    val filePath: String,
-    val preview: Any,
-    val type: MediaType
+  val filePath: String,
+  val preview: Any,
+  val type: MediaType
 )

@@ -43,57 +43,57 @@ import com.twidere.twiderex.notification.notificationChannelId
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 actual fun AccountNotificationChannelDetail(
-    enabled: Boolean,
-    accountKey: MicroBlogKey,
+  enabled: Boolean,
+  accountKey: MicroBlogKey,
 ) {
-    val context = LocalContext.current
-    val resLoader = LocalResLoader.current
-    NotificationChannelSpec.values().filter { it.grouped }
-        .sortedBy { resLoader.getString(res = it.nameRes) }
-        .forEach {
-            ListItem(
-                modifier = Modifier.clickable(
-                    onClick = {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            val intent =
-                                Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
-                                    .putExtra(
-                                        Settings.EXTRA_APP_PACKAGE,
-                                        BuildConfig.APPLICATION_ID
-                                    )
-                                    .putExtra(
-                                        Settings.EXTRA_CHANNEL_ID,
-                                        accountKey.notificationChannelId(it.id)
-                                    )
-                            context.startActivity(intent)
-                        }
-                    },
-                    enabled = enabled
-                ),
-                text = {
-                    CompositionLocalProvider(
-                        *if (!enabled) {
-                            arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
-                        } else {
-                            emptyArray()
-                        }
-                    ) {
-                        Text(text = stringResource(res = it.nameRes))
-                    }
-                },
-                secondaryText = it.descriptionRes?.let {
-                    {
-                        CompositionLocalProvider(
-                            *if (!enabled) {
-                                arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
-                            } else {
-                                emptyArray()
-                            }
-                        ) {
-                            Text(text = stringResource(res = it))
-                        }
-                    }
-                }
-            )
+  val context = LocalContext.current
+  val resLoader = LocalResLoader.current
+  NotificationChannelSpec.values().filter { it.grouped }
+    .sortedBy { resLoader.getString(res = it.nameRes) }
+    .forEach {
+      ListItem(
+        modifier = Modifier.clickable(
+          onClick = {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+              val intent =
+                Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                  .putExtra(
+                    Settings.EXTRA_APP_PACKAGE,
+                    BuildConfig.APPLICATION_ID
+                  )
+                  .putExtra(
+                    Settings.EXTRA_CHANNEL_ID,
+                    accountKey.notificationChannelId(it.id)
+                  )
+              context.startActivity(intent)
+            }
+          },
+          enabled = enabled
+        ),
+        text = {
+          CompositionLocalProvider(
+            *if (!enabled) {
+              arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
+            } else {
+              emptyArray()
+            }
+          ) {
+            Text(text = stringResource(res = it.nameRes))
+          }
+        },
+        secondaryText = it.descriptionRes?.let {
+          {
+            CompositionLocalProvider(
+              *if (!enabled) {
+                arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
+              } else {
+                emptyArray()
+              }
+            ) {
+              Text(text = stringResource(res = it))
+            }
+          }
         }
+      )
+    }
 }

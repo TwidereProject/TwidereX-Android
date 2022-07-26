@@ -39,31 +39,31 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 @Composable
 fun <T> Flow<T>.observeAsState(initial: T, coroutineContext: CoroutineContext = EmptyCoroutineContext): State<T> {
-    val lifecycleOwner = LocalLifecycleOwner.current
-    return remember(this, lifecycleOwner) {
-        flowWithLifecycle(lifecycleOwner.lifecycle)
-    }.collectAsState(initial = initial, coroutineContext)
+  val lifecycleOwner = LocalLifecycleOwner.current
+  return remember(this, lifecycleOwner) {
+    flowWithLifecycle(lifecycleOwner.lifecycle)
+  }.collectAsState(initial = initial, coroutineContext)
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
 fun <T> Flow<T>.flowWithLifecycle(
-    lifecycle: Lifecycle,
+  lifecycle: Lifecycle,
 ): Flow<T> = callbackFlow {
-    lifecycle.repeatOnLifecycle {
-        this@flowWithLifecycle.collect {
-            send(it)
-        }
+  lifecycle.repeatOnLifecycle {
+    this@flowWithLifecycle.collect {
+      send(it)
     }
-    close()
+  }
+  close()
 }
 
 fun <T> Flow<T>.asStateIn(
-    scope: CoroutineScope,
-    initialValue: T
+  scope: CoroutineScope,
+  initialValue: T
 ): Flow<T> {
-    return stateIn(
-        scope = scope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = initialValue
-    )
+  return stateIn(
+    scope = scope,
+    started = SharingStarted.WhileSubscribed(5000),
+    initialValue = initialValue
+  )
 }

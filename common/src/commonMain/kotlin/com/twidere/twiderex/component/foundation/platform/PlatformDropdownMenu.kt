@@ -32,20 +32,20 @@ import androidx.compose.ui.unit.dp
 // issue tracker: https://issuetracker.google.com/issues/196413692
 @Composable
 expect fun PlatformDropdownMenu(
-    expanded: Boolean,
-    onDismissRequest: () -> Unit,
-    focusable: Boolean = true,
-    modifier: Modifier = Modifier,
-    offset: DpOffset = DpOffset(0.dp, 0.dp),
-    content: @Composable (ColumnScope.() -> Unit)
+  expanded: Boolean,
+  onDismissRequest: () -> Unit,
+  focusable: Boolean = true,
+  modifier: Modifier = Modifier,
+  offset: DpOffset = DpOffset(0.dp, 0.dp),
+  content: @Composable (ColumnScope.() -> Unit)
 )
 
 @Composable
 expect fun PlatformDropdownMenuItem(
-    onClick: () -> Unit,
-    modifier: Modifier,
-    enabled: Boolean,
-    contentPadding: PaddingValues,
-    interactionSource: MutableInteractionSource,
-    content: @Composable (RowScope.() -> Unit)
+  onClick: () -> Unit,
+  modifier: Modifier,
+  enabled: Boolean,
+  contentPadding: PaddingValues,
+  interactionSource: MutableInteractionSource,
+  content: @Composable (RowScope.() -> Unit)
 )

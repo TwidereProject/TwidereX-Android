@@ -27,14 +27,14 @@ import androidx.compose.ui.platform.LocalView
 
 @Composable
 actual fun getLocalView(): LocalView {
-    return LocalView().apply {
-        view = LocalView.current
-    }
+  return LocalView().apply {
+    view = LocalView.current
+  }
 }
 
 actual class LocalView actual constructor() {
-    var view: View? = null
-    actual fun performHapticFeedback() {
-        view?.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-    }
+  var view: View? = null
+  actual fun performHapticFeedback() {
+    view?.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+  }
 }

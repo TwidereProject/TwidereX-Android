@@ -46,81 +46,81 @@ import kotlinx.coroutines.flow.flattenMerge
 import kotlinx.coroutines.flow.flow
 
 class StatusRepository(
-    private val database: CacheDatabase,
-    private val preferences: DataStore<MiscPreferences>?,
+  private val database: CacheDatabase,
+  private val preferences: DataStore<MiscPreferences>?,
 ) {
-    fun loadStatus(
-        statusKey: MicroBlogKey,
-        accountKey: MicroBlogKey
-    ): Flow<UiStatus?> {
-        return database.statusDao().findWithStatusKeyWithFlow(statusKey, accountKey)
-    }
+  fun loadStatus(
+    statusKey: MicroBlogKey,
+    accountKey: MicroBlogKey
+  ): Flow<UiStatus?> {
+    return database.statusDao().findWithStatusKeyWithFlow(statusKey, accountKey)
+  }
 
-    suspend fun loadFromCache(statusKey: MicroBlogKey, accountKey: MicroBlogKey): UiStatus? {
-        return database.statusDao().findWithStatusKey(statusKey, accountKey)
-    }
+  suspend fun loadFromCache(statusKey: MicroBlogKey, accountKey: MicroBlogKey): UiStatus? {
+    return database.statusDao().findWithStatusKey(statusKey, accountKey)
+  }
 
-    suspend fun updateStatus(
-        statusKey: MicroBlogKey,
-        accountKey: MicroBlogKey,
-        action: (UiStatus) -> UiStatus
-    ) {
-        database.statusDao().findWithStatusKey(statusKey, accountKey = accountKey)?.let {
-            database.statusDao().insertAll(listOf(action.invoke(it)), accountKey)
-        }
+  suspend fun updateStatus(
+    statusKey: MicroBlogKey,
+    accountKey: MicroBlogKey,
+    action: (UiStatus) -> UiStatus
+  ) {
+    database.statusDao().findWithStatusKey(statusKey, accountKey = accountKey)?.let {
+      database.statusDao().insertAll(listOf(action.invoke(it)), accountKey)
     }
+  }
 
-    suspend fun removeStatus(statusKey: MicroBlogKey) {
-        database.withTransaction {
-            database.statusDao().delete(statusKey)
-            database.pagingTimelineDao().delete(statusKey)
-        }
+  suspend fun removeStatus(statusKey: MicroBlogKey) {
+    database.withTransaction {
+      database.statusDao().delete(statusKey)
+      database.pagingTimelineDao().delete(statusKey)
     }
+  }
 
-    suspend fun loadTweetFromNetwork(
-        id: String,
-        accountKey: MicroBlogKey,
-        lookupService: LookupService
-    ) {
-        database.statusDao().insertAll(
-            listOf(
-                lookupService.lookupStatus(id).toUi(accountKey = accountKey)
-            ),
-            accountKey = accountKey
-        )
-    }
+  suspend fun loadTweetFromNetwork(
+    id: String,
+    accountKey: MicroBlogKey,
+    lookupService: LookupService
+  ) {
+    database.statusDao().insertAll(
+      listOf(
+        lookupService.lookupStatus(id).toUi(accountKey = accountKey)
+      ),
+      accountKey = accountKey
+    )
+  }
 
-    @OptIn(ExperimentalPagingApi::class, FlowPreview::class)
-    fun conversation(
-        statusKey: MicroBlogKey,
-        platformType: PlatformType,
-        service: MicroBlogService,
-        accountKey: MicroBlogKey
-    ): Flow<PagingData<UiStatus>> = flow {
-        // TODO: remove usage of `when`
-        val remoteMediator = when (platformType) {
-            PlatformType.Twitter -> TwitterConversationMediator(
-                service = service as TwitterService,
-                nitterService = preferences?.data?.first()?.nitterInstance?.takeIf { it.isNotEmpty() }
-                    ?.let {
-                        NitterService(
-                            it.trimEnd('/'),
-                            TwidereServiceFactory.createHttpClientFactory()
-                        )
-                    },
-                statusKey = statusKey,
-                accountKey = accountKey,
-                database = database,
+  @OptIn(ExperimentalPagingApi::class, FlowPreview::class)
+  fun conversation(
+    statusKey: MicroBlogKey,
+    platformType: PlatformType,
+    service: MicroBlogService,
+    accountKey: MicroBlogKey
+  ): Flow<PagingData<UiStatus>> = flow {
+    // TODO: remove usage of `when`
+    val remoteMediator = when (platformType) {
+      PlatformType.Twitter -> TwitterConversationMediator(
+        service = service as TwitterService,
+        nitterService = preferences?.data?.first()?.nitterInstance?.takeIf { it.isNotEmpty() }
+          ?.let {
+            NitterService(
+              it.trimEnd('/'),
+              TwidereServiceFactory.createHttpClientFactory()
             )
-            PlatformType.StatusNet -> TODO()
-            PlatformType.Fanfou -> TODO()
-            PlatformType.Mastodon -> MastodonStatusContextMediator(
-                service = service as MastodonService,
-                statusKey = statusKey,
-                accountKey = accountKey,
-                database = database,
-            )
-        }
-        emit(remoteMediator.pager().toUi())
-    }.flattenMerge()
+          },
+        statusKey = statusKey,
+        accountKey = accountKey,
+        database = database,
+      )
+      PlatformType.StatusNet -> TODO()
+      PlatformType.Fanfou -> TODO()
+      PlatformType.Mastodon -> MastodonStatusContextMediator(
+        service = service as MastodonService,
+        statusKey = statusKey,
+        accountKey = accountKey,
+        database = database,
+      )
+    }
+    emit(remoteMediator.pager().toUi())
+  }.flattenMerge()
 }

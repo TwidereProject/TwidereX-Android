@@ -25,15 +25,15 @@ import com.twidere.services.nitter.model.serializer.UrlDecodeSerializer
 import moe.tlaster.hson.annotations.HtmlSerializable
 
 data class User(
-    @HtmlSerializable(
-        ".tweet-avatar > img",
-        ".fullname-and-username > .avatar",
-        attr = "src",
-        serializer = UrlDecodeSerializer::class,
-    )
-    val avatar: String?,
-    @HtmlSerializable(".fullname-and-username > .fullname")
-    val name: String?,
-    @HtmlSerializable(".fullname-and-username > .username")
-    val screenName: String?,
+  @HtmlSerializable(
+    ".tweet-avatar > img",
+    ".fullname-and-username > .avatar",
+    attr = "src",
+    serializer = UrlDecodeSerializer::class,
+  )
+  val avatar: String?,
+  @HtmlSerializable(".fullname-and-username > .fullname")
+  val name: String?,
+  @HtmlSerializable(".fullname-and-username > .username")
+  val screenName: String?,
 ) : IUser

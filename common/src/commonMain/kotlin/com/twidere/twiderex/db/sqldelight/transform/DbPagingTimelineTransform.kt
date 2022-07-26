@@ -26,29 +26,29 @@ import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.sqldelight.table.DbPagingTimeline
 
 internal fun PagingTimeLine.toDbPagingTimeline() = DbPagingTimeline(
-    accountKey = accountKey,
-    pagingKey = pagingKey,
-    statusKey = statusKey,
-    timestamp = timestamp,
-    sortId = sortId,
-    isGap = isGap
+  accountKey = accountKey,
+  pagingKey = pagingKey,
+  statusKey = statusKey,
+  timestamp = timestamp,
+  sortId = sortId,
+  isGap = isGap
 )
 
 internal fun DbPagingTimeline.toUi() = PagingTimeLine(
-    accountKey = accountKey,
-    pagingKey = pagingKey,
-    statusKey = statusKey,
-    timestamp = timestamp,
-    sortId = sortId,
-    isGap = isGap
+  accountKey = accountKey,
+  pagingKey = pagingKey,
+  statusKey = statusKey,
+  timestamp = timestamp,
+  sortId = sortId,
+  isGap = isGap
 )
 
 internal fun PagingTimeLineWithStatus.toDbPagingTimelineWithStatus() = DbPagingTimelineWithStatus(
-    timeline = timeline.toDbPagingTimeline(),
-    status = status.toDbStatusWithAttachments(accountKey = timeline.accountKey)
+  timeline = timeline.toDbPagingTimeline(),
+  status = status.toDbStatusWithAttachments(accountKey = timeline.accountKey)
 )
 
 internal fun DbPagingTimelineWithStatus.toUi() = PagingTimeLineWithStatus(
-    timeline = timeline.toUi(),
-    status = status.toUi().copy(isGap = timeline.isGap)
+  timeline = timeline.toUi(),
+  status = status.toUi().copy(isGap = timeline.isGap)
 )

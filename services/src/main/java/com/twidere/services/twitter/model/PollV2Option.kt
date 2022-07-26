@@ -24,7 +24,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PollV2Option(
-    val position: Long? = null,
-    val label: String? = null,
-    val votes: Long? = null
+  val position: Long? = null,
+  val label: String? = null,
+  val votes: Long? = null
 )

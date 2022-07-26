@@ -27,35 +27,35 @@ import java.util.Locale
 
 object DateFormatUtils {
 
-    private val dateFormats = arrayOf(
-        "yyyy-MM-dd'T'HH:mm:ss",
-        "yyyy-MM-dd'T'HH:mm:ssZ",
-        "yyyy-MM-dd'T'HH:mm:ss.SSS",
-        "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
-        "EEE MMM dd HH:mm:ss Z yyyy",
-        "MMM d, yyyy H:mm aaa ZZZZ",
-        "MMM d, yyyy·H:mm aaa ZZZZ",
-        "MMM d, yyyy · H:mm aaa ZZZZ",
-    )
+  private val dateFormats = arrayOf(
+    "yyyy-MM-dd'T'HH:mm:ss",
+    "yyyy-MM-dd'T'HH:mm:ssZ",
+    "yyyy-MM-dd'T'HH:mm:ss.SSS",
+    "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+    "EEE MMM dd HH:mm:ss Z yyyy",
+    "MMM d, yyyy H:mm aaa ZZZZ",
+    "MMM d, yyyy·H:mm aaa ZZZZ",
+    "MMM d, yyyy · H:mm aaa ZZZZ",
+  )
 
-    private val formatter by lazy {
-        DateTimeFormatterBuilder()
-            .append(
-                null,
-                Array(dateFormats.size) {
-                    DateTimeFormat.forPattern(dateFormats[it]).withLocale(Locale.ENGLISH).parser
-                }
-            )
-            .toFormatter()
-            .withLocale(Locale.ENGLISH)
-            .withZoneUTC()
-    }
+  private val formatter by lazy {
+    DateTimeFormatterBuilder()
+      .append(
+        null,
+        Array(dateFormats.size) {
+          DateTimeFormat.forPattern(dateFormats[it]).withLocale(Locale.ENGLISH).parser
+        }
+      )
+      .toFormatter()
+      .withLocale(Locale.ENGLISH)
+      .withZoneUTC()
+  }
 
-    fun parse(text: String): DateTime {
-        return DateTime.parse(text, formatter)
-    }
+  fun parse(text: String): DateTime {
+    return DateTime.parse(text, formatter)
+  }
 
-    fun format(date: DateTime): String {
-        return date.toString()
-    }
+  fun format(date: DateTime): String {
+    return date.toString()
+  }
 }

@@ -37,65 +37,65 @@ import kotlin.test.Test
 import kotlin.test.assertNotNull
 
 internal class UserTimelineViewModelTest : AccountViewModelTestBase() {
-    override val mockService: MicroBlogService
-        get() = MockTimelineService()
+  override val mockService: MicroBlogService
+    get() = MockTimelineService()
 
-    @MockK
-    private lateinit var repository: TimelineRepository
+  @MockK
+  private lateinit var repository: TimelineRepository
 
-    private lateinit var viewModel: UserTimelineViewModel
+  private lateinit var viewModel: UserTimelineViewModel
 
-    override fun setUp() {
-        super.setUp()
-        every { repository.userTimeline(any(), any(), any(), true) }.returns(
-            flowOf(
-                PagingData.from(
-                    (0..3).map {
-                        mockk {
-                            every { statusId }.returns(it.toString())
-                            every { inReplyToStatusId }.returns(null)
-                        }
-                    }
-                )
-            )
-        )
-        every { repository.userTimeline(any(), any(), any(), false) }.returns(
-            flowOf(
-                PagingData.from(
-                    (0..3).map {
-                        mockk {
-                            every { statusId }.returns(it.toString())
-                            every { inReplyToStatusId }.returns(it.toString())
-                        }
-                    }
-                )
-            )
-        )
-        viewModel = UserTimelineViewModel(
-            repository,
-            mockAccountRepository,
-            MicroBlogKey.twitter("321")
-        )
-    }
-
-    @Test
-    fun source_any(): Unit = runBlocking {
-        viewModel.source.firstOrNull().let {
-            assertNotNull(it)
-            it.collectDataForTest().let {
-                assert(it.any())
+  override fun setUp() {
+    super.setUp()
+    every { repository.userTimeline(any(), any(), any(), true) }.returns(
+      flowOf(
+        PagingData.from(
+          (0..3).map {
+            mockk {
+              every { statusId }.returns(it.toString())
+              every { inReplyToStatusId }.returns(null)
             }
-        }
-    }
-
-    @Test
-    fun exclude_replies(): Unit = runBlocking {
-        viewModel.setExcludeReplies(true)
-        viewModel.source.firstOrNull().let {
-            assertNotNull(it)
-            it.collectDataForTest().let {
-                assert(it.all { it.inReplyToStatusId.isNullOrEmpty() })
+          }
+        )
+      )
+    )
+    every { repository.userTimeline(any(), any(), any(), false) }.returns(
+      flowOf(
+        PagingData.from(
+          (0..3).map {
+            mockk {
+              every { statusId }.returns(it.toString())
+              every { inReplyToStatusId }.returns(it.toString())
             }
-        }
+          }
+        )
+      )
+    )
+    viewModel = UserTimelineViewModel(
+      repository,
+      mockAccountRepository,
+      MicroBlogKey.twitter("321")
+    )
+  }
+
+  @Test
+  fun source_any(): Unit = runBlocking {
+    viewModel.source.firstOrNull().let {
+      assertNotNull(it)
+      it.collectDataForTest().let {
+        assert(it.any())
+      }
     }
+  }
+
+  @Test
+  fun exclude_replies(): Unit = runBlocking {
+    viewModel.setExcludeReplies(true)
+    viewModel.source.firstOrNull().let {
+      assertNotNull(it)
+      it.collectDataForTest().let {
+        assert(it.all { it.inReplyToStatusId.isNullOrEmpty() })
+      }
+    }
+  }
 }

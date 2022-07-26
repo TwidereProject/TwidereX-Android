@@ -26,7 +26,7 @@ import kotlinx.coroutines.CoroutineScope
 
 @Composable
 expect fun PlatformMediaWrapper(
-    scope: CoroutineScope,
-    onResult: (List<UiMediaInsert>) -> Unit,
-    content: @Composable (launchCamera: () -> Unit, launchVideo: () -> Unit) -> Unit
+  scope: CoroutineScope,
+  onResult: (List<UiMediaInsert>) -> Unit,
+  content: @Composable (launchCamera: () -> Unit, launchVideo: () -> Unit) -> Unit
 )

@@ -37,47 +37,47 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun MastodonListsEditDialog(listKey: MicroBlogKey, onDismissRequest: () -> Unit) {
-    var showMastodonComponent by remember {
-        mutableStateOf(true)
-    }
-    val dismiss = {
-        onDismissRequest.invoke()
-        showMastodonComponent = true
-    }
-    val listsEditViewModel: ListsModifyViewModel = getViewModel {
-        parametersOf(listKey)
-    }
-    val source by listsEditViewModel.source.observeAsState(initial = null)
-    val loading by listsEditViewModel.loading.observeAsState(initial = false)
-    source?.let { uiList ->
-        if (loading) {
-            Dialog(
-                onDismissRequest = {
-                    dismiss()
-                }
-            ) {
-                LoadingProgress()
-            }
-            return
+  var showMastodonComponent by remember {
+    mutableStateOf(true)
+  }
+  val dismiss = {
+    onDismissRequest.invoke()
+    showMastodonComponent = true
+  }
+  val listsEditViewModel: ListsModifyViewModel = getViewModel {
+    parametersOf(listKey)
+  }
+  val source by listsEditViewModel.source.observeAsState(initial = null)
+  val loading by listsEditViewModel.loading.observeAsState(initial = false)
+  source?.let { uiList ->
+    if (loading) {
+      Dialog(
+        onDismissRequest = {
+          dismiss()
         }
+      ) {
+        LoadingProgress()
+      }
+      return
+    }
 
-        if (showMastodonComponent) {
-            var name by remember {
-                mutableStateOf(uiList.title)
-            }
-            MastodonListsModifyComponent(
-                onDismissRequest = { dismiss() },
-                title = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_dialog_edit),
-                name = name,
-                onNameChanged = { name = it }
-            ) {
-                listsEditViewModel.editList(
-                    listId = listKey.id,
-                    title = it
-                ) { success, _ ->
-                    if (success) onDismissRequest.invoke()
-                }
-            }
+    if (showMastodonComponent) {
+      var name by remember {
+        mutableStateOf(uiList.title)
+      }
+      MastodonListsModifyComponent(
+        onDismissRequest = { dismiss() },
+        title = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_dialog_edit),
+        name = name,
+        onNameChanged = { name = it }
+      ) {
+        listsEditViewModel.editList(
+          listId = listKey.id,
+          title = it
+        ) { success, _ ->
+          if (success) onDismissRequest.invoke()
         }
+      }
     }
+  }
 }

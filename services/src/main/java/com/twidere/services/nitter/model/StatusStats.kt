@@ -24,12 +24,12 @@ import com.twidere.services.nitter.model.serializer.StatsSerializer
 import moe.tlaster.hson.annotations.HtmlSerializable
 
 data class StatusStats(
-    @HtmlSerializable(".tweet-stat .icon-comment", serializer = StatsSerializer::class)
-    val comment: Int,
-    @HtmlSerializable(".tweet-stat .icon-retweet", serializer = StatsSerializer::class)
-    val retweet: Int,
-    @HtmlSerializable(".tweet-stat .icon-quote", serializer = StatsSerializer::class)
-    val quote: Int,
-    @HtmlSerializable(".tweet-stat .icon-heart", serializer = StatsSerializer::class)
-    val like: Int,
+  @HtmlSerializable(".tweet-stat .icon-comment", serializer = StatsSerializer::class)
+  val comment: Int,
+  @HtmlSerializable(".tweet-stat .icon-retweet", serializer = StatsSerializer::class)
+  val retweet: Int,
+  @HtmlSerializable(".tweet-stat .icon-quote", serializer = StatsSerializer::class)
+  val quote: Int,
+  @HtmlSerializable(".tweet-stat .icon-heart", serializer = StatsSerializer::class)
+  val like: Int,
 )

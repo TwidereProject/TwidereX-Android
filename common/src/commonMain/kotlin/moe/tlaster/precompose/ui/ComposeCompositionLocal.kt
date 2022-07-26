@@ -29,5 +29,5 @@ val LocalLifecycleOwner = compositionLocalOf<LifecycleOwner> { noLocalProvidedFo
 val LocalViewModelStoreOwner = compositionLocalOf<ViewModelStoreOwner> { noLocalProvidedFor("ViewModelStoreOwner") }
 
 private fun noLocalProvidedFor(name: String): Nothing {
-    error("CompositionLocal $name not present")
+  error("CompositionLocal $name not present")
 }

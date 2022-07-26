@@ -23,5 +23,5 @@ package com.twidere.twiderex.kmp
 import com.twidere.twiderex.model.ui.UiMediaInsert
 
 expect class MediaInsertProvider {
-    suspend fun provideUiMediaInsert(filePath: String): UiMediaInsert
+  suspend fun provideUiMediaInsert(filePath: String): UiMediaInsert
 }

@@ -40,91 +40,91 @@ import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingTimelineMediatorBase<T : IPagination>(
-    accountKey: MicroBlogKey,
-    database: CacheDatabase,
+  accountKey: MicroBlogKey,
+  database: CacheDatabase,
 ) : PagingMediator(accountKey = accountKey, database = database) {
-    private var paging: T? = null
+  private var paging: T? = null
 
-    override suspend fun load(
-        loadType: LoadType,
-        state: PagingState<Int, PagingTimeLineWithStatus>
-    ): MediatorResult {
-        try {
-            val key = when (loadType) {
-                LoadType.APPEND -> {
-                    paging
-                }
-                LoadType.PREPEND -> {
-                    return MediatorResult.Success(endOfPaginationReached = true)
-                }
-                LoadType.REFRESH -> {
-                    paging = null
-                    null
-                }
-            }
-            val pageSize = state.config.pageSize
-            val last = state.lastItemOrNull()
-            val result = load(pageSize, key).let { list ->
-                list.map { status ->
-                    status.toPagingTimeline(accountKey, pagingKey)
-                }.filter {
-                    last?.status?.statusKey != it.status.statusKey
-                }.let {
-                    transform(state, it, list)
-                }.also {
-                    paging = if (list is IPagingList<*, *>) {
-                        @Suppress("UNCHECKED_CAST")
-                        list.nextPage as T
-                    } else {
-                        provideNextPage(list, it)
-                    }
-                }
-            }
-            database.withTransaction {
-                if (loadType == LoadType.REFRESH) {
-                    clearData(database)
-                }
-                result.saveToDb(database)
-            }
-
-            return MediatorResult.Success(
-                endOfPaginationReached = !hasMore(result, pageSize)
-            )
-        } catch (e: Throwable) {
-            return MediatorResult.Error(e)
+  override suspend fun load(
+    loadType: LoadType,
+    state: PagingState<Int, PagingTimeLineWithStatus>
+  ): MediatorResult {
+    try {
+      val key = when (loadType) {
+        LoadType.APPEND -> {
+          paging
         }
+        LoadType.PREPEND -> {
+          return MediatorResult.Success(endOfPaginationReached = true)
+        }
+        LoadType.REFRESH -> {
+          paging = null
+          null
+        }
+      }
+      val pageSize = state.config.pageSize
+      val last = state.lastItemOrNull()
+      val result = load(pageSize, key).let { list ->
+        list.map { status ->
+          status.toPagingTimeline(accountKey, pagingKey)
+        }.filter {
+          last?.status?.statusKey != it.status.statusKey
+        }.let {
+          transform(state, it, list)
+        }.also {
+          paging = if (list is IPagingList<*, *>) {
+            @Suppress("UNCHECKED_CAST")
+            list.nextPage as T
+          } else {
+            provideNextPage(list, it)
+          }
+        }
+      }
+      database.withTransaction {
+        if (loadType == LoadType.REFRESH) {
+          clearData(database)
+        }
+        result.saveToDb(database)
+      }
+
+      return MediatorResult.Success(
+        endOfPaginationReached = !hasMore(result, pageSize)
+      )
+    } catch (e: Throwable) {
+      return MediatorResult.Error(e)
     }
+  }
 
-    protected abstract fun provideNextPage(
-        raw: List<IStatus>,
-        result: List<PagingTimeLineWithStatus>
-    ): T
+  protected abstract fun provideNextPage(
+    raw: List<IStatus>,
+    result: List<PagingTimeLineWithStatus>
+  ): T
 
-    protected open fun transform(
-        state: PagingState<Int, PagingTimeLineWithStatus>,
-        data: List<PagingTimeLineWithStatus>,
-        list: List<IStatus>
-    ): List<PagingTimeLineWithStatus> {
-        return data
-    }
+  protected open fun transform(
+    state: PagingState<Int, PagingTimeLineWithStatus>,
+    data: List<PagingTimeLineWithStatus>,
+    list: List<IStatus>
+  ): List<PagingTimeLineWithStatus> {
+    return data
+  }
 
-    protected open fun hasMore(
-        result: List<PagingTimeLineWithStatus>,
-        pageSize: Int
-    ) = result.isNotEmpty()
+  protected open fun hasMore(
+    result: List<PagingTimeLineWithStatus>,
+    pageSize: Int
+  ) = result.isNotEmpty()
 
-    protected open suspend fun clearData(database: CacheDatabase) {
-        database.pagingTimelineDao().clearAll(pagingKey, accountKey = accountKey)
-    }
+  protected open suspend fun clearData(database: CacheDatabase) {
+    database.pagingTimelineDao().clearAll(pagingKey, accountKey = accountKey)
+  }
 
-    protected abstract suspend fun load(
-        pageSize: Int,
-        paging: T?
-    ): List<IStatus>
+  protected abstract suspend fun load(
+    pageSize: Int,
+    paging: T?
+  ): List<IStatus>
 }
 
 fun Pager<Int, PagingTimeLineWithStatus>.toUi(): Flow<PagingData<UiStatus>> {
-    return flow.map { pagingData ->
-        pagingData.map { it.status }
-    }
+  return flow.map { pagingData ->
+    pagingData.map { it.status }
+  }
 }

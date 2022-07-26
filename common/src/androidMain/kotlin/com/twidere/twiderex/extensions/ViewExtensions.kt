@@ -25,14 +25,14 @@ import android.view.View
 
 @Suppress("DEPRECATION")
 fun View.addSystemUiVisibility(systemUiVisibility: Int) {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-        this.systemUiVisibility = this.systemUiVisibility or systemUiVisibility
-    }
+  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+    this.systemUiVisibility = this.systemUiVisibility or systemUiVisibility
+  }
 }
 
 @Suppress("DEPRECATION")
 fun View.removeSystemUiVisibility(systemUiVisibility: Int) {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-        this.systemUiVisibility = this.systemUiVisibility and systemUiVisibility.inv()
-    }
+  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+    this.systemUiVisibility = this.systemUiVisibility and systemUiVisibility.inv()
+  }
 }

@@ -28,15 +28,15 @@ import moe.tlaster.precompose.viewmodel.getViewModel
 
 @Composable
 inline fun <reified VM : ViewModel> viewModel(
-    viewModelStoreOwner: ViewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
-        "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
-    },
-    key: String? = null,
-    noinline creator: () -> VM,
+  viewModelStoreOwner: ViewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
+    "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+  },
+  key: String? = null,
+  noinline creator: () -> VM,
 ): VM = viewModelStoreOwner.viewModelStore.let {
-    if (key == null) {
-        it.getViewModel(creator)
-    } else {
-        it.getViewModel(key, VM::class, creator)
-    }
+  if (key == null) {
+    it.getViewModel(creator)
+  } else {
+    it.getViewModel(key, VM::class, creator)
+  }
 }

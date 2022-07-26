@@ -41,82 +41,82 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class PagingTimelineMediatorBaseTest {
-    @ExperimentalPagingApi
-    @Test
-    fun refresh_whenReturnedSuccessSaveResultToDatabase() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("test")
-        val database = MockCacheDatabase()
-        val mediator = MockPagingTimelineMediatorBase(
-            accountKey = accountKey,
-            database = database
-        )
-        assert(database.pagingTimelineDao().getPagingSource(mediator.pagingKey, accountKey).collectDataForTest().isEmpty())
-        val pagingState = PagingState<Int, PagingTimeLineWithStatus>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
-        val result = mediator.load(LoadType.REFRESH, pagingState)
-        assert(database.pagingTimelineDao().getPagingSource(mediator.pagingKey, accountKey).collectDataForTest().isNotEmpty())
-        assert(result is RemoteMediator.MediatorResult.Success)
-        assert(!(result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
-    }
+  @ExperimentalPagingApi
+  @Test
+  fun refresh_whenReturnedSuccessSaveResultToDatabase() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("test")
+    val database = MockCacheDatabase()
+    val mediator = MockPagingTimelineMediatorBase(
+      accountKey = accountKey,
+      database = database
+    )
+    assert(database.pagingTimelineDao().getPagingSource(mediator.pagingKey, accountKey).collectDataForTest().isEmpty())
+    val pagingState = PagingState<Int, PagingTimeLineWithStatus>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
+    val result = mediator.load(LoadType.REFRESH, pagingState)
+    assert(database.pagingTimelineDao().getPagingSource(mediator.pagingKey, accountKey).collectDataForTest().isNotEmpty())
+    assert(result is RemoteMediator.MediatorResult.Success)
+    assert(!(result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
+  }
 
-    @OptIn(ExperimentalPagingApi::class)
-    @Test
-    fun refresh_SaveTransformedDataIfTransformed() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("test")
-        val database = MockCacheDatabase()
-        val mediator = MockTransformPagingTimelineMediatorBase(
-            accountKey = accountKey,
-            database = database
-        )
-        assert(database.pagingTimelineDao().getPagingSource(mediator.pagingKey, accountKey).collectDataForTest().isEmpty())
-        val pagingState = PagingState<Int, PagingTimeLineWithStatus>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
-        val result = mediator.load(LoadType.REFRESH, pagingState)
-        val timelines = database.pagingTimelineDao().getPagingSource(mediator.pagingKey, accountKey).collectDataForTest()
-        assertEquals("transformed text", timelines.first().status.rawText)
-        assert(result is RemoteMediator.MediatorResult.Success)
-        assert(!(result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
-    }
+  @OptIn(ExperimentalPagingApi::class)
+  @Test
+  fun refresh_SaveTransformedDataIfTransformed() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("test")
+    val database = MockCacheDatabase()
+    val mediator = MockTransformPagingTimelineMediatorBase(
+      accountKey = accountKey,
+      database = database
+    )
+    assert(database.pagingTimelineDao().getPagingSource(mediator.pagingKey, accountKey).collectDataForTest().isEmpty())
+    val pagingState = PagingState<Int, PagingTimeLineWithStatus>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
+    val result = mediator.load(LoadType.REFRESH, pagingState)
+    val timelines = database.pagingTimelineDao().getPagingSource(mediator.pagingKey, accountKey).collectDataForTest()
+    assertEquals("transformed text", timelines.first().status.rawText)
+    assert(result is RemoteMediator.MediatorResult.Success)
+    assert(!(result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
+  }
 }
 
 internal open class MockPagingTimelineMediatorBase(
-    accountKey: MicroBlogKey,
-    database: CacheDatabase
+  accountKey: MicroBlogKey,
+  database: CacheDatabase
 ) : PagingTimelineMediatorBase<MockPagingTimelineMediatorBase.MockPagination>(accountKey = accountKey, database = database) {
-    class MockPagination(
-        val nextKey: String?
-    ) : IPagination
+  class MockPagination(
+    val nextKey: String?
+  ) : IPagination
 
-    override val pagingKey: String
-        get() = "Mock paging key"
+  override val pagingKey: String
+    get() = "Mock paging key"
 
-    override fun provideNextPage(
-        raw: List<IStatus>,
-        result: List<PagingTimeLineWithStatus>
-    ): MockPagination {
-        return if (raw is IPaging) {
-            MockPagination(raw.nextPage)
-        } else {
-            MockPagination(null)
-        }
+  override fun provideNextPage(
+    raw: List<IStatus>,
+    result: List<PagingTimeLineWithStatus>
+  ): MockPagination {
+    return if (raw is IPaging) {
+      MockPagination(raw.nextPage)
+    } else {
+      MockPagination(null)
     }
+  }
 
-    override suspend fun load(pageSize: Int, paging: MockPagination?): List<IStatus> {
-        return listOf(mockIStatus()).toIPaging()
-    }
+  override suspend fun load(pageSize: Int, paging: MockPagination?): List<IStatus> {
+    return listOf(mockIStatus()).toIPaging()
+  }
 }
 
 internal class MockTransformPagingTimelineMediatorBase(
-    accountKey: MicroBlogKey,
-    database: CacheDatabase
+  accountKey: MicroBlogKey,
+  database: CacheDatabase
 ) : MockPagingTimelineMediatorBase(
-    accountKey = accountKey, database = database
+  accountKey = accountKey, database = database
 ) {
-    override fun transform(
-        state: PagingState<Int, PagingTimeLineWithStatus>,
-        data: List<PagingTimeLineWithStatus>,
-        list: List<IStatus>
-    ): List<PagingTimeLineWithStatus> {
-        return data.map {
-            it.copy(status = it.status.copy(rawText = "transformed text"))
-        }
+  override fun transform(
+    state: PagingState<Int, PagingTimeLineWithStatus>,
+    data: List<PagingTimeLineWithStatus>,
+    list: List<IStatus>
+  ): List<PagingTimeLineWithStatus> {
+    return data.map {
+      it.copy(status = it.status.copy(rawText = "transformed text"))
     }
+  }
 }

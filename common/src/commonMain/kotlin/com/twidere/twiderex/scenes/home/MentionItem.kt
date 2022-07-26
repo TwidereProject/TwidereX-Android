@@ -37,51 +37,51 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
 
 class MentionItem : HomeNavigationItem() {
-    @Composable
-    override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_mentions_title)
-    override val route: String
-        get() = Root.Mentions
+  @Composable
+  override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_mentions_title)
+  override val route: String
+    get() = Root.Mentions
 
-    @Composable
-    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_message_circle)
+  @Composable
+  override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_message_circle)
 
-    @Composable
-    override fun Content() {
-        val viewModel: MentionsTimelineViewModel = getViewModel()
-        TimelineComponent(
-            viewModel = viewModel,
-            lazyListController = lazyListController,
-        )
-    }
+  @Composable
+  override fun Content() {
+    val viewModel: MentionsTimelineViewModel = getViewModel()
+    TimelineComponent(
+      viewModel = viewModel,
+      lazyListController = lazyListController,
+    )
+  }
 }
 
 @Composable
 fun MentionScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_mentions_title))
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    }
-                )
-            }
-        ) {
-            MentionSceneContent()
-        }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_mentions_title))
+          },
+          navigationIcon = {
+            AppBarNavigationButton()
+          }
+        )
+      }
+    ) {
+      MentionSceneContent()
     }
+  }
 }
 
 @Composable
 fun MentionSceneContent(
-    lazyListController: LazyListController? = null
+  lazyListController: LazyListController? = null
 ) {
-    val viewModel: MentionsTimelineViewModel = getViewModel()
-    TimelineComponent(
-        viewModel = viewModel,
-        lazyListController = lazyListController,
-    )
+  val viewModel: MentionsTimelineViewModel = getViewModel()
+  TimelineComponent(
+    viewModel = viewModel,
+    lazyListController = lazyListController,
+  )
 }

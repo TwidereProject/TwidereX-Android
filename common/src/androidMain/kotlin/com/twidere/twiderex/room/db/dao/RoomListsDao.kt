@@ -33,43 +33,43 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface RoomListsDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(lists: List<DbList>)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertAll(lists: List<DbList>)
 
-    @Query("SELECT * FROM lists WHERE listKey == :listKey AND accountKey == :accountKey")
-    suspend fun findWithListKey(listKey: MicroBlogKey, accountKey: MicroBlogKey): DbList?
+  @Query("SELECT * FROM lists WHERE listKey == :listKey AND accountKey == :accountKey")
+  suspend fun findWithListKey(listKey: MicroBlogKey, accountKey: MicroBlogKey): DbList?
 
-    @Query("SELECT * FROM lists WHERE listKey == :listKey AND accountKey == :accountKey")
-    fun findWithListKeyWithFlow(listKey: MicroBlogKey, accountKey: MicroBlogKey): Flow<DbList?>
+  @Query("SELECT * FROM lists WHERE listKey == :listKey AND accountKey == :accountKey")
+  fun findWithListKeyWithFlow(listKey: MicroBlogKey, accountKey: MicroBlogKey): Flow<DbList?>
 
-    @Query("SELECT * FROM lists")
-    suspend fun findAll(): List<DbList>?
+  @Query("SELECT * FROM lists")
+  suspend fun findAll(): List<DbList>?
 
-    @Query("SELECT * FROM lists WHERE accountKey == :accountKey")
-    suspend fun findWithAccountKey(accountKey: MicroBlogKey): List<DbList>?
+  @Query("SELECT * FROM lists WHERE accountKey == :accountKey")
+  suspend fun findWithAccountKey(accountKey: MicroBlogKey): List<DbList>?
 
-    @Transaction
-    @Query("SELECT * FROM lists WHERE accountKey == :accountKey LIMIT :limit OFFSET :offset")
-    suspend fun getPagingList(
-        accountKey: MicroBlogKey,
-        limit: Int,
-        offset: Int
-    ): List<DbList>
+  @Transaction
+  @Query("SELECT * FROM lists WHERE accountKey == :accountKey LIMIT :limit OFFSET :offset")
+  suspend fun getPagingList(
+    accountKey: MicroBlogKey,
+    limit: Int,
+    offset: Int
+  ): List<DbList>
 
-    @Transaction
-    @Query("SELECT COUNT(*) FROM (SELECT * FROM lists WHERE accountKey == :accountKey)")
-    suspend fun getPagingListCount(
-        accountKey: MicroBlogKey,
-    ): Int
+  @Transaction
+  @Query("SELECT COUNT(*) FROM (SELECT * FROM lists WHERE accountKey == :accountKey)")
+  suspend fun getPagingListCount(
+    accountKey: MicroBlogKey,
+  ): Int
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(lists: List<DbList>)
+  @Update(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun update(lists: List<DbList>)
 
-    @Delete
-    suspend fun delete(lists: List<DbList>)
+  @Delete
+  suspend fun delete(lists: List<DbList>)
 
-    @Query("DELETE FROM lists WHERE accountKey == :accountKey")
-    suspend fun clearAll(
-        accountKey: MicroBlogKey,
-    )
+  @Query("DELETE FROM lists WHERE accountKey == :accountKey")
+  suspend fun clearAll(
+    accountKey: MicroBlogKey,
+  )
 }

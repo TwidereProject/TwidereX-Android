@@ -28,11 +28,11 @@ import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 
 @OptIn(ExperimentalPagingApi::class)
 class HomeTimelineMediator(
-    private val service: TimelineService,
-    accountKey: MicroBlogKey,
-    database: CacheDatabase,
+  private val service: TimelineService,
+  accountKey: MicroBlogKey,
+  database: CacheDatabase,
 ) : PagingWithGapMediator(accountKey, database) {
-    override val pagingKey: String = "home:$accountKey"
-    override suspend fun loadBetweenImpl(pageSize: Int, max_id: String?, since_id: String?) =
-        service.homeTimeline(pageSize, max_id = max_id, since_id = since_id)
+  override val pagingKey: String = "home:$accountKey"
+  override suspend fun loadBetweenImpl(pageSize: Int, max_id: String?, since_id: String?) =
+    service.homeTimeline(pageSize, max_id = max_id, since_id = since_id)
 }

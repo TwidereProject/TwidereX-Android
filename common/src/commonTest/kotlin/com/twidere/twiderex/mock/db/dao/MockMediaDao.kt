@@ -26,13 +26,13 @@ import com.twidere.twiderex.model.ui.UiMedia
 import org.jetbrains.annotations.TestOnly
 
 internal class MockMediaDao @TestOnly constructor() : MediaDao {
-    private var initData: List<UiMedia> = emptyList()
-    fun initData(initData: List<UiMedia>) {
-        this.initData = initData
+  private var initData: List<UiMedia> = emptyList()
+  fun initData(initData: List<UiMedia>) {
+    this.initData = initData
+  }
+  override suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey): List<UiMedia> {
+    return initData.filter {
+      it.belongToKey == belongToKey
     }
-    override suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey): List<UiMedia> {
-        return initData.filter {
-            it.belongToKey == belongToKey
-        }
-    }
+  }
 }

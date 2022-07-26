@@ -36,55 +36,55 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class ListsUserViewModel(
-    private val listsUsersRepository: ListsUsersRepository,
-    private val accountRepository: AccountRepository,
-    private val listId: String,
-    private val viewMembers: Boolean = true,
+  private val listsUsersRepository: ListsUsersRepository,
+  private val accountRepository: AccountRepository,
+  private val listId: String,
+  private val viewMembers: Boolean = true,
 ) : UserListViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
+
+  @OptIn(ExperimentalCoroutinesApi::class)
+  private val members by lazy {
+    account.flatMapLatest { account ->
+      listsUsersRepository.fetchMembers(
+        accountKey = account.accountKey,
+        service = account.service as ListsService,
+        listId = listId
+      )
+    }.cachedIn(viewModelScope)
+  }
+
+  @OptIn(ExperimentalCoroutinesApi::class)
+  private val subscribers by lazy {
+    account.flatMapLatest { account ->
+      listsUsersRepository.fetchSubscribers(
+        accountKey = account.accountKey,
+        service = account.service as ListsService,
+        listId = listId
+      )
+    }.cachedIn(viewModelScope)
+  }
+
+  override val source: Flow<PagingData<UiUser>>
+    get() {
+      return if (viewMembers) members else subscribers
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val members by lazy {
-        account.flatMapLatest { account ->
-            listsUsersRepository.fetchMembers(
-                accountKey = account.accountKey,
-                service = account.service as ListsService,
-                listId = listId
-            )
-        }.cachedIn(viewModelScope)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val subscribers by lazy {
-        account.flatMapLatest { account ->
-            listsUsersRepository.fetchSubscribers(
-                accountKey = account.accountKey,
-                service = account.service as ListsService,
-                listId = listId
-            )
-        }.cachedIn(viewModelScope)
-    }
-
-    override val source: Flow<PagingData<UiUser>>
-        get() {
-            return if (viewMembers) members else subscribers
+  fun removeMember(user: UiUser) {
+    try {
+      viewModelScope.launch {
+        account.firstOrNull()?.let { account ->
+          listsUsersRepository.removeMember(
+            service = account.service as ListsService,
+            listId = listId,
+            user = user
+          )
         }
-
-    fun removeMember(user: UiUser) {
-        try {
-            viewModelScope.launch {
-                account.firstOrNull()?.let { account ->
-                    listsUsersRepository.removeMember(
-                        service = account.service as ListsService,
-                        listId = listId,
-                        user = user
-                    )
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+      }
+    } catch (e: Exception) {
+      e.printStackTrace()
     }
+  }
 }

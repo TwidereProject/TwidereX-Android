@@ -32,72 +32,72 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class SqlDelightDirectMessageEventDaoImplTest : BaseCacheDatabaseTest() {
-    private lateinit var dao: SqlDelightDirectMessageEventDaoImpl
-    private val accountKey = MicroBlogKey.twitter("account")
-    override fun setUp() {
-        super.setUp()
-        dao = SqlDelightDirectMessageEventDaoImpl(
-            database = database
-        )
-    }
+  private lateinit var dao: SqlDelightDirectMessageEventDaoImpl
+  private val accountKey = MicroBlogKey.twitter("account")
+  override fun setUp() {
+    super.setUp()
+    dao = SqlDelightDirectMessageEventDaoImpl(
+      database = database
+    )
+  }
 
-    @Test
-    fun insertAll_InsertBothEventAndAttachments() = runBlocking {
-        val insert = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
-            .toUi(accountKey, mockIUser(id = "other").toUi(accountKey))
-        dao.insertAll(listOf(insert))
-        val result = dao.findWithMessageKey(accountKey = accountKey, conversationKey = insert.conversationKey, messageKey = insert.messageKey)
-        assertEquals(insert.messageKey, result?.messageKey)
-        assertEquals(insert.sender.userKey, result?.sender?.userKey)
-        assertEquals(insert.media.first().url, result?.media?.first()?.url)
-        assertEquals(insert.urlEntity.first().url, result?.urlEntity?.first()?.url)
-    }
+  @Test
+  fun insertAll_InsertBothEventAndAttachments() = runBlocking {
+    val insert = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
+      .toUi(accountKey, mockIUser(id = "other").toUi(accountKey))
+    dao.insertAll(listOf(insert))
+    val result = dao.findWithMessageKey(accountKey = accountKey, conversationKey = insert.conversationKey, messageKey = insert.messageKey)
+    assertEquals(insert.messageKey, result?.messageKey)
+    assertEquals(insert.sender.userKey, result?.sender?.userKey)
+    assertEquals(insert.media.first().url, result?.media?.first()?.url)
+    assertEquals(insert.urlEntity.first().url, result?.urlEntity?.first()?.url)
+  }
 
-    @Test
-    fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
-        val list = listOf(
-            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
-                .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)),
-            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
-                .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)),
-            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
-                .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)),
-        )
-        dao.insertAll(list)
-        val pagingSource = dao.getPagingSource(
-            accountKey = accountKey,
-            conversationKey = list.first().conversationKey
-        )
-        val limit = 2
-        val result = pagingSource.load(params = PagingSource.LoadParams.Refresh(0, limit, false))
-        assert(result is PagingSource.LoadResult.Page)
-        assertEquals(limit, (result as PagingSource.LoadResult.Page).nextKey)
-        assertEquals(limit, result.data.size)
+  @Test
+  fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
+    val list = listOf(
+      mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
+        .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)),
+      mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
+        .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)),
+      mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
+        .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)),
+    )
+    dao.insertAll(list)
+    val pagingSource = dao.getPagingSource(
+      accountKey = accountKey,
+      conversationKey = list.first().conversationKey
+    )
+    val limit = 2
+    val result = pagingSource.load(params = PagingSource.LoadParams.Refresh(0, limit, false))
+    assert(result is PagingSource.LoadResult.Page)
+    assertEquals(limit, (result as PagingSource.LoadResult.Page).nextKey)
+    assertEquals(limit, result.data.size)
 
-        val loadMoreResult = pagingSource.load(params = PagingSource.LoadParams.Append(result.nextKey ?: 0, limit, false))
-        assert(loadMoreResult is PagingSource.LoadResult.Page)
-        assertEquals(null, (loadMoreResult as PagingSource.LoadResult.Page).nextKey)
-    }
+    val loadMoreResult = pagingSource.load(params = PagingSource.LoadParams.Append(result.nextKey ?: 0, limit, false))
+    assert(loadMoreResult is PagingSource.LoadResult.Page)
+    assertEquals(null, (loadMoreResult as PagingSource.LoadResult.Page).nextKey)
+  }
 
-    @Test
-    fun getPagingSource_pagingSourceInvalidateAfterDbUpDate() = runBlocking {
-        val message = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
-            .toUi(accountKey, mockIUser(id = "other").toUi(accountKey))
-        var invalidate = false
-        dao.getPagingSource(
-            accountKey = accountKey,
-            conversationKey = message.conversationKey
-        ).apply {
-            registerInvalidatedCallback {
-                invalidate = true
-            }
-            load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
-        }
-        dao.insertAll(listOf(message))
-        val start = System.currentTimeMillis()
-        while (!invalidate && System.currentTimeMillis() - start < 3000) {
-            continue
-        }
-        assert(invalidate)
+  @Test
+  fun getPagingSource_pagingSourceInvalidateAfterDbUpDate() = runBlocking {
+    val message = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
+      .toUi(accountKey, mockIUser(id = "other").toUi(accountKey))
+    var invalidate = false
+    dao.getPagingSource(
+      accountKey = accountKey,
+      conversationKey = message.conversationKey
+    ).apply {
+      registerInvalidatedCallback {
+        invalidate = true
+      }
+      load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
     }
+    dao.insertAll(listOf(message))
+    val start = System.currentTimeMillis()
+    while (!invalidate && System.currentTimeMillis() - start < 3000) {
+      continue
+    }
+    assert(invalidate)
+  }
 }

@@ -36,34 +36,34 @@ import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 internal class CacheRepositoryTest {
-    @Test
-    fun clearAllCachesSuccess() = runBlocking {
-        val cacheDatabase = MockCacheDatabase()
-        val appDatabase = MockAppDatabase()
-        val storage = StorageProvider(ApplicationProvider.getApplicationContext())
-        val repository = CacheRepository(storage, cacheDatabase, appDatabase)
-        appDatabase.searchDao().insertAll(listOf(mockUiSearch(accountKey = MicroBlogKey.twitter("1"))))
-        val list = appDatabase.searchDao().getAll(MicroBlogKey.twitter("1")).first()
-        val mediaDir = File(storage.mediaCacheDir).also {
-            File(it, "test").createNewFile()
-        }
-        val cacheDir = File(storage.cacheDir).also {
-            File(it, "test").createNewFile()
-        }
-
-        assert(list.isNotEmpty())
-        assert(mediaDir.listFiles()?.isNotEmpty() ?: false)
-        assert(cacheDir.listFiles()?.isNotEmpty() ?: false)
-        assert(!cacheDatabase.isAllTablesCleared())
-
-        repository.clearCacheDir()
-        repository.clearDatabaseCache()
-        repository.clearImageCache()
-        repository.clearSearchHistory()
-
-        assert(mediaDir.listFiles()?.isEmpty() ?: true)
-        assert(cacheDir.listFiles()?.isEmpty() ?: true)
-        assert(cacheDatabase.isAllTablesCleared())
-        assert(appDatabase.searchDao().getAll(MicroBlogKey.twitter("1")).firstOrNull().isNullOrEmpty())
+  @Test
+  fun clearAllCachesSuccess() = runBlocking {
+    val cacheDatabase = MockCacheDatabase()
+    val appDatabase = MockAppDatabase()
+    val storage = StorageProvider(ApplicationProvider.getApplicationContext())
+    val repository = CacheRepository(storage, cacheDatabase, appDatabase)
+    appDatabase.searchDao().insertAll(listOf(mockUiSearch(accountKey = MicroBlogKey.twitter("1"))))
+    val list = appDatabase.searchDao().getAll(MicroBlogKey.twitter("1")).first()
+    val mediaDir = File(storage.mediaCacheDir).also {
+      File(it, "test").createNewFile()
     }
+    val cacheDir = File(storage.cacheDir).also {
+      File(it, "test").createNewFile()
+    }
+
+    assert(list.isNotEmpty())
+    assert(mediaDir.listFiles()?.isNotEmpty() ?: false)
+    assert(cacheDir.listFiles()?.isNotEmpty() ?: false)
+    assert(!cacheDatabase.isAllTablesCleared())
+
+    repository.clearCacheDir()
+    repository.clearDatabaseCache()
+    repository.clearImageCache()
+    repository.clearSearchHistory()
+
+    assert(mediaDir.listFiles()?.isEmpty() ?: true)
+    assert(cacheDir.listFiles()?.isEmpty() ?: true)
+    assert(cacheDatabase.isAllTablesCleared())
+    assert(appDatabase.searchDao().getAll(MicroBlogKey.twitter("1")).firstOrNull().isNullOrEmpty())
+  }
 }

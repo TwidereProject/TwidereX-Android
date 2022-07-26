@@ -26,28 +26,28 @@ import androidx.room.PrimaryKey
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
-    tableName = "notification_cursor",
-    indices = [
-        Index(
-            value = ["accountKey", "type"],
-            unique = true
-        )
-    ],
+  tableName = "notification_cursor",
+  indices = [
+    Index(
+      value = ["accountKey", "type"],
+      unique = true
+    )
+  ],
 )
 internal data class DbNotificationCursor(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    val _id: String,
-    val accountKey: MicroBlogKey,
-    val type: DbNotificationCursorType,
-    val value: String,
-    val timestamp: Long,
+  /**
+   * Id that being used in the database
+   */
+  @PrimaryKey
+  val _id: String,
+  val accountKey: MicroBlogKey,
+  val type: DbNotificationCursorType,
+  val value: String,
+  val timestamp: Long,
 )
 
 enum class DbNotificationCursorType {
-    General,
-    Mentions,
-    Follower,
+  General,
+  Mentions,
+  Follower,
 }

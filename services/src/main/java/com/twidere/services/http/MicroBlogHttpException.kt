@@ -21,8 +21,8 @@
 package com.twidere.services.http
 
 class MicroBlogHttpException(
-    val httpCode: Int,
+  val httpCode: Int,
 ) : MicroBlogException() {
-    override val microBlogErrorMessage: String?
-        get() = null
+  override val microBlogErrorMessage: String?
+    get() = null
 }

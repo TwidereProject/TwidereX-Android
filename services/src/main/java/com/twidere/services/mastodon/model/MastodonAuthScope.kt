@@ -21,5 +21,5 @@
 package com.twidere.services.mastodon.model
 
 enum class MastodonAuthScope {
-    read, write, follow, push,
+  read, write, follow, push,
 }

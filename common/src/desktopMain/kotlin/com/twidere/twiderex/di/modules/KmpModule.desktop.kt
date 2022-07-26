@@ -31,12 +31,12 @@ import com.twidere.twiderex.notification.AppNotificationManager
 import org.koin.dsl.module
 
 actual val kmpModule = module {
-    single { FileResolver() }
-    single { RemoteNavigator() }
-    single { LocationProvider() }
-    single { ExifScrambler() }
-    single { ResLoader() }
-    single { AppNotificationManager() }
-    single { MediaInsertProvider() }
-    single { OrientationSensorManager() }
+  single { FileResolver() }
+  single { RemoteNavigator() }
+  single { LocationProvider() }
+  single { ExifScrambler() }
+  single { ResLoader() }
+  single { AppNotificationManager() }
+  single { MediaInsertProvider() }
+  single { OrientationSensorManager() }
 }

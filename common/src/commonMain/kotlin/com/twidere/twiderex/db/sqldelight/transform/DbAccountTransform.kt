@@ -25,24 +25,24 @@ import com.twidere.twiderex.model.AccountPreferences
 import com.twidere.twiderex.sqldelight.table.DbAccount
 
 internal fun AccountDetails.toDbAccount() = DbAccount(
-    accountKey = accountKey,
-    account = account,
-    type = type,
-    credentials_type = credentials_type,
-    credentials_json = credentials_json,
-    extras_json = extras_json,
-    user = user,
-    lastActive = lastActive
+  accountKey = accountKey,
+  account = account,
+  type = type,
+  credentials_type = credentials_type,
+  credentials_json = credentials_json,
+  extras_json = extras_json,
+  user = user,
+  lastActive = lastActive
 )
 
 internal fun DbAccount.toUi(preferences: AccountPreferences) = AccountDetails(
-    accountKey = accountKey,
-    account = account,
-    type = type,
-    credentials_type = credentials_type,
-    credentials_json = credentials_json,
-    extras_json = extras_json,
-    user = user,
-    lastActive = lastActive,
-    preferences = preferences
+  accountKey = accountKey,
+  account = account,
+  type = type,
+  credentials_type = credentials_type,
+  credentials_json = credentials_json,
+  extras_json = extras_json,
+  user = user,
+  lastActive = lastActive,
+  preferences = preferences
 )

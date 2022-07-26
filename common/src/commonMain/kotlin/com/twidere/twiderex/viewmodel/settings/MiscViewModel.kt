@@ -32,158 +32,158 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class MiscViewModel(
-    private val miscPreferences: DataStore<MiscPreferences>,
-    private val accountRepository: AccountRepository,
-    private val nitterRepository: NitterRepository,
+  private val miscPreferences: DataStore<MiscPreferences>,
+  private val accountRepository: AccountRepository,
+  private val nitterRepository: NitterRepository,
 ) : ViewModel() {
 
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    val nitter by lazy {
-        MutableStateFlow("")
-    }
+  val nitter by lazy {
+    MutableStateFlow("")
+  }
 
-    val isNitterInputValid by lazy {
-        MutableStateFlow(true)
-    }
+  val isNitterInputValid by lazy {
+    MutableStateFlow(true)
+  }
 
-    val nitterVerifyLoading by lazy {
-        MutableStateFlow(false)
-    }
+  val nitterVerifyLoading by lazy {
+    MutableStateFlow(false)
+  }
 
-    val nitterVerify by lazy {
-        MutableStateFlow(false)
-    }
+  val nitterVerify by lazy {
+    MutableStateFlow(false)
+  }
 
-    val useProxy by lazy {
-        MutableStateFlow(false)
-    }
+  val useProxy by lazy {
+    MutableStateFlow(false)
+  }
 
-    val proxyType by lazy {
-        MutableStateFlow(MiscPreferences.ProxyType.HTTP)
-    }
+  val proxyType by lazy {
+    MutableStateFlow(MiscPreferences.ProxyType.HTTP)
+  }
 
-    val proxyServer by lazy {
-        MutableStateFlow("")
-    }
+  val proxyServer by lazy {
+    MutableStateFlow("")
+  }
 
-    val proxyPort by lazy {
-        MutableStateFlow<Int?>(null)
-    }
+  val proxyPort by lazy {
+    MutableStateFlow<Int?>(null)
+  }
 
-    val proxyUserName by lazy {
-        MutableStateFlow("")
-    }
+  val proxyUserName by lazy {
+    MutableStateFlow("")
+  }
 
-    val proxyPassword by lazy {
-        MutableStateFlow("")
-    }
+  val proxyPassword by lazy {
+    MutableStateFlow("")
+  }
 
-    init {
-        viewModelScope.launch {
-            nitter.value = miscPreferences.data.first().nitterInstance
-            useProxy.value = miscPreferences.data.first().useProxy
-            proxyServer.value = miscPreferences.data.first().proxyServer
-            proxyPort.value = miscPreferences.data.first().proxyPort
-            proxyUserName.value = miscPreferences.data.first().proxyUserName
-            proxyPassword.value = miscPreferences.data.first().proxyPassword
-            proxyType.value = miscPreferences.data.first().proxyType
-        }
-        verifyNitterInstance()
+  init {
+    viewModelScope.launch {
+      nitter.value = miscPreferences.data.first().nitterInstance
+      useProxy.value = miscPreferences.data.first().useProxy
+      proxyServer.value = miscPreferences.data.first().proxyServer
+      proxyPort.value = miscPreferences.data.first().proxyPort
+      proxyUserName.value = miscPreferences.data.first().proxyUserName
+      proxyPassword.value = miscPreferences.data.first().proxyPassword
+      proxyType.value = miscPreferences.data.first().proxyType
     }
+    verifyNitterInstance()
+  }
 
-    fun checkIfNitterInputValid(value: String) {
-        isNitterInputValid.value = value.isEmpty() ||
-            (
-                (value.startsWith("http://") || value.startsWith("https://")) &&
-                    !value.endsWith("/")
-                )
-    }
+  fun checkIfNitterInputValid(value: String) {
+    isNitterInputValid.value = value.isEmpty() ||
+      (
+        (value.startsWith("http://") || value.startsWith("https://")) &&
+          !value.endsWith("/")
+        )
+  }
 
-    fun setNitterInstance(value: String) {
-        if (nitter.value == value) return
-        nitter.value = value
-        viewModelScope.launch {
-            miscPreferences.updateData {
-                it.copy(nitterInstance = value)
-            }
-        }
-        verifyNitterInstance()
+  fun setNitterInstance(value: String) {
+    if (nitter.value == value) return
+    nitter.value = value
+    viewModelScope.launch {
+      miscPreferences.updateData {
+        it.copy(nitterInstance = value)
+      }
     }
+    verifyNitterInstance()
+  }
 
-    fun verifyNitterInstance() {
-        if (nitter.value.isEmpty()) {
-            nitterVerify.value = false
-            nitterVerifyLoading.value = false
-            return
-        }
-        viewModelScope.launch {
-            try {
-                nitterVerifyLoading.value = true
-                nitterRepository.verifyInstance(account.first().user.screenName, instance = nitter.value)
-                nitterVerify.value = true
-            } catch (e: Exception) {
-                e.printStackTrace()
-                nitterVerify.value = false
-            } finally {
-                nitterVerifyLoading.value = false
-            }
-        }
+  fun verifyNitterInstance() {
+    if (nitter.value.isEmpty()) {
+      nitterVerify.value = false
+      nitterVerifyLoading.value = false
+      return
     }
+    viewModelScope.launch {
+      try {
+        nitterVerifyLoading.value = true
+        nitterRepository.verifyInstance(account.first().user.screenName, instance = nitter.value)
+        nitterVerify.value = true
+      } catch (e: Exception) {
+        e.printStackTrace()
+        nitterVerify.value = false
+      } finally {
+        nitterVerifyLoading.value = false
+      }
+    }
+  }
 
-    fun setUseProxy(value: Boolean) {
-        useProxy.value = value
-        viewModelScope.launch {
-            miscPreferences.updateData {
-                it.copy(useProxy = value)
-            }
-        }
+  fun setUseProxy(value: Boolean) {
+    useProxy.value = value
+    viewModelScope.launch {
+      miscPreferences.updateData {
+        it.copy(useProxy = value)
+      }
     }
+  }
 
-    fun setProxyType(value: String) {
-        proxyType.value = MiscPreferences.ProxyType.valueOf(value)
-        viewModelScope.launch {
-            miscPreferences.updateData {
-                it.copy(proxyType = proxyType.value)
-            }
-        }
+  fun setProxyType(value: String) {
+    proxyType.value = MiscPreferences.ProxyType.valueOf(value)
+    viewModelScope.launch {
+      miscPreferences.updateData {
+        it.copy(proxyType = proxyType.value)
+      }
     }
+  }
 
-    fun setProxyServer(value: String) {
-        proxyServer.value = value
-        viewModelScope.launch {
-            miscPreferences.updateData {
-                it.copy(proxyServer = value)
-            }
-        }
+  fun setProxyServer(value: String) {
+    proxyServer.value = value
+    viewModelScope.launch {
+      miscPreferences.updateData {
+        it.copy(proxyServer = value)
+      }
     }
+  }
 
-    fun setProxyPort(value: Int) {
-        proxyPort.value = value
-        viewModelScope.launch {
-            miscPreferences.updateData {
-                it.copy(proxyPort = value.toInt())
-            }
-        }
+  fun setProxyPort(value: Int) {
+    proxyPort.value = value
+    viewModelScope.launch {
+      miscPreferences.updateData {
+        it.copy(proxyPort = value.toInt())
+      }
     }
+  }
 
-    fun setProxyUserName(value: String) {
-        proxyUserName.value = value
-        viewModelScope.launch {
-            miscPreferences.updateData {
-                it.copy(proxyUserName = value)
-            }
-        }
+  fun setProxyUserName(value: String) {
+    proxyUserName.value = value
+    viewModelScope.launch {
+      miscPreferences.updateData {
+        it.copy(proxyUserName = value)
+      }
     }
+  }
 
-    fun setProxyPassword(value: String) {
-        proxyPassword.value = value
-        viewModelScope.launch {
-            miscPreferences.updateData {
-                it.copy(proxyPassword = value)
-            }
-        }
+  fun setProxyPassword(value: String) {
+    proxyPassword.value = value
+    viewModelScope.launch {
+      miscPreferences.updateData {
+        it.copy(proxyPassword = value)
+      }
     }
+  }
 }

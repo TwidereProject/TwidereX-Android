@@ -28,19 +28,19 @@ import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.model.ui.UiGif
 
 abstract class GifPagingSource(protected val service: GifService) : PagingSource<String, UiGif>() {
-    override fun getRefreshKey(state: PagingState<String, UiGif>): String? {
-        return null
-    }
+  override fun getRefreshKey(state: PagingState<String, UiGif>): String? {
+    return null
+  }
 
-    override suspend fun load(params: LoadParams<String>): LoadResult<String, UiGif> {
-        return try {
-            val result = loadFromService(params.key, params.loadSize)
-            val nextPage = result.nextPage
-            LoadResult.Page(data = result.map { it.toUi() }, prevKey = null, nextKey = nextPage)
-        } catch (e: Throwable) {
-            LoadResult.Error(e)
-        }
+  override suspend fun load(params: LoadParams<String>): LoadResult<String, UiGif> {
+    return try {
+      val result = loadFromService(params.key, params.loadSize)
+      val nextPage = result.nextPage
+      LoadResult.Page(data = result.map { it.toUi() }, prevKey = null, nextKey = nextPage)
+    } catch (e: Throwable) {
+      LoadResult.Error(e)
     }
+  }
 
-    abstract suspend fun loadFromService(key: String?, loadSize: Int): GifPaging
+  abstract suspend fun loadFromService(key: String?, loadSize: Int): GifPaging
 }

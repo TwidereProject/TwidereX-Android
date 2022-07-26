@@ -30,85 +30,85 @@ import com.twidere.twiderex.room.db.model.DbDirectMessageConversationWithMessage
 import java.util.UUID
 
 internal fun DbDMConversation.toUi() = UiDMConversation(
-    accountKey = accountKey,
-    conversationId = conversationId,
-    conversationKey = conversationKey,
-    conversationAvatar = conversationAvatar,
-    conversationName = conversationName,
-    conversationSubName = conversationSubName,
-    conversationType = when (conversationType) {
-        DbDMConversation.Type.ONE_TO_ONE -> UiDMConversation.Type.ONE_TO_ONE
-        DbDMConversation.Type.GROUP -> UiDMConversation.Type.GROUP
-    },
-    recipientKey = recipientKey,
+  accountKey = accountKey,
+  conversationId = conversationId,
+  conversationKey = conversationKey,
+  conversationAvatar = conversationAvatar,
+  conversationName = conversationName,
+  conversationSubName = conversationSubName,
+  conversationType = when (conversationType) {
+    DbDMConversation.Type.ONE_TO_ONE -> UiDMConversation.Type.ONE_TO_ONE
+    DbDMConversation.Type.GROUP -> UiDMConversation.Type.GROUP
+  },
+  recipientKey = recipientKey,
 )
 
 internal fun DbDirectMessageConversationWithMessage.toUi() = UiDMConversationWithLatestMessage(
-    conversation = conversation.toUi(),
-    latestMessage = latestMessage.toUi()
+  conversation = conversation.toUi(),
+  latestMessage = latestMessage.toUi()
 )
 
 internal fun DbDMEventWithAttachments.toUi() = UiDMEvent(
-    accountKey = message.accountKey,
-    sortId = message.sortId,
-    conversationKey = message.conversationKey,
-    messageId = message.messageId,
-    messageKey = message.messageKey,
-    htmlText = message.htmlText,
-    originText = message.originText,
-    createdTimestamp = message.createdTimestamp,
-    messageType = message.messageType,
-    senderAccountKey = message.senderAccountKey,
-    recipientAccountKey = message.recipientAccountKey,
-    sendStatus = when (message.sendStatus) {
-        DbDMEvent.SendStatus.PENDING -> UiDMEvent.SendStatus.PENDING
-        DbDMEvent.SendStatus.SUCCESS -> UiDMEvent.SendStatus.SUCCESS
-        DbDMEvent.SendStatus.FAILED -> UiDMEvent.SendStatus.FAILED
-    },
-    media = media.toUi(),
-    urlEntity = urlEntity.toUi(),
-    sender = sender.toUi()
+  accountKey = message.accountKey,
+  sortId = message.sortId,
+  conversationKey = message.conversationKey,
+  messageId = message.messageId,
+  messageKey = message.messageKey,
+  htmlText = message.htmlText,
+  originText = message.originText,
+  createdTimestamp = message.createdTimestamp,
+  messageType = message.messageType,
+  senderAccountKey = message.senderAccountKey,
+  recipientAccountKey = message.recipientAccountKey,
+  sendStatus = when (message.sendStatus) {
+    DbDMEvent.SendStatus.PENDING -> UiDMEvent.SendStatus.PENDING
+    DbDMEvent.SendStatus.SUCCESS -> UiDMEvent.SendStatus.SUCCESS
+    DbDMEvent.SendStatus.FAILED -> UiDMEvent.SendStatus.FAILED
+  },
+  media = media.toUi(),
+  urlEntity = urlEntity.toUi(),
+  sender = sender.toUi()
 )
 
 internal fun UiDMConversation.toDbDMConversation(dbId: String = UUID.randomUUID().toString()) = DbDMConversation(
-    accountKey = accountKey,
-    conversationId = conversationId,
-    conversationKey = conversationKey,
-    conversationAvatar = conversationAvatar,
-    conversationName = conversationName,
-    conversationSubName = conversationSubName,
-    conversationType = when (conversationType) {
-        UiDMConversation.Type.ONE_TO_ONE -> DbDMConversation.Type.ONE_TO_ONE
-        UiDMConversation.Type.GROUP -> DbDMConversation.Type.GROUP
-    },
-    recipientKey = recipientKey,
-    _id = dbId
+  accountKey = accountKey,
+  conversationId = conversationId,
+  conversationKey = conversationKey,
+  conversationAvatar = conversationAvatar,
+  conversationName = conversationName,
+  conversationSubName = conversationSubName,
+  conversationType = when (conversationType) {
+    UiDMConversation.Type.ONE_TO_ONE -> DbDMConversation.Type.ONE_TO_ONE
+    UiDMConversation.Type.GROUP -> DbDMConversation.Type.GROUP
+  },
+  recipientKey = recipientKey,
+  _id = dbId
 )
 
 internal fun UiDMEvent.toDbMEventWithAttachments(
-    dbId: String = UUID.randomUUID().toString(),
-    dbSenderId: String = UUID.randomUUID().toString(),
+  dbId: String = UUID.randomUUID().toString(),
+  dbSenderId: String = UUID.randomUUID().toString(),
 ) = DbDMEventWithAttachments(
-    message = DbDMEvent(
-        _id = dbId,
-        accountKey = accountKey,
-        sortId = sortId,
-        conversationKey = conversationKey,
-        messageId = messageId,
-        messageKey = messageKey,
-        htmlText = htmlText,
-        originText = originText,
-        createdTimestamp = createdTimestamp,
-        messageType = messageType,
-        senderAccountKey = senderAccountKey,
-        recipientAccountKey = recipientAccountKey,
-        sendStatus = when (sendStatus) {
-            UiDMEvent.SendStatus.PENDING -> DbDMEvent.SendStatus.PENDING
-            UiDMEvent.SendStatus.SUCCESS -> DbDMEvent.SendStatus.SUCCESS
-            UiDMEvent.SendStatus.FAILED -> DbDMEvent.SendStatus.FAILED
-        },
-    ),
-    media = media.toDbMedia(),
-    urlEntity = urlEntity.toDbUrl(belongToKey = messageKey),
-    sender = sender.toDbUser(dbId = dbSenderId)
+  message = DbDMEvent(
+    _id = dbId,
+    accountKey = accountKey,
+    sortId = sortId,
+    conversationKey = conversationKey,
+    messageId = messageId,
+    messageKey = messageKey,
+    htmlText = htmlText,
+    originText = originText,
+    createdTimestamp = createdTimestamp,
+    messageType = messageType,
+    senderAccountKey = senderAccountKey,
+    recipientAccountKey = recipientAccountKey,
+    sendStatus = when (sendStatus) {
+      UiDMEvent.SendStatus.PENDING -> DbDMEvent.SendStatus.PENDING
+      UiDMEvent.SendStatus.SUCCESS -> DbDMEvent.SendStatus.SUCCESS
+      UiDMEvent.SendStatus.FAILED -> DbDMEvent.SendStatus.FAILED
+    },
+  ),
+  media = media.toDbMedia(),
+  urlEntity = urlEntity.toDbUrl(belongToKey = messageKey),
+  sender = sender.toDbUser(dbId = dbSenderId)
 )

@@ -24,9 +24,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class MediaType {
-    photo,
-    video,
-    animated_gif,
-    audio,
-    other,
+  photo,
+  video,
+  animated_gif,
+  audio,
+  other,
 }

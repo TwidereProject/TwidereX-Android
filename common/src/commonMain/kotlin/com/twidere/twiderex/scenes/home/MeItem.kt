@@ -36,47 +36,47 @@ import com.twidere.twiderex.ui.TwidereScene
 
 class MeItem : HomeNavigationItem() {
 
-    @Composable
-    override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_profile_title)
-    override val route: String
-        get() = Root.Me
+  @Composable
+  override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_profile_title)
+  override val route: String
+    get() = Root.Me
 
-    @Composable
-    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_user)
+  @Composable
+  override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_user)
 
-    override val withAppBar: Boolean
-        get() = false
+  override val withAppBar: Boolean
+    get() = false
 
-    @Composable
-    override fun Content() {
-        MeSceneContent()
-    }
+  @Composable
+  override fun Content() {
+    MeSceneContent()
+  }
 }
 
 @Composable
 fun MeScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_profile_title))
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    }
-                )
-            }
-        ) {
-            MeSceneContent()
-        }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_profile_title))
+          },
+          navigationIcon = {
+            AppBarNavigationButton()
+          }
+        )
+      }
+    ) {
+      MeSceneContent()
     }
+  }
 }
 
 @Composable
 fun MeSceneContent() {
-    val account = LocalActiveAccount.current
-    account?.toUi()?.let { user ->
-        UserComponent(userKey = user.userKey)
-    }
+  val account = LocalActiveAccount.current
+  account?.toUi()?.let { user ->
+    UserComponent(userKey = user.userKey)
+  }
 }

@@ -23,10 +23,10 @@ package com.twidere.twiderex.db.sqldelight.adapter
 import com.twidere.twiderex.sqldelight.table.DbList
 
 object ListAdapterFactory {
-    fun create() = MicroBlogKeyColumnAdapter().let {
-        DbList.Adapter(
-            accountKeyAdapter = it,
-            listKeyAdapter = it,
-        )
-    }
+  fun create() = MicroBlogKeyColumnAdapter().let {
+    DbList.Adapter(
+      accountKeyAdapter = it,
+      listKeyAdapter = it,
+    )
+  }
 }

@@ -23,8 +23,8 @@ package com.twidere.twiderex.model.job
 import com.twidere.twiderex.model.MicroBlogKey
 
 data class DirectMessageDeleteData(
-    val messageId: String,
-    val conversationKey: MicroBlogKey,
-    val messageKey: MicroBlogKey,
-    val accountKey: MicroBlogKey,
+  val messageId: String,
+  val conversationKey: MicroBlogKey,
+  val messageKey: MicroBlogKey,
+  val accountKey: MicroBlogKey,
 )

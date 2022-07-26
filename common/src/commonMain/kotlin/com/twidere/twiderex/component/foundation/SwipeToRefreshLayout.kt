@@ -72,255 +72,255 @@ private val MinRefreshDistance = 32.dp
 
 @Composable
 private fun rememberSwipeToRefreshState(
-    scope: CoroutineScope,
-    initialValue: Boolean,
-    initialOffset: Float,
-    maxOffset: Float,
-    minOffset: Float,
-    onRefresh: () -> Unit,
+  scope: CoroutineScope,
+  initialValue: Boolean,
+  initialOffset: Float,
+  maxOffset: Float,
+  minOffset: Float,
+  onRefresh: () -> Unit,
 ): SwipeToRefreshState {
-    // Avoid creating a new instance every invocation
-    val currentOnRefresh = rememberUpdatedState(newValue = onRefresh)
-    val saver = remember(
-        scope,
-        initialValue,
-        initialOffset,
-        maxOffset,
-        minOffset,
-        onRefresh,
-    ) {
-        Saver<SwipeToRefreshState, Boolean>(
-            save = {
-                it.value
-            },
-            restore = {
-                SwipeToRefreshState(
-                    it,
-                    scope = scope,
-                    initialOffset = initialOffset,
-                    maxOffset = maxOffset,
-                    minOffset = minOffset,
-                    onRefresh = currentOnRefresh,
-                )
-            }
-        )
-    }
-    return rememberSaveable(
-        saver = saver,
-    ) {
+  // Avoid creating a new instance every invocation
+  val currentOnRefresh = rememberUpdatedState(newValue = onRefresh)
+  val saver = remember(
+    scope,
+    initialValue,
+    initialOffset,
+    maxOffset,
+    minOffset,
+    onRefresh,
+  ) {
+    Saver<SwipeToRefreshState, Boolean>(
+      save = {
+        it.value
+      },
+      restore = {
         SwipeToRefreshState(
-            scope = scope,
-            initialValue = initialValue,
-            initialOffset = initialOffset,
-            maxOffset = maxOffset,
-            minOffset = minOffset,
-            onRefresh = currentOnRefresh,
+          it,
+          scope = scope,
+          initialOffset = initialOffset,
+          maxOffset = maxOffset,
+          minOffset = minOffset,
+          onRefresh = currentOnRefresh,
         )
-    }
+      }
+    )
+  }
+  return rememberSaveable(
+    saver = saver,
+  ) {
+    SwipeToRefreshState(
+      scope = scope,
+      initialValue = initialValue,
+      initialOffset = initialOffset,
+      maxOffset = maxOffset,
+      minOffset = minOffset,
+      onRefresh = currentOnRefresh,
+    )
+  }
 }
 
 @Stable
 private class SwipeToRefreshState(
-    initialValue: Boolean,
-    private val scope: CoroutineScope,
-    private val initialOffset: Float,
-    private val minOffset: Float,
-    private val maxOffset: Float,
-    private val onRefresh: State<() -> Unit>,
+  initialValue: Boolean,
+  private val scope: CoroutineScope,
+  private val initialOffset: Float,
+  private val minOffset: Float,
+  private val maxOffset: Float,
+  private val onRefresh: State<() -> Unit>,
 ) : NestedScrollConnection {
 
-    var value: Boolean by mutableStateOf(initialValue)
+  var value: Boolean by mutableStateOf(initialValue)
 
-    val offset: Float
-        get() = _offset.value
+  val offset: Float
+    get() = _offset.value
 
-    private var _offset = Animatable(
-        if (initialValue) {
-            minOffset
-        } else {
-            initialOffset
-        },
-    )
+  private var _offset = Animatable(
+    if (initialValue) {
+      minOffset
+    } else {
+      initialOffset
+    },
+  )
 
-    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-        val delta = available.toFloat()
-        return if (delta < 0 && source == NestedScrollSource.Drag) {
-            drag(delta).toOffset()
-        } else {
-            Offset.Zero
+  override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+    val delta = available.toFloat()
+    return if (delta < 0 && source == NestedScrollSource.Drag) {
+      drag(delta).toOffset()
+    } else {
+      Offset.Zero
+    }
+  }
+
+  override fun onPostScroll(
+    consumed: Offset,
+    available: Offset,
+    source: NestedScrollSource
+  ): Offset {
+    return if (source == NestedScrollSource.Drag) {
+      drag(available.toFloat()).toOffset()
+    } else {
+      Offset.Zero
+    }
+  }
+
+  override suspend fun onPreFling(available: Velocity): Velocity {
+    val toFling = Offset(available.x, available.y).toFloat()
+    return if (toFling < 0) {
+      Velocity.Zero
+    } else {
+      fling()
+      Velocity.Zero
+    }
+  }
+
+  override suspend fun onPostFling(
+    consumed: Velocity,
+    available: Velocity,
+  ): Velocity {
+    fling()
+    return available
+  }
+
+  suspend fun snapTo(value: Float) {
+    _offset.snapTo(value)
+  }
+
+  suspend fun fling() {
+    val offsetValue = _offset.value
+    when {
+      offsetValue >= 0 -> {
+        if (!value) {
+          value = true
+          onRefresh.value.invoke()
         }
+        _offset.animateTo(minOffset)
+      }
+      else -> {
+        _offset.animateTo(initialOffset)
+      }
     }
+  }
 
-    override fun onPostScroll(
-        consumed: Offset,
-        available: Offset,
-        source: NestedScrollSource
-    ): Offset {
-        return if (source == NestedScrollSource.Drag) {
-            drag(available.toFloat()).toOffset()
-        } else {
-            Offset.Zero
-        }
+  fun drag(delta: Float): Float {
+    return if (!value && (delta > 0 || offset > initialOffset)) {
+      scope.launch {
+        snapTo((offset + delta).coerceAtMost(maxOffset))
+      }
+      delta
+    } else {
+      0f
     }
+  }
 
-    override suspend fun onPreFling(available: Velocity): Velocity {
-        val toFling = Offset(available.x, available.y).toFloat()
-        return if (toFling < 0) {
-            Velocity.Zero
-        } else {
-            fling()
-            Velocity.Zero
-        }
+  suspend fun animateTo(refreshingState: Boolean) {
+    value = refreshingState
+    when {
+      refreshingState -> {
+        _offset.animateTo(minOffset)
+      }
+      else -> {
+        _offset.animateTo(initialOffset)
+      }
     }
+  }
 
-    override suspend fun onPostFling(
-        consumed: Velocity,
-        available: Velocity,
-    ): Velocity {
-        fling()
-        return available
-    }
+  private fun Float.toOffset(): Offset = Offset(0f, this)
 
-    suspend fun snapTo(value: Float) {
-        _offset.snapTo(value)
-    }
-
-    suspend fun fling() {
-        val offsetValue = _offset.value
-        when {
-            offsetValue >= 0 -> {
-                if (!value) {
-                    value = true
-                    onRefresh.value.invoke()
-                }
-                _offset.animateTo(minOffset)
-            }
-            else -> {
-                _offset.animateTo(initialOffset)
-            }
-        }
-    }
-
-    fun drag(delta: Float): Float {
-        return if (!value && (delta > 0 || offset > initialOffset)) {
-            scope.launch {
-                snapTo((offset + delta).coerceAtMost(maxOffset))
-            }
-            delta
-        } else {
-            0f
-        }
-    }
-
-    suspend fun animateTo(refreshingState: Boolean) {
-        value = refreshingState
-        when {
-            refreshingState -> {
-                _offset.animateTo(minOffset)
-            }
-            else -> {
-                _offset.animateTo(initialOffset)
-            }
-        }
-    }
-
-    private fun Float.toOffset(): Offset = Offset(0f, this)
-
-    private fun Offset.toFloat(): Float = this.y
+  private fun Offset.toFloat(): Float = this.y
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun SwipeToRefreshLayout(
-    modifier: Modifier = Modifier,
-    refreshingState: Boolean,
-    refreshIndicatorPadding: PaddingValues = PaddingValues(0.dp),
-    onRefresh: () -> Unit,
-    refreshIndicator: @Composable () -> Unit = {
-        Surface(elevation = 10.dp, shape = CircleShape) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .size(36.dp)
-                    .padding(4.dp)
-            )
-        }
-    },
-    content: @Composable () -> Unit
-) {
-    val scope = rememberCoroutineScope()
-    val refreshDistance = with(LocalDensity.current) { RefreshDistance.toPx() }
-    val minRefreshDistance = with(LocalDensity.current) { MinRefreshDistance.toPx() }
-    val state = rememberSwipeToRefreshState(
-        scope = scope,
-        initialValue = refreshingState,
-        initialOffset = -refreshDistance,
-        maxOffset = refreshDistance,
-        minOffset = minRefreshDistance,
-        onRefresh = onRefresh,
-    )
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .nestedScroll(state)
-            .pointerInput(Unit) {
-                detectVerticalDrag(
-                    onVerticalDrag = { change, dragAmount ->
-                        if (state.drag(dragAmount) != 0f) {
-                            if (change.positionChange() != Offset.Zero) change.consume()
-                        }
-                    },
-                    onDragEnd = {
-                        scope.launch {
-                            state.fling()
-                        }
-                    }
-                )
-            }
-    ) {
-        content()
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.TopCenter)
-                .padding(refreshIndicatorPadding)
-                .offset { IntOffset(0, state.offset.roundToInt()) },
-            contentAlignment = Alignment.TopCenter,
-        ) {
-            if (state.offset != -refreshDistance) {
-                refreshIndicator()
-            }
-        }
-
-        LaunchedEffect(refreshingState) {
-            scope.launch {
-                state.animateTo(refreshingState)
-            }
-        }
+  modifier: Modifier = Modifier,
+  refreshingState: Boolean,
+  refreshIndicatorPadding: PaddingValues = PaddingValues(0.dp),
+  onRefresh: () -> Unit,
+  refreshIndicator: @Composable () -> Unit = {
+    Surface(elevation = 10.dp, shape = CircleShape) {
+      CircularProgressIndicator(
+        modifier = Modifier
+          .size(36.dp)
+          .padding(4.dp)
+      )
     }
+  },
+  content: @Composable () -> Unit
+) {
+  val scope = rememberCoroutineScope()
+  val refreshDistance = with(LocalDensity.current) { RefreshDistance.toPx() }
+  val minRefreshDistance = with(LocalDensity.current) { MinRefreshDistance.toPx() }
+  val state = rememberSwipeToRefreshState(
+    scope = scope,
+    initialValue = refreshingState,
+    initialOffset = -refreshDistance,
+    maxOffset = refreshDistance,
+    minOffset = minRefreshDistance,
+    onRefresh = onRefresh,
+  )
+  Box(
+    modifier = modifier
+      .fillMaxSize()
+      .nestedScroll(state)
+      .pointerInput(Unit) {
+        detectVerticalDrag(
+          onVerticalDrag = { change, dragAmount ->
+            if (state.drag(dragAmount) != 0f) {
+              if (change.positionChange() != Offset.Zero) change.consume()
+            }
+          },
+          onDragEnd = {
+            scope.launch {
+              state.fling()
+            }
+          }
+        )
+      }
+  ) {
+    content()
+    Box(
+      modifier = Modifier
+        .fillMaxWidth()
+        .align(Alignment.TopCenter)
+        .padding(refreshIndicatorPadding)
+        .offset { IntOffset(0, state.offset.roundToInt()) },
+      contentAlignment = Alignment.TopCenter,
+    ) {
+      if (state.offset != -refreshDistance) {
+        refreshIndicator()
+      }
+    }
+
+    LaunchedEffect(refreshingState) {
+      scope.launch {
+        state.animateTo(refreshingState)
+      }
+    }
+  }
 }
 
 private suspend fun PointerInputScope.detectVerticalDrag(
-    onDragStart: (Offset) -> Unit = { },
-    onDragEnd: () -> Unit = { },
-    onDragCancel: () -> Unit = { },
-    onVerticalDrag: (change: PointerInputChange, dragAmount: Float) -> Unit
+  onDragStart: (Offset) -> Unit = { },
+  onDragEnd: () -> Unit = { },
+  onDragCancel: () -> Unit = { },
+  onVerticalDrag: (change: PointerInputChange, dragAmount: Float) -> Unit
 ) {
-    forEachGesture {
-        awaitPointerEventScope {
-            val down = awaitFirstDown(requireUnconsumed = false)
-            val drag = awaitVerticalTouchSlopOrCancellation(down.id, onVerticalDrag)
-            if (drag != null) {
-                onDragStart.invoke(drag.position)
-                if (
-                    verticalDrag(drag.id) {
-                        onVerticalDrag(it, it.positionChange().y)
-                    }
-                ) {
-                    onDragEnd()
-                } else {
-                    onDragCancel()
-                }
-            }
+  forEachGesture {
+    awaitPointerEventScope {
+      val down = awaitFirstDown(requireUnconsumed = false)
+      val drag = awaitVerticalTouchSlopOrCancellation(down.id, onVerticalDrag)
+      if (drag != null) {
+        onDragStart.invoke(drag.position)
+        if (
+          verticalDrag(drag.id) {
+            onVerticalDrag(it, it.positionChange().y)
+          }
+        ) {
+          onDragEnd()
+        } else {
+          onDragCancel()
         }
+      }
     }
+  }
 }

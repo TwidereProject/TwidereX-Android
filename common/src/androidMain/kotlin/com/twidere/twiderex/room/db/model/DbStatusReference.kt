@@ -31,77 +31,77 @@ import com.twidere.twiderex.room.db.RoomCacheDatabase
 import java.util.UUID
 
 @Entity(
-    tableName = "status_reference",
-    indices = [
-        Index(
-            value = [
-                "referenceType",
-                "statusKey",
-                "referenceStatusKey",
-            ],
-            unique = true,
-        ),
-    ],
+  tableName = "status_reference",
+  indices = [
+    Index(
+      value = [
+        "referenceType",
+        "statusKey",
+        "referenceStatusKey",
+      ],
+      unique = true,
+    ),
+  ],
 )
 internal data class DbStatusReference(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    val _id: String,
-    val referenceType: ReferenceType,
-    val statusKey: MicroBlogKey,
-    val referenceStatusKey: MicroBlogKey,
+  /**
+   * Id that being used in the database
+   */
+  @PrimaryKey
+  val _id: String,
+  val referenceType: ReferenceType,
+  val statusKey: MicroBlogKey,
+  val referenceStatusKey: MicroBlogKey,
 )
 
 internal data class DbStatusReferenceWithStatus(
-    @Embedded
-    val reference: DbStatusReference,
-    @Relation(
-        parentColumn = "referenceStatusKey",
-        entityColumn = "statusKey",
-        entity = DbStatusV2::class
-    )
-    val status: DbStatusWithMediaAndUser
+  @Embedded
+  val reference: DbStatusReference,
+  @Relation(
+    parentColumn = "referenceStatusKey",
+    entityColumn = "statusKey",
+    entity = DbStatusV2::class
+  )
+  val status: DbStatusWithMediaAndUser
 )
 
 internal fun DbStatusWithMediaAndUser?.toDbStatusReference(
-    statusKey: MicroBlogKey,
-    referenceType: ReferenceType,
+  statusKey: MicroBlogKey,
+  referenceType: ReferenceType,
 ): DbStatusReferenceWithStatus? {
-    return if (this == null) {
-        null
-    } else {
-        DbStatusReferenceWithStatus(
-            reference = DbStatusReference(
-                _id = UUID.randomUUID().toString(),
-                referenceType = referenceType,
-                statusKey = statusKey,
-                referenceStatusKey = data.statusKey
-            ),
-            status = this,
-        )
-    }
+  return if (this == null) {
+    null
+  } else {
+    DbStatusReferenceWithStatus(
+      reference = DbStatusReference(
+        _id = UUID.randomUUID().toString(),
+        referenceType = referenceType,
+        statusKey = statusKey,
+        referenceStatusKey = data.statusKey
+      ),
+      status = this,
+    )
+  }
 }
 
 internal data class DbStatusWithReference(
-    @Embedded
-    val status: DbStatusWithMediaAndUser,
-    @Relation(
-        parentColumn = "statusKey",
-        entityColumn = "statusKey",
-        entity = DbStatusReference::class
-    )
-    val references: List<DbStatusReferenceWithStatus>,
+  @Embedded
+  val status: DbStatusWithMediaAndUser,
+  @Relation(
+    parentColumn = "statusKey",
+    entityColumn = "statusKey",
+    entity = DbStatusReference::class
+  )
+  val references: List<DbStatusReferenceWithStatus>,
 )
 
 internal suspend fun List<DbStatusWithReference>.saveToDb(
-    database: RoomCacheDatabase
+  database: RoomCacheDatabase
 ) {
-    this.map { it.references.map { it.status } + it.status }
-        .flatten()
-        .saveToDb(database = database)
-    this.flatMap { it.references }.map { it.reference }.let {
-        database.statusReferenceDao().insertAll(it)
-    }
+  this.map { it.references.map { it.status } + it.status }
+    .flatten()
+    .saveToDb(database = database)
+  this.flatMap { it.references }.map { it.reference }.let {
+    database.statusReferenceDao().insertAll(it)
+  }
 }

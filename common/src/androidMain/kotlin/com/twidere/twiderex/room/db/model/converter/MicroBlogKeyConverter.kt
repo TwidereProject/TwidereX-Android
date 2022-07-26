@@ -24,13 +24,13 @@ import androidx.room.TypeConverter
 import com.twidere.twiderex.model.MicroBlogKey
 
 internal class MicroBlogKeyConverter {
-    @TypeConverter
-    fun fromMicroBlogKey(microBlogKey: MicroBlogKey?): String? {
-        return microBlogKey?.toString()
-    }
+  @TypeConverter
+  fun fromMicroBlogKey(microBlogKey: MicroBlogKey?): String? {
+    return microBlogKey?.toString()
+  }
 
-    @TypeConverter
-    fun fromString(string: String?): MicroBlogKey? {
-        return string?.let { MicroBlogKey.valueOf(it) }
-    }
+  @TypeConverter
+  fun fromString(string: String?): MicroBlogKey? {
+    return string?.let { MicroBlogKey.valueOf(it) }
+  }
 }

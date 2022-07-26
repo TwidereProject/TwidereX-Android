@@ -26,62 +26,62 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DirectMessageResponse(
-    @SerialName("events")
-    val events: List<DirectMessageEvent>? = null,
-    @SerialName("next_cursor")
-    val nextCursor: String? = null
+  @SerialName("events")
+  val events: List<DirectMessageEvent>? = null,
+  @SerialName("next_cursor")
+  val nextCursor: String? = null
 )
 @Serializable
 data class DirectMessageEventObject(
-    val event: DirectMessageEvent? = null
+  val event: DirectMessageEvent? = null
 )
 
 @Serializable
 data class DirectMessageEvent(
-    @SerialName("created_timestamp")
-    val createdTimestamp: String? = null,
-    @SerialName("id")
-    val id: String? = null,
-    @SerialName("message_create")
-    val messageCreate: MessageCreate? = null,
-    @SerialName("type")
-    val type: String? = null
+  @SerialName("created_timestamp")
+  val createdTimestamp: String? = null,
+  @SerialName("id")
+  val id: String? = null,
+  @SerialName("message_create")
+  val messageCreate: MessageCreate? = null,
+  @SerialName("type")
+  val type: String? = null
 ) : IDirectMessage
 
 @Serializable
 data class MessageCreate(
-    @SerialName("message_data")
-    val messageData: MessageData? = null,
-    @SerialName("sender_id")
-    val senderId: String? = null,
-    @SerialName("source_app_id")
-    val sourceAppId: String? = null,
-    @SerialName("target")
-    val target: MessageTarget? = null
+  @SerialName("message_data")
+  val messageData: MessageData? = null,
+  @SerialName("sender_id")
+  val senderId: String? = null,
+  @SerialName("source_app_id")
+  val sourceAppId: String? = null,
+  @SerialName("target")
+  val target: MessageTarget? = null
 )
 
 @Serializable
 data class MessageTarget(
-    @SerialName("recipient_id")
-    val recipientId: String? = null
+  @SerialName("recipient_id")
+  val recipientId: String? = null
 )
 
 @Serializable
 data class MessageData(
-    @SerialName("entities")
-    val entities: Entities? = null,
-    @SerialName("text")
-    val text: String? = null,
-    @SerialName("quick_reply_response")
-    val quickReplyResponse: String? = null,
-    @SerialName("attachment")
-    val attachment: Attachment? = null
+  @SerialName("entities")
+  val entities: Entities? = null,
+  @SerialName("text")
+  val text: String? = null,
+  @SerialName("quick_reply_response")
+  val quickReplyResponse: String? = null,
+  @SerialName("attachment")
+  val attachment: Attachment? = null
 )
 
 @Serializable
 data class Attachment(
-    @SerialName("type")
-    val type: String? = null,
-    @SerialName("media")
-    val media: PurpleMedia? = null,
+  @SerialName("type")
+  val type: String? = null,
+  @SerialName("media")
+  val media: PurpleMedia? = null,
 )

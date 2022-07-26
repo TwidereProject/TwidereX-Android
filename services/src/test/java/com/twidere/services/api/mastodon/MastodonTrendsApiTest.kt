@@ -29,16 +29,16 @@ import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MastodonTrendsApiTest {
-    private lateinit var trendsResources: TrendsResources
+  private lateinit var trendsResources: TrendsResources
 
-    @BeforeAll
-    fun setUp() {
-        trendsResources = mockRetrofit("https://test.mastodon.com/", MastodonRequest2AssetPathConvertor())
-    }
+  @BeforeAll
+  fun setUp() {
+    trendsResources = mockRetrofit("https://test.mastodon.com/", MastodonRequest2AssetPathConvertor())
+  }
 
-    @Test
-    fun trends_listIsNotEmpty(): Unit = runBlocking {
-        val result = trendsResources.trends()
-        assert(result.isNotEmpty())
-    }
+  @Test
+  fun trends_listIsNotEmpty(): Unit = runBlocking {
+    val result = trendsResources.trends()
+    assert(result.isNotEmpty())
+  }
 }

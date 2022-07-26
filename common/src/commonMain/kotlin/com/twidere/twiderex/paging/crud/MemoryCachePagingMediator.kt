@@ -28,32 +28,32 @@ import androidx.paging.RemoteMediator
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class MemoryCachePagingMediator<Key : Any, Value : Any>(protected val memoryCache: PagingMemoryCache<Value>) : RemoteMediator<Int, Value>() {
-    protected var paging: Key? = null
-    override suspend fun load(loadType: LoadType, state: PagingState<Int, Value>): MediatorResult {
-        return try {
-            val key = when (loadType) {
-                LoadType.APPEND -> paging
-                LoadType.REFRESH -> {
-                    memoryCache.clear()
-                    null
-                }
-                LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
-            }
-            when (val result = load(key, loadType, state)) {
-                is PagingSource.LoadResult.Page -> {
-                    paging = result.nextKey
-                    memoryCache.insert(result.data)
-                }
-                is PagingSource.LoadResult.Error -> {
-                    throw result.throwable
-                }
-                is PagingSource.LoadResult.Invalid -> Unit
-            }
-            MediatorResult.Success(paging == null)
-        } catch (e: Exception) {
-            MediatorResult.Error(e)
+  protected var paging: Key? = null
+  override suspend fun load(loadType: LoadType, state: PagingState<Int, Value>): MediatorResult {
+    return try {
+      val key = when (loadType) {
+        LoadType.APPEND -> paging
+        LoadType.REFRESH -> {
+          memoryCache.clear()
+          null
         }
+        LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
+      }
+      when (val result = load(key, loadType, state)) {
+        is PagingSource.LoadResult.Page -> {
+          paging = result.nextKey
+          memoryCache.insert(result.data)
+        }
+        is PagingSource.LoadResult.Error -> {
+          throw result.throwable
+        }
+        is PagingSource.LoadResult.Invalid -> Unit
+      }
+      MediatorResult.Success(paging == null)
+    } catch (e: Exception) {
+      MediatorResult.Error(e)
     }
+  }
 
-    abstract suspend fun load(key: Key?, loadType: LoadType, state: PagingState<Int, Value>): PagingSource.LoadResult<Key, Value>
+  abstract suspend fun load(key: Key?, loadType: LoadType, state: PagingState<Int, Value>): PagingSource.LoadResult<Key, Value>
 }

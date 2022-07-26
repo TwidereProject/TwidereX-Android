@@ -26,28 +26,28 @@ import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
 import com.twidere.twiderex.sqldelight.table.DbDMConversation
 
 internal fun UiDMConversation.toDbDMConversation() = DbDMConversation(
-    accountKey = accountKey,
-    conversationKey = conversationKey,
-    recipientKey = recipientKey,
-    conversationId = conversationId,
-    conversationAvatar = conversationAvatar,
-    conversationName = conversationName,
-    conversationSubName = conversationSubName,
-    conversationType = conversationType
+  accountKey = accountKey,
+  conversationKey = conversationKey,
+  recipientKey = recipientKey,
+  conversationId = conversationId,
+  conversationAvatar = conversationAvatar,
+  conversationName = conversationName,
+  conversationSubName = conversationSubName,
+  conversationType = conversationType
 )
 
 internal fun DbDMConversation.toUi() = UiDMConversation(
-    accountKey = accountKey,
-    conversationKey = conversationKey,
-    recipientKey = recipientKey,
-    conversationId = conversationId,
-    conversationAvatar = conversationAvatar,
-    conversationName = conversationName,
-    conversationSubName = conversationSubName,
-    conversationType = conversationType
+  accountKey = accountKey,
+  conversationKey = conversationKey,
+  recipientKey = recipientKey,
+  conversationId = conversationId,
+  conversationAvatar = conversationAvatar,
+  conversationName = conversationName,
+  conversationSubName = conversationSubName,
+  conversationType = conversationType
 )
 
 internal fun DbDMConversationWithEvent.toUi() = UiDMConversationWithLatestMessage(
-    conversation = conversation.toUi(),
-    latestMessage = event.toUi()
+  conversation = conversation.toUi(),
+  latestMessage = event.toUi()
 )

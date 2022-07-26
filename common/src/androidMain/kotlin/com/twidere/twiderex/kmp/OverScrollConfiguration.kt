@@ -30,13 +30,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 @ExperimentalFoundationApi
 @Composable
 actual fun ProvideOverScrollConfiguration(
-    content: @Composable () -> Unit
+  content: @Composable () -> Unit
 ) {
-    CompositionLocalProvider(
-        LocalOverscrollConfiguration provides OverscrollConfiguration(
-            glowColor = MaterialTheme.colors.primary,
-        )
-    ) {
-        content.invoke()
-    }
+  CompositionLocalProvider(
+    LocalOverscrollConfiguration provides OverscrollConfiguration(
+      glowColor = MaterialTheme.colors.primary,
+    )
+  ) {
+    content.invoke()
+  }
 }

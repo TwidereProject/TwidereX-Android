@@ -64,161 +64,161 @@ import com.twidere.twiderex.viewmodel.settings.DisplayViewModel
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DisplayScene() {
-    val viewModel: DisplayViewModel = getViewModel()
-    val display = LocalDisplayPreferences.current
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_title))
-                    }
-                )
-            }
-        ) {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(
-                        rememberScrollState()
-                    )
-            ) {
-                ItemHeader() {
-                    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_section_header_preview))
-                }
-                CompositionLocalProvider(
-                    LocalNavigator provides FakeNavigator,
-                    LocalStatusActions provides FakeStatusActions,
-                ) {
-                    TimelineStatusComponent(data = UiStatus.sample())
-                }
-                ItemDivider()
-                ItemHeader() {
-                    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_section_header_text))
-                }
-                switchItem(
-                    value = display.useSystemFontSize,
-                    onChanged = {
-                        viewModel.setUseSystemFontSize(it)
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_text_use_the_system_font_size))
-                    },
-                )
-                if (!display.useSystemFontSize) {
-                    ListItem(
-                        icon = {
-                            Icon(
-                                modifier = Modifier.size(12.dp),
-                                imageVector = Icons.Default.TextFields,
-                                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_settings_display_font_size)
-                            )
-                        },
-                        text = {
-                            var fontSize by remember {
-                                mutableStateOf(display.fontScale)
-                            }
-                            Slider(
-                                steps = ((1.4f - 0.8f) * 10).toInt(),
-                                value = fontSize,
-                                onValueChange = { fontSize = it },
-                                valueRange = 0.8f..1.4f,
-                                onValueChangeFinished = { viewModel.commitFontScale(fontSize) }
-                            )
-                        },
-                        trailing = {
-                            Icon(
-                                imageVector = Icons.Default.TextFields,
-                                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_settings_display_font_size)
-                            )
-                        }
-                    )
-                }
-                ItemDivider()
-                RadioItem(
-                    options = listOf(
-                        DisplayPreferences.AvatarStyle.Round,
-                        DisplayPreferences.AvatarStyle.Square,
-                    ),
-                    value = display.avatarStyle,
-                    onChanged = {
-                        viewModel.setAvatarStyle(it)
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_text_avatar_style))
-                    },
-                    itemContent = {
-                        Text(
-                            text = stringResource(
-                                arrayOf(
-                                    com.twidere.twiderex.MR.strings.scene_settings_display_text_circle,
-                                    com.twidere.twiderex.MR.strings.scene_settings_display_text_rounded_square,
-                                )[it.ordinal]
-                            )
-                        )
-                    }
-                )
-                ItemDivider()
-                ItemHeader() {
-                    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_section_header_media))
-                }
-                switchItem(
-                    value = display.urlPreview,
-                    onChanged = {
-                        viewModel.setUrlPreview(it)
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_url_preview))
-                    }
-                )
-                switchItem(
-                    value = display.mediaPreview,
-                    onChanged = {
-                        viewModel.setMediaPreview(it)
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_media_media_previews))
-                    }
-                )
-                switchItem(
-                    value = display.muteByDefault,
-                    onChanged = {
-                        viewModel.setMuteByDefault(it)
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_media_mute_by_default))
-                    }
-                )
-                if (display.mediaPreview && currentPlatform != Platform.JVM) {
-                    RadioItem(
-                        options = listOf(
-                            DisplayPreferences.AutoPlayback.Auto,
-                            DisplayPreferences.AutoPlayback.Always,
-                            DisplayPreferences.AutoPlayback.Off,
-                        ),
-                        value = display.autoPlayback,
-                        onChanged = {
-                            viewModel.setAutoPlayback(it)
-                        },
-                        title = {
-                            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_media_auto_playback))
-                        },
-                        itemContent = {
-                            Text(
-                                text = stringResource(
-                                    arrayOf(
-                                        com.twidere.twiderex.MR.strings.scene_settings_display_media_automatic,
-                                        com.twidere.twiderex.MR.strings.scene_settings_display_media_always,
-                                        com.twidere.twiderex.MR.strings.scene_settings_display_media_off,
-                                    )[it.ordinal]
-                                )
-                            )
-                        }
-                    )
-                }
-            }
+  val viewModel: DisplayViewModel = getViewModel()
+  val display = LocalDisplayPreferences.current
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_title))
+          }
+        )
+      }
+    ) {
+      Column(
+        modifier = Modifier
+          .verticalScroll(
+            rememberScrollState()
+          )
+      ) {
+        ItemHeader() {
+          Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_section_header_preview))
         }
+        CompositionLocalProvider(
+          LocalNavigator provides FakeNavigator,
+          LocalStatusActions provides FakeStatusActions,
+        ) {
+          TimelineStatusComponent(data = UiStatus.sample())
+        }
+        ItemDivider()
+        ItemHeader() {
+          Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_section_header_text))
+        }
+        switchItem(
+          value = display.useSystemFontSize,
+          onChanged = {
+            viewModel.setUseSystemFontSize(it)
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_text_use_the_system_font_size))
+          },
+        )
+        if (!display.useSystemFontSize) {
+          ListItem(
+            icon = {
+              Icon(
+                modifier = Modifier.size(12.dp),
+                imageVector = Icons.Default.TextFields,
+                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_settings_display_font_size)
+              )
+            },
+            text = {
+              var fontSize by remember {
+                mutableStateOf(display.fontScale)
+              }
+              Slider(
+                steps = ((1.4f - 0.8f) * 10).toInt(),
+                value = fontSize,
+                onValueChange = { fontSize = it },
+                valueRange = 0.8f..1.4f,
+                onValueChangeFinished = { viewModel.commitFontScale(fontSize) }
+              )
+            },
+            trailing = {
+              Icon(
+                imageVector = Icons.Default.TextFields,
+                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_settings_display_font_size)
+              )
+            }
+          )
+        }
+        ItemDivider()
+        RadioItem(
+          options = listOf(
+            DisplayPreferences.AvatarStyle.Round,
+            DisplayPreferences.AvatarStyle.Square,
+          ),
+          value = display.avatarStyle,
+          onChanged = {
+            viewModel.setAvatarStyle(it)
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_text_avatar_style))
+          },
+          itemContent = {
+            Text(
+              text = stringResource(
+                arrayOf(
+                  com.twidere.twiderex.MR.strings.scene_settings_display_text_circle,
+                  com.twidere.twiderex.MR.strings.scene_settings_display_text_rounded_square,
+                )[it.ordinal]
+              )
+            )
+          }
+        )
+        ItemDivider()
+        ItemHeader() {
+          Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_section_header_media))
+        }
+        switchItem(
+          value = display.urlPreview,
+          onChanged = {
+            viewModel.setUrlPreview(it)
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_url_preview))
+          }
+        )
+        switchItem(
+          value = display.mediaPreview,
+          onChanged = {
+            viewModel.setMediaPreview(it)
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_media_media_previews))
+          }
+        )
+        switchItem(
+          value = display.muteByDefault,
+          onChanged = {
+            viewModel.setMuteByDefault(it)
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_media_mute_by_default))
+          }
+        )
+        if (display.mediaPreview && currentPlatform != Platform.JVM) {
+          RadioItem(
+            options = listOf(
+              DisplayPreferences.AutoPlayback.Auto,
+              DisplayPreferences.AutoPlayback.Always,
+              DisplayPreferences.AutoPlayback.Off,
+            ),
+            value = display.autoPlayback,
+            onChanged = {
+              viewModel.setAutoPlayback(it)
+            },
+            title = {
+              Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_media_auto_playback))
+            },
+            itemContent = {
+              Text(
+                text = stringResource(
+                  arrayOf(
+                    com.twidere.twiderex.MR.strings.scene_settings_display_media_automatic,
+                    com.twidere.twiderex.MR.strings.scene_settings_display_media_always,
+                    com.twidere.twiderex.MR.strings.scene_settings_display_media_off,
+                  )[it.ordinal]
+                )
+              )
+            }
+          )
+        }
+      }
     }
+  }
 }

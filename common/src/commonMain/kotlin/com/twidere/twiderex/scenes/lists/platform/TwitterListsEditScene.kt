@@ -49,68 +49,68 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun TwitterListsEditScene(
-    listKey: MicroBlogKey
+  listKey: MicroBlogKey
 ) {
-    val navController = LocalNavController.current
-    val listsEditViewModel: ListsModifyViewModel = getViewModel {
-        parametersOf(listKey)
-    }
-    val loading by listsEditViewModel.loading.observeAsState(initial = false)
-    val source by listsEditViewModel.source.observeAsState(null)
-    source?.let { uiList ->
-        TwidereScene {
-            val name by listsEditViewModel.editName.observeAsState(uiList.title)
-            val desc by listsEditViewModel.editDesc.observeAsState(uiList.descriptions)
-            val isPrivate by listsEditViewModel.editPrivate.observeAsState(uiList.isPrivate)
-            InAppNotificationScaffold(
-                topBar = {
-                    AppBar(
-                        navigationIcon = { AppBarNavigationButton(Icons.Default.Close) },
-                        title = {
-                            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_edit_title))
-                        },
-                        actions = {
-                            IconButton(
-                                enabled = name.isNotEmpty(),
-                                onClick = {
-                                    listsEditViewModel.editList(
-                                        listKey.id,
-                                        title = name,
-                                        description = desc,
-                                        private = isPrivate
-                                    ) { success, _ ->
-                                        if (success) navController.popBackStack()
-                                    }
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Done,
-                                    contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_confirm),
-                                    tint = if (name.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(
-                                        alpha = LocalContentAlpha.current
-                                    )
-                                )
-                            }
-                        }
-                    )
+  val navController = LocalNavController.current
+  val listsEditViewModel: ListsModifyViewModel = getViewModel {
+    parametersOf(listKey)
+  }
+  val loading by listsEditViewModel.loading.observeAsState(initial = false)
+  val source by listsEditViewModel.source.observeAsState(null)
+  source?.let { uiList ->
+    TwidereScene {
+      val name by listsEditViewModel.editName.observeAsState(uiList.title)
+      val desc by listsEditViewModel.editDesc.observeAsState(uiList.descriptions)
+      val isPrivate by listsEditViewModel.editPrivate.observeAsState(uiList.isPrivate)
+      InAppNotificationScaffold(
+        topBar = {
+          AppBar(
+            navigationIcon = { AppBarNavigationButton(Icons.Default.Close) },
+            title = {
+              Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_edit_title))
+            },
+            actions = {
+              IconButton(
+                enabled = name.isNotEmpty(),
+                onClick = {
+                  listsEditViewModel.editList(
+                    listKey.id,
+                    title = name,
+                    description = desc,
+                    private = isPrivate
+                  ) { success, _ ->
+                    if (success) navController.popBackStack()
+                  }
                 }
-            ) {
-                Box {
-                    TwitterListsModifyComponent(
-                        name = name,
-                        desc = desc,
-                        isPrivate = isPrivate,
-                        onNameChanged = { listsEditViewModel.editName.value = it },
-                        onDescChanged = { listsEditViewModel.editDesc.value = it },
-                        onPrivateChanged = { listsEditViewModel.editPrivate.value = it }
-                    )
-                    if (loading) {
-                        Dialog(onDismissRequest = { }) {
-                            LoadingProgress()
-                        }
-                    }
-                }
+              ) {
+                Icon(
+                  imageVector = Icons.Default.Done,
+                  contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_confirm),
+                  tint = if (name.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                    alpha = LocalContentAlpha.current
+                  )
+                )
+              }
             }
+          )
         }
+      ) {
+        Box {
+          TwitterListsModifyComponent(
+            name = name,
+            desc = desc,
+            isPrivate = isPrivate,
+            onNameChanged = { listsEditViewModel.editName.value = it },
+            onDescChanged = { listsEditViewModel.editDesc.value = it },
+            onPrivateChanged = { listsEditViewModel.editPrivate.value = it }
+          )
+          if (loading) {
+            Dialog(onDismissRequest = { }) {
+              LoadingProgress()
+            }
+          }
+        }
+      }
     }
+  }
 }

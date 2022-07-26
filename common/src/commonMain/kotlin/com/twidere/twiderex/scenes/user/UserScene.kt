@@ -60,159 +60,159 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun UserScene(
-    userKey: MicroBlogKey,
+  userKey: MicroBlogKey,
 ) {
-    val account = LocalActiveAccount.current ?: return
-    val viewModel: UserViewModel = getViewModel {
-        parametersOf(userKey)
-    }
-    val conversationViewModel: DMNewConversationViewModel = getViewModel()
-    val user by viewModel.user.observeAsState(initial = null)
-    val navController = LocalNavController.current
-    var expanded by remember { mutableStateOf(false) }
-    var showBlockAlert by remember { mutableStateOf(false) }
-    val relationship by viewModel.relationship.observeAsState(initial = null)
-    val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
-    TwidereScene {
-        InAppNotificationScaffold(
-            // TODO: Show top bar with actions
-            topBar = {
-                AppBar(
-                    backgroundColor = MaterialTheme.colors.surface.withElevation(),
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    actions = {
-                        if (account.type == PlatformType.Twitter && user?.platformType == PlatformType.Twitter) {
-                            user?.let {
-                                if (userKey != account.accountKey) {
-                                    IconButton(
-                                        onClick = {
-                                            conversationViewModel.createNewConversation(
-                                                it,
-                                                onResult = { conversationKey ->
-                                                    conversationKey?.let {
-                                                        navController.navigate(Root.Messages.Conversation(it))
-                                                    }
-                                                }
-                                            )
-                                        }
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_mail),
-                                            contentDescription = stringResource(
-                                                res = com.twidere.twiderex.MR.strings.scene_messages_title
-                                            ),
-                                            tint = MaterialTheme.colors.onSurface
-                                        )
-                                    }
-                                }
-                            }
+  val account = LocalActiveAccount.current ?: return
+  val viewModel: UserViewModel = getViewModel {
+    parametersOf(userKey)
+  }
+  val conversationViewModel: DMNewConversationViewModel = getViewModel()
+  val user by viewModel.user.observeAsState(initial = null)
+  val navController = LocalNavController.current
+  var expanded by remember { mutableStateOf(false) }
+  var showBlockAlert by remember { mutableStateOf(false) }
+  val relationship by viewModel.relationship.observeAsState(initial = null)
+  val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
+  TwidereScene {
+    InAppNotificationScaffold(
+      // TODO: Show top bar with actions
+      topBar = {
+        AppBar(
+          backgroundColor = MaterialTheme.colors.surface.withElevation(),
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          actions = {
+            if (account.type == PlatformType.Twitter && user?.platformType == PlatformType.Twitter) {
+              user?.let {
+                if (userKey != account.accountKey) {
+                  IconButton(
+                    onClick = {
+                      conversationViewModel.createNewConversation(
+                        it,
+                        onResult = { conversationKey ->
+                          conversationKey?.let {
+                            navController.navigate(Root.Messages.Conversation(it))
+                          }
                         }
-                        Box {
-                            if (userKey != account.accountKey) {
-                                IconButton(
-                                    onClick = {
-                                        expanded = true
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.MoreHoriz,
-                                        contentDescription = stringResource(
-                                            res = MR.strings.accessibility_common_more
-                                        ),
-                                        tint = MaterialTheme.colors.onSurface
-                                    )
-                                }
-                            }
-
-                            DropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false },
-                            ) {
-                                relationship.takeIf { !loadingRelationship }
-                                    ?.blocking?.let { blocking ->
-                                        DropdownMenuItem(
-                                            onClick = {
-                                                if (blocking)
-                                                    viewModel.unblock()
-                                                else
-                                                    showBlockAlert = true
-                                                expanded = false
-                                            }
-                                        ) {
-                                            Text(
-                                                text = stringResource(
-                                                    res = if (blocking) MR.strings.common_controls_friendship_actions_unblock
-                                                    else MR.strings.common_controls_friendship_actions_block
-                                                )
-                                            )
-                                        }
-                                    }
-                            }
-                        }
-                    },
-                    elevation = 0.dp,
-                    title = {
-                        user?.let {
-                            UserName(user = it)
-                        }
+                      )
                     }
-                )
-            }
-        ) {
-            Box {
-                UserComponent(userKey)
-                if (showBlockAlert) {
-                    user?.let {
-                        BlockAlert(
-                            screenName = it.getDisplayScreenName(it.userKey.host),
-                            onDismissRequest = { showBlockAlert = false },
-                            onConfirm = {
-                                viewModel.block()
-                            }
-                        )
-                    }
+                  ) {
+                    Icon(
+                      painter = painterResource(res = com.twidere.twiderex.MR.files.ic_mail),
+                      contentDescription = stringResource(
+                        res = com.twidere.twiderex.MR.strings.scene_messages_title
+                      ),
+                      tint = MaterialTheme.colors.onSurface
+                    )
+                  }
                 }
+              }
             }
+            Box {
+              if (userKey != account.accountKey) {
+                IconButton(
+                  onClick = {
+                    expanded = true
+                  }
+                ) {
+                  Icon(
+                    imageVector = Icons.Default.MoreHoriz,
+                    contentDescription = stringResource(
+                      res = MR.strings.accessibility_common_more
+                    ),
+                    tint = MaterialTheme.colors.onSurface
+                  )
+                }
+              }
+
+              DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+              ) {
+                relationship.takeIf { !loadingRelationship }
+                  ?.blocking?.let { blocking ->
+                    DropdownMenuItem(
+                      onClick = {
+                        if (blocking)
+                          viewModel.unblock()
+                        else
+                          showBlockAlert = true
+                        expanded = false
+                      }
+                    ) {
+                      Text(
+                        text = stringResource(
+                          res = if (blocking) MR.strings.common_controls_friendship_actions_unblock
+                          else MR.strings.common_controls_friendship_actions_block
+                        )
+                      )
+                    }
+                  }
+              }
+            }
+          },
+          elevation = 0.dp,
+          title = {
+            user?.let {
+              UserName(user = it)
+            }
+          }
+        )
+      }
+    ) {
+      Box {
+        UserComponent(userKey)
+        if (showBlockAlert) {
+          user?.let {
+            BlockAlert(
+              screenName = it.getDisplayScreenName(it.userKey.host),
+              onDismissRequest = { showBlockAlert = false },
+              onConfirm = {
+                viewModel.block()
+              }
+            )
+          }
         }
+      }
     }
+  }
 }
 
 @Composable
 fun BlockAlert(
-    screenName: String,
-    onDismissRequest: () -> Unit,
-    onConfirm: () -> Unit
+  screenName: String,
+  onDismissRequest: () -> Unit,
+  onConfirm: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = {
-            onDismissRequest.invoke()
-        },
-        title = {
-            Text(
-                text = stringResource(res = MR.strings.common_alerts_block_user_confirm_title, screenName),
-                style = MaterialTheme.typography.subtitle1
-            )
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest.invoke()
-                }
-            ) {
-                Text(text = stringResource(res = MR.strings.common_controls_actions_cancel))
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirm()
-                    onDismissRequest.invoke()
-                }
-            ) {
-                Text(text = stringResource(res = MR.strings.common_controls_actions_yes))
-            }
-        },
-    )
+  AlertDialog(
+    onDismissRequest = {
+      onDismissRequest.invoke()
+    },
+    title = {
+      Text(
+        text = stringResource(res = MR.strings.common_alerts_block_user_confirm_title, screenName),
+        style = MaterialTheme.typography.subtitle1
+      )
+    },
+    dismissButton = {
+      TextButton(
+        onClick = {
+          onDismissRequest.invoke()
+        }
+      ) {
+        Text(text = stringResource(res = MR.strings.common_controls_actions_cancel))
+      }
+    },
+    confirmButton = {
+      TextButton(
+        onClick = {
+          onConfirm()
+          onDismissRequest.invoke()
+        }
+      ) {
+        Text(text = stringResource(res = MR.strings.common_controls_actions_yes))
+      }
+    },
+  )
 }

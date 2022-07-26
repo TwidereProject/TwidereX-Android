@@ -48,103 +48,103 @@ import moe.tlaster.precompose.ui.LocalLifecycleOwner
 
 @Composable
 fun VideoPlayer(
-    modifier: Modifier = Modifier.fillMaxSize(), // must set video player size
-    videoState: VideoPlayerState,
-    playEnable: Boolean = true,
-    zOrderMediaOverlay: Boolean = false,
-    keepScreenOn: Boolean = false,
-    thumb: @Composable() (() -> Unit)? = null,
-    backgroundColor: Color? = null,
-    onClick: (() -> Unit)? = null
+  modifier: Modifier = Modifier.fillMaxSize(), // must set video player size
+  videoState: VideoPlayerState,
+  playEnable: Boolean = true,
+  zOrderMediaOverlay: Boolean = false,
+  keepScreenOn: Boolean = false,
+  thumb: @Composable() (() -> Unit)? = null,
+  backgroundColor: Color? = null,
+  onClick: (() -> Unit)? = null
 ) {
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val resLoder = LocalResLoader.current
-    val httpConfig = LocalHttpConfig.current
-    Box {
-        if (playEnable) {
-            val platformPlayerView = remember(videoState.url) {
-                PlatformPlayerView(
-                    url = videoState.url,
-                    httpConfig = httpConfig,
-                    zOrderMediaOverlay = zOrderMediaOverlay,
-                    keepScreenOn = keepScreenOn,
-                    backgroundColor = backgroundColor,
-                    onClick = onClick
-                ).apply {
-                    videoState.bind(this)
-                }
+  val lifecycle = LocalLifecycleOwner.current.lifecycle
+  val resLoder = LocalResLoader.current
+  val httpConfig = LocalHttpConfig.current
+  Box {
+    if (playEnable) {
+      val platformPlayerView = remember(videoState.url) {
+        PlatformPlayerView(
+          url = videoState.url,
+          httpConfig = httpConfig,
+          zOrderMediaOverlay = zOrderMediaOverlay,
+          keepScreenOn = keepScreenOn,
+          backgroundColor = backgroundColor,
+          onClick = onClick
+        ).apply {
+          videoState.bind(this)
+        }
+      }
+      DisposableEffect(Unit) {
+        val observer = object : LifecycleObserver {
+          override fun onStateChanged(state: Lifecycle.State) {
+            when (state) {
+              Lifecycle.State.Active -> {
+                videoState.onResume()
+              }
+              Lifecycle.State.InActive -> {
+                videoState.onPause()
+              }
+              else -> {
+              }
             }
-            DisposableEffect(Unit) {
-                val observer = object : LifecycleObserver {
-                    override fun onStateChanged(state: Lifecycle.State) {
-                        when (state) {
-                            Lifecycle.State.Active -> {
-                                videoState.onResume()
-                            }
-                            Lifecycle.State.InActive -> {
-                                videoState.onPause()
-                            }
-                            else -> {
-                            }
-                        }
-                    }
-                }
-                lifecycle.addObserver(observer)
-                onDispose {
-                    videoState.onPause()
-                    platformPlayerView.release()
-                    lifecycle.removeObserver(observer)
-                }
-            }
+          }
+        }
+        lifecycle.addObserver(observer)
+        onDispose {
+          videoState.onPause()
+          platformPlayerView.release()
+          lifecycle.removeObserver(observer)
+        }
+      }
 
-            Box {
-                platformPlayerView.Content(modifier = modifier) {}
-            }
-        }
-        if ((videoState.showThumbnail || !playEnable) && thumb != null) {
-            thumb()
-        }
-        if (videoState.showLoading && playEnable) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-        }
-
-        if (!playEnable) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                Icon(
-                    imageVector = Icons.Default.PlayArrow,
-                    tint = Color.White.copy(alpha = LocalContentAlpha.current),
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .size(UserAvatarDefaults.AvatarSize)
-                        .background(MaterialTheme.colors.primary, CircleShape),
-                    contentDescription = resLoder.getString(
-                        MR.strings.accessibility_common_video_play
-                    )
-                )
-            }
-        }
+      Box {
+        platformPlayerView.Content(modifier = modifier) {}
+      }
     }
+    if ((videoState.showThumbnail || !playEnable) && thumb != null) {
+      thumb()
+    }
+    if (videoState.showLoading && playEnable) {
+      Box(
+        modifier = Modifier
+          .fillMaxSize()
+      ) {
+        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+      }
+    }
+
+    if (!playEnable) {
+      Box(
+        modifier = Modifier
+          .fillMaxSize()
+      ) {
+        Icon(
+          imageVector = Icons.Default.PlayArrow,
+          tint = Color.White.copy(alpha = LocalContentAlpha.current),
+          modifier = Modifier
+            .align(Alignment.Center)
+            .size(UserAvatarDefaults.AvatarSize)
+            .background(MaterialTheme.colors.primary, CircleShape),
+          contentDescription = resLoder.getString(
+            MR.strings.accessibility_common_video_play
+          )
+        )
+      }
+    }
+  }
 }
 
 interface PlayerCallBack {
-    fun onPrepareStart() // start to prepare video
-    fun onReady() // ready to play video
-    fun onIsPlayingChanged(isPlaying: Boolean) // video play/pause
-    fun onBuffering() // video buffering
+  fun onPrepareStart() // start to prepare video
+  fun onReady() // ready to play video
+  fun onIsPlayingChanged(isPlaying: Boolean) // video play/pause
+  fun onBuffering() // video buffering
 }
 
 interface PlayerProgressCallBack {
-    fun onTimeChanged(time: Long)
+  fun onTimeChanged(time: Long)
 }
 
 object UserAvatarDefaults {
-    val AvatarSize = 44.dp
+  val AvatarSize = 44.dp
 }

@@ -53,155 +53,155 @@ private const val ACCOUNT_USER_DATA_TEST = "test"
 private const val ACCOUNT_USER_DATA_LAST_ACTIVE = "last_active"
 
 actual class AccountRepository(
-    private val manager: AccountManager,
-    private val accountPreferencesFactory: AccountPreferencesFactory,
+  private val manager: AccountManager,
+  private val accountPreferencesFactory: AccountPreferencesFactory,
 ) {
-    actual fun updateAccount(user: UiUser) {
-        findByAccountKey(user.userKey)?.copy(
-            user = user.toAmUser()
-        )?.let {
-            updateAccount(it)
-        }
+  actual fun updateAccount(user: UiUser) {
+    findByAccountKey(user.userKey)?.copy(
+      user = user.toAmUser()
+    )?.let {
+      updateAccount(it)
     }
+  }
 
-    private val preferencesCache = linkedMapOf<MicroBlogKey, AccountPreferences>()
-    private val _activeAccount =
-        MutableStateFlow(if (hasAccount()) getCurrentAccount() else null)
+  private val preferencesCache = linkedMapOf<MicroBlogKey, AccountPreferences>()
+  private val _activeAccount =
+    MutableStateFlow(if (hasAccount()) getCurrentAccount() else null)
 
-    actual val activeAccount: Flow<AccountDetails?>
-        get() = _activeAccount
+  actual val activeAccount: Flow<AccountDetails?>
+    get() = _activeAccount
 
-    private val _accounts = MutableStateFlow(
-        getAccounts()
+  private val _accounts = MutableStateFlow(
+    getAccounts()
+  )
+
+  actual val accounts: Flow<List<AccountDetails>>
+    get() = _accounts
+
+  actual fun hasAccount(): Boolean {
+    return getAccounts().isNotEmpty()
+  }
+
+  actual fun setCurrentAccount(detail: AccountDetails) {
+    detail.lastActive = System.currentTimeMillis()
+    updateAccount(detail)
+    _activeAccount.value = detail
+  }
+
+  private fun getCurrentAccount(): AccountDetails? {
+    return getAccounts().maxByOrNull { it.lastActive }
+  }
+
+  actual fun addAccount(
+    displayKey: MicroBlogKey,
+    type: PlatformType,
+    accountKey: MicroBlogKey,
+    credentials_type: CredentialsType,
+    credentials_json: String,
+    extras_json: String,
+    user: AmUser,
+    lastActive: Long,
+  ) {
+    val account = Account(displayKey.toString(), ACCOUNT_TYPE)
+    manager.addAccountExplicitly(account, null, null)
+    val detail = AccountDetails(
+      account = account.toTwidere(),
+      type = type,
+      accountKey = accountKey,
+      credentials_type = credentials_type,
+      credentials_json = credentials_json,
+      extras_json = extras_json,
+      user = user,
+      lastActive = lastActive,
+      preferences = getAccountPreferences(accountKey)
     )
+    updateAccount(detail)
+    setCurrentAccount(detail)
+    _accounts.value = getAccounts()
+  }
 
-    actual val accounts: Flow<List<AccountDetails>>
-        get() = _accounts
-
-    actual fun hasAccount(): Boolean {
-        return getAccounts().isNotEmpty()
+  actual fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences {
+    return preferencesCache.getOrPut(accountKey) {
+      accountPreferencesFactory.create(accountKey)
     }
+  }
 
-    actual fun setCurrentAccount(detail: AccountDetails) {
-        detail.lastActive = System.currentTimeMillis()
-        updateAccount(detail)
-        _activeAccount.value = detail
+  private fun getAccountKey(account: Account): MicroBlogKey =
+    MicroBlogKey.valueOf(manager.getUserData(account, ACCOUNT_USER_DATA_KEY))
+
+  actual fun containsAccount(key: MicroBlogKey): Boolean {
+    return findByAccountKey(key) != null
+  }
+
+  actual fun updateAccount(detail: AccountDetails) {
+    val account = detail.account.toAndroid()
+    manager.setUserData(account, ACCOUNT_USER_DATA_TYPE, detail.type.name)
+    manager.setUserData(account, ACCOUNT_USER_DATA_KEY, detail.accountKey.toString())
+    manager.setUserData(
+      account,
+      ACCOUNT_USER_DATA_CREDS_TYPE,
+      detail.credentials_type.name
+    )
+    manager.setAuthToken(account, ACCOUNT_AUTH_TOKEN_TYPE, detail.credentials_json)
+    manager.setUserData(account, ACCOUNT_USER_DATA_EXTRAS, detail.extras_json)
+    manager.setUserData(account, ACCOUNT_USER_DATA_USER, detail.user.json())
+    manager.setUserData(
+      account,
+      ACCOUNT_USER_DATA_LAST_ACTIVE,
+      detail.lastActive.toString()
+    )
+    _activeAccount.value = getCurrentAccount()
+    _accounts.value = getAccounts()
+  }
+
+  actual fun delete(detail: AccountDetails) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+      manager.removeAccountExplicitly(detail.account.toAndroid())
+      _accounts.value = getAccounts()
+      _activeAccount.value = getCurrentAccount()
+      preferencesCache.remove(detail.accountKey)?.close()
     }
+  }
 
-    private fun getCurrentAccount(): AccountDetails? {
-        return getAccounts().maxByOrNull { it.lastActive }
+  actual fun getFirstByType(type: PlatformType): AccountDetails? {
+    return _accounts.value.sortedByDescending { it.lastActive }.firstOrNull { it.type == type }
+  }
+
+  actual fun getAccounts(): List<AccountDetails> {
+    return manager.getAccountsByType(ACCOUNT_TYPE).map {
+      getAccountDetails(it)
     }
+  }
 
-    actual fun addAccount(
-        displayKey: MicroBlogKey,
-        type: PlatformType,
-        accountKey: MicroBlogKey,
-        credentials_type: CredentialsType,
-        credentials_json: String,
-        extras_json: String,
-        user: AmUser,
-        lastActive: Long,
-    ) {
-        val account = Account(displayKey.toString(), ACCOUNT_TYPE)
-        manager.addAccountExplicitly(account, null, null)
-        val detail = AccountDetails(
-            account = account.toTwidere(),
-            type = type,
-            accountKey = accountKey,
-            credentials_type = credentials_type,
-            credentials_json = credentials_json,
-            extras_json = extras_json,
-            user = user,
-            lastActive = lastActive,
-            preferences = getAccountPreferences(accountKey)
+  // Note that UserKey that being used in AccountRepository is idStr@domain, not screenName@domain
+  actual fun findByAccountKey(accountKey: MicroBlogKey): AccountDetails? {
+    for (account in getAccounts()) {
+      if (accountKey == getAccountKey(account.account.toAndroid())) {
+        return account
+      }
+    }
+    return null
+  }
+
+  private fun getAccountDetails(
+    account: Account,
+  ): AccountDetails {
+    return AccountDetails(
+      account = account.toTwidere(),
+      type = PlatformType.valueOf(manager.getUserData(account, ACCOUNT_USER_DATA_TYPE)),
+      accountKey = getAccountKey(account),
+      credentials_type = CredentialsType.valueOf(
+        manager.getUserData(
+          account,
+          ACCOUNT_USER_DATA_CREDS_TYPE
         )
-        updateAccount(detail)
-        setCurrentAccount(detail)
-        _accounts.value = getAccounts()
-    }
-
-    actual fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences {
-        return preferencesCache.getOrPut(accountKey) {
-            accountPreferencesFactory.create(accountKey)
-        }
-    }
-
-    private fun getAccountKey(account: Account): MicroBlogKey =
-        MicroBlogKey.valueOf(manager.getUserData(account, ACCOUNT_USER_DATA_KEY))
-
-    actual fun containsAccount(key: MicroBlogKey): Boolean {
-        return findByAccountKey(key) != null
-    }
-
-    actual fun updateAccount(detail: AccountDetails) {
-        val account = detail.account.toAndroid()
-        manager.setUserData(account, ACCOUNT_USER_DATA_TYPE, detail.type.name)
-        manager.setUserData(account, ACCOUNT_USER_DATA_KEY, detail.accountKey.toString())
-        manager.setUserData(
-            account,
-            ACCOUNT_USER_DATA_CREDS_TYPE,
-            detail.credentials_type.name
-        )
-        manager.setAuthToken(account, ACCOUNT_AUTH_TOKEN_TYPE, detail.credentials_json)
-        manager.setUserData(account, ACCOUNT_USER_DATA_EXTRAS, detail.extras_json)
-        manager.setUserData(account, ACCOUNT_USER_DATA_USER, detail.user.json())
-        manager.setUserData(
-            account,
-            ACCOUNT_USER_DATA_LAST_ACTIVE,
-            detail.lastActive.toString()
-        )
-        _activeAccount.value = getCurrentAccount()
-        _accounts.value = getAccounts()
-    }
-
-    actual fun delete(detail: AccountDetails) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            manager.removeAccountExplicitly(detail.account.toAndroid())
-            _accounts.value = getAccounts()
-            _activeAccount.value = getCurrentAccount()
-            preferencesCache.remove(detail.accountKey)?.close()
-        }
-    }
-
-    actual fun getFirstByType(type: PlatformType): AccountDetails? {
-        return _accounts.value.sortedByDescending { it.lastActive }.firstOrNull { it.type == type }
-    }
-
-    actual fun getAccounts(): List<AccountDetails> {
-        return manager.getAccountsByType(ACCOUNT_TYPE).map {
-            getAccountDetails(it)
-        }
-    }
-
-    // Note that UserKey that being used in AccountRepository is idStr@domain, not screenName@domain
-    actual fun findByAccountKey(accountKey: MicroBlogKey): AccountDetails? {
-        for (account in getAccounts()) {
-            if (accountKey == getAccountKey(account.account.toAndroid())) {
-                return account
-            }
-        }
-        return null
-    }
-
-    private fun getAccountDetails(
-        account: Account,
-    ): AccountDetails {
-        return AccountDetails(
-            account = account.toTwidere(),
-            type = PlatformType.valueOf(manager.getUserData(account, ACCOUNT_USER_DATA_TYPE)),
-            accountKey = getAccountKey(account),
-            credentials_type = CredentialsType.valueOf(
-                manager.getUserData(
-                    account,
-                    ACCOUNT_USER_DATA_CREDS_TYPE
-                )
-            ),
-            credentials_json = manager.peekAuthToken(account, ACCOUNT_AUTH_TOKEN_TYPE),
-            extras_json = manager.getUserData(account, ACCOUNT_USER_DATA_EXTRAS),
-            user = manager.getUserData(account, ACCOUNT_USER_DATA_USER).fromJson(),
-            lastActive = manager.getUserData(account, ACCOUNT_USER_DATA_LAST_ACTIVE)?.toLongOrNull()
-                ?: 0,
-            preferences = getAccountPreferences(getAccountKey(account))
-        )
-    }
+      ),
+      credentials_json = manager.peekAuthToken(account, ACCOUNT_AUTH_TOKEN_TYPE),
+      extras_json = manager.getUserData(account, ACCOUNT_USER_DATA_EXTRAS),
+      user = manager.getUserData(account, ACCOUNT_USER_DATA_USER).fromJson(),
+      lastActive = manager.getUserData(account, ACCOUNT_USER_DATA_LAST_ACTIVE)?.toLongOrNull()
+        ?: 0,
+      preferences = getAccountPreferences(getAccountKey(account))
+    )
+  }
 }

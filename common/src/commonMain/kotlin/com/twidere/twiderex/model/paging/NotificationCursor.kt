@@ -23,9 +23,9 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.NotificationCursorType
 
 data class NotificationCursor(
-    val _id: String,
-    val accountKey: MicroBlogKey,
-    val type: NotificationCursorType,
-    val value: String,
-    val timestamp: Long,
+  val _id: String,
+  val accountKey: MicroBlogKey,
+  val type: NotificationCursorType,
+  val value: String,
+  val timestamp: Long,
 )

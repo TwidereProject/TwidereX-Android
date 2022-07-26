@@ -50,85 +50,85 @@ private const val ID_PlaceHolder = "placeholder"
 
 @Composable
 fun TextPlaceHolder(
-    modifier: Modifier = Modifier,
-    length: Int,
-    durationMillis: Int = PlaceholderConstants.DefaultDurationMillis,
-    delayMillis: Long = 0,
-    color: PlaceholderColors = PlaceholderConstants.DefaultColor,
+  modifier: Modifier = Modifier,
+  length: Int,
+  durationMillis: Int = PlaceholderConstants.DefaultDurationMillis,
+  delayMillis: Long = 0,
+  color: PlaceholderColors = PlaceholderConstants.DefaultColor,
 ) {
-    val value = buildAnnotatedString {
-        repeat(length) {
-            appendInlineContent(ID_PlaceHolder)
-        }
+  val value = buildAnnotatedString {
+    repeat(length) {
+      appendInlineContent(ID_PlaceHolder)
     }
-    Text(
-        modifier = modifier,
-        text = value,
-        inlineContent = mapOf(
-            ID_PlaceHolder to InlineTextContent(
-                androidx.compose.ui.text.Placeholder(
-                    width = LocalTextStyle.current.fontSize,
-                    height = LocalTextStyle.current.fontSize,
-                    placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter
-                )
-            ) {
-                Placeholder(
-                    modifier = Modifier.fillMaxSize(),
-                    durationMillis = durationMillis,
-                    delayMillis = delayMillis,
-                    color = color,
-                )
-            },
+  }
+  Text(
+    modifier = modifier,
+    text = value,
+    inlineContent = mapOf(
+      ID_PlaceHolder to InlineTextContent(
+        androidx.compose.ui.text.Placeholder(
+          width = LocalTextStyle.current.fontSize,
+          height = LocalTextStyle.current.fontSize,
+          placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter
         )
+      ) {
+        Placeholder(
+          modifier = Modifier.fillMaxSize(),
+          durationMillis = durationMillis,
+          delayMillis = delayMillis,
+          color = color,
+        )
+      },
     )
+  )
 }
 
 @Composable
 fun Placeholder(
-    modifier: Modifier,
-    durationMillis: Int = PlaceholderConstants.DefaultDurationMillis,
-    delayMillis: Long = 0,
-    color: PlaceholderColors = PlaceholderConstants.DefaultColor,
+  modifier: Modifier,
+  durationMillis: Int = PlaceholderConstants.DefaultDurationMillis,
+  delayMillis: Long = 0,
+  color: PlaceholderColors = PlaceholderConstants.DefaultColor,
 ) {
-    var started by rememberSaveable(delayMillis) {
-        mutableStateOf(delayMillis == 0L)
+  var started by rememberSaveable(delayMillis) {
+    mutableStateOf(delayMillis == 0L)
+  }
+  if (!started) {
+    LaunchedEffect(delayMillis) {
+      delay(delayMillis)
+      started = true
     }
-    if (!started) {
-        LaunchedEffect(delayMillis) {
-            delay(delayMillis)
-            started = true
-        }
-    }
-    val colorAnimation = if (started) {
-        val transition = rememberInfiniteTransition()
-        val colorAnimation by transition.animateColor(
-            initialValue = color.start,
-            targetValue = color.end,
-            animationSpec = infiniteRepeatable(
-                animation = tween(
-                    durationMillis = durationMillis,
-                    easing = CubicBezierEasing(1.0f, 0.0f, 0.8f, 0.3f)
-                ),
-                repeatMode = RepeatMode.Reverse
-            )
-        )
-        colorAnimation
-    } else {
-        color.start
-    }
+  }
+  val colorAnimation = if (started) {
+    val transition = rememberInfiniteTransition()
+    val colorAnimation by transition.animateColor(
+      initialValue = color.start,
+      targetValue = color.end,
+      animationSpec = infiniteRepeatable(
+        animation = tween(
+          durationMillis = durationMillis,
+          easing = CubicBezierEasing(1.0f, 0.0f, 0.8f, 0.3f)
+        ),
+        repeatMode = RepeatMode.Reverse
+      )
+    )
+    colorAnimation
+  } else {
+    color.start
+  }
 
-    Box(modifier = modifier.background(color = colorAnimation))
+  Box(modifier = modifier.background(color = colorAnimation))
 }
 
 object PlaceholderConstants {
-    const val DefaultDurationMillis: Int = 1500
-    val DefaultColor = PlaceholderColors(
-        start = Color.Black.copy(alpha = 0.1f),
-        end = Color.Black.copy(alpha = 0.025f)
-    )
+  const val DefaultDurationMillis: Int = 1500
+  val DefaultColor = PlaceholderColors(
+    start = Color.Black.copy(alpha = 0.1f),
+    end = Color.Black.copy(alpha = 0.025f)
+  )
 }
 
 data class PlaceholderColors(
-    val start: Color,
-    val end: Color,
+  val start: Color,
+  val end: Color,
 )

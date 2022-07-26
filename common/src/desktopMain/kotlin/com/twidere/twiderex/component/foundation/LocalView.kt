@@ -24,9 +24,9 @@ import androidx.compose.runtime.Composable
 
 @Composable
 actual fun getLocalView(): LocalView {
-    return LocalView()
+  return LocalView()
 }
 
 actual class LocalView actual constructor() {
-    actual fun performHapticFeedback() {}
+  actual fun performHapticFeedback() {}
 }

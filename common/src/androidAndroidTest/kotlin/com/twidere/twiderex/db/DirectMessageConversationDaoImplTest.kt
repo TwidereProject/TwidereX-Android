@@ -35,100 +35,100 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 internal class DirectMessageConversationDaoImplTest : CacheDatabaseDaoTest() {
-    val accountKey = MicroBlogKey.twitter("test")
+  val accountKey = MicroBlogKey.twitter("test")
 
-    @Test
-    fun delete() = runBlocking {
-        val cacheDatabase = CacheDatabaseImpl(roomDatabase)
-        val conversation = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
-            .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)).toConversation()
-        cacheDatabase.directMessageConversationDao().insertAll(listOf(conversation))
-        cacheDatabase.directMessageConversationDao().delete(conversation)
-        assertNull(
-            cacheDatabase.directMessageConversationDao().findWithConversationKey(
-                accountKey = accountKey,
-                conversationKey = conversation.conversationKey,
-            )
-        )
+  @Test
+  fun delete() = runBlocking {
+    val cacheDatabase = CacheDatabaseImpl(roomDatabase)
+    val conversation = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
+      .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)).toConversation()
+    cacheDatabase.directMessageConversationDao().insertAll(listOf(conversation))
+    cacheDatabase.directMessageConversationDao().delete(conversation)
+    assertNull(
+      cacheDatabase.directMessageConversationDao().findWithConversationKey(
+        accountKey = accountKey,
+        conversationKey = conversation.conversationKey,
+      )
+    )
+  }
+
+  @Test
+  fun getPagingListCount_ReturnsCountMatchesQuery() = runBlocking {
+    val cacheDatabase = CacheDatabaseImpl(roomDatabase)
+    val list = listOf(
+      mockIDirectMessage(accountId = accountKey.id, otherUserID = "other1")
+        .toUi(accountKey, mockIUser(id = "other1").toUi(accountKey)),
+      mockIDirectMessage(accountId = accountKey.id, otherUserID = "other2")
+        .toUi(accountKey, mockIUser(id = "other2").toUi(accountKey)),
+      mockIDirectMessage(accountId = accountKey.id, otherUserID = "other3")
+        .toUi(MicroBlogKey.twitter("Not included"), mockIUser(id = "other3").toUi(MicroBlogKey.twitter("Not included"))),
+    )
+    cacheDatabase.directMessageDao().insertAll(list)
+    cacheDatabase.directMessageConversationDao().insertAll(list.map { it.toConversation() })
+    assertEquals(2, roomDatabase.directMessageConversationDao().getPagingList(accountKey, limit = 20, offset = 0).size)
+    assertEquals(2, roomDatabase.directMessageConversationDao().getPagingListCount(accountKey))
+  }
+
+  @Test
+  fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
+    val cacheDatabase = CacheDatabaseImpl(roomDatabase)
+    val list = listOf(
+      mockIDirectMessage(accountId = accountKey.id, otherUserID = "other1")
+        .toUi(accountKey, mockIUser(id = "other1").toUi(accountKey)),
+      mockIDirectMessage(accountId = accountKey.id, otherUserID = "other2")
+        .toUi(accountKey, mockIUser(id = "other2").toUi(accountKey)),
+      mockIDirectMessage(accountId = accountKey.id, otherUserID = "other3")
+        .toUi(accountKey, mockIUser(id = "other3").toUi(accountKey)),
+    )
+    cacheDatabase.directMessageDao().insertAll(list)
+    cacheDatabase.directMessageConversationDao().insertAll(list.map { it.toConversation() })
+    val pagingSource = cacheDatabase.directMessageConversationDao().getPagingSource(
+      accountKey = accountKey,
+    )
+    val limit = 2
+    val result = pagingSource.load(params = PagingSource.LoadParams.Refresh(0, limit, false))
+    assert(result is PagingSource.LoadResult.Page)
+    assertEquals(limit, (result as PagingSource.LoadResult.Page).nextKey)
+    assertEquals(limit, result.data.size)
+
+    val loadMoreResult = pagingSource.load(params = PagingSource.LoadParams.Append(result.nextKey ?: 0, limit, false))
+    assert(loadMoreResult is PagingSource.LoadResult.Page)
+    assertEquals(null, (loadMoreResult as PagingSource.LoadResult.Page).nextKey)
+  }
+
+  @Test
+  fun getPagingSource_pagingSourceInvalidateAfterDbUpDate() = runBlocking {
+    val cacheDatabase = CacheDatabaseImpl(roomDatabase)
+    val conversation = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
+      .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)).toConversation()
+    var invalidate = false
+    cacheDatabase.directMessageConversationDao().getPagingSource(
+      accountKey = accountKey,
+    ).apply {
+      registerInvalidatedCallback {
+        invalidate = true
+      }
+      load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
     }
-
-    @Test
-    fun getPagingListCount_ReturnsCountMatchesQuery() = runBlocking {
-        val cacheDatabase = CacheDatabaseImpl(roomDatabase)
-        val list = listOf(
-            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other1")
-                .toUi(accountKey, mockIUser(id = "other1").toUi(accountKey)),
-            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other2")
-                .toUi(accountKey, mockIUser(id = "other2").toUi(accountKey)),
-            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other3")
-                .toUi(MicroBlogKey.twitter("Not included"), mockIUser(id = "other3").toUi(MicroBlogKey.twitter("Not included"))),
-        )
-        cacheDatabase.directMessageDao().insertAll(list)
-        cacheDatabase.directMessageConversationDao().insertAll(list.map { it.toConversation() })
-        assertEquals(2, roomDatabase.directMessageConversationDao().getPagingList(accountKey, limit = 20, offset = 0).size)
-        assertEquals(2, roomDatabase.directMessageConversationDao().getPagingListCount(accountKey))
+    cacheDatabase.directMessageConversationDao().insertAll(listOf(conversation))
+    val start = System.currentTimeMillis()
+    while (!invalidate && System.currentTimeMillis() - start < 3000) {
+      continue
     }
+    assert(invalidate)
+  }
 
-    @Test
-    fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
-        val cacheDatabase = CacheDatabaseImpl(roomDatabase)
-        val list = listOf(
-            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other1")
-                .toUi(accountKey, mockIUser(id = "other1").toUi(accountKey)),
-            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other2")
-                .toUi(accountKey, mockIUser(id = "other2").toUi(accountKey)),
-            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other3")
-                .toUi(accountKey, mockIUser(id = "other3").toUi(accountKey)),
-        )
-        cacheDatabase.directMessageDao().insertAll(list)
-        cacheDatabase.directMessageConversationDao().insertAll(list.map { it.toConversation() })
-        val pagingSource = cacheDatabase.directMessageConversationDao().getPagingSource(
-            accountKey = accountKey,
-        )
-        val limit = 2
-        val result = pagingSource.load(params = PagingSource.LoadParams.Refresh(0, limit, false))
-        assert(result is PagingSource.LoadResult.Page)
-        assertEquals(limit, (result as PagingSource.LoadResult.Page).nextKey)
-        assertEquals(limit, result.data.size)
-
-        val loadMoreResult = pagingSource.load(params = PagingSource.LoadParams.Append(result.nextKey ?: 0, limit, false))
-        assert(loadMoreResult is PagingSource.LoadResult.Page)
-        assertEquals(null, (loadMoreResult as PagingSource.LoadResult.Page).nextKey)
-    }
-
-    @Test
-    fun getPagingSource_pagingSourceInvalidateAfterDbUpDate() = runBlocking {
-        val cacheDatabase = CacheDatabaseImpl(roomDatabase)
-        val conversation = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
-            .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)).toConversation()
-        var invalidate = false
-        cacheDatabase.directMessageConversationDao().getPagingSource(
-            accountKey = accountKey,
-        ).apply {
-            registerInvalidatedCallback {
-                invalidate = true
-            }
-            load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
-        }
-        cacheDatabase.directMessageConversationDao().insertAll(listOf(conversation))
-        val start = System.currentTimeMillis()
-        while (!invalidate && System.currentTimeMillis() - start < 3000) {
-            continue
-        }
-        assert(invalidate)
-    }
-
-    @Test
-    fun findWithConversationKeyFlow() = runBlocking {
-        val cacheDatabase = CacheDatabaseImpl(roomDatabase)
-        val conversation = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
-            .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)).toConversation()
-        val conversationFlow = cacheDatabase.directMessageConversationDao().findWithConversationKeyFlow(
-            accountKey = accountKey,
-            conversationKey = conversation.conversationKey
-        )
-        assertNull(conversationFlow.firstOrNull())
-        cacheDatabase.directMessageConversationDao().insertAll(listOf(conversation))
-        assertEquals(conversation.conversationKey, conversationFlow.firstOrNull()?.conversationKey)
-    }
+  @Test
+  fun findWithConversationKeyFlow() = runBlocking {
+    val cacheDatabase = CacheDatabaseImpl(roomDatabase)
+    val conversation = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
+      .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)).toConversation()
+    val conversationFlow = cacheDatabase.directMessageConversationDao().findWithConversationKeyFlow(
+      accountKey = accountKey,
+      conversationKey = conversation.conversationKey
+    )
+    assertNull(conversationFlow.firstOrNull())
+    cacheDatabase.directMessageConversationDao().insertAll(listOf(conversation))
+    assertEquals(conversation.conversationKey, conversationFlow.firstOrNull()?.conversationKey)
+  }
 }

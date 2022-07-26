@@ -67,167 +67,167 @@ import com.twidere.twiderex.viewmodel.settings.LayoutViewModel
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LayoutScene() {
-    val account = LocalActiveAccount.current ?: return
-    val viewModel: LayoutViewModel = getViewModel()
-    val user by viewModel.user.observeAsState(initial = null)
-    val menuOrder by account.preferences.homeMenuOrder.collectAsState(
-        initial = HomeMenus.values().map { it to it.showDefault }
-    )
-    val menus =
-        menuOrder.filter { it.first.supportedPlatformType.contains(account.type) }.groupBy {
-            it.second
-        }.map {
-            listOf(
-                it.key
-            ) + it.value.map { it.first }
-        }.flatten().let {
-            if (it.firstOrNull() != true) {
-                listOf(true) + it
-            } else {
-                it
-            }
-        }.let {
-            if (!it.contains(false)) {
-                it + false
-            } else {
-                it
-            }
-        } as List<Any>
-    val menuState = rememberUpdatedState(newValue = menus)
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_layout_title))
-                    }
-                )
-            }
-        ) {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState()),
-            ) {
-                user?.let { user ->
-                    Surface(
-                        color = MaterialTheme.colors.primary,
-                    ) {
-                        ListItem(
-                            text = {
-                                Row {
-                                    UserName(user = user)
-                                    UserScreenName(user = user)
-                                }
-                            }
-                        )
-                    }
+  val account = LocalActiveAccount.current ?: return
+  val viewModel: LayoutViewModel = getViewModel()
+  val user by viewModel.user.observeAsState(initial = null)
+  val menuOrder by account.preferences.homeMenuOrder.collectAsState(
+    initial = HomeMenus.values().map { it to it.showDefault }
+  )
+  val menus =
+    menuOrder.filter { it.first.supportedPlatformType.contains(account.type) }.groupBy {
+      it.second
+    }.map {
+      listOf(
+        it.key
+      ) + it.value.map { it.first }
+    }.flatten().let {
+      if (it.firstOrNull() != true) {
+        listOf(true) + it
+      } else {
+        it
+      }
+    }.let {
+      if (!it.contains(false)) {
+        it + false
+      } else {
+        it
+      }
+    } as List<Any>
+  val menuState = rememberUpdatedState(newValue = menus)
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_layout_title))
+          }
+        )
+      }
+    ) {
+      Column(
+        modifier = Modifier
+          .verticalScroll(rememberScrollState()),
+      ) {
+        user?.let { user ->
+          Surface(
+            color = MaterialTheme.colors.primary,
+          ) {
+            ListItem(
+              text = {
+                Row {
+                  UserName(user = user)
+                  UserScreenName(user = user)
                 }
-                ListItem(
-                    text = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_layout_desc_title))
-                    },
-                    secondaryText = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_layout_desc_content))
-                    }
-                )
-                ReorderableColumn(
-                    data = menus,
-                    state = rememberReorderableColumnState { oldIndex, newIndex ->
-                        viewModel.updateHomeMenu(
-                            oldIndex,
-                            newIndex,
-                            menuState.value,
-                        )
-                    },
-                    dragingContent = {
-                        Card {
-                            LayoutItemContent(it = it, viewModel = viewModel, menus = menus)
-                        }
-                    }
-                ) {
-                    LayoutItemContent(it = it, viewModel = viewModel, menus = menus)
-                }
-            }
+              }
+            )
+          }
         }
+        ListItem(
+          text = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_layout_desc_title))
+          },
+          secondaryText = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_layout_desc_content))
+          }
+        )
+        ReorderableColumn(
+          data = menus,
+          state = rememberReorderableColumnState { oldIndex, newIndex ->
+            viewModel.updateHomeMenu(
+              oldIndex,
+              newIndex,
+              menuState.value,
+            )
+          },
+          dragingContent = {
+            Card {
+              LayoutItemContent(it = it, viewModel = viewModel, menus = menus)
+            }
+          }
+        ) {
+          LayoutItemContent(it = it, viewModel = viewModel, menus = menus)
+        }
+      }
     }
+  }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun LayoutItemContent(
-    it: Any,
-    viewModel: LayoutViewModel,
-    menus: List<Any>,
+  it: Any,
+  viewModel: LayoutViewModel,
+  menus: List<Any>,
 ) {
-    val current = menus.indexOf(it)
-    val falseIndex = menus.indexOf(false)
-    val visible = current < falseIndex
-    when (it) {
-        is Boolean -> {
-            ItemHeader {
-                Text(
-                    text = if (it) {
-                        stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_layout_actions_tabbar)
-                    } else {
-                        stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_layout_actions_drawer)
-                    }
-                )
-            }
-        }
-        is HomeMenus -> {
-            ListItem(
-                text = {
-                    Text(text = it.item.name())
-                },
-                icon = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        IconButton(
-                            onClick = {
-                                if (visible) {
-                                    viewModel.removeMenu(
-                                        current,
-                                        menus
-                                    )
-                                } else {
-                                    viewModel.addMenu(
-                                        current,
-                                        menus
-                                    )
-                                }
-                            }
-                        ) {
-                            Image(
-                                painter = painterResource(
-                                    res = if (visible) {
-                                        com.twidere.twiderex.MR.files.ic_delete_colored
-                                    } else {
-                                        com.twidere.twiderex.MR.files.ic_add_colored
-                                    }
-                                ),
-                                modifier = Modifier.size(24.dp),
-                                contentDescription = null,
-                            )
-                        }
-                        Icon(
-                            it.item.icon(),
-                            contentDescription = null,
-                            tint = MaterialTheme.colors.primary,
-                        )
-                    }
-                },
-                trailing = {
-                    CompositionLocalProvider(
-                        LocalContentAlpha provides ContentAlpha.medium
-                    ) {
-                        Icon(Icons.Default.Menu, contentDescription = null)
-                    }
-                }
-            )
-        }
+  val current = menus.indexOf(it)
+  val falseIndex = menus.indexOf(false)
+  val visible = current < falseIndex
+  when (it) {
+    is Boolean -> {
+      ItemHeader {
+        Text(
+          text = if (it) {
+            stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_layout_actions_tabbar)
+          } else {
+            stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_layout_actions_drawer)
+          }
+        )
+      }
     }
+    is HomeMenus -> {
+      ListItem(
+        text = {
+          Text(text = it.item.name())
+        },
+        icon = {
+          Row(
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            IconButton(
+              onClick = {
+                if (visible) {
+                  viewModel.removeMenu(
+                    current,
+                    menus
+                  )
+                } else {
+                  viewModel.addMenu(
+                    current,
+                    menus
+                  )
+                }
+              }
+            ) {
+              Image(
+                painter = painterResource(
+                  res = if (visible) {
+                    com.twidere.twiderex.MR.files.ic_delete_colored
+                  } else {
+                    com.twidere.twiderex.MR.files.ic_add_colored
+                  }
+                ),
+                modifier = Modifier.size(24.dp),
+                contentDescription = null,
+              )
+            }
+            Icon(
+              it.item.icon(),
+              contentDescription = null,
+              tint = MaterialTheme.colors.primary,
+            )
+          }
+        },
+        trailing = {
+          CompositionLocalProvider(
+            LocalContentAlpha provides ContentAlpha.medium
+          ) {
+            Icon(Icons.Default.Menu, contentDescription = null)
+          }
+        }
+      )
+    }
+  }
 }

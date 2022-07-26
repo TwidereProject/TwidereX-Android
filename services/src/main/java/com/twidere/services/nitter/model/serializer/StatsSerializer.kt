@@ -24,7 +24,7 @@ import moe.tlaster.hson.HtmlSerializer
 import org.jsoup.nodes.Element
 
 class StatsSerializer : HtmlSerializer<Int> {
-    override fun decode(element: Element, wholeText: String): Int {
-        return element.parent().wholeText().trim().replace(",", "").toInt()
-    }
+  override fun decode(element: Element, wholeText: String): Int {
+    return element.parent().wholeText().trim().replace(",", "").toInt()
+  }
 }

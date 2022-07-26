@@ -28,6 +28,6 @@ import com.twidere.twiderex.extensions.humanizedTimestamp
 
 @Composable
 fun HumanizedTime(time: Long) {
-    val text = remember(time) { time.humanizedTimestamp() }
-    Text(text = text)
+  val text = remember(time) { time.humanizedTimestamp() }
+  Text(text = text)
 }

@@ -25,25 +25,25 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TwitterUploadResponse(
-    @SerialName("media_id")
-    val mediaID: Long? = null,
+  @SerialName("media_id")
+  val mediaID: Long? = null,
 
-    @SerialName("media_id_string")
-    val mediaIDString: String? = null,
+  @SerialName("media_id_string")
+  val mediaIDString: String? = null,
 
-    @SerialName("expires_after_secs")
-    val expiresAfterSecs: Long? = null,
+  @SerialName("expires_after_secs")
+  val expiresAfterSecs: Long? = null,
 
-    @SerialName("processing_info")
-    val processingInfo: TwitterUploadProcessInfo? = null
+  @SerialName("processing_info")
+  val processingInfo: TwitterUploadProcessInfo? = null
 )
 
 @Serializable
 data class TwitterUploadProcessInfo(
-    @SerialName("check_after_secs")
-    val checkAfterSecs: Int? = null,
-    @SerialName("progress_percent")
-    val progressPercent: Int? = null,
-    @SerialName("state")
-    val state: String? = null
+  @SerialName("check_after_secs")
+  val checkAfterSecs: Int? = null,
+  @SerialName("progress_percent")
+  val progressPercent: Int? = null,
+  @SerialName("state")
+  val state: String? = null
 )

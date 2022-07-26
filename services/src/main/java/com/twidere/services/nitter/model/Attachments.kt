@@ -24,8 +24,8 @@ import com.twidere.services.nitter.model.serializer.UrlDecodeSerializer
 import moe.tlaster.hson.annotations.HtmlSerializable
 
 data class Attachments(
-    @HtmlSerializable("img", attr = "src", serializer = UrlDecodeSerializer::class)
-    val source: String?,
-    @HtmlSerializable("video", attr = "poster", serializer = UrlDecodeSerializer::class)
-    val videoCover: String?,
+  @HtmlSerializable("img", attr = "src", serializer = UrlDecodeSerializer::class)
+  val source: String?,
+  @HtmlSerializable("video", attr = "poster", serializer = UrlDecodeSerializer::class)
+  val videoCover: String?,
 )

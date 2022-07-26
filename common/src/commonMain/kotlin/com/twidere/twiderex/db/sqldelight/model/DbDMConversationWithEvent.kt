@@ -26,21 +26,21 @@ import com.twidere.twiderex.sqldelight.table.DbDMConversation
 import com.twidere.twiderex.sqldelight.table.DbDMEvent
 
 internal data class DbDMConversationWithEvent(
-    val event: DbDMEventWithAttachments,
-    val conversation: DbDMConversation
+  val event: DbDMEventWithAttachments,
+  val conversation: DbDMConversation
 ) {
-    companion object {
-        fun DbDMEvent.toDbDMConversationWithEvent(database: SqlDelightCacheDatabase): DbDMConversationWithEvent {
-            return withAttachments(database)
-                .let {
-                    DbDMConversationWithEvent(
-                        event = it,
-                        conversation = database.dMConversationQueries.findWithConversationKey(
-                            accountKey = it.event.accountKey,
-                            conversationKey = it.event.conversationKey
-                        ).executeAsOne()
-                    )
-                }
+  companion object {
+    fun DbDMEvent.toDbDMConversationWithEvent(database: SqlDelightCacheDatabase): DbDMConversationWithEvent {
+      return withAttachments(database)
+        .let {
+          DbDMConversationWithEvent(
+            event = it,
+            conversation = database.dMConversationQueries.findWithConversationKey(
+              accountKey = it.event.accountKey,
+              conversationKey = it.event.conversationKey
+            ).executeAsOne()
+          )
         }
     }
+  }
 }

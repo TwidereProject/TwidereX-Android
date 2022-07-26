@@ -24,14 +24,14 @@ import android.webkit.JavascriptInterface
 import moe.tlaster.precompose.navigation.NavController
 
 class TwitterWebJavascriptInterface(
-    val navController: NavController,
+  val navController: NavController,
 ) {
-    @JavascriptInterface
-    fun tryPinCode(content: String?) {
-        if (!content.isNullOrEmpty()) {
-            content.toIntOrNull()?.let {
-                navController.goBackWith(content)
-            }
-        }
+  @JavascriptInterface
+  fun tryPinCode(content: String?) {
+    if (!content.isNullOrEmpty()) {
+      content.toIntOrNull()?.let {
+        navController.goBackWith(content)
+      }
     }
+  }
 }

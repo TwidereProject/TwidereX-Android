@@ -29,39 +29,39 @@ import com.twidere.twiderex.model.enums.MediaType
 
 @Composable
 actual fun PlatformStatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
-    StatusMediaScene(statusKey = statusKey, selectedIndex = selectedIndex)
+  StatusMediaScene(statusKey = statusKey, selectedIndex = selectedIndex)
 }
 
 @Composable
 actual fun PlatformRawMediaScene(url: String, type: MediaType) {
-    RawMediaScene(url = url, type = type)
+  RawMediaScene(url = url, type = type)
 }
 
 @Composable
 actual fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
-    PureMediaScene(belongToKey = belongToKey, selectedIndex = selectedIndex)
+  PureMediaScene(belongToKey = belongToKey, selectedIndex = selectedIndex)
 }
 
 @Composable
 actual fun StatusMediaSceneLayout(
-    backgroundColor: Color,
-    contentColor: Color,
-    closeButton: @Composable () -> Unit,
-    bottomView: @Composable () -> Unit,
-    mediaView: @Composable () -> Unit,
-    backgroundView: @Composable () -> Unit,
+  backgroundColor: Color,
+  contentColor: Color,
+  closeButton: @Composable () -> Unit,
+  bottomView: @Composable () -> Unit,
+  mediaView: @Composable () -> Unit,
+  backgroundView: @Composable () -> Unit,
 ) {
-    InAppNotificationScaffold(
-        backgroundColor = backgroundColor,
-        contentColor = contentColor,
-        bottomBar = {
-            bottomView.invoke()
-        }
-    ) {
-        Box {
-            backgroundView.invoke()
-            mediaView.invoke()
-            closeButton.invoke()
-        }
+  InAppNotificationScaffold(
+    backgroundColor = backgroundColor,
+    contentColor = contentColor,
+    bottomBar = {
+      bottomView.invoke()
     }
+  ) {
+    Box {
+      backgroundView.invoke()
+      mediaView.invoke()
+      closeButton.invoke()
+    }
+  }
 }

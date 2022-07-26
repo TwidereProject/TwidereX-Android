@@ -40,92 +40,92 @@ import kotlinx.coroutines.flow.asSharedFlow
 
 @Composable
 actual fun RequestLocationPermission(
-    onPermissionGrantt: () -> Unit,
-    content: @Composable (launchRequest: () -> Unit) -> Unit,
+  onPermissionGrantt: () -> Unit,
+  content: @Composable (launchRequest: () -> Unit) -> Unit,
 ) {
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    @SuppressLint("MissingPermission")
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = {
-            if (it.all { it.value }) {
-                onPermissionGrantt()
-            } else {
-                context.launchAppSetting()
-            }
-        },
-    )
+  @SuppressLint("MissingPermission")
+  val permissionLauncher = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.RequestMultiplePermissions(),
+    onResult = {
+      if (it.all { it.value }) {
+        onPermissionGrantt()
+      } else {
+        context.launchAppSetting()
+      }
+    },
+  )
 
-    val launchLocationRequest = remember {
-        {
-            val permissions = arrayOf(
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-            permissionLauncher.launch(permissions)
-        }
+  val launchLocationRequest = remember {
+    {
+      val permissions = arrayOf(
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION
+      )
+      permissionLauncher.launch(permissions)
     }
-    content.invoke(launchLocationRequest)
+  }
+  content.invoke(launchLocationRequest)
 }
 
 actual class LocationProvider(
-    private val locationManager: LocationManager,
+  private val locationManager: LocationManager,
 ) : LocationListener {
-    private val _location = MutableStateFlow<Location?>(null)
-    actual val location: Flow<Location?>
-        get() = _location.asSharedFlow()
+  private val _location = MutableStateFlow<Location?>(null)
+  actual val location: Flow<Location?>
+    get() = _location.asSharedFlow()
 
-    private val _locationEnabled = MutableStateFlow<Boolean>(false)
-    actual val locationEnabled: Flow<Boolean>
-        get() = _locationEnabled.asSharedFlow()
+  private val _locationEnabled = MutableStateFlow<Boolean>(false)
+  actual val locationEnabled: Flow<Boolean>
+    get() = _locationEnabled.asSharedFlow()
 
-    @RequiresPermission(anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION])
-    actual fun enable() {
-        val criteria = Criteria()
-        criteria.accuracy = Criteria.ACCURACY_FINE
-        val provider = locationManager.getBestProvider(criteria, true) ?: return
-        locationManager.requestLocationUpdates(provider, 0, 0f, this)
-        locationManager.getCachedLocation()?.let {
-            _location.value = Location(
-                latitude = it.latitude,
-                longitude = it.longitude,
-            )
-        }
-        _locationEnabled.value = true
+  @RequiresPermission(anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION])
+  actual fun enable() {
+    val criteria = Criteria()
+    criteria.accuracy = Criteria.ACCURACY_FINE
+    val provider = locationManager.getBestProvider(criteria, true) ?: return
+    locationManager.requestLocationUpdates(provider, 0, 0f, this)
+    locationManager.getCachedLocation()?.let {
+      _location.value = Location(
+        latitude = it.latitude,
+        longitude = it.longitude,
+      )
     }
+    _locationEnabled.value = true
+  }
 
-    actual fun disable() {
-        _locationEnabled.value = false
-        locationManager.removeUpdates(this)
-    }
+  actual fun disable() {
+    _locationEnabled.value = false
+    locationManager.removeUpdates(this)
+  }
 
-    override fun onLocationChanged(p0: android.location.Location) {
-        _location.value = p0.let {
-            Location(
-                latitude = it.latitude,
-                longitude = it.longitude,
-            )
-        }
+  override fun onLocationChanged(p0: android.location.Location) {
+    _location.value = p0.let {
+      Location(
+        latitude = it.latitude,
+        longitude = it.longitude,
+      )
     }
+  }
 
-    // compatibility fix for Api < 22
-    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-    }
+  // compatibility fix for Api < 22
+  override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+  }
 }
 
 private fun LocationManager.getCachedLocation(): android.location.Location? {
-    var location: android.location.Location? = null
-    try {
-        location = getLastKnownLocation(LocationManager.GPS_PROVIDER)
-    } catch (ignore: SecurityException) {
-    }
+  var location: android.location.Location? = null
+  try {
+    location = getLastKnownLocation(LocationManager.GPS_PROVIDER)
+  } catch (ignore: SecurityException) {
+  }
 
-    if (location != null) return location
-    try {
-        location = getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-    } catch (ignore: SecurityException) {
-    }
+  if (location != null) return location
+  try {
+    location = getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+  } catch (ignore: SecurityException) {
+  }
 
-    return location
+  return location
 }

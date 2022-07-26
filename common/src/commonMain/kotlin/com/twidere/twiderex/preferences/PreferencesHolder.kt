@@ -31,17 +31,17 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 
 data class PreferencesHolder(
-    val appearancePreferences: DataStore<AppearancePreferences>,
-    val displayPreferences: DataStore<DisplayPreferences>,
-    val miscPreferences: DataStore<MiscPreferences>,
-    val notificationPreferences: DataStore<NotificationPreferences>,
+  val appearancePreferences: DataStore<AppearancePreferences>,
+  val displayPreferences: DataStore<DisplayPreferences>,
+  val miscPreferences: DataStore<MiscPreferences>,
+  val notificationPreferences: DataStore<NotificationPreferences>,
 ) {
-    suspend fun warmup() = coroutineScope {
-        awaitAll(
-            async { appearancePreferences.data.firstOrNull() },
-            async { displayPreferences.data.firstOrNull() },
-            async { miscPreferences.data.firstOrNull() },
-            async { notificationPreferences.data.firstOrNull() },
-        )
-    }
+  suspend fun warmup() = coroutineScope {
+    awaitAll(
+      async { appearancePreferences.data.firstOrNull() },
+      async { displayPreferences.data.firstOrNull() },
+      async { miscPreferences.data.firstOrNull() },
+      async { notificationPreferences.data.firstOrNull() },
+    )
+  }
 }

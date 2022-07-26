@@ -24,15 +24,15 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UiEmojiCategory(
-    val category: String?,
-    val emoji: List<UiEmoji>
+  val category: String?,
+  val emoji: List<UiEmoji>
 )
 
 @Serializable
 data class UiEmoji(
-    val shortcode: String? = null,
-    val url: String? = null,
-    val staticURL: String? = null,
-    val visibleInPicker: Boolean? = null,
-    val category: String? = null
+  val shortcode: String? = null,
+  val url: String? = null,
+  val staticURL: String? = null,
+  val visibleInPicker: Boolean? = null,
+  val category: String? = null
 )

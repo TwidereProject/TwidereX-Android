@@ -33,23 +33,23 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun HorizontalDivider(
-    modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colors.onSurface.copy(alpha = HorizontalDividerDefaults.DividerAlpha),
-    thickness: Dp = 1.dp,
-    startIndent: Dp = 0.dp
+  modifier: Modifier = Modifier,
+  color: Color = MaterialTheme.colors.onSurface.copy(alpha = HorizontalDividerDefaults.DividerAlpha),
+  thickness: Dp = 1.dp,
+  startIndent: Dp = 0.dp
 ) {
-    val indentMod = if (startIndent.value != 0f) {
-        Modifier.padding(start = startIndent)
-    } else {
-        Modifier
-    }
-    Box(
-        modifier.then(indentMod)
-            .width(thickness)
-            .background(color = color)
-    )
+  val indentMod = if (startIndent.value != 0f) {
+    Modifier.padding(start = startIndent)
+  } else {
+    Modifier
+  }
+  Box(
+    modifier.then(indentMod)
+      .width(thickness)
+      .background(color = color)
+  )
 }
 
 object HorizontalDividerDefaults {
-    const val DividerAlpha = 0.12f
+  const val DividerAlpha = 0.12f
 }

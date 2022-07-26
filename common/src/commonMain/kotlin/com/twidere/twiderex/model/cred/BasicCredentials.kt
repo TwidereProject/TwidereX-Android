@@ -24,6 +24,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BasicCredentials(
-    val username: String,
-    val password: String,
+  val username: String,
+  val password: String,
 ) : Credentials

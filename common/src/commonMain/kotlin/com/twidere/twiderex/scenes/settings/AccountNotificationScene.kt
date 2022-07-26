@@ -47,61 +47,61 @@ import org.koin.core.parameter.parametersOf
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AccountNotificationScene(
-    accountKey: MicroBlogKey,
+  accountKey: MicroBlogKey,
 ) {
-    val viewModel: AccountNotificationViewModel = getViewModel {
-        parametersOf(accountKey)
-    }
-    val account by viewModel.account.observeAsState(initial = null)
-    val enabled by viewModel.isNotificationEnabled.observeAsState(initial = true)
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_notification_title))
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                )
+  val viewModel: AccountNotificationViewModel = getViewModel {
+    parametersOf(accountKey)
+  }
+  val account by viewModel.account.observeAsState(initial = null)
+  val enabled by viewModel.isNotificationEnabled.observeAsState(initial = true)
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_notification_title))
+          },
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+        )
+      },
+    ) {
+      Column(
+        modifier = Modifier.verticalScroll(rememberScrollState())
+      ) {
+        account?.let {
+          ListItem(
+            modifier = Modifier.clickable {
+              viewModel.setIsNotificationEnabled(!enabled)
             },
-        ) {
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState())
-            ) {
-                account?.let {
-                    ListItem(
-                        modifier = Modifier.clickable {
-                            viewModel.setIsNotificationEnabled(!enabled)
-                        },
-                        text = {
-                            UserName(user = it.toUi())
-                        },
-                        secondaryText = {
-                            UserScreenName(user = it.toUi())
-                        },
-                        trailing = {
-                            ColoredSwitch(
-                                checked = enabled,
-                                onCheckedChange = {
-                                    viewModel.setIsNotificationEnabled(it)
-                                },
-                            )
-                        }
-                    )
-                }
-                AccountNotificationChannelDetail(
-                    enabled = enabled,
-                    accountKey = accountKey,
-                )
+            text = {
+              UserName(user = it.toUi())
+            },
+            secondaryText = {
+              UserScreenName(user = it.toUi())
+            },
+            trailing = {
+              ColoredSwitch(
+                checked = enabled,
+                onCheckedChange = {
+                  viewModel.setIsNotificationEnabled(it)
+                },
+              )
             }
+          )
         }
+        AccountNotificationChannelDetail(
+          enabled = enabled,
+          accountKey = accountKey,
+        )
+      }
     }
+  }
 }
 
 @Composable
 expect fun AccountNotificationChannelDetail(
-    enabled: Boolean,
-    accountKey: MicroBlogKey,
+  enabled: Boolean,
+  accountKey: MicroBlogKey,
 )

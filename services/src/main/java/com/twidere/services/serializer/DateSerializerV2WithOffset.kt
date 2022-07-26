@@ -34,15 +34,15 @@ import org.joda.time.DateTime
 @OptIn(ExperimentalSerializationApi::class)
 @Serializer(forClass = DateTime::class)
 internal object DateSerializerV2WithOffset : KSerializer<DateTime> {
-    override val descriptor: SerialDescriptor
-        get() = PrimitiveSerialDescriptor("DateTime", PrimitiveKind.STRING)
+  override val descriptor: SerialDescriptor
+    get() = PrimitiveSerialDescriptor("DateTime", PrimitiveKind.STRING)
 
-    override fun deserialize(decoder: Decoder): DateTime {
-        val str = decoder.decodeString()
-        return DateFormatUtils.parse(str)
-    }
+  override fun deserialize(decoder: Decoder): DateTime {
+    val str = decoder.decodeString()
+    return DateFormatUtils.parse(str)
+  }
 
-    override fun serialize(encoder: Encoder, value: DateTime) {
-        encoder.encodeString(DateFormatUtils.format(value))
-    }
+  override fun serialize(encoder: Encoder, value: DateTime) {
+    encoder.encodeString(DateFormatUtils.format(value))
+  }
 }

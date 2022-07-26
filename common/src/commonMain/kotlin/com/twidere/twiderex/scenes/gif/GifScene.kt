@@ -68,128 +68,128 @@ import com.twidere.twiderex.viewmodel.gif.GifViewModel
 
 @Composable
 fun GifScene() {
-    val viewModel = getViewModel<GifViewModel>()
-    val enable by viewModel.enable.collectAsState(initial = false)
-    val account = LocalActiveAccount.current
-    val navController = LocalNavController.current
-    val commitLoading by viewModel.commitLoading.collectAsState(initial = false)
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_gif_title))
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                viewModel.commit(
-                                    platform = account?.type ?: PlatformType.Twitter,
-                                    onSuccess = {
-                                        navController.goBackWith(it)
-                                    }
-                                )
-                            },
-                            enabled = enable
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Done,
-                                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_yes),
-                                tint = if (enable) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-                            )
-                        }
-                    }
+  val viewModel = getViewModel<GifViewModel>()
+  val enable by viewModel.enable.collectAsState(initial = false)
+  val account = LocalActiveAccount.current
+  val navController = LocalNavController.current
+  val commitLoading by viewModel.commitLoading.collectAsState(initial = false)
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_gif_title))
+          },
+          actions = {
+            IconButton(
+              onClick = {
+                viewModel.commit(
+                  platform = account?.type ?: PlatformType.Twitter,
+                  onSuccess = {
+                    navController.goBackWith(it)
+                  }
                 )
-            },
-        ) {
-            Box {
-                GifContent(viewModel = viewModel)
-                if (commitLoading) {
-                    LoadingView()
-                }
+              },
+              enabled = enable
+            ) {
+              Icon(
+                imageVector = Icons.Default.Done,
+                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_yes),
+                tint = if (enable) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+              )
             }
+          }
+        )
+      },
+    ) {
+      Box {
+        GifContent(viewModel = viewModel)
+        if (commitLoading) {
+          LoadingView()
         }
+      }
     }
+  }
 }
 
 @Composable
 fun LoadingView() {
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .clickable { }
-            .background(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)),
-        contentAlignment = Alignment.Center
-    ) {
-        LoadingProgress()
-    }
+  Box(
+    modifier = Modifier.fillMaxSize()
+      .clickable { }
+      .background(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)),
+    contentAlignment = Alignment.Center
+  ) {
+    LoadingProgress()
+  }
 }
 
 @Composable
 private fun GifContent(viewModel: GifViewModel) {
-    val searchInput by viewModel.input.collectAsState()
-    val searchState by viewModel.searchFlow.collectAsState(initial = null)
-    val searchSource = searchState?.collectAsLazyPagingItems()
-    val trendingSource = viewModel.trendSource.collectAsLazyPagingItems()
-    val selectedItem by viewModel.selectedItem.collectAsState(initial = null)
-    Column {
-        SearchInput(
-            input = searchInput,
-            onValueChanged = {
-                viewModel.input.value = it
-            }
-        )
-        Divider()
-        GifList(
-            data = if (searchInput.isNotEmpty() && searchSource != null) searchSource else trendingSource,
-            selectedItem = selectedItem,
-            onItemSelected = { viewModel.selectedItem.value = it }
-        )
-    }
+  val searchInput by viewModel.input.collectAsState()
+  val searchState by viewModel.searchFlow.collectAsState(initial = null)
+  val searchSource = searchState?.collectAsLazyPagingItems()
+  val trendingSource = viewModel.trendSource.collectAsLazyPagingItems()
+  val selectedItem by viewModel.selectedItem.collectAsState(initial = null)
+  Column {
+    SearchInput(
+      input = searchInput,
+      onValueChanged = {
+        viewModel.input.value = it
+      }
+    )
+    Divider()
+    GifList(
+      data = if (searchInput.isNotEmpty() && searchSource != null) searchSource else trendingSource,
+      selectedItem = selectedItem,
+      onItemSelected = { viewModel.selectedItem.value = it }
+    )
+  }
 }
 
 @Composable
 private fun SearchInput(modifier: Modifier = Modifier, input: String, onValueChanged: (value: String) -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.padding(
-            SearchInputDefaults.ContentPadding
-        )
-    ) {
-        Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
-            contentDescription = stringResource(
-                res = com.twidere.twiderex.MR.strings.scene_search_title
-            )
-        )
-        Spacer(modifier = Modifier.width(SearchInputDefaults.ContentSpacing))
-        TextInput(
-            value = input,
-            onValueChange = onValueChanged, modifier = Modifier.weight(1f),
-            placeholder = {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_gif_search))
-            },
-            maxLines = 1,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
-        )
-    }
+  Row(
+    verticalAlignment = Alignment.CenterVertically,
+    modifier = modifier.padding(
+      SearchInputDefaults.ContentPadding
+    )
+  ) {
+    Icon(
+      painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
+      contentDescription = stringResource(
+        res = com.twidere.twiderex.MR.strings.scene_search_title
+      )
+    )
+    Spacer(modifier = Modifier.width(SearchInputDefaults.ContentSpacing))
+    TextInput(
+      value = input,
+      onValueChange = onValueChanged, modifier = Modifier.weight(1f),
+      placeholder = {
+        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_gif_search))
+      },
+      maxLines = 1,
+      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+    )
+  }
 }
 
 private object SearchInputDefaults {
-    val ContentPadding = PaddingValues(16.dp)
-    val ContentSpacing = 16.dp
+  val ContentPadding = PaddingValues(16.dp)
+  val ContentSpacing = 16.dp
 }
 
 @Composable
 private fun GifList(data: LazyPagingItems<UiGif>, selectedItem: UiGif?, onItemSelected: (UiGif) -> Unit = {}) {
-    LazyUiGifList(
-        items = data,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        selectedItem = selectedItem,
-        onItemSelected = onItemSelected
-    )
+  LazyUiGifList(
+    items = data,
+    modifier = Modifier
+      .fillMaxSize()
+      .padding(16.dp),
+    selectedItem = selectedItem,
+    onItemSelected = onItemSelected
+  )
 }

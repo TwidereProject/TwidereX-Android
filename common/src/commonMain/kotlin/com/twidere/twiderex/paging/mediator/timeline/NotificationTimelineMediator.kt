@@ -28,29 +28,29 @@ import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 
 class NotificationTimelineMediator(
-    private val service: NotificationService,
-    private val addCursorIfNeed: suspend (PagingTimeLineWithStatus, accountKey: MicroBlogKey) -> Unit,
-    accountKey: MicroBlogKey,
-    database: CacheDatabase,
+  private val service: NotificationService,
+  private val addCursorIfNeed: suspend (PagingTimeLineWithStatus, accountKey: MicroBlogKey) -> Unit,
+  accountKey: MicroBlogKey,
+  database: CacheDatabase,
 ) : PagingWithGapMediator(accountKey, database) {
-    override suspend fun loadBetweenImpl(
-        pageSize: Int,
-        max_id: String?,
-        since_id: String?
-    ) = service.notificationTimeline(count = pageSize, max_id = max_id, since_id = since_id)
+  override suspend fun loadBetweenImpl(
+    pageSize: Int,
+    max_id: String?,
+    since_id: String?
+  ) = service.notificationTimeline(count = pageSize, max_id = max_id, since_id = since_id)
 
-    override suspend fun transform(
-        data: List<PagingTimeLineWithStatus>,
-        list: List<IStatus>
-    ): List<PagingTimeLineWithStatus> {
-        if (data.any()) {
-            addCursorIfNeed(
-                data.first(),
-                accountKey,
-            )
-        }
-        return super.transform(data, list)
+  override suspend fun transform(
+    data: List<PagingTimeLineWithStatus>,
+    list: List<IStatus>
+  ): List<PagingTimeLineWithStatus> {
+    if (data.any()) {
+      addCursorIfNeed(
+        data.first(),
+        accountKey,
+      )
     }
+    return super.transform(data, list)
+  }
 
-    override val pagingKey: String = "notification:$accountKey"
+  override val pagingKey: String = "notification:$accountKey"
 }

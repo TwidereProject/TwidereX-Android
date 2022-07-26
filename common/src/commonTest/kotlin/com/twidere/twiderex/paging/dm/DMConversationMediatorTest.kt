@@ -34,31 +34,31 @@ import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 
 internal class DMConversationMediatorTest {
-    private val accountKey = MicroBlogKey.twitter("123")
+  private val accountKey = MicroBlogKey.twitter("123")
 
-    private val mockDataBase = MockCacheDatabase()
+  private val mockDataBase = MockCacheDatabase()
 
-    private var mockService = MockDirectMessageService(accountKey)
+  private var mockService = MockDirectMessageService(accountKey)
 
-    @OptIn(ExperimentalPagingApi::class)
-    @Test
-    fun refresh_LoadReturnsSuccessResultWhenSuccess() = runBlocking {
-        val mediator = DMConversationMediator(mockDataBase, accountKey = accountKey) { mockService.getDirectMessages(it, 50) }
-        val pagingState = PagingState<Int, UiDMConversationWithLatestMessage>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
-        val result = mediator.load(LoadType.REFRESH, pagingState)
-        assert(result is RemoteMediator.MediatorResult.Success)
-        assert(!(result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
+  @OptIn(ExperimentalPagingApi::class)
+  @Test
+  fun refresh_LoadReturnsSuccessResultWhenSuccess() = runBlocking {
+    val mediator = DMConversationMediator(mockDataBase, accountKey = accountKey) { mockService.getDirectMessages(it, 50) }
+    val pagingState = PagingState<Int, UiDMConversationWithLatestMessage>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
+    val result = mediator.load(LoadType.REFRESH, pagingState)
+    assert(result is RemoteMediator.MediatorResult.Success)
+    assert(!(result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
+  }
+
+  @OptIn(ExperimentalPagingApi::class)
+  @Test
+  fun refresh_LoadReturnsErrorResultWhenErrorOccurs() = runBlocking {
+    mockService.errorMsg = "Throw test failure"
+    val mediator = DMConversationMediator(mockDataBase, accountKey = accountKey) {
+      mockService.getDirectMessages(it, 50)
     }
-
-    @OptIn(ExperimentalPagingApi::class)
-    @Test
-    fun refresh_LoadReturnsErrorResultWhenErrorOccurs() = runBlocking {
-        mockService.errorMsg = "Throw test failure"
-        val mediator = DMConversationMediator(mockDataBase, accountKey = accountKey) {
-            mockService.getDirectMessages(it, 50)
-        }
-        val pagingState = PagingState<Int, UiDMConversationWithLatestMessage>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
-        val result = mediator.load(LoadType.REFRESH, pagingState)
-        assert(result is RemoteMediator.MediatorResult.Error)
-    }
+    val pagingState = PagingState<Int, UiDMConversationWithLatestMessage>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
+    val result = mediator.load(LoadType.REFRESH, pagingState)
+    assert(result is RemoteMediator.MediatorResult.Error)
+  }
 }

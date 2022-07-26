@@ -28,28 +28,28 @@ import com.twidere.twiderex.jobs.dm.DirectMessageSendJob
 import com.twidere.twiderex.model.MicroBlogKey
 
 abstract class DirectMessageSendWorker(
-    context: Context,
-    workerParams: WorkerParameters,
-    private val directMessageSendJob: DirectMessageSendJob<*>,
+  context: Context,
+  workerParams: WorkerParameters,
+  private val directMessageSendJob: DirectMessageSendJob<*>,
 ) : CoroutineWorker(
-    context,
-    workerParams
+  context,
+  workerParams
 ) {
 
-    override suspend fun doWork(): Result {
-        val sendData = inputData.toDirectMessageSendData()
-        val accountKey = inputData.getString("accountKey")?.let {
-            MicroBlogKey.valueOf(it)
-        } ?: return Result.failure()
-        return try {
-            directMessageSendJob.execute(
-                sendData = sendData,
-                accountKey = accountKey
-            )
-            Result.success()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            Result.failure()
-        }
+  override suspend fun doWork(): Result {
+    val sendData = inputData.toDirectMessageSendData()
+    val accountKey = inputData.getString("accountKey")?.let {
+      MicroBlogKey.valueOf(it)
+    } ?: return Result.failure()
+    return try {
+      directMessageSendJob.execute(
+        sendData = sendData,
+        accountKey = accountKey
+      )
+      Result.success()
+    } catch (e: Throwable) {
+      e.printStackTrace()
+      Result.failure()
     }
+  }
 }

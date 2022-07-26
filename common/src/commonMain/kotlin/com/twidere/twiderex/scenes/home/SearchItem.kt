@@ -67,194 +67,194 @@ import org.koin.core.parameter.parametersOf
 
 class SearchItem : HomeNavigationItem() {
 
-    @Composable
-    override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_search_title)
-    override val route: String
-        get() = Root.Search.Home
+  @Composable
+  override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_search_title)
+  override val route: String
+    get() = Root.Search.Home
 
-    @Composable
-    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search)
+  @Composable
+  override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search)
 
-    override val withAppBar: Boolean
-        get() = false
+  override val withAppBar: Boolean
+    get() = false
 
-    @Composable
-    override fun Content() {
-        SearchSceneContent()
-    }
+  @Composable
+  override fun Content() {
+    SearchSceneContent()
+  }
 }
 
 @Composable
 fun SearchScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_title))
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    }
-                )
-            }
-        ) {
-            SearchSceneContent()
-        }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_title))
+          },
+          navigationIcon = {
+            AppBarNavigationButton()
+          }
+        )
+      }
+    ) {
+      SearchSceneContent()
     }
+  }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchSceneContent() {
-    val account = LocalActiveAccount.current ?: return
-    val viewModel: SearchInputViewModel = getViewModel {
-        parametersOf("")
-    }
-    val trendViewModel: TrendViewModel = getViewModel()
-    val source by viewModel.savedSource.observeAsState(initial = emptyList())
-    val trends = trendViewModel.source.collectAsLazyPagingItems()
-    val navigator = LocalNavigator.current
-    val searchCount = 3
-    val expandSearch by viewModel.expandSearch.observeAsState(false)
-    Scaffold(
-        topBar = {
-            AppBar(
-                title = {
-                    ProvideTextStyle(value = MaterialTheme.typography.body1) {
-                        Row(
-                            modifier = Modifier.clickable(
-                                onClick = {
-                                    navigator.searchInput()
-                                },
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() }
-                            )
-                        ) {
-                            CompositionLocalProvider(
-                                LocalContentAlpha provides ContentAlpha.medium
-                            ) {
-                                Text(
-                                    modifier = Modifier
-                                        .weight(1F)
-                                        .align(Alignment.CenterVertically),
-                                    text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_search_bar_placeholder),
-                                )
-                            }
-                            IconButton(
-                                onClick = {
-                                    navigator.searchInput()
-                                }
-                            ) {
-                                Icon(
-                                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
-                                    contentDescription = stringResource(
-                                        res = com.twidere.twiderex.MR.strings.scene_search_title
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
-            )
-        }
-    ) {
-        LazyColumn {
-            item {
-                if (source.isNotEmpty()) ListItem {
-                    Text(
-                        text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_saved_search),
-                        style = MaterialTheme.typography.button
-                    )
-                }
-            }
-            items(items = source.filterIndexed { index, _ -> index < searchCount || expandSearch }) {
-                ListItem(
-                    modifier = Modifier.clickable(
-                        onClick = {
-                            viewModel.addOrUpgrade(it.content)
-                            navigator.search(it.content)
-                        }
-                    ),
-                    trailing = {
-                        IconButton(
-                            onClick = {
-                                viewModel.remove(it)
-                            }
-                        ) {
-                            Icon(
-                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_trash_can),
-                                contentDescription = stringResource(
-                                    res = com.twidere.twiderex.MR.strings.common_controls_actions_remove
-                                )
-                            )
-                        }
-                    },
-                    text = {
-                        Text(
-                            text = it.content,
-                            style = MaterialTheme.typography.subtitle1
-                        )
-                    },
+  val account = LocalActiveAccount.current ?: return
+  val viewModel: SearchInputViewModel = getViewModel {
+    parametersOf("")
+  }
+  val trendViewModel: TrendViewModel = getViewModel()
+  val source by viewModel.savedSource.observeAsState(initial = emptyList())
+  val trends = trendViewModel.source.collectAsLazyPagingItems()
+  val navigator = LocalNavigator.current
+  val searchCount = 3
+  val expandSearch by viewModel.expandSearch.observeAsState(false)
+  Scaffold(
+    topBar = {
+      AppBar(
+        title = {
+          ProvideTextStyle(value = MaterialTheme.typography.body1) {
+            Row(
+              modifier = Modifier.clickable(
+                onClick = {
+                  navigator.searchInput()
+                },
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+              )
+            ) {
+              CompositionLocalProvider(
+                LocalContentAlpha provides ContentAlpha.medium
+              ) {
+                Text(
+                  modifier = Modifier
+                    .weight(1F)
+                    .align(Alignment.CenterVertically),
+                  text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_search_bar_placeholder),
                 )
-            }
-            item {
-                if (source.size > searchCount) ListItem(
-                    modifier = Modifier.clickable {
-                        viewModel.expandSearch.value = !expandSearch
-                    }
-                ) {
-                    Text(
-                        text = if (expandSearch) stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_less) else stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_more),
-                        style = MaterialTheme.typography.subtitle1,
-                        color = MaterialTheme.colors.primary
-                    )
+              }
+              IconButton(
+                onClick = {
+                  navigator.searchInput()
                 }
+              ) {
+                Icon(
+                  painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
+                  contentDescription = stringResource(
+                    res = com.twidere.twiderex.MR.strings.scene_search_title
+                  )
+                )
+              }
             }
-            if (trends.itemCount > 0) {
-                item {
-                    Column {
-                        Divider()
-                        ListItem {
-                            when (account.type) {
-                                PlatformType.Twitter ->
-                                    Text(
-                                        text = stringResource(res = com.twidere.twiderex.MR.strings.scene_trends_world_wide),
-                                        style = MaterialTheme.typography.button
-                                    )
-                                PlatformType.StatusNet -> TODO()
-                                PlatformType.Fanfou -> TODO()
-                                PlatformType.Mastodon ->
-                                    Text(
-                                        text = stringResource(res = com.twidere.twiderex.MR.strings.scene_trends_world_wide),
-                                        style = MaterialTheme.typography.button
-                                    )
-                            }
-                        }
-                    }
-                }
-            }
-            items(trends) {
-                it?.let { trend ->
-                    when (account.type) {
-                        PlatformType.Twitter -> TwitterTrendItem(
-                            trend = it,
-                            onClick = {
-                                viewModel.addOrUpgrade(trend.query)
-                                navigator.search(trend.query)
-                            }
-                        )
-                        PlatformType.StatusNet -> TODO()
-                        PlatformType.Fanfou -> TODO()
-                        PlatformType.Mastodon -> MastodonTrendItem(
-                            trend = it,
-                            onClick = {
-                                navigator.hashtag(it.query)
-                            }
-                        )
-                    }
-                }
-            }
+          }
         }
+      )
     }
+  ) {
+    LazyColumn {
+      item {
+        if (source.isNotEmpty()) ListItem {
+          Text(
+            text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_saved_search),
+            style = MaterialTheme.typography.button
+          )
+        }
+      }
+      items(items = source.filterIndexed { index, _ -> index < searchCount || expandSearch }) {
+        ListItem(
+          modifier = Modifier.clickable(
+            onClick = {
+              viewModel.addOrUpgrade(it.content)
+              navigator.search(it.content)
+            }
+          ),
+          trailing = {
+            IconButton(
+              onClick = {
+                viewModel.remove(it)
+              }
+            ) {
+              Icon(
+                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_trash_can),
+                contentDescription = stringResource(
+                  res = com.twidere.twiderex.MR.strings.common_controls_actions_remove
+                )
+              )
+            }
+          },
+          text = {
+            Text(
+              text = it.content,
+              style = MaterialTheme.typography.subtitle1
+            )
+          },
+        )
+      }
+      item {
+        if (source.size > searchCount) ListItem(
+          modifier = Modifier.clickable {
+            viewModel.expandSearch.value = !expandSearch
+          }
+        ) {
+          Text(
+            text = if (expandSearch) stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_less) else stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_more),
+            style = MaterialTheme.typography.subtitle1,
+            color = MaterialTheme.colors.primary
+          )
+        }
+      }
+      if (trends.itemCount > 0) {
+        item {
+          Column {
+            Divider()
+            ListItem {
+              when (account.type) {
+                PlatformType.Twitter ->
+                  Text(
+                    text = stringResource(res = com.twidere.twiderex.MR.strings.scene_trends_world_wide),
+                    style = MaterialTheme.typography.button
+                  )
+                PlatformType.StatusNet -> TODO()
+                PlatformType.Fanfou -> TODO()
+                PlatformType.Mastodon ->
+                  Text(
+                    text = stringResource(res = com.twidere.twiderex.MR.strings.scene_trends_world_wide),
+                    style = MaterialTheme.typography.button
+                  )
+              }
+            }
+          }
+        }
+      }
+      items(trends) {
+        it?.let { trend ->
+          when (account.type) {
+            PlatformType.Twitter -> TwitterTrendItem(
+              trend = it,
+              onClick = {
+                viewModel.addOrUpgrade(trend.query)
+                navigator.search(trend.query)
+              }
+            )
+            PlatformType.StatusNet -> TODO()
+            PlatformType.Fanfou -> TODO()
+            PlatformType.Mastodon -> MastodonTrendItem(
+              trend = it,
+              onClick = {
+                navigator.hashtag(it.query)
+              }
+            )
+          }
+        }
+      }
+    }
+  }
 }

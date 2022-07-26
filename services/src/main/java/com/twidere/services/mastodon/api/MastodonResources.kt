@@ -24,15 +24,15 @@ import com.twidere.services.mastodon.model.Emoji
 import retrofit2.http.GET
 
 interface MastodonResources :
-    TimelineResources,
-    LookupResources,
-    FriendshipResources,
-    AccountResources,
-    SearchResources,
-    StatusResources,
-    ListsResources,
-    TrendsResources {
+  TimelineResources,
+  LookupResources,
+  FriendshipResources,
+  AccountResources,
+  SearchResources,
+  StatusResources,
+  ListsResources,
+  TrendsResources {
 
-    @GET("/api/v1/custom_emojis")
-    suspend fun emojis(): List<Emoji>
+  @GET("/api/v1/custom_emojis")
+  suspend fun emojis(): List<Emoji>
 }

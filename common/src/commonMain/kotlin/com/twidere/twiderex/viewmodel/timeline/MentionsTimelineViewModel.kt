@@ -34,35 +34,35 @@ import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class MentionsTimelineViewModel(
-    dataStore: DataStore<Preferences>,
-    database: CacheDatabase,
-    notificationRepository: NotificationRepository,
-    private val accountRepository: AccountRepository,
+  dataStore: DataStore<Preferences>,
+  database: CacheDatabase,
+  notificationRepository: NotificationRepository,
+  private val accountRepository: AccountRepository,
 ) : TimelineViewModel(dataStore) {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    override val pagingMediator by lazy {
-        account.map {
-            MentionTimelineMediator(
-                service = it.service as TimelineService,
-                accountKey = it.accountKey,
-                database = database,
-                addCursorIfNeed = { data, accountKey ->
-                    notificationRepository.addCursorIfNeeded(
-                        accountKey,
-                        NotificationCursorType.Mentions,
-                        data.status.statusId,
-                        data.status.timestamp,
-                    )
-                }
-            )
-        }.asStateIn(viewModelScope, null)
-    }
-    override val savedStateKey by lazy {
-        account.map {
-            "${it.accountKey}_mentions"
-        }.asStateIn(viewModelScope, null)
-    }
+  override val pagingMediator by lazy {
+    account.map {
+      MentionTimelineMediator(
+        service = it.service as TimelineService,
+        accountKey = it.accountKey,
+        database = database,
+        addCursorIfNeed = { data, accountKey ->
+          notificationRepository.addCursorIfNeeded(
+            accountKey,
+            NotificationCursorType.Mentions,
+            data.status.statusId,
+            data.status.timestamp,
+          )
+        }
+      )
+    }.asStateIn(viewModelScope, null)
+  }
+  override val savedStateKey by lazy {
+    account.map {
+      "${it.accountKey}_mentions"
+    }.asStateIn(viewModelScope, null)
+  }
 }

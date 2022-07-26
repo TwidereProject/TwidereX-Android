@@ -25,22 +25,22 @@ import com.twidere.twiderex.sqldelight.SqlDelightCacheDatabase
 import com.twidere.twiderex.sqldelight.table.DbPagingTimeline
 
 internal data class DbPagingTimelineWithStatus(
-    val timeline: DbPagingTimeline,
-    val status: DbStatusWithAttachments,
+  val timeline: DbPagingTimeline,
+  val status: DbStatusWithAttachments,
 ) {
-    companion object {
-        fun DbPagingTimeline.withStatus(database: SqlDelightCacheDatabase) = DbPagingTimelineWithStatus(
-            timeline = this,
-            status = database.statusQueries
-                .findWithStatusKey(statusKey = statusKey)
-                .executeAsOne()
-                .withAttachments(database, accountKey = accountKey)
-        )
+  companion object {
+    fun DbPagingTimeline.withStatus(database: SqlDelightCacheDatabase) = DbPagingTimelineWithStatus(
+      timeline = this,
+      status = database.statusQueries
+        .findWithStatusKey(statusKey = statusKey)
+        .executeAsOne()
+        .withAttachments(database, accountKey = accountKey)
+    )
 
-        fun List<DbPagingTimeline>.saveToDb(database: SqlDelightCacheDatabase) {
-            database.transaction {
-                map { database.pagingTimelineQueries.insert(it) }
-            }
-        }
+    fun List<DbPagingTimeline>.saveToDb(database: SqlDelightCacheDatabase) {
+      database.transaction {
+        map { database.pagingTimelineQueries.insert(it) }
+      }
     }
+  }
 }

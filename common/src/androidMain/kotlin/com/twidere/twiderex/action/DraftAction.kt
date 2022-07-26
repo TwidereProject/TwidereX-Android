@@ -27,21 +27,21 @@ import com.twidere.twiderex.worker.draft.RemoveDraftWorker
 import com.twidere.twiderex.worker.draft.SaveDraftWorker
 
 actual class DraftAction(
-    private val workManager: WorkManager,
-    private val notificationManagerCompat: NotificationManagerCompat,
+  private val workManager: WorkManager,
+  private val notificationManagerCompat: NotificationManagerCompat,
 ) {
-    actual fun delete(id: String) {
-        workManager.beginWith(RemoveDraftWorker.create(id)).enqueue()
-        notificationManagerCompat.cancel(id.hashCode())
-    }
+  actual fun delete(id: String) {
+    workManager.beginWith(RemoveDraftWorker.create(id)).enqueue()
+    notificationManagerCompat.cancel(id.hashCode())
+  }
 
-    actual fun save(composeData: ComposeData) {
-        workManager
-            .beginWith(
-                SaveDraftWorker.create(
-                    composeData
-                )
-            )
-            .enqueue()
-    }
+  actual fun save(composeData: ComposeData) {
+    workManager
+      .beginWith(
+        SaveDraftWorker.create(
+          composeData
+        )
+      )
+      .enqueue()
+  }
 }

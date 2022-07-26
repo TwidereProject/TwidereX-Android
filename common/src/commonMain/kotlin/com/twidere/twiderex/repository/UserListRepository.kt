@@ -29,33 +29,33 @@ import com.twidere.twiderex.paging.source.FollowersPagingSource
 import com.twidere.twiderex.paging.source.FollowingPagingSource
 
 class UserListRepository {
-    fun following(
-        userKey: MicroBlogKey,
-        service: RelationshipService,
-    ) = Pager(
-        config = PagingConfig(
-            pageSize = defaultLoadCount,
-            enablePlaceholders = false,
-        )
-    ) {
-        FollowingPagingSource(
-            userKey = userKey,
-            service = service,
-        )
-    }.flow
+  fun following(
+    userKey: MicroBlogKey,
+    service: RelationshipService,
+  ) = Pager(
+    config = PagingConfig(
+      pageSize = defaultLoadCount,
+      enablePlaceholders = false,
+    )
+  ) {
+    FollowingPagingSource(
+      userKey = userKey,
+      service = service,
+    )
+  }.flow
 
-    fun followers(
-        userKey: MicroBlogKey,
-        service: RelationshipService
-    ) = Pager(
-        config = PagingConfig(
-            pageSize = defaultLoadCount,
-            enablePlaceholders = false,
-        )
-    ) {
-        FollowersPagingSource(
-            userKey = userKey,
-            service = service,
-        )
-    }.flow
+  fun followers(
+    userKey: MicroBlogKey,
+    service: RelationshipService
+  ) = Pager(
+    config = PagingConfig(
+      pageSize = defaultLoadCount,
+      enablePlaceholders = false,
+    )
+  ) {
+    FollowersPagingSource(
+      userKey = userKey,
+      service = service,
+    )
+  }.flow
 }

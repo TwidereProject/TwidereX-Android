@@ -28,102 +28,102 @@ import android.hardware.SensorManager
 import kotlin.math.PI
 
 actual class OrientationSensorManager(
-    private val context: Context,
+  private val context: Context,
 ) : SensorEventListener {
-    private val sensorManager by lazy {
-        context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-    }
-    private val accelerometerReading = FloatArray(3)
-    private val magnetometerReading = FloatArray(3)
-    private val rotationMatrix = FloatArray(9)
-    private val currentOrientationValues = FloatArray(3)
-    private var originValues = floatArrayOf(0f, 0f, 0f)
-    private var hasOriginInit = false
+  private val sensorManager by lazy {
+    context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+  }
+  private val accelerometerReading = FloatArray(3)
+  private val magnetometerReading = FloatArray(3)
+  private val rotationMatrix = FloatArray(9)
+  private val currentOrientationValues = FloatArray(3)
+  private var originValues = floatArrayOf(0f, 0f, 0f)
+  private var hasOriginInit = false
 
-    init {
-        sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)?.also { accelerometer ->
-            sensorManager.registerListener(
-                this,
-                accelerometer,
-                SensorManager.SENSOR_DELAY_NORMAL,
-                SensorManager.SENSOR_DELAY_UI
-            )
-        }
-        sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)?.also { magneticField ->
-            sensorManager.registerListener(
-                this,
-                magneticField,
-                SensorManager.SENSOR_DELAY_NORMAL,
-                SensorManager.SENSOR_DELAY_UI
-            )
-        }
+  init {
+    sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)?.also { accelerometer ->
+      sensorManager.registerListener(
+        this,
+        accelerometer,
+        SensorManager.SENSOR_DELAY_NORMAL,
+        SensorManager.SENSOR_DELAY_UI
+      )
     }
-
-    override fun onSensorChanged(event: SensorEvent) {
-        when (event.sensor.type) {
-            Sensor.TYPE_ACCELEROMETER -> {
-                System.arraycopy(
-                    event.values,
-                    0,
-                    accelerometerReading,
-                    0,
-                    accelerometerReading.size
-                )
-            }
-            Sensor.TYPE_MAGNETIC_FIELD -> {
-                System.arraycopy(event.values, 0, magnetometerReading, 0, magnetometerReading.size)
-            }
-            else -> return
-        }
-        updateOrientationAngles()
+    sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)?.also { magneticField ->
+      sensorManager.registerListener(
+        this,
+        magneticField,
+        SensorManager.SENSOR_DELAY_NORMAL,
+        SensorManager.SENSOR_DELAY_UI
+      )
     }
+  }
 
-    private fun updateOrientationAngles() {
-        // Update rotation matrix, which is needed to update orientation angles.
-        val rotationOk = SensorManager.getRotationMatrix(
-            rotationMatrix,
-            null,
-            accelerometerReading,
-            magnetometerReading
+  override fun onSensorChanged(event: SensorEvent) {
+    when (event.sensor.type) {
+      Sensor.TYPE_ACCELEROMETER -> {
+        System.arraycopy(
+          event.values,
+          0,
+          accelerometerReading,
+          0,
+          accelerometerReading.size
         )
-
-        // "mRotationMatrix" now has up-to-date information.
-        if (rotationOk) {
-            SensorManager.getOrientation(rotationMatrix, currentOrientationValues)
-            // "mOrientationAngles" now has up-to-date information.
-            if (!hasOriginInit) {
-                originValues[0] = toDegree(currentOrientationValues[0])
-                originValues[1] = toDegree(currentOrientationValues[1])
-                originValues[2] = toDegree(currentOrientationValues[2])
-                hasOriginInit = true
-            }
-            dispatchOrientationChanged()
-        }
+      }
+      Sensor.TYPE_MAGNETIC_FIELD -> {
+        System.arraycopy(event.values, 0, magnetometerReading, 0, magnetometerReading.size)
+      }
+      else -> return
     }
+    updateOrientationAngles()
+  }
 
-    private fun toDegree(origin: Float): Float {
-        return origin / PI.toFloat() * 180
+  private fun updateOrientationAngles() {
+    // Update rotation matrix, which is needed to update orientation angles.
+    val rotationOk = SensorManager.getRotationMatrix(
+      rotationMatrix,
+      null,
+      accelerometerReading,
+      magnetometerReading
+    )
+
+    // "mRotationMatrix" now has up-to-date information.
+    if (rotationOk) {
+      SensorManager.getOrientation(rotationMatrix, currentOrientationValues)
+      // "mOrientationAngles" now has up-to-date information.
+      if (!hasOriginInit) {
+        originValues[0] = toDegree(currentOrientationValues[0])
+        originValues[1] = toDegree(currentOrientationValues[1])
+        originValues[2] = toDegree(currentOrientationValues[2])
+        hasOriginInit = true
+      }
+      dispatchOrientationChanged()
     }
+  }
 
-    private fun dispatchOrientationChanged() {
-        // change current to degree
-        onOrientationChangedListener?.invoke(
-            originValues,
-            currentOrientationValues.apply {
-                this[0] = toDegree(this[0])
-                this[1] = toDegree(this[1])
-                this[2] = toDegree(this[2])
-            }
-        )
-    }
+  private fun toDegree(origin: Float): Float {
+    return origin / PI.toFloat() * 180
+  }
 
-    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
-        // do nothing
-    }
+  private fun dispatchOrientationChanged() {
+    // change current to degree
+    onOrientationChangedListener?.invoke(
+      originValues,
+      currentOrientationValues.apply {
+        this[0] = toDegree(this[0])
+        this[1] = toDegree(this[1])
+        this[2] = toDegree(this[2])
+      }
+    )
+  }
 
-    actual fun release() {
-        sensorManager.unregisterListener(this)
-    }
+  override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
+    // do nothing
+  }
 
-    actual var onOrientationChangedListener: ((originValues: FloatArray, currentValues: FloatArray) -> Unit)? = null
+  actual fun release() {
+    sensorManager.unregisterListener(this)
+  }
+
+  actual var onOrientationChangedListener: ((originValues: FloatArray, currentValues: FloatArray) -> Unit)? = null
 }

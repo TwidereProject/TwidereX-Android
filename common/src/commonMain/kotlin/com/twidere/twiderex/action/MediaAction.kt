@@ -23,6 +23,6 @@ package com.twidere.twiderex.action
 import com.twidere.twiderex.model.MicroBlogKey
 
 expect class MediaAction {
-    fun download(source: String, target: String, accountKey: MicroBlogKey)
-    fun share(source: String, fileName: String, accountKey: MicroBlogKey, extraText: String = "")
+  fun download(source: String, target: String, accountKey: MicroBlogKey)
+  fun share(source: String, fileName: String, accountKey: MicroBlogKey, extraText: String = "")
 }

@@ -21,6 +21,6 @@
 package com.twidere.twiderex.model.kmp
 
 data class Location(
-    val latitude: Double,
-    val longitude: Double,
+  val latitude: Double,
+  val longitude: Double,
 )

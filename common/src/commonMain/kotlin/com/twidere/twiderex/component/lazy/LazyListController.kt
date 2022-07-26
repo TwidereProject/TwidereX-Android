@@ -23,18 +23,18 @@ package com.twidere.twiderex.component.lazy
 import androidx.compose.foundation.lazy.LazyListState
 
 class LazyListController {
-    var listState: LazyListState? = null
+  var listState: LazyListState? = null
 
-    companion object {
-        const val SMOOTH_THRESHOLD = 5
-    }
+  companion object {
+    const val SMOOTH_THRESHOLD = 5
+  }
 
-    suspend fun scrollToTop() {
-        listState?.run {
-            if (firstVisibleItemIndex > SMOOTH_THRESHOLD) {
-                scrollToItem(SMOOTH_THRESHOLD)
-            }
-            animateScrollToItem(0)
-        }
+  suspend fun scrollToTop() {
+    listState?.run {
+      if (firstVisibleItemIndex > SMOOTH_THRESHOLD) {
+        scrollToItem(SMOOTH_THRESHOLD)
+      }
+      animateScrollToItem(0)
     }
+  }
 }

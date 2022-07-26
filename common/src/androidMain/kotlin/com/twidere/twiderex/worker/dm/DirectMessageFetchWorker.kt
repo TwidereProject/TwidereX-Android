@@ -28,24 +28,24 @@ import com.twidere.twiderex.jobs.dm.DirectMessageFetchJob
 import java.util.concurrent.TimeUnit
 
 class DirectMessageFetchWorker(
-    context: Context,
-    workerParams: WorkerParameters,
-    private val directMessageFetchJob: DirectMessageFetchJob
+  context: Context,
+  workerParams: WorkerParameters,
+  private val directMessageFetchJob: DirectMessageFetchJob
 ) : CoroutineWorker(
-    context,
-    workerParams
+  context,
+  workerParams
 ) {
-    companion object {
-        fun createRepeatableWorker() = PeriodicWorkRequestBuilder<DirectMessageFetchWorker>(15, TimeUnit.MINUTES)
-            .build()
-    }
+  companion object {
+    fun createRepeatableWorker() = PeriodicWorkRequestBuilder<DirectMessageFetchWorker>(15, TimeUnit.MINUTES)
+      .build()
+  }
 
-    override suspend fun doWork(): Result {
-        try {
-            directMessageFetchJob.execute()
-        } catch (e: Throwable) {
-            // no need to handle this error
-        }
-        return Result.success()
+  override suspend fun doWork(): Result {
+    try {
+      directMessageFetchJob.execute()
+    } catch (e: Throwable) {
+      // no need to handle this error
     }
+    return Result.success()
+  }
 }

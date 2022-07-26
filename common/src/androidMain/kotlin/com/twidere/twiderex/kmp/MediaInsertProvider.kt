@@ -31,39 +31,39 @@ import kotlinx.coroutines.coroutineScope
 
 actual class MediaInsertProvider(private val context: Context) {
 
-    actual suspend fun provideUiMediaInsert(filePath: String): UiMediaInsert {
-        val androidUri = filePath.toUri(context)
-        val type = (context.contentResolver.getType(androidUri) ?: "image/*").let {
-            when {
-                it.startsWith("video") -> MediaType.video
-                it == "image/gif" -> MediaType.animated_gif
-                else -> MediaType.photo
-            }
-        }
-        return UiMediaInsert(
-            filePath = androidUri.toString(),
-            preview = if (type == MediaType.video) getVideoThumbnail(androidUri) ?: androidUri.toString() else androidUri.toString(),
-            type = type,
-        )
+  actual suspend fun provideUiMediaInsert(filePath: String): UiMediaInsert {
+    val androidUri = filePath.toUri(context)
+    val type = (context.contentResolver.getType(androidUri) ?: "image/*").let {
+      when {
+        it.startsWith("video") -> MediaType.video
+        it == "image/gif" -> MediaType.animated_gif
+        else -> MediaType.photo
+      }
     }
+    return UiMediaInsert(
+      filePath = androidUri.toString(),
+      preview = if (type == MediaType.video) getVideoThumbnail(androidUri) ?: androidUri.toString() else androidUri.toString(),
+      type = type,
+    )
+  }
 
-    private suspend fun getVideoThumbnail(uri: Uri): Bitmap? {
-        return coroutineScope {
-            var bitmap: Bitmap? = null
-            var mediaMetadataRetriever: MediaMetadataRetriever? = null
-            try {
-                mediaMetadataRetriever = MediaMetadataRetriever()
-                mediaMetadataRetriever.setDataSource(context, uri)
-                bitmap = mediaMetadataRetriever.getFrameAtTime(
-                    1000,
-                    MediaMetadataRetriever.OPTION_CLOSEST_SYNC
-                )
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                mediaMetadataRetriever?.release()
-            }
-            bitmap
-        }
+  private suspend fun getVideoThumbnail(uri: Uri): Bitmap? {
+    return coroutineScope {
+      var bitmap: Bitmap? = null
+      var mediaMetadataRetriever: MediaMetadataRetriever? = null
+      try {
+        mediaMetadataRetriever = MediaMetadataRetriever()
+        mediaMetadataRetriever.setDataSource(context, uri)
+        bitmap = mediaMetadataRetriever.getFrameAtTime(
+          1000,
+          MediaMetadataRetriever.OPTION_CLOSEST_SYNC
+        )
+      } catch (e: Exception) {
+        e.printStackTrace()
+      } finally {
+        mediaMetadataRetriever?.release()
+      }
+      bitmap
     }
+  }
 }

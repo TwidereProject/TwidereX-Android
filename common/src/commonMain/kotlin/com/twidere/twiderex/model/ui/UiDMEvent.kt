@@ -23,33 +23,33 @@ package com.twidere.twiderex.model.ui
 import com.twidere.twiderex.model.MicroBlogKey
 
 data class UiDMEvent(
-    val accountKey: MicroBlogKey,
-    val sortId: Long,
-    // message
-    val conversationKey: MicroBlogKey,
-    val messageId: String,
-    val messageKey: MicroBlogKey,
-    // include hash tag in this parameter
-    val htmlText: String,
-    val originText: String,
-    val createdTimestamp: Long,
-    val messageType: String,
-    val senderAccountKey: MicroBlogKey,
-    val recipientAccountKey: MicroBlogKey,
-    val sendStatus: SendStatus,
-    val media: List<UiMedia>,
-    val urlEntity: List<UiUrlEntity>,
-    val sender: UiUser
+  val accountKey: MicroBlogKey,
+  val sortId: Long,
+  // message
+  val conversationKey: MicroBlogKey,
+  val messageId: String,
+  val messageKey: MicroBlogKey,
+  // include hash tag in this parameter
+  val htmlText: String,
+  val originText: String,
+  val createdTimestamp: Long,
+  val messageType: String,
+  val senderAccountKey: MicroBlogKey,
+  val recipientAccountKey: MicroBlogKey,
+  val sendStatus: SendStatus,
+  val media: List<UiMedia>,
+  val urlEntity: List<UiUrlEntity>,
+  val sender: UiUser
 ) {
-    val isInCome: Boolean
-        get() = recipientAccountKey == accountKey
+  val isInCome: Boolean
+    get() = recipientAccountKey == accountKey
 
-    val conversationUserKey: MicroBlogKey
-        get() = if (accountKey == senderAccountKey) recipientAccountKey else senderAccountKey
+  val conversationUserKey: MicroBlogKey
+    get() = if (accountKey == senderAccountKey) recipientAccountKey else senderAccountKey
 
-    enum class SendStatus {
-        PENDING,
-        SUCCESS,
-        FAILED
-    }
+  enum class SendStatus {
+    PENDING,
+    SUCCESS,
+    FAILED
+  }
 }

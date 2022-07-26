@@ -39,41 +39,41 @@ import com.twidere.twiderex.viewmodel.mastodon.MastodonSearchHashtagViewModel
 import org.koin.core.parameter.parametersOf
 
 class MastodonSearchHashtagItem : SearchSceneItem {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_search_tabs_hashtag)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_search_tabs_hashtag)
+  }
 
-    @OptIn(ExperimentalMaterialApi::class)
-    @Composable
-    override fun Content(keyword: String) {
-        val viewModel: MastodonSearchHashtagViewModel = getViewModel {
-            parametersOf(keyword)
-        }
-        val source = viewModel.source.collectAsLazyPagingItems()
-        val navigator = LocalNavigator.current
-        SwipeToRefreshLayout(
-            refreshingState = source.loadState.refresh is LoadState.Loading,
-            onRefresh = {
-                source.refreshOrRetry()
-            }
-        ) {
-            if (source.itemCount > 0) {
-                LazyColumn {
-                    items(source) {
-                        it?.name?.let { name ->
-                            ListItem(
-                                modifier = Modifier
-                                    .clickable {
-                                        navigator.hashtag(name)
-                                    }
-                            ) {
-                                Text(text = name)
-                            }
-                        }
-                    }
-                }
-            }
-        }
+  @OptIn(ExperimentalMaterialApi::class)
+  @Composable
+  override fun Content(keyword: String) {
+    val viewModel: MastodonSearchHashtagViewModel = getViewModel {
+      parametersOf(keyword)
     }
+    val source = viewModel.source.collectAsLazyPagingItems()
+    val navigator = LocalNavigator.current
+    SwipeToRefreshLayout(
+      refreshingState = source.loadState.refresh is LoadState.Loading,
+      onRefresh = {
+        source.refreshOrRetry()
+      }
+    ) {
+      if (source.itemCount > 0) {
+        LazyColumn {
+          items(source) {
+            it?.name?.let { name ->
+              ListItem(
+                modifier = Modifier
+                  .clickable {
+                    navigator.hashtag(name)
+                  }
+              ) {
+                Text(text = name)
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

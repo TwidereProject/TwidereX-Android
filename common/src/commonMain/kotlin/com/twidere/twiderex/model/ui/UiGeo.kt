@@ -21,7 +21,7 @@
 package com.twidere.twiderex.model.ui
 
 data class UiGeo(
-    val name: String,
-    val lat: Long? = null,
-    val long: Long? = null,
+  val name: String,
+  val lat: Long? = null,
+  val long: Long? = null,
 )

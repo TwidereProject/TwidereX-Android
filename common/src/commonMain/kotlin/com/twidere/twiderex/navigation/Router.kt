@@ -33,21 +33,21 @@ import moe.tlaster.precompose.navigation.rememberNavController
 
 @Composable
 fun Router(
-    navController: NavController = rememberNavController(),
-    isDebug: Boolean = false
+  navController: NavController = rememberNavController(),
+  isDebug: Boolean = false
 ) {
-    val remoteNavigator = LocalRemoteNavigator.current
-    CompositionLocalProvider(
-        LocalNavController provides navController,
-        LocalNavigator provides Navigator(navController, remoteNavigator),
-    ) {
-        BoxWithConstraints {
-            NavHost(navController = navController, initialRoute = initialRoute) {
-                route(constraints)
-            }
-        }
-        if (isDebug) {
-            ComposeDebugTool(navController)
-        }
+  val remoteNavigator = LocalRemoteNavigator.current
+  CompositionLocalProvider(
+    LocalNavController provides navController,
+    LocalNavigator provides Navigator(navController, remoteNavigator),
+  ) {
+    BoxWithConstraints {
+      NavHost(navController = navController, initialRoute = initialRoute) {
+        route(constraints)
+      }
     }
+    if (isDebug) {
+      ComposeDebugTool(navController)
+    }
+  }
 }

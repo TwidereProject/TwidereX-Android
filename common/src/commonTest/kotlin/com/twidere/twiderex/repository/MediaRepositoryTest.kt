@@ -28,12 +28,12 @@ import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 
 internal class MediaRepositoryTest {
-    @Test
-    fun findMediasWithBelongToKey() = runBlocking {
-        val repository = MediaRepository(
-            MockCacheDatabase().apply { (mediaDao() as MockMediaDao).initData(listOf(mockUiMedia("test", MicroBlogKey.twitter("account")))) }
-        )
-        val result = repository.findMediaByBelongToKey(MicroBlogKey.twitter("account"))
-        assert(result.isNotEmpty())
-    }
+  @Test
+  fun findMediasWithBelongToKey() = runBlocking {
+    val repository = MediaRepository(
+      MockCacheDatabase().apply { (mediaDao() as MockMediaDao).initData(listOf(mockUiMedia("test", MicroBlogKey.twitter("account")))) }
+    )
+    val result = repository.findMediaByBelongToKey(MicroBlogKey.twitter("account"))
+    assert(result.isNotEmpty())
+  }
 }

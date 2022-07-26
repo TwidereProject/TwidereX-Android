@@ -27,18 +27,18 @@ import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
 import kotlinx.coroutines.flow.Flow
 
 interface DirectMessageConversationDao {
-    fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiDMConversationWithLatestMessage>
-    fun findWithConversationKeyFlow(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey
-    ): Flow<UiDMConversation?>
+  fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiDMConversationWithLatestMessage>
+  fun findWithConversationKeyFlow(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey
+  ): Flow<UiDMConversation?>
 
-    suspend fun findWithConversationKey(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey
-    ): UiDMConversation?
+  suspend fun findWithConversationKey(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey
+  ): UiDMConversation?
 
-    suspend fun insertAll(listOf: List<UiDMConversation>)
-    suspend fun find(accountKey: MicroBlogKey): List<UiDMConversationWithLatestMessage>
-    suspend fun delete(conversation: UiDMConversation)
+  suspend fun insertAll(listOf: List<UiDMConversation>)
+  suspend fun find(accountKey: MicroBlogKey): List<UiDMConversationWithLatestMessage>
+  suspend fun delete(conversation: UiDMConversation)
 }

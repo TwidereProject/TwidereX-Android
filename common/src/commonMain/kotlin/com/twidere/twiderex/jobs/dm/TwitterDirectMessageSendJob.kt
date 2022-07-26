@@ -35,59 +35,59 @@ import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.repository.AccountRepository
 
 class TwitterDirectMessageSendJob(
-    accountRepository: AccountRepository,
-    notificationManager: AppNotificationManager,
-    fileResolver: FileResolver,
-    cacheDatabase: CacheDatabase,
-    resLoader: ResLoader,
+  accountRepository: AccountRepository,
+  notificationManager: AppNotificationManager,
+  fileResolver: FileResolver,
+  cacheDatabase: CacheDatabase,
+  resLoader: ResLoader,
 ) : DirectMessageSendJob<TwitterService>(
-    cacheDatabase,
-    accountRepository,
-    notificationManager,
-    fileResolver,
-    resLoader,
+  cacheDatabase,
+  accountRepository,
+  notificationManager,
+  fileResolver,
+  resLoader,
 ) {
 
-    override suspend fun sendMessage(
-        service: TwitterService,
-        sendData: DirectMessageSendData,
-        mediaIds: ArrayList<String>
-    ): UiDMEvent = service.sendDirectMessage(
-        recipientId = sendData.recipientUserKey.id,
-        text = sendData.text,
-        attachmentType = "media",
-        mediaId = mediaIds.firstOrNull()
-    )?.toUi(
-        accountKey = sendData.accountKey,
-        sender = lookUpUser(cacheDatabase, sendData.accountKey, service)
-    ) ?: throw Error()
+  override suspend fun sendMessage(
+    service: TwitterService,
+    sendData: DirectMessageSendData,
+    mediaIds: ArrayList<String>
+  ): UiDMEvent = service.sendDirectMessage(
+    recipientId = sendData.recipientUserKey.id,
+    text = sendData.text,
+    attachmentType = "media",
+    mediaId = mediaIds.firstOrNull()
+  )?.toUi(
+    accountKey = sendData.accountKey,
+    sender = lookUpUser(cacheDatabase, sendData.accountKey, service)
+  ) ?: throw Error()
 
-    private suspend fun lookUpUser(database: CacheDatabase, userKey: MicroBlogKey, service: TwitterService): UiUser {
-        return database.userDao().findWithUserKey(userKey) ?: let {
-            val user = (service as LookupService).lookupUser(userKey.id)
-                .toUi(userKey)
-            database.userDao().insertAll(listOf(user))
-            user
-        }
+  private suspend fun lookUpUser(database: CacheDatabase, userKey: MicroBlogKey, service: TwitterService): UiUser {
+    return database.userDao().findWithUserKey(userKey) ?: let {
+      val user = (service as LookupService).lookupUser(userKey.id)
+        .toUi(userKey)
+      database.userDao().insertAll(listOf(user))
+      user
     }
+  }
 
-    override suspend fun uploadImage(
-        originUri: String,
-        scramblerUri: String,
-        service: TwitterService
-    ): String? {
-        val type = fileResolver.getMimeType(originUri)
-        val size = fileResolver.getFileSize(originUri)
-        return fileResolver.openInputStream(scramblerUri)?.use {
-            service.uploadFile(
-                it,
-                type ?: "image/*",
-                size ?: it.available().toLong()
-            )
-        } ?: throw Error()
-    }
+  override suspend fun uploadImage(
+    originUri: String,
+    scramblerUri: String,
+    service: TwitterService
+  ): String? {
+    val type = fileResolver.getMimeType(originUri)
+    val size = fileResolver.getFileSize(originUri)
+    return fileResolver.openInputStream(scramblerUri)?.use {
+      service.uploadFile(
+        it,
+        type ?: "image/*",
+        size ?: it.available().toLong()
+      )
+    } ?: throw Error()
+  }
 
-    override suspend fun autoLink(text: String): String {
-        return autolink.autoLink(text)
-    }
+  override suspend fun autoLink(text: String): String {
+    return autolink.autoLink(text)
+  }
 }

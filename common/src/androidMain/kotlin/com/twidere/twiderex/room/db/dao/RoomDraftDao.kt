@@ -30,18 +30,18 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface RoomDraftDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(vararg draft: DbDraft)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertAll(vararg draft: DbDraft)
 
-    @Query("SELECT * FROM draft")
-    fun getAll(): Flow<List<DbDraft>>
+  @Query("SELECT * FROM draft")
+  fun getAll(): Flow<List<DbDraft>>
 
-    @Query("SELECT * FROM draft WHERE _id == :id")
-    suspend fun get(id: String): DbDraft?
+  @Query("SELECT * FROM draft WHERE _id == :id")
+  suspend fun get(id: String): DbDraft?
 
-    @Delete
-    suspend fun remove(draft: DbDraft)
+  @Delete
+  suspend fun remove(draft: DbDraft)
 
-    @Query("SELECT COUNT(*) FROM draft")
-    fun getDraftCount(): Flow<Int>
+  @Query("SELECT COUNT(*) FROM draft")
+  fun getDraftCount(): Flow<Int>
 }

@@ -37,31 +37,31 @@ import com.twidere.twiderex.notification.NotificationEvent
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ErrorPlaceholder(
-    throwable: NotificationEvent?,
-    modifier: Modifier = Modifier,
+  throwable: NotificationEvent?,
+  modifier: Modifier = Modifier,
 ) {
-    val message = throwable?.getMessage()
-    ListItem(
-        modifier = modifier,
-        icon = {
-            CompositionLocalProvider(
-                LocalContentAlpha provides ContentAlpha.medium
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ErrorOutline,
-                    contentDescription = null,
-                )
-            }
-        },
-        text = {
-            CompositionLocalProvider(
-                LocalContentAlpha provides ContentAlpha.medium
-            ) {
-                Text(
-                    text = message
-                        ?: stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_failed_to_load_title),
-                )
-            }
-        }
-    )
+  val message = throwable?.getMessage()
+  ListItem(
+    modifier = modifier,
+    icon = {
+      CompositionLocalProvider(
+        LocalContentAlpha provides ContentAlpha.medium
+      ) {
+        Icon(
+          imageVector = Icons.Default.ErrorOutline,
+          contentDescription = null,
+        )
+      }
+    },
+    text = {
+      CompositionLocalProvider(
+        LocalContentAlpha provides ContentAlpha.medium
+      ) {
+        Text(
+          text = message
+            ?: stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_failed_to_load_title),
+        )
+      }
+    }
+  )
 }

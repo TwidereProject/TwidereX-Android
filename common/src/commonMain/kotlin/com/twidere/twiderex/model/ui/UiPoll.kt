@@ -21,18 +21,18 @@
 package com.twidere.twiderex.model.ui
 
 data class UiPoll(
-    val id: String,
-    val options: List<Option>,
-    val expiresAt: Long?, // some instance of mastodon won't expire
-    val expired: Boolean,
-    val multiple: Boolean,
-    val voted: Boolean,
-    val votesCount: Long? = null,
-    val votersCount: Long? = null,
-    val ownVotes: List<Int>? = null,
+  val id: String,
+  val options: List<Option>,
+  val expiresAt: Long?, // some instance of mastodon won't expire
+  val expired: Boolean,
+  val multiple: Boolean,
+  val voted: Boolean,
+  val votesCount: Long? = null,
+  val votersCount: Long? = null,
+  val ownVotes: List<Int>? = null,
 )
 
 data class Option(
-    val text: String,
-    val count: Long,
+  val text: String,
+  val count: Long,
 )

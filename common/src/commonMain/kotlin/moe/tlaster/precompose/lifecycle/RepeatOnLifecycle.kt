@@ -71,66 +71,66 @@ import kotlin.coroutines.resume
  * again.
  */
 suspend fun Lifecycle.repeatOnLifecycle(
-    block: suspend CoroutineScope.() -> Unit
+  block: suspend CoroutineScope.() -> Unit
 ) {
-    if (currentState === Lifecycle.State.Destroyed) {
-        return
-    }
+  if (currentState === Lifecycle.State.Destroyed) {
+    return
+  }
 
-    // This scope is required to preserve context before we move to Dispatchers.Main
-    coroutineScope {
-        withContext(Dispatchers.Main.immediate) {
-            // Check the current state of the lifecycle as the previous check is not guaranteed
-            // to be done on the main thread.
-            if (currentState === Lifecycle.State.Destroyed) return@withContext
+  // This scope is required to preserve context before we move to Dispatchers.Main
+  coroutineScope {
+    withContext(Dispatchers.Main.immediate) {
+      // Check the current state of the lifecycle as the previous check is not guaranteed
+      // to be done on the main thread.
+      if (currentState === Lifecycle.State.Destroyed) return@withContext
 
-            // Instance of the running repeating coroutine
-            var launchedJob: Job? = null
+      // Instance of the running repeating coroutine
+      var launchedJob: Job? = null
 
-            // Registered observer
-            var observer: LifecycleObserver? = null
-            try {
-                // Suspend the coroutine until the lifecycle is destroyed or
-                // the coroutine is cancelled
-                suspendCancellableCoroutine<Unit> { cont ->
-                    // Lifecycle observers that executes `block` when the lifecycle reaches certain state, and
-                    // cancels when it falls below that state.
-                    val mutex = Mutex()
-                    observer = object : LifecycleObserver {
-                        override fun onStateChanged(state: Lifecycle.State) {
-                            when (state) {
-                                Lifecycle.State.Initialized -> Unit
-                                Lifecycle.State.Active -> {
-                                    launchedJob = this@coroutineScope.launch {
-                                        // Mutex makes invocations run serially,
-                                        // coroutineScope ensures all child coroutines finish
-                                        mutex.withLock {
-                                            coroutineScope {
-                                                block()
-                                            }
-                                        }
-                                    }
-                                }
-                                Lifecycle.State.InActive -> {
-                                    launchedJob?.cancel()
-                                    launchedJob = null
-                                }
-                                Lifecycle.State.Destroyed -> {
-                                    cont.resume(Unit)
-                                }
-                            }
-                        }
+      // Registered observer
+      var observer: LifecycleObserver? = null
+      try {
+        // Suspend the coroutine until the lifecycle is destroyed or
+        // the coroutine is cancelled
+        suspendCancellableCoroutine<Unit> { cont ->
+          // Lifecycle observers that executes `block` when the lifecycle reaches certain state, and
+          // cancels when it falls below that state.
+          val mutex = Mutex()
+          observer = object : LifecycleObserver {
+            override fun onStateChanged(state: Lifecycle.State) {
+              when (state) {
+                Lifecycle.State.Initialized -> Unit
+                Lifecycle.State.Active -> {
+                  launchedJob = this@coroutineScope.launch {
+                    // Mutex makes invocations run serially,
+                    // coroutineScope ensures all child coroutines finish
+                    mutex.withLock {
+                      coroutineScope {
+                        block()
+                      }
                     }
-                    this@repeatOnLifecycle.addObserver(observer as LifecycleObserver)
+                  }
                 }
-            } finally {
-                launchedJob?.cancel()
-                observer?.let {
-                    this@repeatOnLifecycle.removeObserver(it)
+                Lifecycle.State.InActive -> {
+                  launchedJob?.cancel()
+                  launchedJob = null
                 }
+                Lifecycle.State.Destroyed -> {
+                  cont.resume(Unit)
+                }
+              }
             }
+          }
+          this@repeatOnLifecycle.addObserver(observer as LifecycleObserver)
         }
+      } finally {
+        launchedJob?.cancel()
+        observer?.let {
+          this@repeatOnLifecycle.removeObserver(it)
+        }
+      }
     }
+  }
 }
 
 /**
@@ -158,5 +158,5 @@ suspend fun Lifecycle.repeatOnLifecycle(
  * @see Lifecycle.repeatOnLifecycle
  */
 suspend fun LifecycleOwner.repeatOnLifecycle(
-    block: suspend CoroutineScope.() -> Unit
+  block: suspend CoroutineScope.() -> Unit
 ): Unit = lifecycle.repeatOnLifecycle(block)

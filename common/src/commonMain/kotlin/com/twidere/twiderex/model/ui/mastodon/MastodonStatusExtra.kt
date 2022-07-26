@@ -28,16 +28,16 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MastodonStatusExtra(
-    val type: MastodonStatusType,
-    val emoji: List<UiEmojiCategory>,
-    val visibility: MastodonVisibility,
-    val mentions: List<MastodonMention>?,
+  val type: MastodonStatusType,
+  val emoji: List<UiEmojiCategory>,
+  val visibility: MastodonVisibility,
+  val mentions: List<MastodonMention>?,
 ) : StatusExtra
 
 @Serializable
 data class MastodonMention(
-    val id: String? = null,
-    val username: String? = null,
-    val url: String? = null,
-    val acct: String? = null
+  val id: String? = null,
+  val username: String? = null,
+  val url: String? = null,
+  val acct: String? = null
 )

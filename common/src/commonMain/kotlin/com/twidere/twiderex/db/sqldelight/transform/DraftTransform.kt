@@ -24,21 +24,21 @@ import com.twidere.twiderex.model.ui.UiDraft
 import com.twidere.twiderex.sqldelight.table.Draft
 
 fun Draft.toUi() = UiDraft(
-    draftId = id,
-    content = content,
-    media = media,
-    createdAt = createAt,
-    composeType = composeType,
-    statusKey = statusKey,
-    excludedReplyUserIds = excludedReplyUserIds
+  draftId = id,
+  content = content,
+  media = media,
+  createdAt = createAt,
+  composeType = composeType,
+  statusKey = statusKey,
+  excludedReplyUserIds = excludedReplyUserIds
 )
 
 fun UiDraft.toDbDraft() = Draft(
-    id = draftId,
-    content = content,
-    media = media,
-    createAt = createdAt,
-    composeType = composeType,
-    statusKey = statusKey,
-    excludedReplyUserIds = excludedReplyUserIds
+  id = draftId,
+  content = content,
+  media = media,
+  createAt = createdAt,
+  composeType = composeType,
+  statusKey = statusKey,
+  excludedReplyUserIds = excludedReplyUserIds
 )

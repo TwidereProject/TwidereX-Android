@@ -27,9 +27,9 @@ import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.sqldelight.table.MediaQueries
 
 internal class SqlDelightMediaDaoImpl(private val mediaQueries: MediaQueries) : MediaDao {
-    override suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey): List<UiMedia> {
-        return mediaQueries.findMediaByBelongToKey(belongToKey).executeAsList().map {
-            it.toUi()
-        }
+  override suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey): List<UiMedia> {
+    return mediaQueries.findMediaByBelongToKey(belongToKey).executeAsList().map {
+      it.toUi()
     }
+  }
 }

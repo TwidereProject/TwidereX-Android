@@ -34,31 +34,31 @@ import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalPagingApi::class)
 class DMConversationMediator(
-    database: CacheDatabase,
-    accountKey: MicroBlogKey,
-    realFetch: suspend (key: String?) -> List<IDirectMessage>
+  database: CacheDatabase,
+  accountKey: MicroBlogKey,
+  realFetch: suspend (key: String?) -> List<IDirectMessage>
 ) : BaseDirectMessageMediator<Int, UiDMConversationWithLatestMessage>(database, accountKey, realFetch) {
-    override fun reverse() = false
+  override fun reverse() = false
 
-    fun pager(
-        config: PagingConfig = PagingConfig(
-            pageSize = defaultLoadCount,
-            enablePlaceholders = false
-        ),
-        pagingSourceFactory: () -> PagingSource<Int, UiDMConversationWithLatestMessage> = {
-            database.directMessageConversationDao().getPagingSource(accountKey = accountKey)
-        }
-    ): Pager<Int, UiDMConversationWithLatestMessage> {
-        return Pager(
-            config = config,
-            remoteMediator = this,
-            pagingSourceFactory = pagingSourceFactory,
-        )
+  fun pager(
+    config: PagingConfig = PagingConfig(
+      pageSize = defaultLoadCount,
+      enablePlaceholders = false
+    ),
+    pagingSourceFactory: () -> PagingSource<Int, UiDMConversationWithLatestMessage> = {
+      database.directMessageConversationDao().getPagingSource(accountKey = accountKey)
     }
+  ): Pager<Int, UiDMConversationWithLatestMessage> {
+    return Pager(
+      config = config,
+      remoteMediator = this,
+      pagingSourceFactory = pagingSourceFactory,
+    )
+  }
 
-    companion object {
-        fun Pager<Int, UiDMConversationWithLatestMessage>.toUi(): Flow<PagingData<UiDMConversationWithLatestMessage>> {
-            return this.flow
-        }
+  companion object {
+    fun Pager<Int, UiDMConversationWithLatestMessage>.toUi(): Flow<PagingData<UiDMConversationWithLatestMessage>> {
+      return this.flow
     }
+  }
 }

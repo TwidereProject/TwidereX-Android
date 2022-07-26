@@ -23,10 +23,10 @@ package com.twidere.twiderex.db.sqldelight.adapter
 import com.twidere.twiderex.sqldelight.table.DbStatusReactions
 
 internal object StatusReactionsFactory {
-    fun create() = MicroBlogKeyColumnAdapter().let {
-        DbStatusReactions.Adapter(
-            statusKeyAdapter = it,
-            accountKeyAdapter = it
-        )
-    }
+  fun create() = MicroBlogKeyColumnAdapter().let {
+    DbStatusReactions.Adapter(
+      statusKeyAdapter = it,
+      accountKeyAdapter = it
+    )
+  }
 }

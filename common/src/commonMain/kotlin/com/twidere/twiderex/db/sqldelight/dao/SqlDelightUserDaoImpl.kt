@@ -32,22 +32,22 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 internal class SqlDelightUserDaoImpl(private val userQueries: UserQueries) : UserDao {
-    override suspend fun findWithUserKey(userKey: MicroBlogKey): UiUser? {
-        return userQueries.findWithUserKey(userKey).executeAsOneOrNull()?.toUi()
-    }
+  override suspend fun findWithUserKey(userKey: MicroBlogKey): UiUser? {
+    return userQueries.findWithUserKey(userKey).executeAsOneOrNull()?.toUi()
+  }
 
-    override suspend fun insertAll(listOf: List<UiUser>) {
-        userQueries.transaction {
-            listOf.forEach {
-                userQueries.insert(it.toDbUser())
-            }
-        }
+  override suspend fun insertAll(listOf: List<UiUser>) {
+    userQueries.transaction {
+      listOf.forEach {
+        userQueries.insert(it.toDbUser())
+      }
     }
+  }
 
-    override fun findWithUserKeyFlow(userKey: MicroBlogKey): Flow<UiUser?> {
-        return userQueries.findWithUserKey(userKey)
-            .asFlow()
-            .mapToOneOrNull()
-            .map { it?.toUi() }
-    }
+  override fun findWithUserKeyFlow(userKey: MicroBlogKey): Flow<UiUser?> {
+    return userQueries.findWithUserKey(userKey)
+      .asFlow()
+      .mapToOneOrNull()
+      .map { it?.toUi() }
+  }
 }

@@ -23,47 +23,47 @@ package com.twidere.twiderex.model
 import com.twidere.twiderex.model.enums.PlatformType
 
 enum class HomeMenus(
-    val showDefault: Boolean,
-    val supportedPlatformType: List<PlatformType>,
+  val showDefault: Boolean,
+  val supportedPlatformType: List<PlatformType>,
 ) {
-    HomeTimeline(
-        showDefault = true,
-        supportedPlatformType = PlatformType.values().toList(),
-    ),
-    MastodonNotification(
-        showDefault = true,
-        supportedPlatformType = listOf(PlatformType.Mastodon),
-    ),
-    Mention(
-        showDefault = true,
-        supportedPlatformType = listOf(PlatformType.Twitter),
-    ),
-    Search(
-        showDefault = true,
-        supportedPlatformType = PlatformType.values().toList(),
-    ),
-    Me(
-        showDefault = true,
-        supportedPlatformType = PlatformType.values().toList(),
-    ),
-    Message(
-        showDefault = false,
-        supportedPlatformType = listOf(PlatformType.Twitter),
-    ),
-    LocalTimeline(
-        showDefault = false,
-        supportedPlatformType = listOf(PlatformType.Mastodon),
-    ),
-    FederatedTimeline(
-        showDefault = false,
-        supportedPlatformType = listOf(PlatformType.Mastodon),
-    ),
-    Draft(
-        showDefault = false,
-        supportedPlatformType = PlatformType.values().toList(),
-    ),
-    Lists(
-        showDefault = false,
-        supportedPlatformType = PlatformType.values().toList(),
-    )
+  HomeTimeline(
+    showDefault = true,
+    supportedPlatformType = PlatformType.values().toList(),
+  ),
+  MastodonNotification(
+    showDefault = true,
+    supportedPlatformType = listOf(PlatformType.Mastodon),
+  ),
+  Mention(
+    showDefault = true,
+    supportedPlatformType = listOf(PlatformType.Twitter),
+  ),
+  Search(
+    showDefault = true,
+    supportedPlatformType = PlatformType.values().toList(),
+  ),
+  Me(
+    showDefault = true,
+    supportedPlatformType = PlatformType.values().toList(),
+  ),
+  Message(
+    showDefault = false,
+    supportedPlatformType = listOf(PlatformType.Twitter),
+  ),
+  LocalTimeline(
+    showDefault = false,
+    supportedPlatformType = listOf(PlatformType.Mastodon),
+  ),
+  FederatedTimeline(
+    showDefault = false,
+    supportedPlatformType = listOf(PlatformType.Mastodon),
+  ),
+  Draft(
+    showDefault = false,
+    supportedPlatformType = PlatformType.values().toList(),
+  ),
+  Lists(
+    showDefault = false,
+    supportedPlatformType = PlatformType.values().toList(),
+  )
 }

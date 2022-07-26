@@ -29,46 +29,46 @@ import com.twidere.twiderex.room.db.model.DbTrendWithHistory
 import java.util.UUID
 
 internal fun DbTrendWithHistory.toUi(accountKey: MicroBlogKey) = UiTrend(
-    trendKey = trend.trendKey,
-    displayName = trend.displayName,
-    url = trend.url,
-    query = trend.query,
-    volume = trend.volume,
-    history = history.map {
-        it.toUi()
-    },
-    accountKey = accountKey
+  trendKey = trend.trendKey,
+  displayName = trend.displayName,
+  url = trend.url,
+  query = trend.query,
+  volume = trend.volume,
+  history = history.map {
+    it.toUi()
+  },
+  accountKey = accountKey
 )
 
 internal fun DbTrendHistory.toUi() = UiTrendHistory(
-    trendKey = trendKey,
-    day = day,
-    uses = uses,
-    accounts = accounts
+  trendKey = trendKey,
+  day = day,
+  uses = uses,
+  accounts = accounts
 )
 
 internal fun List<UiTrend>.toDbTrendWithHistory() = map {
-    DbTrendWithHistory(
-        trend = it.toDbTrend(),
-        history = it.history.map { history -> history.toDbTrendHistory(it.accountKey) }
-    )
+  DbTrendWithHistory(
+    trend = it.toDbTrend(),
+    history = it.history.map { history -> history.toDbTrendHistory(it.accountKey) }
+  )
 }
 
 internal fun UiTrend.toDbTrend() = DbTrend(
-    _id = UUID.randomUUID().toString(),
-    trendKey = trendKey,
-    displayName = displayName,
-    url = url,
-    query = query,
-    volume = volume,
-    accountKey = accountKey
+  _id = UUID.randomUUID().toString(),
+  trendKey = trendKey,
+  displayName = displayName,
+  url = url,
+  query = query,
+  volume = volume,
+  accountKey = accountKey
 )
 
 internal fun UiTrendHistory.toDbTrendHistory(accountKey: MicroBlogKey) = DbTrendHistory(
-    trendKey = trendKey,
-    day = day,
-    uses = uses,
-    accounts = accounts,
-    _id = UUID.randomUUID().toString(),
-    accountKey = accountKey
+  trendKey = trendKey,
+  day = day,
+  uses = uses,
+  accounts = accounts,
+  _id = UUID.randomUUID().toString(),
+  accountKey = accountKey
 )

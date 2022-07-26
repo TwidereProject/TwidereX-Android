@@ -24,7 +24,7 @@ import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 
 actual object SqlDriverFactory {
-    actual fun create(schema: SqlDriver.Schema): SqlDriver {
-        return JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
-    }
+  actual fun create(schema: SqlDriver.Schema): SqlDriver {
+    return JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+  }
 }

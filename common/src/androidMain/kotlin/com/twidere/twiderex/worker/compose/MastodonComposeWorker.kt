@@ -31,22 +31,22 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.ComposeData
 
 class MastodonComposeWorker(
-    context: Context,
-    workerParams: WorkerParameters,
-    mastodonComposeJob: MastodonComposeJob
+  context: Context,
+  workerParams: WorkerParameters,
+  mastodonComposeJob: MastodonComposeJob
 ) : ComposeWorker<MastodonService>(context, workerParams, mastodonComposeJob) {
 
-    companion object {
-        fun create(
-            accountKey: MicroBlogKey,
-            data: ComposeData,
-        ) = OneTimeWorkRequestBuilder<MastodonComposeWorker>()
-            .setInputData(
-                Data.Builder()
-                    .putAll(data.toWorkData())
-                    .putString("accountKey", accountKey.toString())
-                    .build()
-            )
-            .build()
-    }
+  companion object {
+    fun create(
+      accountKey: MicroBlogKey,
+      data: ComposeData,
+    ) = OneTimeWorkRequestBuilder<MastodonComposeWorker>()
+      .setInputData(
+        Data.Builder()
+          .putAll(data.toWorkData())
+          .putString("accountKey", accountKey.toString())
+          .build()
+      )
+      .build()
+  }
 }

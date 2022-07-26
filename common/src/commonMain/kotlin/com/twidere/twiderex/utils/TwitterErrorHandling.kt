@@ -35,53 +35,53 @@ import com.twidere.twiderex.notification.StringResWithActionNotificationEvent
 import java.util.concurrent.CancellationException
 
 internal fun InAppNotification.notifyError(e: Throwable) {
-    val event = e.generateNotificationEvent()
-    if (event != null) {
-        show(event)
-    }
+  val event = e.generateNotificationEvent()
+  if (event != null) {
+    show(event)
+  }
 }
 
 fun Throwable.generateNotificationEvent(): NotificationEvent? {
-    return when (this) {
-        is MicroBlogHttpException -> {
-            when (this.httpCode) {
-                HttpErrorCodes.TooManyRequests -> {
-                    return StringResNotificationEvent(message = MR.strings.common_alerts_too_many_requests_title)
-                }
-                else -> null
-            }
-        }
-        is MicroBlogJsonException -> {
-            microBlogErrorMessage?.let { StringNotificationEvent(it) }
-        }
-        is TwitterApiException -> {
-            when (this.errors?.firstOrNull()?.code) {
-                TwitterErrorCodes.TemporarilyLocked -> {
-                    StringResWithActionNotificationEvent(
-                        MR.strings.common_alerts_account_temporarily_locked_title,
-                        MR.strings.common_alerts_account_temporarily_locked_message,
-                        actionStr = MR.strings.common_controls_actions_ok
-                    ) {
-                        remoteNavigator.openDeepLink("https://twitter.com/login")
-                    }
-                }
-                TwitterErrorCodes.RateLimitExceeded -> null
-                else -> microBlogErrorMessage?.let { StringNotificationEvent(it) }
-            }
-        }
-        is TwitterApiExceptionV2 -> {
-            detail?.let { StringNotificationEvent(it) }
-        }
-        is MastodonException -> {
-            microBlogErrorMessage?.let { StringNotificationEvent(it) }
-        }
-        !is CancellationException -> {
-            message?.let { StringNotificationEvent(it) }
+  return when (this) {
+    is MicroBlogHttpException -> {
+      when (this.httpCode) {
+        HttpErrorCodes.TooManyRequests -> {
+          return StringResNotificationEvent(message = MR.strings.common_alerts_too_many_requests_title)
         }
         else -> null
+      }
     }
+    is MicroBlogJsonException -> {
+      microBlogErrorMessage?.let { StringNotificationEvent(it) }
+    }
+    is TwitterApiException -> {
+      when (this.errors?.firstOrNull()?.code) {
+        TwitterErrorCodes.TemporarilyLocked -> {
+          StringResWithActionNotificationEvent(
+            MR.strings.common_alerts_account_temporarily_locked_title,
+            MR.strings.common_alerts_account_temporarily_locked_message,
+            actionStr = MR.strings.common_controls_actions_ok
+          ) {
+            remoteNavigator.openDeepLink("https://twitter.com/login")
+          }
+        }
+        TwitterErrorCodes.RateLimitExceeded -> null
+        else -> microBlogErrorMessage?.let { StringNotificationEvent(it) }
+      }
+    }
+    is TwitterApiExceptionV2 -> {
+      detail?.let { StringNotificationEvent(it) }
+    }
+    is MastodonException -> {
+      microBlogErrorMessage?.let { StringNotificationEvent(it) }
+    }
+    !is CancellationException -> {
+      message?.let { StringNotificationEvent(it) }
+    }
+    else -> null
+  }
 }
 
 private object HttpErrorCodes {
-    const val TooManyRequests = 429
+  const val TooManyRequests = 429
 }

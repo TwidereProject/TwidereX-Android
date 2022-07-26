@@ -27,30 +27,30 @@ import androidx.compose.ui.graphics.Color
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 
 val mediumEmphasisContentContentColor: Color
-    @Composable
-    get() = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
+  @Composable
+  get() = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
 
 val Orange: Color
-    get() = Color(0XFFFF9500)
+  get() = Color(0XFFFF9500)
 
 val primaryColors = listOf(
-    Color(0XFF4C9EEB) to Color(0XFF5CB0FF),
-    Color(0XFF1C68F3) to Color(0XFF4B85F0),
-    Color(0XFF8D47EE) to Color(0XFF9254DE),
-    Color(0XFFBC5077) to Color(0XFFF4769B),
-    Color(0XFFFA541C) to Color(0XFFFF7A45),
-    Color(0XFFFAAD14) to Color(0XFFFFC53D),
-    Color(0XFF9ACB1E) to Color(0XFFBBE739),
-    Color(0XFF38D29B) to Color(0XFF44ECAE),
+  Color(0XFF4C9EEB) to Color(0XFF5CB0FF),
+  Color(0XFF1C68F3) to Color(0XFF4B85F0),
+  Color(0XFF8D47EE) to Color(0XFF9254DE),
+  Color(0XFFBC5077) to Color(0XFFF4769B),
+  Color(0XFFFA541C) to Color(0XFFFF7A45),
+  Color(0XFFFAAD14) to Color(0XFFFFC53D),
+  Color(0XFF9ACB1E) to Color(0XFFBBE739),
+  Color(0XFF38D29B) to Color(0XFF44ECAE),
 )
 
 @Composable
 fun currentPrimaryColor(): Color {
-    val appearance = LocalAppearancePreferences.current
-    val colorIndex = appearance.primaryColorIndex
-    return if (isDarkTheme()) {
-        primaryColors[colorIndex].second
-    } else {
-        primaryColors[colorIndex].first
-    }
+  val appearance = LocalAppearancePreferences.current
+  val colorIndex = appearance.primaryColorIndex
+  return if (isDarkTheme()) {
+    primaryColors[colorIndex].second
+  } else {
+    primaryColors[colorIndex].first
+  }
 }

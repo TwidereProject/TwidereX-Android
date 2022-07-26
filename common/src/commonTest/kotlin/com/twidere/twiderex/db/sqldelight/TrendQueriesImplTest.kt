@@ -31,28 +31,28 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class TrendQueriesImplTest : BaseCacheDatabaseTest() {
-    private val accountKey = MicroBlogKey.twitter("account")
-    @Test
-    fun insert_ReplaceWhenUniqueKeyEquals() = runBlocking {
-        val insert = mockITrend().toUi(accountKey).toDbTrendWithHistory()
-        database.trendQueries.insert(insert.trend.copy(displayName = "insert"))
-        assertEquals("insert", database.trendQueries.getTrendPagingList(accountKey = accountKey, limit = 10, offset = 0).executeAsOne().displayName)
-        database.trendQueries.insert(insert.trend.copy(displayName = "replace"))
-        assertEquals("replace", database.trendQueries.getTrendPagingList(accountKey = accountKey, limit = 10, offset = 0).executeAsOne().displayName)
-    }
+  private val accountKey = MicroBlogKey.twitter("account")
+  @Test
+  fun insert_ReplaceWhenUniqueKeyEquals() = runBlocking {
+    val insert = mockITrend().toUi(accountKey).toDbTrendWithHistory()
+    database.trendQueries.insert(insert.trend.copy(displayName = "insert"))
+    assertEquals("insert", database.trendQueries.getTrendPagingList(accountKey = accountKey, limit = 10, offset = 0).executeAsOne().displayName)
+    database.trendQueries.insert(insert.trend.copy(displayName = "replace"))
+    assertEquals("replace", database.trendQueries.getTrendPagingList(accountKey = accountKey, limit = 10, offset = 0).executeAsOne().displayName)
+  }
 
-    @Test
-    fun getTrendPagingList_ReturnResultsWithGiveOffsetAndLimit() = runBlocking {
-        val list = mutableListOf<DbTrend>()
-        for (i in 0 until 10) {
-            list.add(mockITrend().toUi(accountKey).toDbTrendWithHistory().trend.copy(trendKey = MicroBlogKey.valueOf(i.toString()), displayName = i.toString()))
-        }
-        database.trendQueries.transaction {
-            list.forEach { database.trendQueries.insert(it) }
-        }
-        assertEquals(10, database.trendQueries.getTrendPagingCount(accountKey = accountKey).executeAsOne())
-        val result = database.trendQueries.getTrendPagingList(accountKey = accountKey, limit = 4, offset = 3).executeAsList()
-        assertEquals(4, result.size)
-        assertEquals(3, result.first().displayName.toInt())
+  @Test
+  fun getTrendPagingList_ReturnResultsWithGiveOffsetAndLimit() = runBlocking {
+    val list = mutableListOf<DbTrend>()
+    for (i in 0 until 10) {
+      list.add(mockITrend().toUi(accountKey).toDbTrendWithHistory().trend.copy(trendKey = MicroBlogKey.valueOf(i.toString()), displayName = i.toString()))
     }
+    database.trendQueries.transaction {
+      list.forEach { database.trendQueries.insert(it) }
+    }
+    assertEquals(10, database.trendQueries.getTrendPagingCount(accountKey = accountKey).executeAsOne())
+    val result = database.trendQueries.getTrendPagingList(accountKey = accountKey, limit = 4, offset = 3).executeAsList()
+    assertEquals(4, result.size)
+    assertEquals(3, result.first().displayName.toInt())
+  }
 }

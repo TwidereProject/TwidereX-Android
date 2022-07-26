@@ -26,7 +26,7 @@ import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 
 @Composable
 internal fun DisplayPreferences.AutoPlayback.playEnable() = when (this) {
-    DisplayPreferences.AutoPlayback.Auto -> !LocalIsActiveNetworkMetered.current
-    DisplayPreferences.AutoPlayback.Always -> true
-    DisplayPreferences.AutoPlayback.Off -> false
+  DisplayPreferences.AutoPlayback.Auto -> !LocalIsActiveNetworkMetered.current
+  DisplayPreferences.AutoPlayback.Always -> true
+  DisplayPreferences.AutoPlayback.Off -> false
 }

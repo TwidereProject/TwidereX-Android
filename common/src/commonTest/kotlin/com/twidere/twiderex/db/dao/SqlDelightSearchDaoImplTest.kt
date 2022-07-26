@@ -31,78 +31,78 @@ import java.util.UUID
 import kotlin.test.assertEquals
 
 internal class SqlDelightSearchDaoImplTest : BaseAppDatabaseTest() {
-    @Test
-    fun getAll_ReturnsFlowAndUpdateAfterDbUpdated() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("test")
-        val searchDao = SqlDelightSearchDaoImpl(database.searchQueries)
-        val flow = searchDao.getAll(accountKey)
-        assert(flow.firstOrNull()?.isEmpty() ?: false)
-        searchDao.insertAll(createSearchList(accountKey = accountKey, count = 1))
-        assert(flow.firstOrNull()?.isNotEmpty() ?: false)
-    }
+  @Test
+  fun getAll_ReturnsFlowAndUpdateAfterDbUpdated() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("test")
+    val searchDao = SqlDelightSearchDaoImpl(database.searchQueries)
+    val flow = searchDao.getAll(accountKey)
+    assert(flow.firstOrNull()?.isEmpty() ?: false)
+    searchDao.insertAll(createSearchList(accountKey = accountKey, count = 1))
+    assert(flow.firstOrNull()?.isNotEmpty() ?: false)
+  }
 
-    @Test
-    fun insertAll_InsertAllDataInGivenList() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("test")
-        val searchDao = SqlDelightSearchDaoImpl(database.searchQueries)
-        val flow = searchDao.getAll(accountKey)
-        assert(flow.firstOrNull()?.isEmpty() ?: false)
-        val count = 10
-        searchDao.insertAll(createSearchList(count = count, accountKey = accountKey))
-        assertEquals(count, flow.firstOrNull()?.size)
-    }
+  @Test
+  fun insertAll_InsertAllDataInGivenList() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("test")
+    val searchDao = SqlDelightSearchDaoImpl(database.searchQueries)
+    val flow = searchDao.getAll(accountKey)
+    assert(flow.firstOrNull()?.isEmpty() ?: false)
+    val count = 10
+    searchDao.insertAll(createSearchList(count = count, accountKey = accountKey))
+    assertEquals(count, flow.firstOrNull()?.size)
+  }
 
-    @Test
-    fun getHistories_ReturnsFlowWithNotSavedSearchAndUpdateAfterDbUpdated() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("test")
-        val searchDao = SqlDelightSearchDaoImpl(database.searchQueries)
-        val flow = searchDao.getAllHistory(accountKey)
-        assert(flow.firstOrNull()?.isEmpty() ?: false)
-        searchDao.insertAll(createSearchList(count = 5, accountKey = accountKey))
-        searchDao.insertAll(createSearchList(count = 5, accountKey = accountKey, saved = true))
-        assertEquals(5, flow.firstOrNull()?.size)
-        flow.firstOrNull()?.forEach {
-            assertEquals(false, it.saved)
-        }
-        searchDao.insertAll(flow.firstOrNull()!!.map { it.copy(saved = true) })
-        assert(flow.firstOrNull()?.isEmpty() ?: true)
-        searchDao.clear()
-        assert(flow.firstOrNull()?.isEmpty() ?: true)
+  @Test
+  fun getHistories_ReturnsFlowWithNotSavedSearchAndUpdateAfterDbUpdated() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("test")
+    val searchDao = SqlDelightSearchDaoImpl(database.searchQueries)
+    val flow = searchDao.getAllHistory(accountKey)
+    assert(flow.firstOrNull()?.isEmpty() ?: false)
+    searchDao.insertAll(createSearchList(count = 5, accountKey = accountKey))
+    searchDao.insertAll(createSearchList(count = 5, accountKey = accountKey, saved = true))
+    assertEquals(5, flow.firstOrNull()?.size)
+    flow.firstOrNull()?.forEach {
+      assertEquals(false, it.saved)
     }
+    searchDao.insertAll(flow.firstOrNull()!!.map { it.copy(saved = true) })
+    assert(flow.firstOrNull()?.isEmpty() ?: true)
+    searchDao.clear()
+    assert(flow.firstOrNull()?.isEmpty() ?: true)
+  }
 
-    @Test
-    fun getSaved_ReturnsFlowWithSavedSearchAndUpdateAfterDbUpdated() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("test")
-        val searchDao = SqlDelightSearchDaoImpl(database.searchQueries)
-        val flow = searchDao.getAllSaved(accountKey)
-        assert(flow.firstOrNull()?.isEmpty() ?: false)
-        searchDao.insertAll(createSearchList(count = 5, accountKey = accountKey))
-        searchDao.insertAll(createSearchList(count = 5, accountKey = accountKey, saved = true))
-        assertEquals(5, flow.firstOrNull()?.size)
-        flow.firstOrNull()?.forEach {
-            assertEquals(true, it.saved)
-        }
-        searchDao.insertAll(flow.firstOrNull()!!.map { it.copy(saved = false) })
-        assert(flow.firstOrNull()?.isEmpty() ?: true)
+  @Test
+  fun getSaved_ReturnsFlowWithSavedSearchAndUpdateAfterDbUpdated() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("test")
+    val searchDao = SqlDelightSearchDaoImpl(database.searchQueries)
+    val flow = searchDao.getAllSaved(accountKey)
+    assert(flow.firstOrNull()?.isEmpty() ?: false)
+    searchDao.insertAll(createSearchList(count = 5, accountKey = accountKey))
+    searchDao.insertAll(createSearchList(count = 5, accountKey = accountKey, saved = true))
+    assertEquals(5, flow.firstOrNull()?.size)
+    flow.firstOrNull()?.forEach {
+      assertEquals(true, it.saved)
     }
+    searchDao.insertAll(flow.firstOrNull()!!.map { it.copy(saved = false) })
+    assert(flow.firstOrNull()?.isEmpty() ?: true)
+  }
 
-    private fun createSearchList(
-        count: Int,
-        content: String = UUID.randomUUID().toString(),
-        accountKey: MicroBlogKey,
-        saved: Boolean = false
-    ): MutableList<UiSearch> {
-        val list = mutableListOf<UiSearch>()
-        for (i in 0 until count) {
-            list.add(
-                UiSearch(
-                    content = content + i.toString(),
-                    accountKey = accountKey,
-                    lastActive = System.currentTimeMillis(),
-                    saved = saved
-                )
-            )
-        }
-        return list
+  private fun createSearchList(
+    count: Int,
+    content: String = UUID.randomUUID().toString(),
+    accountKey: MicroBlogKey,
+    saved: Boolean = false
+  ): MutableList<UiSearch> {
+    val list = mutableListOf<UiSearch>()
+    for (i in 0 until count) {
+      list.add(
+        UiSearch(
+          content = content + i.toString(),
+          accountKey = accountKey,
+          lastActive = System.currentTimeMillis(),
+          saved = saved
+        )
+      )
     }
+    return list
+  }
 }

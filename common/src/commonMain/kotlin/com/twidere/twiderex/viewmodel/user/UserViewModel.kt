@@ -40,115 +40,115 @@ import moe.tlaster.precompose.viewmodel.viewModelScope
 import java.util.UUID
 
 class UserViewModel(
-    private val repository: UserRepository,
-    private val accountRepository: AccountRepository,
-    private val inAppNotification: InAppNotification,
-    private val userKey: MicroBlogKey,
+  private val repository: UserRepository,
+  private val accountRepository: AccountRepository,
+  private val inAppNotification: InAppNotification,
+  private val userKey: MicroBlogKey,
 ) : ViewModel() {
-    private val refreshFlow = MutableStateFlow(UUID.randomUUID())
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val refreshFlow = MutableStateFlow(UUID.randomUUID())
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    val refreshing = MutableStateFlow(false)
-    val loadingRelationship = MutableStateFlow(false)
-    val user = repository.getUserFlow(userKey)
-    val relationship = combine(account, refreshFlow) { account, _ ->
-        loadingRelationship.compareAndSet(expect = false, update = true)
-        val relationshipService = account.service as RelationshipService
-        try {
-            relationshipService.showRelationship(userKey.id)
-        } catch (e: Throwable) {
-            null
-        } finally {
-            loadingRelationship.compareAndSet(expect = true, update = false)
-        }
+  val refreshing = MutableStateFlow(false)
+  val loadingRelationship = MutableStateFlow(false)
+  val user = repository.getUserFlow(userKey)
+  val relationship = combine(account, refreshFlow) { account, _ ->
+    loadingRelationship.compareAndSet(expect = false, update = true)
+    val relationshipService = account.service as RelationshipService
+    try {
+      relationshipService.showRelationship(userKey.id)
+    } catch (e: Throwable) {
+      null
+    } finally {
+      loadingRelationship.compareAndSet(expect = true, update = false)
     }
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val isMe by lazy {
-        account.mapLatest {
-            it.accountKey == userKey
-        }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  val isMe by lazy {
+    account.mapLatest {
+      it.accountKey == userKey
     }
+  }
 
-    private fun collectUser() = combine(account, refreshFlow) { account, _ ->
-        refreshing.value = true
-        runCatching {
-            repository.lookupUserById(
-                userKey.id,
-                accountKey = account.accountKey,
-                lookupService = account.service as LookupService,
-            )
-        }.onFailure {
-            inAppNotification.notifyError(it)
-        }
-        refreshing.value = false
-    }.launchIn(viewModelScope)
-
-    fun follow() = viewModelScope.launch {
-        loadingRelationship.compareAndSet(expect = false, update = true)
-        val account = account.firstOrNull() ?: return@launch
-        val relationshipService = account.service as? RelationshipService ?: return@launch
-        try {
-            relationshipService.follow(userKey.id)
-            refresh()
-        } catch (e: Throwable) {
-            inAppNotification.notifyError(e)
-        } finally {
-            loadingRelationship.compareAndSet(expect = true, update = false)
-        }
+  private fun collectUser() = combine(account, refreshFlow) { account, _ ->
+    refreshing.value = true
+    runCatching {
+      repository.lookupUserById(
+        userKey.id,
+        accountKey = account.accountKey,
+        lookupService = account.service as LookupService,
+      )
+    }.onFailure {
+      inAppNotification.notifyError(it)
     }
+    refreshing.value = false
+  }.launchIn(viewModelScope)
 
-    fun unfollow() = viewModelScope.launch {
-        loadingRelationship.compareAndSet(expect = false, update = true)
-        val account = account.firstOrNull() ?: return@launch
-        val relationshipService = account.service as? RelationshipService ?: return@launch
-        try {
-            relationshipService.unfollow(userKey.id)
-            refresh()
-        } catch (e: Throwable) {
-            inAppNotification.notifyError(e)
-        } finally {
-            loadingRelationship.compareAndSet(expect = true, update = false)
-        }
+  fun follow() = viewModelScope.launch {
+    loadingRelationship.compareAndSet(expect = false, update = true)
+    val account = account.firstOrNull() ?: return@launch
+    val relationshipService = account.service as? RelationshipService ?: return@launch
+    try {
+      relationshipService.follow(userKey.id)
+      refresh()
+    } catch (e: Throwable) {
+      inAppNotification.notifyError(e)
+    } finally {
+      loadingRelationship.compareAndSet(expect = true, update = false)
     }
+  }
 
-    fun block() = viewModelScope.launch {
-        loadingRelationship.compareAndSet(expect = false, update = true)
-        val account = account.firstOrNull() ?: return@launch
-        val relationshipService = account.service as? RelationshipService ?: return@launch
-        loadingRelationship.value = true
-        try {
-            relationshipService.block(id = userKey.id)
-            refresh()
-        } catch (e: Throwable) {
-            inAppNotification.notifyError(e)
-        } finally {
-            loadingRelationship.compareAndSet(expect = true, update = false)
-        }
+  fun unfollow() = viewModelScope.launch {
+    loadingRelationship.compareAndSet(expect = false, update = true)
+    val account = account.firstOrNull() ?: return@launch
+    val relationshipService = account.service as? RelationshipService ?: return@launch
+    try {
+      relationshipService.unfollow(userKey.id)
+      refresh()
+    } catch (e: Throwable) {
+      inAppNotification.notifyError(e)
+    } finally {
+      loadingRelationship.compareAndSet(expect = true, update = false)
     }
+  }
 
-    fun unblock() = viewModelScope.launch {
-        loadingRelationship.compareAndSet(expect = false, update = true)
-        val account = account.firstOrNull() ?: return@launch
-        val relationshipService = account.service as? RelationshipService ?: return@launch
-        loadingRelationship.value = true
-        try {
-            relationshipService.unblock(id = userKey.id)
-            refresh()
-        } catch (e: Throwable) {
-            inAppNotification.notifyError(e)
-        } finally {
-            loadingRelationship.compareAndSet(expect = true, update = false)
-        }
+  fun block() = viewModelScope.launch {
+    loadingRelationship.compareAndSet(expect = false, update = true)
+    val account = account.firstOrNull() ?: return@launch
+    val relationshipService = account.service as? RelationshipService ?: return@launch
+    loadingRelationship.value = true
+    try {
+      relationshipService.block(id = userKey.id)
+      refresh()
+    } catch (e: Throwable) {
+      inAppNotification.notifyError(e)
+    } finally {
+      loadingRelationship.compareAndSet(expect = true, update = false)
     }
+  }
 
-    fun refresh() {
-        refreshFlow.value = UUID.randomUUID()
+  fun unblock() = viewModelScope.launch {
+    loadingRelationship.compareAndSet(expect = false, update = true)
+    val account = account.firstOrNull() ?: return@launch
+    val relationshipService = account.service as? RelationshipService ?: return@launch
+    loadingRelationship.value = true
+    try {
+      relationshipService.unblock(id = userKey.id)
+      refresh()
+    } catch (e: Throwable) {
+      inAppNotification.notifyError(e)
+    } finally {
+      loadingRelationship.compareAndSet(expect = true, update = false)
     }
+  }
 
-    init {
-        collectUser()
-    }
+  fun refresh() {
+    refreshFlow.value = UUID.randomUUID()
+  }
+
+  init {
+    collectUser()
+  }
 }

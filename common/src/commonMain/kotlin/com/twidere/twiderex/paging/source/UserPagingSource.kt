@@ -29,29 +29,29 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 
 abstract class UserPagingSource(
-    protected val userKey: MicroBlogKey,
+  protected val userKey: MicroBlogKey,
 ) : PagingSource<String, UiUser>() {
 
-    override fun getRefreshKey(state: PagingState<String, UiUser>): String? {
-        return null
-    }
+  override fun getRefreshKey(state: PagingState<String, UiUser>): String? {
+    return null
+  }
 
-    override suspend fun load(params: LoadParams<String>): LoadResult<String, UiUser> {
-        return try {
-            val result = loadUsers(params)
-            val users = result.map {
-                it.toUi(userKey)
-            }
-            val nextPage = if (result is IPaging && users.isNotEmpty()) {
-                result.nextPage
-            } else {
-                null
-            }
-            LoadResult.Page(data = users, prevKey = null, nextKey = nextPage)
-        } catch (e: Throwable) {
-            LoadResult.Error(e)
-        }
+  override suspend fun load(params: LoadParams<String>): LoadResult<String, UiUser> {
+    return try {
+      val result = loadUsers(params)
+      val users = result.map {
+        it.toUi(userKey)
+      }
+      val nextPage = if (result is IPaging && users.isNotEmpty()) {
+        result.nextPage
+      } else {
+        null
+      }
+      LoadResult.Page(data = users, prevKey = null, nextKey = nextPage)
+    } catch (e: Throwable) {
+      LoadResult.Error(e)
     }
+  }
 
-    abstract suspend fun loadUsers(params: LoadParams<String>): List<IUser>
+  abstract suspend fun loadUsers(params: LoadParams<String>): List<IUser>
 }

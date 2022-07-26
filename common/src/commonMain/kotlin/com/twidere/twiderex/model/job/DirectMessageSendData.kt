@@ -23,10 +23,10 @@ package com.twidere.twiderex.model.job
 import com.twidere.twiderex.model.MicroBlogKey
 
 data class DirectMessageSendData(
-    val text: String?,
-    val images: List<String>,
-    val recipientUserKey: MicroBlogKey,
-    val conversationKey: MicroBlogKey,
-    val accountKey: MicroBlogKey,
-    val draftMessageKey: MicroBlogKey,
+  val text: String?,
+  val images: List<String>,
+  val recipientUserKey: MicroBlogKey,
+  val conversationKey: MicroBlogKey,
+  val accountKey: MicroBlogKey,
+  val draftMessageKey: MicroBlogKey,
 )

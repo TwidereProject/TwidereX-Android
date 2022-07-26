@@ -25,7 +25,7 @@ import org.jsoup.nodes.Element
 import java.net.URLDecoder
 
 class UrlDecodeSerializer : HtmlSerializer<String> {
-    override fun decode(element: Element, wholeText: String): String {
-        return URLDecoder.decode(wholeText, "UTF-8")
-    }
+  override fun decode(element: Element, wholeText: String): String {
+    return URLDecoder.decode(wholeText, "UTF-8")
+  }
 }
