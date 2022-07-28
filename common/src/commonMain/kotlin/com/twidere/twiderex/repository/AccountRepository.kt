@@ -28,6 +28,7 @@ import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 expect class AccountRepository {
   val activeAccount: Flow<AccountDetails?>
@@ -53,3 +54,5 @@ expect class AccountRepository {
   fun delete(detail: AccountDetails)
   fun getFirstByType(type: PlatformType): AccountDetails?
 }
+
+fun AccountRepository.findByAccountKeyFlow(accountKey: MicroBlogKey): Flow<AccountDetails?> = accounts.map { it.firstOrNull { it.accountKey == accountKey } }

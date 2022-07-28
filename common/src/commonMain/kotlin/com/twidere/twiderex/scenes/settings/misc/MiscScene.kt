@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.settings
+package com.twidere.twiderex.scenes.settings.misc
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -61,6 +61,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.foundation.AlertDialog
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -185,7 +186,7 @@ fun ColumnScope.ProxyPreference(
   }
   ItemProxy(
     enable = useProxy,
-    title = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_type_title),
+    title = stringResource(res = MR.strings.scene_settings_misc_proxy_type_title),
     content = proxyTypeValue(type = proxyType),
     onClick = {
       showProxyTypeDialog.value = true

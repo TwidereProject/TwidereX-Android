@@ -18,16 +18,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.settings
+package com.twidere.twiderex.scenes.settings.misc
 
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
-import com.twidere.twiderex.model.MicroBlogKey
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-actual fun AccountNotificationChannelDetail(
-  enabled: Boolean,
-  accountKey: MicroBlogKey,
-) {
+fun MiscPresenter() {
 }

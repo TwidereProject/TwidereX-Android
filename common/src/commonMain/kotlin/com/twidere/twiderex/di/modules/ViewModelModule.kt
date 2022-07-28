@@ -53,13 +53,7 @@ import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 import com.twidere.twiderex.viewmodel.search.SearchSaveViewModel
 import com.twidere.twiderex.viewmodel.search.SearchTweetsViewModel
 import com.twidere.twiderex.viewmodel.search.SearchUserViewModel
-import com.twidere.twiderex.viewmodel.settings.AccountNotificationViewModel
-import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
-import com.twidere.twiderex.viewmodel.settings.DisplayViewModel
-import com.twidere.twiderex.viewmodel.settings.LayoutViewModel
 import com.twidere.twiderex.viewmodel.settings.MiscViewModel
-import com.twidere.twiderex.viewmodel.settings.NotificationViewModel
-import com.twidere.twiderex.viewmodel.settings.StorageViewModel
 import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
 import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
 import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineViewModel
@@ -182,13 +176,7 @@ private fun Module.search() {
 }
 
 private fun Module.settings() {
-  viewModel { AccountNotificationViewModel(get()) }
-  viewModel { AppearanceViewModel(get<PreferencesHolder>().appearancePreferences) }
-  viewModel { DisplayViewModel(get<PreferencesHolder>().displayPreferences) }
-  viewModel { LayoutViewModel(get()) }
   viewModel { MiscViewModel(get<PreferencesHolder>().miscPreferences, get(), get()) }
-  viewModel { NotificationViewModel(get<PreferencesHolder>().notificationPreferences) }
-  viewModel { StorageViewModel(get()) }
 }
 
 private fun Module.timeline() {

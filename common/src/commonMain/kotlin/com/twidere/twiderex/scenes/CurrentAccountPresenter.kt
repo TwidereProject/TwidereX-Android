@@ -18,25 +18,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.settings
+package com.twidere.twiderex.scenes
 
-import androidx.datastore.core.DataStore
-import com.twidere.twiderex.preferences.model.NotificationPreferences
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class NotificationViewModel(
-  val notification: DataStore<NotificationPreferences>,
-) : ViewModel() {
-  val enabled = notification.data.map {
-    it.enableNotification
-  }
-
-  fun setEnabled(value: Boolean) = viewModelScope.launch {
-    notification.updateData {
-      it.copy(enableNotification = value)
+@Composable
+fun CurrentAccountPresenter(
+  accountRepository: AccountRepository = get(),
+): CurrentAccountState {
+  val state by accountRepository.activeAccount.map {
+    if (it == null) {
+      CurrentAccountState.Empty
+    } else {
+      CurrentAccountState.Account(it)
     }
-  }
+  }.collectAsState(CurrentAccountState.Empty)
+  return state
+}
+
+sealed interface CurrentAccountState {
+  data class Account(val account: AccountDetails) : CurrentAccountState
+  object Empty : CurrentAccountState
 }

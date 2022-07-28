@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.repository
 
+import com.squareup.sqldelight.runtime.coroutines.asFlow
+import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.twidere.twiderex.dataprovider.mapper.toAmUser
 import com.twidere.twiderex.db.sqldelight.transform.toDbAccount
 import com.twidere.twiderex.db.sqldelight.transform.toUi
@@ -34,21 +36,27 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.sqldelight.table.AccountQueries
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 
 actual class AccountRepository(
   private val accountQueries: AccountQueries,
   private val preferencesFactory: AccountPreferencesFactory,
 ) {
   private val preferencesCache = linkedMapOf<MicroBlogKey, AccountPreferences>()
-  private val _accounts = MutableStateFlow(getAccounts())
-  private val _activeAccount = MutableStateFlow(
-    getCurrentAccount()
-  )
   actual val activeAccount: Flow<AccountDetails?>
-    get() = _activeAccount
+    get() = accountQueries.findAll()
+      .asFlow()
+      .mapToList()
+      .map {
+        it.maxByOrNull { it.lastActive }
+      }.map {
+        it?.toUi(getAccountPreferences(it.accountKey))
+      }
   actual val accounts: Flow<List<AccountDetails>>
-    get() = _accounts
+    get() = accountQueries.findAll()
+      .asFlow()
+      .mapToList()
+      .map { it.map { it.toUi(getAccountPreferences(it.accountKey)) } }
 
   actual fun updateAccount(user: UiUser) {
     findByAccountKey(user.userKey)?.copy(
@@ -60,16 +68,11 @@ actual class AccountRepository(
 
   actual fun updateAccount(detail: AccountDetails) {
     accountQueries.insert(detail.toDbAccount())
-    _activeAccount.value = getCurrentAccount()
-    _accounts.value = getAccounts()
   }
 
   actual fun getAccounts(): List<AccountDetails> {
-    return accountQueries.findAll().executeAsList().map { account -> account.toUi(getAccountPreferences(account.accountKey)) }
-  }
-
-  private fun getCurrentAccount(): AccountDetails? {
-    return getAccounts().maxByOrNull { it.lastActive }
+    return accountQueries.findAll().executeAsList()
+      .map { account -> account.toUi(getAccountPreferences(account.accountKey)) }
   }
 
   actual fun hasAccount(): Boolean {
@@ -77,9 +80,10 @@ actual class AccountRepository(
   }
 
   actual fun findByAccountKey(accountKey: MicroBlogKey): AccountDetails? {
-    return accountQueries.findWithAccountKey(accountKey = accountKey).executeAsOneOrNull()?.let {
-      it.toUi(getAccountPreferences(it.accountKey))
-    }
+    return accountQueries.findWithAccountKey(accountKey = accountKey).executeAsOneOrNull()
+      ?.let {
+        it.toUi(getAccountPreferences(it.accountKey))
+      }
   }
 
   actual fun setCurrentAccount(detail: AccountDetails) {
@@ -125,11 +129,10 @@ actual class AccountRepository(
   actual fun delete(detail: AccountDetails) {
     accountQueries.delete(detail.accountKey)
     preferencesCache.remove(detail.accountKey)?.close()
-    _activeAccount.value = getCurrentAccount()
-    _accounts.value = getAccounts()
   }
 
   actual fun getFirstByType(type: PlatformType): AccountDetails? {
-    return _accounts.value.sortedByDescending { it.lastActive }.firstOrNull { it.type == type }
+    return null
+    // return _accounts.value.sortedByDescending { it.lastActive }.firstOrNull { it.type == type }
   }
 }
