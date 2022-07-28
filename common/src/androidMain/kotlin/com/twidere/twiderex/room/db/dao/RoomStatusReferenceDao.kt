@@ -32,16 +32,16 @@ import com.twidere.twiderex.room.db.model.DbStatusReferenceWithStatus
 
 @Dao
 internal interface RoomStatusReferenceDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(items: List<DbStatusReference>)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertAll(items: List<DbStatusReference>)
 
-    @Transaction
-    @Query("SELECT * FROM status_reference WHERE referenceStatusKey == :key AND referenceType == :referenceType")
-    suspend fun find(key: MicroBlogKey, referenceType: ReferenceType): List<DbStatusReferenceWithStatus>
+  @Transaction
+  @Query("SELECT * FROM status_reference WHERE referenceStatusKey == :key AND referenceType == :referenceType")
+  suspend fun find(key: MicroBlogKey, referenceType: ReferenceType): List<DbStatusReferenceWithStatus>
 
-    @Query("DELETE FROM status_reference WHERE statusKey in (:key)")
-    suspend fun remove(key: List<MicroBlogKey>)
+  @Query("DELETE FROM status_reference WHERE statusKey in (:key)")
+  suspend fun remove(key: List<MicroBlogKey>)
 
-    @Query("DELETE FROM status_reference WHERE statusKey == :key")
-    suspend fun delete(key: MicroBlogKey)
+  @Query("DELETE FROM status_reference WHERE statusKey == :key")
+  suspend fun delete(key: MicroBlogKey)
 }

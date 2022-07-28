@@ -26,17 +26,17 @@ import androidx.room.PrimaryKey
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
-    tableName = "url_entity",
-    indices = [Index(value = ["statusKey", "url"], unique = true)],
+  tableName = "url_entity",
+  indices = [Index(value = ["statusKey", "url"], unique = true)],
 )
 internal data class DbUrlEntity(
-    @PrimaryKey
-    val _id: String,
-    val statusKey: MicroBlogKey,
-    val url: String,
-    val expandedUrl: String,
-    val displayUrl: String,
-    val title: String?,
-    val description: String?,
-    val image: String?,
+  @PrimaryKey
+  val _id: String,
+  val statusKey: MicroBlogKey,
+  val url: String,
+  val expandedUrl: String,
+  val displayUrl: String,
+  val title: String?,
+  val description: String?,
+  val image: String?,
 )

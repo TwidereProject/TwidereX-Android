@@ -47,89 +47,89 @@ import moe.tlaster.precompose.PreComposeWindow
 
 @Stable
 class NativeWindowController(
-    initialIsAppearanceLightTitleBar: Boolean = false,
+  initialIsAppearanceLightTitleBar: Boolean = false,
 ) {
-    companion object {
-        fun Saver(): Saver<NativeWindowController, *> = listSaver(
-            save = {
-                listOf(it.isAppearanceLightTitleBar)
-            },
-            restore = {
-                NativeWindowController(
-                    initialIsAppearanceLightTitleBar = it[0],
-                )
-            }
+  companion object {
+    fun Saver(): Saver<NativeWindowController, *> = listSaver(
+      save = {
+        listOf(it.isAppearanceLightTitleBar)
+      },
+      restore = {
+        NativeWindowController(
+          initialIsAppearanceLightTitleBar = it[0],
         )
-    }
+      }
+    )
+  }
 
-    var isAppearanceLightTitleBar: Boolean by mutableStateOf(initialIsAppearanceLightTitleBar)
+  var isAppearanceLightTitleBar: Boolean by mutableStateOf(initialIsAppearanceLightTitleBar)
 }
 
 @Composable
 fun rememberNativeWindowController(): NativeWindowController {
-    val saver = remember {
-        NativeWindowController.Saver()
-    }
-    return rememberSaveable(
-        saver = saver
-    ) {
-        NativeWindowController()
-    }
+  val saver = remember {
+    NativeWindowController.Saver()
+  }
+  return rememberSaveable(
+    saver = saver
+  ) {
+    NativeWindowController()
+  }
 }
 
 val LocalNativeWindowController =
-    staticCompositionLocalOf<NativeWindowController> { error("No NativeWindowController") }
+  staticCompositionLocalOf<NativeWindowController> { error("No NativeWindowController") }
 
 @Composable
 fun NativeWindow(
-    onCloseRequest: () -> Unit,
-    state: WindowState = rememberWindowState(),
-    visible: Boolean = true,
-    title: String = "Untitled",
-    icon: Painter? = null,
-    resizable: Boolean = true,
-    enabled: Boolean = true,
-    focusable: Boolean = true,
-    alwaysOnTop: Boolean = false,
-    onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
-    onKeyEvent: (KeyEvent) -> Boolean = { false },
-    content: @Composable FrameWindowScope.() -> Unit,
+  onCloseRequest: () -> Unit,
+  state: WindowState = rememberWindowState(),
+  visible: Boolean = true,
+  title: String = "Untitled",
+  icon: Painter? = null,
+  resizable: Boolean = true,
+  enabled: Boolean = true,
+  focusable: Boolean = true,
+  alwaysOnTop: Boolean = false,
+  onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
+  onKeyEvent: (KeyEvent) -> Boolean = { false },
+  content: @Composable FrameWindowScope.() -> Unit,
 ) {
-    val nativeWindowController = rememberNativeWindowController()
-    CompositionLocalProvider(
-        LocalNativeWindowController provides nativeWindowController,
-        LocalPlatformWindow provides PlatformWindow(),
-    ) {
-        PreComposeWindow(
-            state = state,
-            visible = visible,
-            title = title,
-            icon = icon,
-            undecorated = false,
-            transparent = false,
-            resizable = resizable,
-            enabled = enabled,
-            focusable = focusable,
-            alwaysOnTop = alwaysOnTop,
-            onPreviewKeyEvent = onPreviewKeyEvent,
-            onKeyEvent = onKeyEvent,
-            onCloseRequest = onCloseRequest,
-            content = {
-                if (currentOperatingSystem == OperatingSystem.MacOS) {
-                    LaunchedEffect(Unit) {
-                        window.rootPane.apply {
-                            putClientProperty("apple.awt.fullWindowContent", true)
-                            putClientProperty("apple.awt.transparentTitleBar", true)
-                        }
-                    }
-                } else if (currentOperatingSystem == OperatingSystem.Windows) {
-                    WindowStyle(
-                        isDarkTheme = !nativeWindowController.isAppearanceLightTitleBar,
-                        backdropType = WindowBackdrop.Mica,
-                    )
-                }
-                content.invoke(this)
-            },
-        )
-    }
+  val nativeWindowController = rememberNativeWindowController()
+  CompositionLocalProvider(
+    LocalNativeWindowController provides nativeWindowController,
+    LocalPlatformWindow provides PlatformWindow(),
+  ) {
+    PreComposeWindow(
+      state = state,
+      visible = visible,
+      title = title,
+      icon = icon,
+      undecorated = false,
+      transparent = false,
+      resizable = resizable,
+      enabled = enabled,
+      focusable = focusable,
+      alwaysOnTop = alwaysOnTop,
+      onPreviewKeyEvent = onPreviewKeyEvent,
+      onKeyEvent = onKeyEvent,
+      onCloseRequest = onCloseRequest,
+      content = {
+        if (currentOperatingSystem == OperatingSystem.MacOS) {
+          LaunchedEffect(Unit) {
+            window.rootPane.apply {
+              putClientProperty("apple.awt.fullWindowContent", true)
+              putClientProperty("apple.awt.transparentTitleBar", true)
+            }
+          }
+        } else if (currentOperatingSystem == OperatingSystem.Windows) {
+          WindowStyle(
+            isDarkTheme = !nativeWindowController.isAppearanceLightTitleBar,
+            backdropType = WindowBackdrop.Mica,
+          )
+        }
+        content.invoke(this)
+      },
+    )
+  }
 }

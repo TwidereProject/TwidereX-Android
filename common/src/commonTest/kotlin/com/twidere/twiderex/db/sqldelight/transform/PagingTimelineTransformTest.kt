@@ -29,21 +29,21 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class PagingTimelineTransformTest {
-    @Test
-    fun transform() {
-        val accountKey = MicroBlogKey.twitter("account")
-        val ui = PagingTimeLineWithStatus(
-            timeline = PagingTimeLine(
-                accountKey = accountKey,
-                pagingKey = "pagingKey",
-                statusKey = MicroBlogKey.valueOf("statusKey"),
-                timestamp = System.currentTimeMillis(),
-                sortId = System.currentTimeMillis(),
-                isGap = true
-            ),
-            status = mockIStatus().toUi(accountKey = accountKey, isGap = true)
-        )
-        val db = ui.toDbPagingTimelineWithStatus()
-        assertEquals(ui, db.toUi())
-    }
+  @Test
+  fun transform() {
+    val accountKey = MicroBlogKey.twitter("account")
+    val ui = PagingTimeLineWithStatus(
+      timeline = PagingTimeLine(
+        accountKey = accountKey,
+        pagingKey = "pagingKey",
+        statusKey = MicroBlogKey.valueOf("statusKey"),
+        timestamp = System.currentTimeMillis(),
+        sortId = System.currentTimeMillis(),
+        isGap = true
+      ),
+      status = mockIStatus().toUi(accountKey = accountKey, isGap = true)
+    )
+    val db = ui.toDbPagingTimelineWithStatus()
+    assertEquals(ui, db.toUi())
+  }
 }

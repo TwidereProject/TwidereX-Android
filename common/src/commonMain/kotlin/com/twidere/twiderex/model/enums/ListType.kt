@@ -21,7 +21,7 @@
 package com.twidere.twiderex.model.enums
 
 enum class ListType {
-    All, // both owned and subscribed
-    Owned,
-    Subscribed
+  All, // both owned and subscribed
+  Owned,
+  Subscribed
 }

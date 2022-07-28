@@ -35,29 +35,29 @@ import kotlinx.coroutines.Dispatchers
 
 @Composable
 internal actual fun rememberNetworkImagePainter(
-    data: Any,
-    authorization: Authorization,
-    httpConfig: HttpConfig,
-    effects: ImageEffects,
-    cacheDir: String,
-    onImageStateChanged: (NetworkImageState) -> Unit
+  data: Any,
+  authorization: Authorization,
+  httpConfig: HttpConfig,
+  effects: ImageEffects,
+  cacheDir: String,
+  onImageStateChanged: (NetworkImageState) -> Unit
 ): Painter {
-    val scope = rememberCoroutineScope { Dispatchers.IO }
-    return remember(data, effects) {
-        ImagePainter(
-            data,
-            scope,
-            imageCache = ImageCacheImpl.create(
-                cacheDir = cacheDir,
-            ),
-            imageEffects = effects,
-            callFactory = {
-                TwidereServiceFactory
-                    .createHttpClientFactory()
-                    .createHttpClientBuilder()
-                    .build()
-            },
-            onImageStateChanged = onImageStateChanged
-        )
-    }
+  val scope = rememberCoroutineScope { Dispatchers.IO }
+  return remember(data, effects) {
+    ImagePainter(
+      data,
+      scope,
+      imageCache = ImageCacheImpl.create(
+        cacheDir = cacheDir,
+      ),
+      imageEffects = effects,
+      callFactory = {
+        TwidereServiceFactory
+          .createHttpClientFactory()
+          .createHttpClientBuilder()
+          .build()
+      },
+      onImageStateChanged = onImageStateChanged
+    )
+  }
 }

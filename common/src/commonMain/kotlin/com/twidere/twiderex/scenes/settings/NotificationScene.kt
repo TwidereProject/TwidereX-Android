@@ -56,101 +56,101 @@ import com.twidere.twiderex.viewmodel.settings.NotificationViewModel
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NotificationScene() {
-    val activeAccountViewModel = LocalActiveAccountViewModel.current
-    val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
-    val viewModel: NotificationViewModel = getViewModel()
-    val notificationEnabled by viewModel.enabled.observeAsState(initial = true)
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_notification_title))
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    }
-                )
-            }
+  val activeAccountViewModel = LocalActiveAccountViewModel.current
+  val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
+  val viewModel: NotificationViewModel = getViewModel()
+  val notificationEnabled by viewModel.enabled.observeAsState(initial = true)
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_notification_title))
+          },
+          navigationIcon = {
+            AppBarNavigationButton()
+          }
+        )
+      }
+    ) {
+      Column {
+        Surface(
+          color = MaterialTheme.colors.primary,
         ) {
-            Column {
-                Surface(
-                    color = MaterialTheme.colors.primary,
-                ) {
-                    ListItem(
-                        modifier = Modifier.clickable {
-                            viewModel.setEnabled(!notificationEnabled)
-                        },
-                        text = {
-                            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_notification_notification_switch))
-                        },
-                        trailing = {
-                            ColoredSwitch(
-                                checked = notificationEnabled,
-                                onCheckedChange = {
-                                    viewModel.setEnabled(it)
-                                },
-                                colors = SwitchDefaults.colors(
-                                    checkedThumbColor = MaterialTheme.colors.onPrimary,
-                                )
-                            )
-                        }
-                    )
-                }
-                ItemHeader {
-                    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_notification_accounts))
-                }
-                val navController = LocalNavController.current
-                LazyColumn {
-                    items(accounts) {
-                        val user = it.toUi()
-                        ListItem(
-                            modifier = Modifier.clickable(
-                                onClick = {
-                                    navController.navigate(Root.Settings.AccountNotification(it.accountKey))
-                                },
-                                enabled = notificationEnabled,
-                            ),
-                            icon = {
-                                CompositionLocalProvider(
-                                    *if (!notificationEnabled) {
-                                        arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
-                                    } else {
-                                        emptyArray()
-                                    }
-                                ) {
-                                    UserAvatar(
-                                        user = user,
-                                        withPlatformIcon = true,
-                                    )
-                                }
-                            },
-                            text = {
-                                CompositionLocalProvider(
-                                    *if (!notificationEnabled) {
-                                        arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
-                                    } else {
-                                        emptyArray()
-                                    }
-                                ) {
-                                    UserName(user = user)
-                                }
-                            },
-                            secondaryText = {
-                                CompositionLocalProvider(
-                                    *if (!notificationEnabled) {
-                                        arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
-                                    } else {
-                                        emptyArray()
-                                    }
-                                ) {
-                                    UserScreenName(user = user)
-                                }
-                            },
-                        )
-                    }
-                }
+          ListItem(
+            modifier = Modifier.clickable {
+              viewModel.setEnabled(!notificationEnabled)
+            },
+            text = {
+              Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_notification_notification_switch))
+            },
+            trailing = {
+              ColoredSwitch(
+                checked = notificationEnabled,
+                onCheckedChange = {
+                  viewModel.setEnabled(it)
+                },
+                colors = SwitchDefaults.colors(
+                  checkedThumbColor = MaterialTheme.colors.onPrimary,
+                )
+              )
             }
+          )
         }
+        ItemHeader {
+          Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_notification_accounts))
+        }
+        val navController = LocalNavController.current
+        LazyColumn {
+          items(accounts) {
+            val user = it.toUi()
+            ListItem(
+              modifier = Modifier.clickable(
+                onClick = {
+                  navController.navigate(Root.Settings.AccountNotification(it.accountKey))
+                },
+                enabled = notificationEnabled,
+              ),
+              icon = {
+                CompositionLocalProvider(
+                  *if (!notificationEnabled) {
+                    arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
+                  } else {
+                    emptyArray()
+                  }
+                ) {
+                  UserAvatar(
+                    user = user,
+                    withPlatformIcon = true,
+                  )
+                }
+              },
+              text = {
+                CompositionLocalProvider(
+                  *if (!notificationEnabled) {
+                    arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
+                  } else {
+                    emptyArray()
+                  }
+                ) {
+                  UserName(user = user)
+                }
+              },
+              secondaryText = {
+                CompositionLocalProvider(
+                  *if (!notificationEnabled) {
+                    arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
+                  } else {
+                    emptyArray()
+                  }
+                ) {
+                  UserScreenName(user = user)
+                }
+              },
+            )
+          }
+        }
+      }
     }
+  }
 }

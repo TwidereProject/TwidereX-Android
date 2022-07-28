@@ -30,43 +30,43 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class SearchSaveViewModel(
-    private val repository: SearchRepository,
-    private val accountRepository: AccountRepository,
-    private val content: String,
+  private val repository: SearchRepository,
+  private val accountRepository: AccountRepository,
+  private val content: String,
 ) : ViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
+
+  val loading = MutableStateFlow(false)
+
+  val isSaved = MutableStateFlow(false)
+
+  init {
+    viewModelScope.launch {
+      account.firstOrNull()?.let {
+        isSaved.value = repository.get(content, it.accountKey)?.saved ?: false
+      }
     }
+  }
 
-    val loading = MutableStateFlow(false)
-
-    val isSaved = MutableStateFlow(false)
-
-    init {
-        viewModelScope.launch {
-            account.firstOrNull()?.let {
-                isSaved.value = repository.get(content, it.accountKey)?.saved ?: false
-            }
+  fun save() {
+    viewModelScope.launch {
+      loading.value = true
+      try {
+        account.firstOrNull()?.let {
+          repository.addOrUpgrade(
+            content = content,
+            accountKey = it.accountKey,
+            saved = true
+          )
+          isSaved.value = true
         }
+      } catch (e: Exception) {
+        isSaved.value = false
+      } finally {
+        loading.value = false
+      }
     }
-
-    fun save() {
-        viewModelScope.launch {
-            loading.value = true
-            try {
-                account.firstOrNull()?.let {
-                    repository.addOrUpgrade(
-                        content = content,
-                        accountKey = it.accountKey,
-                        saved = true
-                    )
-                    isSaved.value = true
-                }
-            } catch (e: Exception) {
-                isSaved.value = false
-            } finally {
-                loading.value = false
-            }
-        }
-    }
+  }
 }

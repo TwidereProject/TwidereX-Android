@@ -23,14 +23,14 @@ package com.twidere.twiderex.paging.source.gif
 import com.twidere.services.gif.GifService
 
 class GifSearchPagingSource(
-    gifService: GifService,
-    private val query: String,
-    private val lang: String
+  gifService: GifService,
+  private val query: String,
+  private val lang: String
 ) : GifPagingSource(gifService) {
-    override suspend fun loadFromService(key: String?, loadSize: Int) = service.search(
-        nextPage = key,
-        limit = loadSize,
-        query = query,
-        lang = lang
-    )
+  override suspend fun loadFromService(key: String?, loadSize: Int) = service.search(
+    nextPage = key,
+    limit = loadSize,
+    query = query,
+    lang = lang
+  )
 }

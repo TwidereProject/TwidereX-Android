@@ -29,43 +29,43 @@ import com.twidere.twiderex.jobs.common.DownloadMediaJob
 import com.twidere.twiderex.model.MicroBlogKey
 
 class DownloadMediaWorker(
-    context: Context,
-    workerParams: WorkerParameters,
-    private val downloadMediaJob: DownloadMediaJob,
+  context: Context,
+  workerParams: WorkerParameters,
+  private val downloadMediaJob: DownloadMediaJob,
 ) : CoroutineWorker(context, workerParams) {
 
-    companion object {
-        fun create(
-            accountKey: MicroBlogKey,
-            source: String,
-            target: String,
-        ) = OneTimeWorkRequestBuilder<DownloadMediaWorker>()
-            .setInputData(
-                Data.Builder()
-                    .putString("accountKey", accountKey.toString())
-                    .putString("source", source)
-                    .putString("target", target)
-                    .build()
-            )
-            .build()
-    }
+  companion object {
+    fun create(
+      accountKey: MicroBlogKey,
+      source: String,
+      target: String,
+    ) = OneTimeWorkRequestBuilder<DownloadMediaWorker>()
+      .setInputData(
+        Data.Builder()
+          .putString("accountKey", accountKey.toString())
+          .putString("source", source)
+          .putString("target", target)
+          .build()
+      )
+      .build()
+  }
 
-    override suspend fun doWork(): Result {
-        val target = inputData.getString("target") ?: return Result.failure()
-        val source = inputData.getString("source") ?: return Result.failure()
-        val accountKey = inputData.getString("accountKey")?.let {
-            MicroBlogKey.valueOf(it)
-        } ?: return Result.failure()
-        return try {
-            downloadMediaJob.execute(
-                target = target,
-                source = source,
-                accountKey = accountKey
-            )
-            Result.success()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            Result.failure()
-        }
+  override suspend fun doWork(): Result {
+    val target = inputData.getString("target") ?: return Result.failure()
+    val source = inputData.getString("source") ?: return Result.failure()
+    val accountKey = inputData.getString("accountKey")?.let {
+      MicroBlogKey.valueOf(it)
+    } ?: return Result.failure()
+    return try {
+      downloadMediaJob.execute(
+        target = target,
+        source = source,
+        accountKey = accountKey
+      )
+      Result.success()
+    } catch (e: Throwable) {
+      e.printStackTrace()
+      Result.failure()
     }
+  }
 }

@@ -31,16 +31,16 @@ import org.junit.Test
 import java.util.UUID
 
 internal class SqlDelightAppDatabaseImplTest : BaseAppDatabaseTest() {
-    @Test
-    fun clearAllTables() = runBlocking {
-        val appDatabase = SqlDelightAppDatabaseImpl(database)
-        val accountKey = MicroBlogKey.twitter("test")
-        database.searchQueries.insert(Search(content = "test", lastActive = System.currentTimeMillis(), saved = false, accountKey = accountKey))
-        database.draftQueries.insert(Draft(content = "test", id = UUID.randomUUID().toString(), media = emptyList(), createAt = System.currentTimeMillis(), composeType = ComposeType.New, statusKey = null, excludedReplyUserIds = emptyList()))
-        assert(database.draftQueries.getAll().executeAsList().isNotEmpty())
-        assert(database.searchQueries.getAll(accountKey).executeAsList().isNotEmpty())
-        appDatabase.clearAllTables()
-        assert(database.draftQueries.getAll().executeAsList().isEmpty())
-        assert(database.searchQueries.getAll(accountKey).executeAsList().isEmpty())
-    }
+  @Test
+  fun clearAllTables() = runBlocking {
+    val appDatabase = SqlDelightAppDatabaseImpl(database)
+    val accountKey = MicroBlogKey.twitter("test")
+    database.searchQueries.insert(Search(content = "test", lastActive = System.currentTimeMillis(), saved = false, accountKey = accountKey))
+    database.draftQueries.insert(Draft(content = "test", id = UUID.randomUUID().toString(), media = emptyList(), createAt = System.currentTimeMillis(), composeType = ComposeType.New, statusKey = null, excludedReplyUserIds = emptyList()))
+    assert(database.draftQueries.getAll().executeAsList().isNotEmpty())
+    assert(database.searchQueries.getAll(accountKey).executeAsList().isNotEmpty())
+    appDatabase.clearAllTables()
+    assert(database.draftQueries.getAll().executeAsList().isEmpty())
+    assert(database.searchQueries.getAll(accountKey).executeAsList().isEmpty())
+  }
 }

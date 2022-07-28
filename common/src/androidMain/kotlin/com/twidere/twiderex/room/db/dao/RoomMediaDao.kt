@@ -29,9 +29,9 @@ import com.twidere.twiderex.room.db.model.DbMedia
 
 @Dao
 internal interface RoomMediaDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(media: List<DbMedia>)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertAll(media: List<DbMedia>)
 
-    @Query("SELECT * FROM media Where belongToKey == :belongToKey")
-    suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey): List<DbMedia>
+  @Query("SELECT * FROM media Where belongToKey == :belongToKey")
+  suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey): List<DbMedia>
 }

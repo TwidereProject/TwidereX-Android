@@ -26,18 +26,18 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 
 @Entity(
-    tableName = "draft",
+  tableName = "draft",
 )
 internal data class DbDraft(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    val _id: String,
-    val content: String,
-    val media: List<String>,
-    val createdAt: Long,
-    val composeType: ComposeType,
-    val statusKey: MicroBlogKey?,
-    val excludedReplyUserIds: List<String>?,
+  /**
+   * Id that being used in the database
+   */
+  @PrimaryKey
+  val _id: String,
+  val content: String,
+  val media: List<String>,
+  val createdAt: Long,
+  val composeType: ComposeType,
+  val statusKey: MicroBlogKey?,
+  val excludedReplyUserIds: List<String>?,
 )

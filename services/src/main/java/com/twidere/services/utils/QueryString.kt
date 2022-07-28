@@ -26,19 +26,19 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import java.net.URLDecoder
 
 internal inline fun <reified T> String.queryString(): T {
-    val map = split("&")
+  val map = split("&")
+    .map {
+      it.split("=")
         .map {
-            it.split("=")
-                .map {
-                    @Suppress("DEPRECATION")
-                    URLDecoder.decode(it)
-                }
-                .let {
-                    it[0] to it[1]
-                }
+          @Suppress("DEPRECATION")
+          URLDecoder.decode(it)
         }
-        .toMap()
-    return JSON.encodeToJsonElement(MapSerializer(String.serializer(), String.serializer()), map).let {
-        JSON.decodeFromJsonElement<T>(it)
+        .let {
+          it[0] to it[1]
+        }
     }
+    .toMap()
+  return JSON.encodeToJsonElement(MapSerializer(String.serializer(), String.serializer()), map).let {
+    JSON.decodeFromJsonElement<T>(it)
+  }
 }

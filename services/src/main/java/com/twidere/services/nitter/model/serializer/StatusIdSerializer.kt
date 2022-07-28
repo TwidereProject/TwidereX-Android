@@ -24,7 +24,7 @@ import moe.tlaster.hson.HtmlSerializer
 import org.jsoup.nodes.Element
 
 class StatusIdSerializer : HtmlSerializer<String> {
-    override fun decode(element: Element, wholeText: String): String {
-        return "status/(\\d+)".toRegex().find(wholeText)?.groupValues?.getOrNull(1) ?: ""
-    }
+  override fun decode(element: Element, wholeText: String): String {
+    return "status/(\\d+)".toRegex().find(wholeText)?.groupValues?.getOrNull(1) ?: ""
+  }
 }

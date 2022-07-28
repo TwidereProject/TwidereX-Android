@@ -30,14 +30,14 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class UserQueriesImplTest : BaseCacheDatabaseTest() {
-    @Test
-    fun insert_ReplaceWhenUserKeyEquals() = runBlocking {
-        val queries = database.userQueries
-        val accountKey = MicroBlogKey.twitter("account")
-        val user = mockIUser(name = "insert").toUi(accountKey)
-        queries.insert(user.toDbUser())
-        assertEquals("insert", queries.findWithUserKey(user.userKey).executeAsOneOrNull()?.name)
-        queries.insert(user.copy(name = "replace").toDbUser())
-        assertEquals("replace", queries.findWithUserKey(user.userKey).executeAsOneOrNull()?.name)
-    }
+  @Test
+  fun insert_ReplaceWhenUserKeyEquals() = runBlocking {
+    val queries = database.userQueries
+    val accountKey = MicroBlogKey.twitter("account")
+    val user = mockIUser(name = "insert").toUi(accountKey)
+    queries.insert(user.toDbUser())
+    assertEquals("insert", queries.findWithUserKey(user.userKey).executeAsOneOrNull()?.name)
+    queries.insert(user.copy(name = "replace").toDbUser())
+    assertEquals("replace", queries.findWithUserKey(user.userKey).executeAsOneOrNull()?.name)
+  }
 }

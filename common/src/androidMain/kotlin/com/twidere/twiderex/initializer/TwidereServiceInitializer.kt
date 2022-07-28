@@ -30,14 +30,14 @@ import org.koin.core.component.inject
 class TwidereserviceInitializerHolder
 
 class TwidereServiceInitializer : Initializer<TwidereserviceInitializerHolder>, KoinComponent {
-    private val configProvider: TwidereHttpConfigProvider by inject()
+  private val configProvider: TwidereHttpConfigProvider by inject()
 
-    override fun create(context: Context): TwidereserviceInitializerHolder {
-        TwidereServiceFactory.initiate(configProvider)
-        return TwidereserviceInitializerHolder()
-    }
+  override fun create(context: Context): TwidereserviceInitializerHolder {
+    TwidereServiceFactory.initiate(configProvider)
+    return TwidereserviceInitializerHolder()
+  }
 
-    override fun dependencies(): MutableList<Class<out Initializer<*>>> {
-        return mutableListOf()
-    }
+  override fun dependencies(): MutableList<Class<out Initializer<*>>> {
+    return mutableListOf()
+  }
 }

@@ -30,39 +30,39 @@ import com.twidere.twiderex.paging.source.gif.GifSearchPagingSource
 import com.twidere.twiderex.paging.source.gif.GifTrendingPagingSource
 
 class GifRepository(
-    private val fileResolver: FileResolver
+  private val fileResolver: FileResolver
 ) {
-    fun gifTrending(service: GifService) = Pager(
-        config = PagingConfig(
-            pageSize = defaultLoadCount,
-            enablePlaceholders = false,
-        )
-    ) {
-        GifTrendingPagingSource(
-            service
-        )
-    }.flow
+  fun gifTrending(service: GifService) = Pager(
+    config = PagingConfig(
+      pageSize = defaultLoadCount,
+      enablePlaceholders = false,
+    )
+  ) {
+    GifTrendingPagingSource(
+      service
+    )
+  }.flow
 
-    fun gifSearch(
-        service: GifService,
-        query: String,
-        lang: String
-    ) = Pager(
-        config = PagingConfig(
-            pageSize = defaultLoadCount,
-            enablePlaceholders = false,
-        )
-    ) {
-        GifSearchPagingSource(
-            service,
-            query = query,
-            lang = lang
-        )
-    }.flow
+  fun gifSearch(
+    service: GifService,
+    query: String,
+    lang: String
+  ) = Pager(
+    config = PagingConfig(
+      pageSize = defaultLoadCount,
+      enablePlaceholders = false,
+    )
+  ) {
+    GifSearchPagingSource(
+      service,
+      query = query,
+      lang = lang
+    )
+  }.flow
 
-    suspend fun download(target: String, source: String, service: DownloadMediaService) {
-        fileResolver.openOutputStream(target)?.use {
-            service.download(target = source).copyTo(it)
-        } ?: throw Error("Download failed")
-    }
+  suspend fun download(target: String, source: String, service: DownloadMediaService) {
+    fileResolver.openOutputStream(target)?.use {
+      service.download(target = source).copyTo(it)
+    } ?: throw Error("Download failed")
+  }
 }

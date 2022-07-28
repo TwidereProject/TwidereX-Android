@@ -23,9 +23,9 @@ package com.twidere.twiderex.scenes.search.tabs
 import androidx.compose.runtime.Composable
 
 interface SearchSceneItem {
-    @Composable
-    fun name(): String
+  @Composable
+  fun name(): String
 
-    @Composable
-    fun Content(keyword: String)
+  @Composable
+  fun Content(keyword: String)
 }

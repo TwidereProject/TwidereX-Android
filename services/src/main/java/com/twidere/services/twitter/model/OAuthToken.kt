@@ -24,6 +24,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OAuthToken(
-    val oauth_token: String,
-    val oauth_token_secret: String,
+  val oauth_token: String,
+  val oauth_token_secret: String,
 )

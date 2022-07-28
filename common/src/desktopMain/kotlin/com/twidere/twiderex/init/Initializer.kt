@@ -24,37 +24,37 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 internal class Initializer private constructor(private val scope: CoroutineScope) {
-    private val tasks = mutableListOf<InitialTask>()
-    private val asyncTasks = mutableListOf<AsyncInitialTask>()
-    companion object {
-        fun withScope(scope: CoroutineScope) = Initializer(scope)
-    }
-    fun add(task: InitialTask): Initializer {
-        tasks.add(task)
-        return this
-    }
+  private val tasks = mutableListOf<InitialTask>()
+  private val asyncTasks = mutableListOf<AsyncInitialTask>()
+  companion object {
+    fun withScope(scope: CoroutineScope) = Initializer(scope)
+  }
+  fun add(task: InitialTask): Initializer {
+    tasks.add(task)
+    return this
+  }
 
-    fun add(task: AsyncInitialTask): Initializer {
-        asyncTasks.add(task)
-        return this
-    }
+  fun add(task: AsyncInitialTask): Initializer {
+    asyncTasks.add(task)
+    return this
+  }
 
-    fun execute() {
-        tasks.forEach {
-            it.execute()
-        }
-        scope.launch {
-            asyncTasks.forEach {
-                it.execute()
-            }
-        }
+  fun execute() {
+    tasks.forEach {
+      it.execute()
     }
+    scope.launch {
+      asyncTasks.forEach {
+        it.execute()
+      }
+    }
+  }
 }
 
 internal interface InitialTask {
-    fun execute()
+  fun execute()
 }
 
 internal interface AsyncInitialTask {
-    suspend fun execute()
+  suspend fun execute()
 }

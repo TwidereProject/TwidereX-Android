@@ -25,12 +25,12 @@ import com.twidere.services.microblog.model.IUser
 import com.twidere.twiderex.model.MicroBlogKey
 
 class FollowingPagingSource(
-    userKey: MicroBlogKey,
-    private val service: RelationshipService
+  userKey: MicroBlogKey,
+  private val service: RelationshipService
 ) : UserPagingSource(userKey = userKey) {
 
-    override suspend fun loadUsers(params: LoadParams<String>): List<IUser> {
-        val page = params.key
-        return service.following(userKey.id, nextPage = page)
-    }
+  override suspend fun loadUsers(params: LoadParams<String>): List<IUser> {
+    val page = params.key
+    return service.following(userKey.id, nextPage = page)
+  }
 }

@@ -36,45 +36,45 @@ import com.twidere.twiderex.paging.mediator.paging.MaxIdPagingMediator
 
 @OptIn(ExperimentalPagingApi::class)
 class UserMediaMediator(
-    private val userKey: MicroBlogKey,
-    database: CacheDatabase,
-    accountKey: MicroBlogKey,
-    private val service: TimelineService,
+  private val userKey: MicroBlogKey,
+  database: CacheDatabase,
+  accountKey: MicroBlogKey,
+  private val service: TimelineService,
 ) : MaxIdPagingMediator(accountKey, database) {
-    override val pagingKey: String
-        get() = UserTimelineType.Media.pagingKey(userKey)
+  override val pagingKey: String
+    get() = UserTimelineType.Media.pagingKey(userKey)
 
-    override suspend fun load(pageSize: Int, paging: SinceMaxPagination?): List<IStatus> {
-        return service.userTimeline(
-            user_id = userKey.id,
-            count = pageSize,
-            max_id = paging?.maxId,
-            exclude_replies = false
-        )
-    }
+  override suspend fun load(pageSize: Int, paging: SinceMaxPagination?): List<IStatus> {
+    return service.userTimeline(
+      user_id = userKey.id,
+      count = pageSize,
+      max_id = paging?.maxId,
+      exclude_replies = false
+    )
+  }
 
-    override fun provideNextPage(
-        raw: List<IStatus>,
-        result: List<PagingTimeLineWithStatus>
-    ): SinceMaxPagination {
-        if (result is PagingList<*, *>) {
-            return result.nextPage as SinceMaxPagination
-        }
-        return super.provideNextPage(raw, result)
+  override fun provideNextPage(
+    raw: List<IStatus>,
+    result: List<PagingTimeLineWithStatus>
+  ): SinceMaxPagination {
+    if (result is PagingList<*, *>) {
+      return result.nextPage as SinceMaxPagination
     }
+    return super.provideNextPage(raw, result)
+  }
 
-    override fun transform(
-        state: PagingState<Int, PagingTimeLineWithStatus>,
-        data: List<PagingTimeLineWithStatus>,
-        list: List<IStatus>,
-    ): List<PagingTimeLineWithStatus> {
-        return PagingList(
-            data.filter {
-                val content = it.status
-                !it.status.referenceStatus.any { reference -> reference.key == ReferenceType.Retweet } &&
-                    content.hasMedia && content.user.userKey == userKey
-            },
-            SinceMaxPagination(maxId = data.lastOrNull()?.status?.statusId)
-        )
-    }
+  override fun transform(
+    state: PagingState<Int, PagingTimeLineWithStatus>,
+    data: List<PagingTimeLineWithStatus>,
+    list: List<IStatus>,
+  ): List<PagingTimeLineWithStatus> {
+    return PagingList(
+      data.filter {
+        val content = it.status
+        !it.status.referenceStatus.any { reference -> reference.key == ReferenceType.Retweet } &&
+          content.hasMedia && content.user.userKey == userKey
+      },
+      SinceMaxPagination(maxId = data.lastOrNull()?.status?.statusId)
+    )
+  }
 }

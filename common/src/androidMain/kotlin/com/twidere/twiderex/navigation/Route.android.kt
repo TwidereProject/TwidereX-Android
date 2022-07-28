@@ -26,11 +26,11 @@ import moe.tlaster.precompose.navigation.path
 import java.net.URLDecoder
 
 actual fun RouteBuilder.platformScene() {
-    scene(
-        Root.SignIn.Web.Twitter,
-    ) { backStackEntry ->
-        backStackEntry.path<String>("target")?.let {
-            TwitterWebSignInScene(target = URLDecoder.decode(it, "UTF-8"))
-        }
+  scene(
+    Root.SignIn.Web.Twitter,
+  ) { backStackEntry ->
+    backStackEntry.path<String>("target")?.let {
+      TwitterWebSignInScene(target = URLDecoder.decode(it, "UTF-8"))
     }
+  }
 }

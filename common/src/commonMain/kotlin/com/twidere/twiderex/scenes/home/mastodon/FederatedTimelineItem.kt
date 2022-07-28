@@ -39,55 +39,55 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.mastodon.FederatedTimelineViewModel
 
 class FederatedTimelineItem : HomeNavigationItem() {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_federated_title)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_federated_title)
+  }
 
-    override val route: String
-        get() = Root.Mastodon.FederatedTimeline
+  override val route: String
+    get() = Root.Mastodon.FederatedTimeline
 
-    @Composable
-    override fun icon(): Painter {
-        return painterResource(res = com.twidere.twiderex.MR.files.ic_globe)
-    }
+  @Composable
+  override fun icon(): Painter {
+    return painterResource(res = com.twidere.twiderex.MR.files.ic_globe)
+  }
 
-    @Composable
-    override fun Content() {
-        FederatedTimelineContent(
-            lazyListController = lazyListController
-        )
-    }
+  @Composable
+  override fun Content() {
+    FederatedTimelineContent(
+      lazyListController = lazyListController
+    )
+  }
 }
 
 @Composable
 fun FederatedTimelineScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = "Federated")
-                    }
-                )
-            }
-        ) {
-            FederatedTimelineContent()
-        }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = "Federated")
+          }
+        )
+      }
+    ) {
+      FederatedTimelineContent()
     }
+  }
 }
 
 @Composable
 fun FederatedTimelineContent(
-    lazyListController: LazyListController? = null,
+  lazyListController: LazyListController? = null,
 ) {
-    val account = LocalActiveAccount.current ?: return
-    if (account.service !is MastodonService) {
-        return
-    }
-    val viewModel: FederatedTimelineViewModel = getViewModel()
-    TimelineComponent(viewModel = viewModel, lazyListController = lazyListController)
+  val account = LocalActiveAccount.current ?: return
+  if (account.service !is MastodonService) {
+    return
+  }
+  val viewModel: FederatedTimelineViewModel = getViewModel()
+  TimelineComponent(viewModel = viewModel, lazyListController = lazyListController)
 }

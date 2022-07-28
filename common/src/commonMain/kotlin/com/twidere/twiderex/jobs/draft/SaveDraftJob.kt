@@ -26,24 +26,24 @@ import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.utils.notifyError
 
 class SaveDraftJob(
-    private val repository: DraftRepository,
-    private val inAppNotification: InAppNotification,
+  private val repository: DraftRepository,
+  private val inAppNotification: InAppNotification,
 ) {
-    suspend fun execute(data: ComposeData) {
-        with(data) {
-            try {
-                repository.addOrUpgrade(
-                    content,
-                    images,
-                    composeType = composeType,
-                    statusKey = statusKey,
-                    draftId = draftId,
-                    excludedReplyUserIds = excludedReplyUserIds,
-                )
-            } catch (e: Throwable) {
-                inAppNotification.notifyError(e)
-                throw e
-            }
-        }
+  suspend fun execute(data: ComposeData) {
+    with(data) {
+      try {
+        repository.addOrUpgrade(
+          content,
+          images,
+          composeType = composeType,
+          statusKey = statusKey,
+          draftId = draftId,
+          excludedReplyUserIds = excludedReplyUserIds,
+        )
+      } catch (e: Throwable) {
+        inAppNotification.notifyError(e)
+        throw e
+      }
     }
+  }
 }

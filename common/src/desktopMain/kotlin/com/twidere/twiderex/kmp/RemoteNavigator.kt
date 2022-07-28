@@ -24,24 +24,24 @@ import java.awt.Desktop
 import java.net.URI
 
 actual class RemoteNavigator {
-    actual fun openDeepLink(deeplink: String, fromBackground: Boolean) {
-        Desktop.getDesktop().browse(URI(deeplink))
-    }
+  actual fun openDeepLink(deeplink: String, fromBackground: Boolean) {
+    Desktop.getDesktop().browse(URI(deeplink))
+  }
 
-    actual fun shareMedia(
-        filePath: String,
-        mimeType: String,
-        fromBackground: Boolean,
-        extraText: String,
-    ) {
-        // TODO: Show native UI for sharing
-    }
+  actual fun shareMedia(
+    filePath: String,
+    mimeType: String,
+    fromBackground: Boolean,
+    extraText: String,
+  ) {
+    // TODO: Show native UI for sharing
+  }
 
-    actual fun shareText(content: String, fromBackground: Boolean) {
-        // TODO: Show native UI for sharing
-    }
+  actual fun shareText(content: String, fromBackground: Boolean) {
+    // TODO: Show native UI for sharing
+  }
 
-    actual fun launchOAuthUri(uri: String) {
-        Desktop.getDesktop().browse(URI(uri))
-    }
+  actual fun launchOAuthUri(uri: String) {
+    Desktop.getDesktop().browse(URI(uri))
+  }
 }

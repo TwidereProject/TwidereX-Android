@@ -35,29 +35,29 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class UserTimelineViewModel(
-    private val repository: TimelineRepository,
-    private val accountRepository: AccountRepository,
-    userKey: MicroBlogKey,
+  private val repository: TimelineRepository,
+  private val accountRepository: AccountRepository,
+  userKey: MicroBlogKey,
 ) : ViewModel() {
-    private val _excludeReplies = MutableStateFlow(false)
-    val excludeReplies = _excludeReplies.asStateIn(viewModelScope, false)
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val _excludeReplies = MutableStateFlow(false)
+  val excludeReplies = _excludeReplies.asStateIn(viewModelScope, false)
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    fun setExcludeReplies(value: Boolean) {
-        _excludeReplies.value = value
-    }
+  fun setExcludeReplies(value: Boolean) {
+    _excludeReplies.value = value
+  }
 
-    @OptIn(FlowPreview::class)
-    val source by lazy {
-        combine(account, _excludeReplies) { account, excludeReplies ->
-            repository.userTimeline(
-                userKey = userKey,
-                accountKey = account.accountKey,
-                service = account.service as TimelineService,
-                exclude_replies = excludeReplies,
-            )
-        }.flattenMerge().cachedIn(viewModelScope)
-    }
+  @OptIn(FlowPreview::class)
+  val source by lazy {
+    combine(account, _excludeReplies) { account, excludeReplies ->
+      repository.userTimeline(
+        userKey = userKey,
+        accountKey = account.accountKey,
+        service = account.service as TimelineService,
+        exclude_replies = excludeReplies,
+      )
+    }.flattenMerge().cachedIn(viewModelScope)
+  }
 }

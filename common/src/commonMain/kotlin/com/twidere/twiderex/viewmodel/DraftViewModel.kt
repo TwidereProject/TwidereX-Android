@@ -26,15 +26,15 @@ import com.twidere.twiderex.repository.DraftRepository
 import moe.tlaster.precompose.viewmodel.ViewModel
 
 class DraftViewModel(
-    private val repository: DraftRepository,
-    private val draftAction: DraftAction
+  private val repository: DraftRepository,
+  private val draftAction: DraftAction
 ) : ViewModel() {
 
-    fun delete(it: UiDraft) {
-        draftAction.delete(it.draftId)
-    }
+  fun delete(it: UiDraft) {
+    draftAction.delete(it.draftId)
+  }
 
-    val source by lazy {
-        repository.source
-    }
+  val source by lazy {
+    repository.source
+  }
 }

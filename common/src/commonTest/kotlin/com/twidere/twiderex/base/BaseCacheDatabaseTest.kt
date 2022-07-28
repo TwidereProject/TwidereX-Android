@@ -26,15 +26,15 @@ import org.junit.After
 import org.junit.Before
 
 internal open class BaseCacheDatabaseTest {
-    private val driver = SqlDriverFactory.create(SqlDelightCacheDatabase.Schema)
-    protected val database: SqlDelightCacheDatabase = createCacheDataBase(driver)
-    @Before
-    open fun setUp() {
-    }
+  private val driver = SqlDriverFactory.create(SqlDelightCacheDatabase.Schema)
+  protected val database: SqlDelightCacheDatabase = createCacheDataBase(driver)
+  @Before
+  open fun setUp() {
+  }
 
-    @After
-    open fun tearDown() {
-        database.cacheDropQueries.clearAllTables()
-        driver.close()
-    }
+  @After
+  open fun tearDown() {
+    database.cacheDropQueries.clearAllTables()
+    driver.close()
+  }
 }

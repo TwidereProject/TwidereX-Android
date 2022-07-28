@@ -31,18 +31,18 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class TwitterSearchMediaViewModel(
-    private val repository: SearchRepository,
-    private val accountRepository: AccountRepository,
-    keyword: String,
+  private val repository: SearchRepository,
+  private val accountRepository: AccountRepository,
+  keyword: String,
 ) : ViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val source by lazy {
-        account.flatMapLatest {
-            repository.media(keyword, it.accountKey, it.service as SearchService)
-        }.cachedIn(viewModelScope)
-    }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  val source by lazy {
+    account.flatMapLatest {
+      repository.media(keyword, it.accountKey, it.service as SearchService)
+    }.cachedIn(viewModelScope)
+  }
 }

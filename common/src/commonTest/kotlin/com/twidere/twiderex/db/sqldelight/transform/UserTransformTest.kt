@@ -31,35 +31,35 @@ import java.util.UUID
 import kotlin.test.assertEquals
 
 internal class UserTransformTest {
-    @Test
-    fun transform() {
-        val ui = UiUser(
-            userKey = MicroBlogKey.valueOf("userKey@twitter.com"),
-            id = UUID.randomUUID().toString(),
-            acct = MicroBlogKey.valueOf("acct"),
-            name = "name",
-            screenName = "screenName",
-            profileImage = "profileImage",
-            profileBackgroundImage = "profileBackgroundImage",
-            metrics = UserMetrics(
-                fans = 1,
-                follow = 2,
-                status = 3,
-                listed = 4
-            ),
-            rawDesc = "rawDesc",
-            htmlDesc = "htmlDesc",
-            website = "website",
-            location = "location",
-            verified = true,
-            protected = false,
-            platformType = PlatformType.Twitter,
-            extra = TwitterUserExtra(
-                pinned_tweet_id = "pinned_tweet_id",
-                url = listOf(mockUiUrlEntity())
-            )
-        )
-        val db = ui.toDbUser()
-        assertEquals(ui, db.toUi())
-    }
+  @Test
+  fun transform() {
+    val ui = UiUser(
+      userKey = MicroBlogKey.valueOf("userKey@twitter.com"),
+      id = UUID.randomUUID().toString(),
+      acct = MicroBlogKey.valueOf("acct"),
+      name = "name",
+      screenName = "screenName",
+      profileImage = "profileImage",
+      profileBackgroundImage = "profileBackgroundImage",
+      metrics = UserMetrics(
+        fans = 1,
+        follow = 2,
+        status = 3,
+        listed = 4
+      ),
+      rawDesc = "rawDesc",
+      htmlDesc = "htmlDesc",
+      website = "website",
+      location = "location",
+      verified = true,
+      protected = false,
+      platformType = PlatformType.Twitter,
+      extra = TwitterUserExtra(
+        pinned_tweet_id = "pinned_tweet_id",
+        url = listOf(mockUiUrlEntity())
+      )
+    )
+    val db = ui.toDbUser()
+    assertEquals(ui, db.toUi())
+  }
 }

@@ -30,26 +30,26 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
 actual class DirectMessageAction(
-    private val twitterDirectMessageSendJob: TwitterDirectMessageSendJob,
-    private val directMessageDeleteJob: DirectMessageDeleteJob,
+  private val twitterDirectMessageSendJob: TwitterDirectMessageSendJob,
+  private val directMessageDeleteJob: DirectMessageDeleteJob,
 ) {
-    private val scope = CoroutineScope(Dispatchers.IO)
-    actual fun send(
-        platformType: PlatformType,
-        data: DirectMessageSendData,
-    ) {
-        scope.launchCatching {
-            if (platformType == PlatformType.Twitter) {
-                twitterDirectMessageSendJob.execute(data, data.accountKey)
-            }
-        }
+  private val scope = CoroutineScope(Dispatchers.IO)
+  actual fun send(
+    platformType: PlatformType,
+    data: DirectMessageSendData,
+  ) {
+    scope.launchCatching {
+      if (platformType == PlatformType.Twitter) {
+        twitterDirectMessageSendJob.execute(data, data.accountKey)
+      }
     }
+  }
 
-    actual fun delete(
-        data: DirectMessageDeleteData
-    ) {
-        scope.launchCatching {
-            directMessageDeleteJob.execute(data, data.accountKey)
-        }
+  actual fun delete(
+    data: DirectMessageDeleteData
+  ) {
+    scope.launchCatching {
+      directMessageDeleteJob.execute(data, data.accountKey)
     }
+  }
 }

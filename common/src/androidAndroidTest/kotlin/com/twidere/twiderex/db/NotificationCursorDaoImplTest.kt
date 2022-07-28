@@ -31,35 +31,35 @@ import java.util.UUID
 import kotlin.test.assertEquals
 
 internal class NotificationCursorDaoImplTest : CacheDatabaseDaoTest() {
-    private fun generateCursor(
-        type: NotificationCursorType,
-        accountKey: MicroBlogKey
-    ) = NotificationCursor(
-        _id = UUID.randomUUID().toString(),
-        accountKey = accountKey,
-        type = type,
-        value = type.name,
-        timestamp = System.currentTimeMillis()
-    )
+  private fun generateCursor(
+    type: NotificationCursorType,
+    accountKey: MicroBlogKey
+  ) = NotificationCursor(
+    _id = UUID.randomUUID().toString(),
+    accountKey = accountKey,
+    type = type,
+    value = type.name,
+    timestamp = System.currentTimeMillis()
+  )
 
-    @Test
-    fun addAndFindCursorWithCorrectType(): Unit = runBlocking {
-        val cacheDatabase = CacheDatabaseImpl(roomDatabase)
-        val accountKey = MicroBlogKey.twitter("test")
-        val generalCursor = generateCursor(NotificationCursorType.General, accountKey)
-        val mentionsCursor = generateCursor(NotificationCursorType.Mentions, accountKey)
-        val followerCursor = generateCursor(NotificationCursorType.Follower, accountKey)
-        cacheDatabase.withTransaction {
-            cacheDatabase.notificationCursorDao().apply {
-                add(generalCursor)
-                add(mentionsCursor)
-                add(followerCursor)
-            }
-        }
-        cacheDatabase.notificationCursorDao().apply {
-            assertEquals(generalCursor._id, find(accountKey = accountKey, type = NotificationCursorType.General)?._id)
-            assertEquals(mentionsCursor._id, find(accountKey = accountKey, type = NotificationCursorType.Mentions)?._id)
-            assertEquals(followerCursor._id, find(accountKey = accountKey, type = NotificationCursorType.Follower)?._id)
-        }
+  @Test
+  fun addAndFindCursorWithCorrectType(): Unit = runBlocking {
+    val cacheDatabase = CacheDatabaseImpl(roomDatabase)
+    val accountKey = MicroBlogKey.twitter("test")
+    val generalCursor = generateCursor(NotificationCursorType.General, accountKey)
+    val mentionsCursor = generateCursor(NotificationCursorType.Mentions, accountKey)
+    val followerCursor = generateCursor(NotificationCursorType.Follower, accountKey)
+    cacheDatabase.withTransaction {
+      cacheDatabase.notificationCursorDao().apply {
+        add(generalCursor)
+        add(mentionsCursor)
+        add(followerCursor)
+      }
     }
+    cacheDatabase.notificationCursorDao().apply {
+      assertEquals(generalCursor._id, find(accountKey = accountKey, type = NotificationCursorType.General)?._id)
+      assertEquals(mentionsCursor._id, find(accountKey = accountKey, type = NotificationCursorType.Mentions)?._id)
+      assertEquals(followerCursor._id, find(accountKey = accountKey, type = NotificationCursorType.Follower)?._id)
+    }
+  }
 }

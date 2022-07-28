@@ -28,38 +28,38 @@ import retrofit2.http.Query
 import java.util.Date
 
 interface SearchResources {
-    @GET("/2/tweets/search/recent")
-    suspend fun search(
-        @Query("query") query: String,
-        @Query("max_results") max_results: Int? = null,
-        @Query("next_token") next_token: String? = null,
-        @Query("since_id") since_id: String? = null,
-        @Query("until_id") until_id: String? = null,
-        @Query("start_time") start_time: Date? = null,
-        @Query("end_time") end_time: Date? = null,
-        @Query("tweet.fields", encoded = true) tweetFields: String? = null,
-        @Query("expansions", encoded = true) expansions: String? = null,
-        @Query("media.fields", encoded = true) mediaFields: String? = null,
-        @Query("place.fields", encoded = true) placeFields: String? = null,
-        @Query("poll.fields", encoded = true) pollFields: String? = null,
-        @Query("user.fields", encoded = true) userFields: String? = null,
-    ): TwitterSearchResponseV2
+  @GET("/2/tweets/search/recent")
+  suspend fun search(
+    @Query("query") query: String,
+    @Query("max_results") max_results: Int? = null,
+    @Query("next_token") next_token: String? = null,
+    @Query("since_id") since_id: String? = null,
+    @Query("until_id") until_id: String? = null,
+    @Query("start_time") start_time: Date? = null,
+    @Query("end_time") end_time: Date? = null,
+    @Query("tweet.fields", encoded = true) tweetFields: String? = null,
+    @Query("expansions", encoded = true) expansions: String? = null,
+    @Query("media.fields", encoded = true) mediaFields: String? = null,
+    @Query("place.fields", encoded = true) placeFields: String? = null,
+    @Query("poll.fields", encoded = true) pollFields: String? = null,
+    @Query("user.fields", encoded = true) userFields: String? = null,
+  ): TwitterSearchResponseV2
 
-    @GET("/1.1/search/tweets.json")
-    suspend fun searchV1(
-        @Query("q") q: String,
-        @Query("include_entities") include_entities: Boolean = true,
-        @Query("tweet_mode") tweet_mode: String = "extended",
-        @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
-        @Query("count") count: Int = 20,
-        @Query("since_id") since_id: String? = null,
-        @Query("max_id") max_id: String? = null,
-    ): TwitterSearchResponseV1
+  @GET("/1.1/search/tweets.json")
+  suspend fun searchV1(
+    @Query("q") q: String,
+    @Query("include_entities") include_entities: Boolean = true,
+    @Query("tweet_mode") tweet_mode: String = "extended",
+    @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
+    @Query("count") count: Int = 20,
+    @Query("since_id") since_id: String? = null,
+    @Query("max_id") max_id: String? = null,
+  ): TwitterSearchResponseV1
 
-    @GET("/1.1/users/search.json")
-    suspend fun searchUser(
-        @Query("q") q: String,
-        @Query("page") page: Int? = null,
-        @Query("count") count: Int? = null,
-    ): List<User>
+  @GET("/1.1/users/search.json")
+  suspend fun searchUser(
+    @Query("q") q: String,
+    @Query("page") page: Int? = null,
+    @Query("count") count: Int? = null,
+  ): List<User>
 }

@@ -33,28 +33,28 @@ import com.twidere.twiderex.viewmodel.search.SearchUserViewModel
 import org.koin.core.parameter.parametersOf
 
 class SearchUserItem : SearchSceneItem {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_search_tabs_users)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_search_tabs_users)
+  }
 
-    @Composable
-    override fun Content(keyword: String) {
-        val viewModel: SearchUserViewModel = getViewModel {
-            parametersOf(keyword)
-        }
-        val source = viewModel.source.collectAsLazyPagingItems()
-        val navigator = LocalNavigator.current
-        SwipeToRefreshLayout(
-            refreshingState = source.loadState.refresh is LoadState.Loading,
-            onRefresh = {
-                source.refreshOrRetry()
-            }
-        ) {
-            LazyUiUserList(
-                items = source,
-                onItemClicked = { navigator.user(it) },
-            )
-        }
+  @Composable
+  override fun Content(keyword: String) {
+    val viewModel: SearchUserViewModel = getViewModel {
+      parametersOf(keyword)
     }
+    val source = viewModel.source.collectAsLazyPagingItems()
+    val navigator = LocalNavigator.current
+    SwipeToRefreshLayout(
+      refreshingState = source.loadState.refresh is LoadState.Loading,
+      onRefresh = {
+        source.refreshOrRetry()
+      }
+    ) {
+      LazyUiUserList(
+        items = source,
+        onItemClicked = { navigator.user(it) },
+      )
+    }
+  }
 }

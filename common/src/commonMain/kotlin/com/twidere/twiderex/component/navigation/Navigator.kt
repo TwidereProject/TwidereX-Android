@@ -38,120 +38,120 @@ import moe.tlaster.precompose.navigation.NavOptions
 val LocalNavigator = staticCompositionLocalOf<INavigator> { error("No Navigator") }
 
 interface INavigator {
-    fun user(user: UiUser, navOptions: NavOptions? = null) {}
-    fun status(status: UiStatus, navOptions: NavOptions? = null) {}
-    fun media(
-        statusKey: MicroBlogKey,
-        selectedIndex: Int = 0,
-        navOptions: NavOptions? = null
-    ) {
-    }
+  fun user(user: UiUser, navOptions: NavOptions? = null) {}
+  fun status(status: UiStatus, navOptions: NavOptions? = null) {}
+  fun media(
+    statusKey: MicroBlogKey,
+    selectedIndex: Int = 0,
+    navOptions: NavOptions? = null
+  ) {
+  }
 
-    fun search(keyword: String) {}
-    fun compose(
-        composeType: ComposeType,
-        statusKey: MicroBlogKey? = null,
-        navOptions: NavOptions? = null
-    ) {
-    }
+  fun search(keyword: String) {}
+  fun compose(
+    composeType: ComposeType,
+    statusKey: MicroBlogKey? = null,
+    navOptions: NavOptions? = null
+  ) {
+  }
 
-    fun openLink(it: String, deepLink: Boolean = true) {}
-    suspend fun twitterSignInWeb(target: String): String = ""
-    fun searchInput(initial: String? = null) {}
-    fun hashtag(name: String) {}
-    fun goBack() {}
+  fun openLink(it: String, deepLink: Boolean = true) {}
+  suspend fun twitterSignInWeb(target: String): String = ""
+  fun searchInput(initial: String? = null) {}
+  fun hashtag(name: String) {}
+  fun goBack() {}
 }
 
 class Navigator(
     private val navController: moe.tlaster.precompose.navigation.Navigator,
     private val remoteNavigator: RemoteNavigator,
 ) : INavigator {
-    override fun user(user: UiUser, navOptions: NavOptions?) {
-        navController.navigate(Root.User(user.userKey), navOptions)
-    }
+  override fun user(user: UiUser, navOptions: NavOptions?) {
+    navController.navigate(Root.User(user.userKey), navOptions)
+  }
 
-    override fun status(status: UiStatus, navOptions: NavOptions?) {
-        val statusKey = when (status.platformType) {
-            PlatformType.Twitter -> status.statusKey
-            PlatformType.StatusNet -> TODO()
-            PlatformType.Fanfou -> TODO()
-            PlatformType.Mastodon -> {
-                if (status.mastodonExtra != null) {
-                    when (status.mastodonExtra.type) {
-                        MastodonStatusType.Status -> status.statusKey
-                        MastodonStatusType.NotificationFollow, MastodonStatusType.NotificationFollowRequest -> null
-                        else -> status.referenceStatus[ReferenceType.MastodonNotification]?.statusKey
-                    }
-                } else {
-                    status.statusKey
-                }
-            }
-        }
-        if (statusKey != null) {
-            navController.navigate(
-                Root.Status(statusKey),
-                navOptions
-            )
-        }
-    }
-
-    override fun media(
-        statusKey: MicroBlogKey,
-        selectedIndex: Int,
-        navOptions: NavOptions?
-    ) {
-        navController.navigate(Root.Media.Status(statusKey, selectedIndex), navOptions)
-    }
-
-    override fun search(keyword: String) {
-        navController.navigate(Root.Search.Result(keyword))
-    }
-
-    override fun searchInput(initial: String?) {
-        navController.navigate(
-            Root.Search.Input(initial),
-        )
-    }
-
-    override fun compose(
-        composeType: ComposeType,
-        statusKey: MicroBlogKey?,
-        navOptions: NavOptions?
-    ) {
-        navController.navigate(Root.Compose.Home(composeType, statusKey))
-    }
-
-    override fun openLink(it: String, deepLink: Boolean) {
-        if ((it.contains(twidereXSchema) || isTwitterDeeplink(it)) && deepLink) {
-            navController.navigate(it)
+  override fun status(status: UiStatus, navOptions: NavOptions?) {
+    val statusKey = when (status.platformType) {
+      PlatformType.Twitter -> status.statusKey
+      PlatformType.StatusNet -> TODO()
+      PlatformType.Fanfou -> TODO()
+      PlatformType.Mastodon -> {
+        if (status.mastodonExtra != null) {
+          when (status.mastodonExtra.type) {
+            MastodonStatusType.Status -> status.statusKey
+            MastodonStatusType.NotificationFollow, MastodonStatusType.NotificationFollowRequest -> null
+            else -> status.referenceStatus[ReferenceType.MastodonNotification]?.statusKey
+          }
         } else {
-            remoteNavigator.openDeepLink(it)
+          status.statusKey
         }
+      }
     }
+    if (statusKey != null) {
+      navController.navigate(
+        Root.Status(statusKey),
+        navOptions
+      )
+    }
+  }
 
-    private fun isTwitterDeeplink(url: String): Boolean {
-        twitterHosts.forEach {
-            if (url.startsWith(it) && url.length > it.length) {
-                return true
-            }
-        }
-        return false
-    }
+  override fun media(
+    statusKey: MicroBlogKey,
+    selectedIndex: Int,
+    navOptions: NavOptions?
+  ) {
+    navController.navigate(Root.Media.Status(statusKey, selectedIndex), navOptions)
+  }
 
-    override suspend fun twitterSignInWeb(target: String): String {
-        clearCookie()
-        return navController.navigateForResult(
-            Root.SignIn.Web.Twitter(target)
-        ).toString()
-    }
+  override fun search(keyword: String) {
+    navController.navigate(Root.Search.Result(keyword))
+  }
 
-    override fun hashtag(name: String) {
-        navController.navigate(Root.Mastodon.Hashtag(name))
-    }
+  override fun searchInput(initial: String?) {
+    navController.navigate(
+      Root.Search.Input(initial),
+    )
+  }
 
-    override fun goBack() {
-        navController.goBack()
+  override fun compose(
+    composeType: ComposeType,
+    statusKey: MicroBlogKey?,
+    navOptions: NavOptions?
+  ) {
+    navController.navigate(Root.Compose.Home(composeType, statusKey))
+  }
+
+  override fun openLink(it: String, deepLink: Boolean) {
+    if ((it.contains(twidereXSchema) || isTwitterDeeplink(it)) && deepLink) {
+      navController.navigate(it)
+    } else {
+      remoteNavigator.openDeepLink(it)
     }
+  }
+
+  private fun isTwitterDeeplink(url: String): Boolean {
+    twitterHosts.forEach {
+      if (url.startsWith(it) && url.length > it.length) {
+        return true
+      }
+    }
+    return false
+  }
+
+  override suspend fun twitterSignInWeb(target: String): String {
+    clearCookie()
+    return navController.navigateForResult(
+      Root.SignIn.Web.Twitter(target)
+    ).toString()
+  }
+
+  override fun hashtag(name: String) {
+    navController.navigate(Root.Mastodon.Hashtag(name))
+  }
+
+  override fun goBack() {
+    navController.goBack()
+  }
 }
 
 object FakeNavigator : INavigator

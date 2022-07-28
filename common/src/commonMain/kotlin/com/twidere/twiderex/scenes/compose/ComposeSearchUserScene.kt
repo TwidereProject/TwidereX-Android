@@ -53,69 +53,69 @@ import com.twidere.twiderex.viewmodel.compose.ComposeSearchUserViewModel
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun ComposeSearchUserScene() {
-    val account = LocalActiveAccount.current ?: return
-    val navController = LocalNavController.current
-    val viewModel: ComposeSearchUserViewModel = getViewModel()
-    val text by viewModel.text.observeAsState(initial = "")
-    val source = viewModel.source.collectAsLazyPagingItems()
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        ProvideTextStyle(value = MaterialTheme.typography.body1) {
-                            TextInput(
-                                value = text,
-                                onValueChange = {
-                                    viewModel.text.value = it
-                                },
-                                maxLines = 1,
-                                placeholder = {
-                                    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_compose_user_search_search_placeholder))
-                                },
-                                autoFocus = true,
-                                alignment = Alignment.CenterStart,
-                                keyboardActions = KeyboardActions(
-                                    onDone = {
-                                        navController.goBackWith("@$text")
-                                    }
-                                ),
-                                keyboardOptions = KeyboardOptions(
-                                    imeAction = ImeAction.Done,
-                                )
-                            )
-                        }
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                navController.goBackWith("@$text")
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Done,
-                                contentDescription = stringResource(
-                                    res = com.twidere.twiderex.MR.strings.accessibility_common_done
-                                )
-                            )
-                        }
-                    },
-                )
-            }
-        ) {
-            LazyUiUserList(
-                items = source,
-                onItemClicked = {
-                    val displayName = it.getDisplayScreenName(account.accountKey.host)
-                    navController.goBackWith(displayName)
+  val account = LocalActiveAccount.current ?: return
+  val navController = LocalNavController.current
+  val viewModel: ComposeSearchUserViewModel = getViewModel()
+  val text by viewModel.text.observeAsState(initial = "")
+  val source = viewModel.source.collectAsLazyPagingItems()
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          title = {
+            ProvideTextStyle(value = MaterialTheme.typography.body1) {
+              TextInput(
+                value = text,
+                onValueChange = {
+                  viewModel.text.value = it
                 },
-                header = {
-                    loadState(source.loadState.refresh)
-                }
-            )
+                maxLines = 1,
+                placeholder = {
+                  Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_compose_user_search_search_placeholder))
+                },
+                autoFocus = true,
+                alignment = Alignment.CenterStart,
+                keyboardActions = KeyboardActions(
+                  onDone = {
+                    navController.goBackWith("@$text")
+                  }
+                ),
+                keyboardOptions = KeyboardOptions(
+                  imeAction = ImeAction.Done,
+                )
+              )
+            }
+          },
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          actions = {
+            IconButton(
+              onClick = {
+                navController.goBackWith("@$text")
+              }
+            ) {
+              Icon(
+                imageVector = Icons.Default.Done,
+                contentDescription = stringResource(
+                  res = com.twidere.twiderex.MR.strings.accessibility_common_done
+                )
+              )
+            }
+          },
+        )
+      }
+    ) {
+      LazyUiUserList(
+        items = source,
+        onItemClicked = {
+          val displayName = it.getDisplayScreenName(account.accountKey.host)
+          navController.goBackWith(displayName)
+        },
+        header = {
+          loadState(source.loadState.refresh)
         }
+      )
     }
+  }
 }

@@ -25,12 +25,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Entities(
-    @SerialName("hashtags")
-    val hashtags: List<Hashtags>? = null,
-    @SerialName("symbols")
-    val symbols: List<Symbol>? = null,
-    @SerialName("urls")
-    val urls: List<EntitiesURL>? = null,
-    @SerialName("user_mentions")
-    val userMentions: List<UserMention>? = null
+  @SerialName("hashtags")
+  val hashtags: List<Hashtags>? = null,
+  @SerialName("symbols")
+  val symbols: List<Symbol>? = null,
+  @SerialName("urls")
+  val urls: List<EntitiesURL>? = null,
+  @SerialName("user_mentions")
+  val userMentions: List<UserMention>? = null
 )

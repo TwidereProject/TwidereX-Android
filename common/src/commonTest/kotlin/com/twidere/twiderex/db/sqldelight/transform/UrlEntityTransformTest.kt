@@ -27,12 +27,12 @@ import java.util.UUID
 import kotlin.test.assertEquals
 
 internal class UrlEntityTransformTest {
-    @Test
-    fun transform() {
-        val belongToKey = MicroBlogKey.valueOf("test")
-        val id = UUID.randomUUID().toString()
-        val ui = mockUiUrlEntity(url = "url")
-        val db = ui.toDbUrlEntity(belongToKey = belongToKey, id = id)
-        assertEquals(ui, db.toUi())
-    }
+  @Test
+  fun transform() {
+    val belongToKey = MicroBlogKey.valueOf("test")
+    val id = UUID.randomUUID().toString()
+    val ui = mockUiUrlEntity(url = "url")
+    val db = ui.toDbUrlEntity(belongToKey = belongToKey, id = id)
+    assertEquals(ui, db.toUi())
+  }
 }

@@ -34,35 +34,35 @@ import moe.tlaster.placeholder.Placeholder
 
 @Composable
 fun RoundAvatar(
-    modifier: Modifier = Modifier,
-    avatar: Any,
-    size: Dp = UserAvatarDefaults.AvatarSize,
-    withPlatformIcon: Boolean = false,
-    onClick: (() -> Unit)? = null,
+  modifier: Modifier = Modifier,
+  avatar: Any,
+  size: Dp = UserAvatarDefaults.AvatarSize,
+  withPlatformIcon: Boolean = false,
+  onClick: (() -> Unit)? = null,
 ) {
-    Box(
-        modifier = modifier
-            .let {
-                if (withPlatformIcon) {
-                    it.padding(bottom = 4.dp, end = 4.dp)
-                } else {
-                    it
-                }
-            }
-            .withAvatarClip()
-            .clipToBounds()
-    ) {
-        NetworkImage(
-            data = avatar,
-            modifier = Modifier
-                .clickable(
-                    onClick = {
-                        onClick?.invoke()
-                    }
-                ).size(size),
-            placeholder = {
-                Placeholder(modifier = Modifier.size(size))
-            },
-        )
-    }
+  Box(
+    modifier = modifier
+      .let {
+        if (withPlatformIcon) {
+          it.padding(bottom = 4.dp, end = 4.dp)
+        } else {
+          it
+        }
+      }
+      .withAvatarClip()
+      .clipToBounds()
+  ) {
+    NetworkImage(
+      data = avatar,
+      modifier = Modifier
+        .clickable(
+          onClick = {
+            onClick?.invoke()
+          }
+        ).size(size),
+      placeholder = {
+        Placeholder(modifier = Modifier.size(size))
+      },
+    )
+  }
 }

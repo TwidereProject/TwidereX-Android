@@ -21,7 +21,7 @@
 package com.twidere.twiderex.model.enums
 
 enum class TwitterReplySettings {
-    Everyone,
-    MentionedUsers,
-    FollowingUsers,
+  Everyone,
+  MentionedUsers,
+  FollowingUsers,
 }

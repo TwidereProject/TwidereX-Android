@@ -21,23 +21,23 @@
 package com.twidere.twiderex.component.image
 
 data class ImageEffects(
-    val blur: ImageBlur?,
-    val crossFade: Boolean
+  val blur: ImageBlur?,
+  val crossFade: Boolean
 ) {
-    class Builder {
-        private var blur: ImageBlur? = null
-        private var crossFade: Boolean = true
-        fun blur(blur: ImageBlur) {
-            this.blur = blur
-        }
-
-        fun crossFade(crossFade: Boolean) {
-            this.crossFade = crossFade
-        }
-
-        fun build() = ImageEffects(
-            blur = blur,
-            crossFade = crossFade
-        )
+  class Builder {
+    private var blur: ImageBlur? = null
+    private var crossFade: Boolean = true
+    fun blur(blur: ImageBlur) {
+      this.blur = blur
     }
+
+    fun crossFade(crossFade: Boolean) {
+      this.crossFade = crossFade
+    }
+
+    fun build() = ImageEffects(
+      blur = blur,
+      crossFade = crossFade
+    )
+  }
 }

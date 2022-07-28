@@ -35,97 +35,97 @@ import java.util.UUID
 
 actual class ExifScrambler(private val context: Context) {
 
-    actual fun removeExifData(file: String, maxImageSize: Long): String {
-        val uri = Uri.parse(file)
-        val contentResolver = context.contentResolver
-        try {
-            contentResolver.openInputStream(uri)?.use { input ->
-                // create an cache image
-                val mimeType = contentResolver.getType(uri) ?: ""
-                val imageType = getImageType(mimeType)
-                val imageCache = File(get<StorageProvider>().appFiles.mediaDir, "${UUID.randomUUID()}.${imageType.name.lowercase()}")
-                if (!imageCache.exists()) imageCache.createNewFile()
-                // write to disk without exif meta data
-                when (imageType) {
-                    ImageType.JPG -> {
-                        imageCache.outputStream().use {
-                            compressImage(contentResolver, uri, maxImageSize, it)
-                        }
-                        val originExif = ExifInterface(input)
-                        // keep origin images orientation
-                        originExif.getAttribute(ExifInterface.TAG_ORIENTATION)?.let {
-                            ExifInterface(imageCache.absolutePath).apply {
-                                setAttribute(ExifInterface.TAG_ORIENTATION, it)
-                                saveAttributes()
-                            }
-                        }
-                    }
-                    ImageType.PNG -> {
-                        imageCache.outputStream().use {
-                            compressImage(contentResolver, uri, maxImageSize, it)
-                        }
-                    }
-                    ImageType.UNKNOWN -> {
-                        return uri.toString()
-                    }
-                }
-                return imageCache.toUri().toString()
+  actual fun removeExifData(file: String, maxImageSize: Long): String {
+    val uri = Uri.parse(file)
+    val contentResolver = context.contentResolver
+    try {
+      contentResolver.openInputStream(uri)?.use { input ->
+        // create an cache image
+        val mimeType = contentResolver.getType(uri) ?: ""
+        val imageType = getImageType(mimeType)
+        val imageCache = File(get<StorageProvider>().appFiles.mediaDir, "${UUID.randomUUID()}.${imageType.name.lowercase()}")
+        if (!imageCache.exists()) imageCache.createNewFile()
+        // write to disk without exif meta data
+        when (imageType) {
+          ImageType.JPG -> {
+            imageCache.outputStream().use {
+              compressImage(contentResolver, uri, maxImageSize, it)
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+            val originExif = ExifInterface(input)
+            // keep origin images orientation
+            originExif.getAttribute(ExifInterface.TAG_ORIENTATION)?.let {
+              ExifInterface(imageCache.absolutePath).apply {
+                setAttribute(ExifInterface.TAG_ORIENTATION, it)
+                saveAttributes()
+              }
+            }
+          }
+          ImageType.PNG -> {
+            imageCache.outputStream().use {
+              compressImage(contentResolver, uri, maxImageSize, it)
+            }
+          }
+          ImageType.UNKNOWN -> {
+            return uri.toString()
+          }
         }
-        return uri.toString()
+        return imageCache.toUri().toString()
+      }
+    } catch (e: Exception) {
+      e.printStackTrace()
     }
+    return uri.toString()
+  }
 
-    private fun compressImage(contentResolver: ContentResolver, uri: Uri, maxImageSize: Long, fos: FileOutputStream) {
-        contentResolver.openInputStream(uri)?.use {
-            val bitmap = try {
-                BitmapFactory.decodeStream(it)
-            } catch (oom: OutOfMemoryError) {
-                throw oom
-            }
-            var currSize: Int
-            var currQuality = 100
-            val stream = ByteArrayOutputStream()
-            do {
-                stream.flush()
-                stream.reset()
-                bitmap.compress(Bitmap.CompressFormat.JPEG, currQuality, stream)
-                currSize = stream.toByteArray().size
-                currQuality -= 5
-            } while (currSize >= maxImageSize && currQuality >= 80)
-            stream.toByteArray()
-        }?.apply {
-            fos.write(this)
-            fos.flush()
-        } ?: throw Error("Failed to open input stream")
-    }
+  private fun compressImage(contentResolver: ContentResolver, uri: Uri, maxImageSize: Long, fos: FileOutputStream) {
+    contentResolver.openInputStream(uri)?.use {
+      val bitmap = try {
+        BitmapFactory.decodeStream(it)
+      } catch (oom: OutOfMemoryError) {
+        throw oom
+      }
+      var currSize: Int
+      var currQuality = 100
+      val stream = ByteArrayOutputStream()
+      do {
+        stream.flush()
+        stream.reset()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, currQuality, stream)
+        currSize = stream.toByteArray().size
+        currQuality -= 5
+      } while (currSize >= maxImageSize && currQuality >= 80)
+      stream.toByteArray()
+    }?.apply {
+      fos.write(this)
+      fos.flush()
+    } ?: throw Error("Failed to open input stream")
+  }
 
-    actual fun deleteCacheFile(file: String) {
-        Uri.parse(file).path?.let {
-            File(it)
-        }?.apply {
-            if (exists()) delete()
-        }
+  actual fun deleteCacheFile(file: String) {
+    Uri.parse(file).path?.let {
+      File(it)
+    }?.apply {
+      if (exists()) delete()
     }
+  }
 
-    private fun getImageType(mimeType: String): ImageType {
-        return when (mimeType) {
-            "image/jpeg" -> {
-                ImageType.JPG
-            }
-            "image/png", "image/x-png", "image/webp", "image-x-webp" -> {
-                ImageType.PNG
-            }
-            else -> {
-                ImageType.UNKNOWN
-            }
-        }
+  private fun getImageType(mimeType: String): ImageType {
+    return when (mimeType) {
+      "image/jpeg" -> {
+        ImageType.JPG
+      }
+      "image/png", "image/x-png", "image/webp", "image-x-webp" -> {
+        ImageType.PNG
+      }
+      else -> {
+        ImageType.UNKNOWN
+      }
     }
+  }
 }
 
 enum class ImageType {
-    JPG,
-    PNG,
-    UNKNOWN
+  JPG,
+  PNG,
+  UNKNOWN
 }

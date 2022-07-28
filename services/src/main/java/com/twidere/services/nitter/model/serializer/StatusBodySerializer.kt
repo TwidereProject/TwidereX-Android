@@ -24,7 +24,7 @@ import moe.tlaster.hson.HtmlSerializer
 import org.jsoup.nodes.Element
 
 class StatusBodySerializer : HtmlSerializer<String> {
-    override fun decode(element: Element, wholeText: String): String {
-        return element.text()
-    }
+  override fun decode(element: Element, wholeText: String): String {
+    return element.text()
+  }
 }

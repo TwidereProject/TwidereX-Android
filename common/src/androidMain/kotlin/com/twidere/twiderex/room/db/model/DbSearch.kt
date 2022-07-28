@@ -26,17 +26,17 @@ import androidx.room.PrimaryKey
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
-    tableName = "search",
-    indices = [Index(value = ["content", "accountKey"], unique = true)],
+  tableName = "search",
+  indices = [Index(value = ["content", "accountKey"], unique = true)],
 )
 internal data class DbSearch(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    val _id: String,
-    val content: String,
-    val lastActive: Long,
-    val saved: Boolean,
-    val accountKey: MicroBlogKey
+  /**
+   * Id that being used in the database
+   */
+  @PrimaryKey
+  val _id: String,
+  val content: String,
+  val lastActive: Long,
+  val saved: Boolean,
+  val accountKey: MicroBlogKey
 )

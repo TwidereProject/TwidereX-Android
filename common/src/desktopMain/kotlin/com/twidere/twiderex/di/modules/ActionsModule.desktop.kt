@@ -28,9 +28,9 @@ import com.twidere.twiderex.action.StatusActions
 import org.koin.dsl.module
 
 actual val actionModule = module {
-    single { ComposeAction(get(), get(), get(), get(), get()) }
-    single { DirectMessageAction(get(), get()) }
-    single { DraftAction(get(), get()) }
-    single { MediaAction(get(), get()) }
-    single { StatusActions(get(), get(), get(), get(), get(), get(), get(), get()) }
+  single { ComposeAction(get(), get(), get(), get(), get()) }
+  single { DirectMessageAction(get(), get()) }
+  single { DraftAction(get(), get()) }
+  single { MediaAction(get(), get()) }
+  single { StatusActions(get(), get(), get(), get(), get(), get(), get(), get()) }
 }

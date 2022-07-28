@@ -28,18 +28,18 @@ import com.twidere.twiderex.paging.SinceMaxPagination
 import com.twidere.twiderex.paging.mediator.paging.MaxIdPagingMediator
 
 class MastodonHashtagTimelineMediator(
-    private val keyword: String,
-    private val service: MastodonService,
-    accountKey: MicroBlogKey,
-    database: CacheDatabase,
+  private val keyword: String,
+  private val service: MastodonService,
+  accountKey: MicroBlogKey,
+  database: CacheDatabase,
 ) : MaxIdPagingMediator(accountKey, database) {
-    override suspend fun load(pageSize: Int, paging: SinceMaxPagination?): List<IStatus> {
-        return service.hashtagTimeline(
-            query = keyword,
-            count = pageSize,
-            max_id = paging?.maxId,
-        )
-    }
+  override suspend fun load(pageSize: Int, paging: SinceMaxPagination?): List<IStatus> {
+    return service.hashtagTimeline(
+      query = keyword,
+      count = pageSize,
+      max_id = paging?.maxId,
+    )
+  }
 
-    override val pagingKey = "timeline:hashtag:$keyword"
+  override val pagingKey = "timeline:hashtag:$keyword"
 }

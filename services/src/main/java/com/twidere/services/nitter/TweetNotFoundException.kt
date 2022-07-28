@@ -23,4 +23,4 @@ package com.twidere.services.nitter
 import com.twidere.services.http.MicroBlogException
 
 class TweetNotFoundException(override val microBlogErrorMessage: String? = null) :
-    MicroBlogException()
+  MicroBlogException()

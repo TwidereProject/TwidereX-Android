@@ -28,27 +28,27 @@ import com.twidere.twiderex.model.ui.UiTrend
 import org.jetbrains.annotations.TestOnly
 
 class MockTrendDao @TestOnly constructor() : TrendDao {
-    private val fakeDb = mutableMapOf<MicroBlogKey, MutableList<UiTrend>>()
+  private val fakeDb = mutableMapOf<MicroBlogKey, MutableList<UiTrend>>()
 
-    override suspend fun insertAll(trends: List<UiTrend>) {
-        trends.forEach { uiTrend ->
-            fakeDb[uiTrend.accountKey].let {
-                if (it.isNullOrEmpty()) {
-                    fakeDb[uiTrend.accountKey] = mutableListOf(uiTrend)
-                } else {
-                    it.add(uiTrend)
-                }
-            }
+  override suspend fun insertAll(trends: List<UiTrend>) {
+    trends.forEach { uiTrend ->
+      fakeDb[uiTrend.accountKey].let {
+        if (it.isNullOrEmpty()) {
+          fakeDb[uiTrend.accountKey] = mutableListOf(uiTrend)
+        } else {
+          it.add(uiTrend)
         }
+      }
     }
+  }
 
-    override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiTrend> {
-        return MockPagingSource(
-            fakeDb[accountKey] ?: emptyList()
-        )
-    }
+  override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiTrend> {
+    return MockPagingSource(
+      fakeDb[accountKey] ?: emptyList()
+    )
+  }
 
-    override suspend fun clear(accountKey: MicroBlogKey) {
-        fakeDb.clear()
-    }
+  override suspend fun clear(accountKey: MicroBlogKey) {
+    fakeDb.clear()
+  }
 }

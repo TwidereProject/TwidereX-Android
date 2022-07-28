@@ -25,9 +25,9 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface TrendsResources {
-    @GET("/1.1/trends/place.json")
-    suspend fun trends(
-        @Query("id") id: String,
-        @Query("exclude") exclude: String? = null // Setting this equal to hashtags will remove all hashtags from the trends list.
-    ): List<TwitterTrendsResponseV1>
+  @GET("/1.1/trends/place.json")
+  suspend fun trends(
+    @Query("id") id: String,
+    @Query("exclude") exclude: String? = null // Setting this equal to hashtags will remove all hashtags from the trends list.
+  ): List<TwitterTrendsResponseV1>
 }

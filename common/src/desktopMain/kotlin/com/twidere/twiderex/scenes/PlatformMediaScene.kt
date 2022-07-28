@@ -33,56 +33,56 @@ import com.twidere.twiderex.model.enums.MediaType
 
 @Composable
 actual fun PlatformStatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
-    MediaScene {
-        StatusMediaScene(statusKey = statusKey, selectedIndex = selectedIndex)
-    }
+  MediaScene {
+    StatusMediaScene(statusKey = statusKey, selectedIndex = selectedIndex)
+  }
 }
 
 @Composable
 actual fun PlatformRawMediaScene(url: String, type: MediaType) {
-    MediaScene {
-        RawMediaScene(url = url, type = type)
-    }
+  MediaScene {
+    RawMediaScene(url = url, type = type)
+  }
 }
 
 @Composable
 actual fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
-    MediaScene {
-        PureMediaScene(belongToKey = belongToKey, selectedIndex = selectedIndex)
-    }
+  MediaScene {
+    PureMediaScene(belongToKey = belongToKey, selectedIndex = selectedIndex)
+  }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 actual fun StatusMediaSceneLayout(
-    backgroundColor: Color,
-    contentColor: Color,
-    closeButton: @Composable () -> Unit,
-    bottomView: @Composable () -> Unit,
-    mediaView: @Composable () -> Unit,
-    backgroundView: @Composable () -> Unit,
+  backgroundColor: Color,
+  contentColor: Color,
+  closeButton: @Composable () -> Unit,
+  bottomView: @Composable () -> Unit,
+  mediaView: @Composable () -> Unit,
+  backgroundView: @Composable () -> Unit,
 ) {
-    InAppNotificationScaffold(
-        backgroundColor = backgroundColor,
-        contentColor = contentColor,
-    ) {
-        Box {
-            backgroundView.invoke()
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                closeButton.invoke()
-                Box(modifier = Modifier.weight(1f)) {
-                    mediaView.invoke()
-                }
-                bottomView.invoke()
-            }
+  InAppNotificationScaffold(
+    backgroundColor = backgroundColor,
+    contentColor = contentColor,
+  ) {
+    Box {
+      backgroundView.invoke()
+      Column(
+        modifier = Modifier.fillMaxSize()
+      ) {
+        closeButton.invoke()
+        Box(modifier = Modifier.weight(1f)) {
+          mediaView.invoke()
         }
+        bottomView.invoke()
+      }
     }
+  }
 }
 
 @Composable
 private fun MediaScene(content: @Composable () -> Unit) {
-    // causes some bug when navigate to other scenes when open a new window to show media
-    content.invoke()
+  // causes some bug when navigate to other scenes when open a new window to show media
+  content.invoke()
 }

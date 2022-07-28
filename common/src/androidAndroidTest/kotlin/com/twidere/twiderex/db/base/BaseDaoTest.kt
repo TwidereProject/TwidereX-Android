@@ -33,20 +33,20 @@ import java.util.concurrent.Executors
 
 @RunWith(AndroidJUnit4::class)
 internal abstract class BaseDaoTest<DB : RoomDatabase> {
-    protected lateinit var roomDatabase: DB
-    @get:Rule
-    val rule = InstantTaskExecutorRule()
+  protected lateinit var roomDatabase: DB
+  @get:Rule
+  val rule = InstantTaskExecutorRule()
 
-    @Before
-    open fun setUp() {
-        roomDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), getDBClass())
-            .setTransactionExecutor(Executors.newSingleThreadExecutor()).build()
-    }
+  @Before
+  open fun setUp() {
+    roomDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), getDBClass())
+      .setTransactionExecutor(Executors.newSingleThreadExecutor()).build()
+  }
 
-    @After
-    open fun tearDown() {
-        roomDatabase.close()
-    }
+  @After
+  open fun tearDown() {
+    roomDatabase.close()
+  }
 
-    abstract fun getDBClass(): Class<DB>
+  abstract fun getDBClass(): Class<DB>
 }

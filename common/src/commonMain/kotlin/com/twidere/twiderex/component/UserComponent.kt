@@ -118,611 +118,611 @@ import org.koin.core.parameter.parametersOf
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun UserComponent(
-    userKey: MicroBlogKey,
+  userKey: MicroBlogKey,
 ) {
-    val viewModel: UserViewModel = getViewModel {
-        parametersOf(userKey)
-    }
-    val isMe by viewModel.isMe.observeAsState(initial = false)
-    val tabs = listOf(
-        UserTabComponent(
-            painterResource(res = com.twidere.twiderex.MR.files.ic_float_left),
-            stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_status)
-        ) {
-            UserStatusTimeline(userKey = userKey, viewModel = viewModel)
-        },
-        UserTabComponent(
-            painterResource(res = com.twidere.twiderex.MR.files.ic_photo),
-            stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_media)
-        ) {
-            UserMediaTimeline(userKey = userKey)
-        },
-    ).let {
-        if (isMe || userKey.host == MicroBlogKey.TwitterHost) {
-            it + UserTabComponent(
-                painterResource(res = com.twidere.twiderex.MR.files.ic_heart),
-                stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_favourite)
-            ) {
-                UserFavouriteTimeline(userKey = userKey)
-            }
-        } else {
-            it
-        }
-    }
-    val refreshing by viewModel.refreshing.observeAsState(initial = false)
-    SwipeToRefreshLayout(
-        refreshingState = refreshing,
-        onRefresh = {
-            viewModel.refresh()
-        },
+  val viewModel: UserViewModel = getViewModel {
+    parametersOf(userKey)
+  }
+  val isMe by viewModel.isMe.observeAsState(initial = false)
+  val tabs = listOf(
+    UserTabComponent(
+      painterResource(res = com.twidere.twiderex.MR.files.ic_float_left),
+      stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_status)
     ) {
-        val nestedScrollViewState = rememberNestedScrollViewState()
-        VerticalNestedScrollView(
-            state = nestedScrollViewState,
-            header = {
-                UserInfo(viewModel = viewModel)
-            },
-            content = {
-                val pagerState = rememberPagerState(pageCount = tabs.size)
-                Column {
-                    val scope = rememberCoroutineScope()
-                    TabRow(
-                        selectedTabIndex = pagerState.currentPage,
-                        backgroundColor = MaterialTheme.colors.surface.withElevation(),
-                        indicator = { tabPositions ->
-                            TabRowDefaults.Indicator(
-                                modifier = Modifier.tabIndicatorOffset(
-                                    tabPositions[pagerState.currentPage]
-                                ),
-                                color = MaterialTheme.colors.primary,
-                            )
-                        }
-                    ) {
-                        tabs.forEachIndexed { index, item ->
-                            Tab(
-                                selected = pagerState.currentPage == index,
-                                onClick = {
-                                    scope.launch {
-                                        pagerState.currentPage = index
-                                        // pagerState.animateScrollToPage(index)
-                                    }
-                                },
-                                content = {
-                                    Box(
-                                        modifier = Modifier.padding(16.dp)
-                                    ) {
-                                        Icon(painter = item.icon, contentDescription = item.title)
-                                    }
-                                },
-                            )
-                        }
-                    }
-                    Pager(
-                        modifier = Modifier.weight(1f),
-                        state = pagerState,
-                        offscreenLimit = 0,
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.TopCenter,
-                        ) {
-                            UserTimeline(viewModel = viewModel) {
-                                tabs[page].compose.invoke()
-                            }
-                        }
-                    }
-                }
-            }
-        )
+      UserStatusTimeline(userKey = userKey, viewModel = viewModel)
+    },
+    UserTabComponent(
+      painterResource(res = com.twidere.twiderex.MR.files.ic_photo),
+      stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_media)
+    ) {
+      UserMediaTimeline(userKey = userKey)
+    },
+  ).let {
+    if (isMe || userKey.host == MicroBlogKey.TwitterHost) {
+      it + UserTabComponent(
+        painterResource(res = com.twidere.twiderex.MR.files.ic_heart),
+        stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_favourite)
+      ) {
+        UserFavouriteTimeline(userKey = userKey)
+      }
+    } else {
+      it
     }
+  }
+  val refreshing by viewModel.refreshing.observeAsState(initial = false)
+  SwipeToRefreshLayout(
+    refreshingState = refreshing,
+    onRefresh = {
+      viewModel.refresh()
+    },
+  ) {
+    val nestedScrollViewState = rememberNestedScrollViewState()
+    VerticalNestedScrollView(
+      state = nestedScrollViewState,
+      header = {
+        UserInfo(viewModel = viewModel)
+      },
+      content = {
+        val pagerState = rememberPagerState(pageCount = tabs.size)
+        Column {
+          val scope = rememberCoroutineScope()
+          TabRow(
+            selectedTabIndex = pagerState.currentPage,
+            backgroundColor = MaterialTheme.colors.surface.withElevation(),
+            indicator = { tabPositions ->
+              TabRowDefaults.Indicator(
+                modifier = Modifier.tabIndicatorOffset(
+                  tabPositions[pagerState.currentPage]
+                ),
+                color = MaterialTheme.colors.primary,
+              )
+            }
+          ) {
+            tabs.forEachIndexed { index, item ->
+              Tab(
+                selected = pagerState.currentPage == index,
+                onClick = {
+                  scope.launch {
+                    pagerState.currentPage = index
+                    // pagerState.animateScrollToPage(index)
+                  }
+                },
+                content = {
+                  Box(
+                    modifier = Modifier.padding(16.dp)
+                  ) {
+                    Icon(painter = item.icon, contentDescription = item.title)
+                  }
+                },
+              )
+            }
+          }
+          Pager(
+            modifier = Modifier.weight(1f),
+            state = pagerState,
+            offscreenLimit = 0,
+          ) {
+            Box(
+              modifier = Modifier.fillMaxSize(),
+              contentAlignment = Alignment.TopCenter,
+            ) {
+              UserTimeline(viewModel = viewModel) {
+                tabs[page].compose.invoke()
+              }
+            }
+          }
+        }
+      }
+    )
+  }
 }
 
 data class UserTabComponent(
-    val icon: Painter,
-    val title: String,
-    val compose: @Composable () -> Unit,
+  val icon: Painter,
+  val title: String,
+  val compose: @Composable () -> Unit,
 )
 
 @Composable
 private fun UserTimeline(viewModel: UserViewModel, content: @Composable () -> Unit) {
-    val relationship by viewModel.relationship.observeAsState(initial = null)
-    val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
-    relationship.takeIf { !loadingRelationship }?.let {
-        when {
-            it.blockedBy -> PermissionDeniedInfo(
-                title = stringResource(res = com.twidere.twiderex.MR.strings.scene_profile_permission_denied_profile_blocked_title),
-                message = stringResource(res = com.twidere.twiderex.MR.strings.scene_profile_permission_denied_profile_blocked_message)
-            )
-            else -> content.invoke()
-        }
-    } ?: content.invoke()
+  val relationship by viewModel.relationship.observeAsState(initial = null)
+  val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
+  relationship.takeIf { !loadingRelationship }?.let {
+    when {
+      it.blockedBy -> PermissionDeniedInfo(
+        title = stringResource(res = com.twidere.twiderex.MR.strings.scene_profile_permission_denied_profile_blocked_title),
+        message = stringResource(res = com.twidere.twiderex.MR.strings.scene_profile_permission_denied_profile_blocked_message)
+      )
+      else -> content.invoke()
+    }
+  } ?: content.invoke()
 }
 
 @Composable
 private fun PermissionDeniedInfo(title: String, message: String) {
-    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(PermissionDeniedInfoDefaults.contentPaddingValues)
-        ) {
-            Icon(painter = painterResource(res = com.twidere.twiderex.MR.files.ic_eye_off), contentDescription = title)
-            Spacer(modifier = Modifier.width(PermissionDeniedInfoDefaults.contentSpacing))
-            Column {
-                Text(text = title, style = MaterialTheme.typography.subtitle2)
-                Text(text = message, style = MaterialTheme.typography.caption)
-            }
-        }
+  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+    Row(
+      modifier = Modifier
+        .fillMaxSize()
+        .padding(PermissionDeniedInfoDefaults.contentPaddingValues)
+    ) {
+      Icon(painter = painterResource(res = com.twidere.twiderex.MR.files.ic_eye_off), contentDescription = title)
+      Spacer(modifier = Modifier.width(PermissionDeniedInfoDefaults.contentSpacing))
+      Column {
+        Text(text = title, style = MaterialTheme.typography.subtitle2)
+        Text(text = message, style = MaterialTheme.typography.caption)
+      }
     }
+  }
 }
 
 private object PermissionDeniedInfoDefaults {
-    val contentPaddingValues = PaddingValues(22.dp)
-    val contentSpacing = 16.dp
+  val contentPaddingValues = PaddingValues(22.dp)
+  val contentSpacing = 16.dp
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun UserStatusTimeline(
-    userKey: MicroBlogKey,
-    viewModel: UserViewModel,
+  userKey: MicroBlogKey,
+  viewModel: UserViewModel,
 ) {
-    val user by viewModel.user.observeAsState(initial = null)
-    val timelineViewModel: UserTimelineViewModel = getViewModel {
-        parametersOf(userKey)
-    }
-    val excludeReplies by timelineViewModel.excludeReplies.observeAsState(initial = false)
-    val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
-    // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
-    @Suppress("UNUSED_VARIABLE")
-    timelineSource.loadState
-    LazyUiStatusList(
-        items = timelineSource,
-        header = {
-            user?.let { user ->
-                item {
-                    UserStatusTimelineFilter(user, excludeReplies) {
-                        timelineViewModel.setExcludeReplies(it)
-                    }
-                }
-            }
-        },
-    )
+  val user by viewModel.user.observeAsState(initial = null)
+  val timelineViewModel: UserTimelineViewModel = getViewModel {
+    parametersOf(userKey)
+  }
+  val excludeReplies by timelineViewModel.excludeReplies.observeAsState(initial = false)
+  val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
+  // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
+  @Suppress("UNUSED_VARIABLE")
+  timelineSource.loadState
+  LazyUiStatusList(
+    items = timelineSource,
+    header = {
+      user?.let { user ->
+        item {
+          UserStatusTimelineFilter(user, excludeReplies) {
+            timelineViewModel.setExcludeReplies(it)
+          }
+        }
+      }
+    },
+  )
 }
 
 @ExperimentalMaterialApi
 @Composable
 private fun UserStatusTimelineFilter(
-    user: UiUser,
-    excludeReplies: Boolean,
-    setExcludeReplies: (Boolean) -> Unit,
+  user: UiUser,
+  excludeReplies: Boolean,
+  setExcludeReplies: (Boolean) -> Unit,
 ) {
-    Row(
-        modifier = Modifier.background(LocalContentColor.current.copy(alpha = 0.04f)),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Spacer(modifier = Modifier.width(UserStatusTimelineFilterDefaults.StartSpacing))
-        Text(
-            modifier = Modifier.weight(1f),
-            text = if (user.metrics.status > 1) {
-                stringResource(
-                    res = com.twidere.twiderex.MR.strings.common_countable_tweet_single,
-                    user.metrics.status
-                )
-            } else {
-                stringResource(
-                    res = com.twidere.twiderex.MR.strings.common_countable_tweet_multiple,
-                    user.metrics.status
-                )
-            }
+  Row(
+    modifier = Modifier.background(LocalContentColor.current.copy(alpha = 0.04f)),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Spacer(modifier = Modifier.width(UserStatusTimelineFilterDefaults.StartSpacing))
+    Text(
+      modifier = Modifier.weight(1f),
+      text = if (user.metrics.status > 1) {
+        stringResource(
+          res = com.twidere.twiderex.MR.strings.common_countable_tweet_single,
+          user.metrics.status
         )
-        Box {
-            var showDropdown by remember {
-                mutableStateOf(false)
-            }
-            DropdownMenu(
-                expanded = showDropdown,
-                onDismissRequest = { showDropdown = false },
-            ) {
-                DropdownMenuItem(
-                    onClick = {
-                        setExcludeReplies(false)
-                        showDropdown = false
-                    }
-                ) {
-                    ListItem(
-                        icon = {
-                            RadioButton(
-                                selected = !excludeReplies,
-                                onClick = {
-                                    setExcludeReplies(false)
-                                    showDropdown = false
-                                },
-                            )
-                        }
-                    ) {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_profile_filter_all))
-                    }
-                }
-                DropdownMenuItem(
-                    onClick = {
-                        setExcludeReplies(true)
-                        showDropdown = false
-                    }
-                ) {
-                    ListItem(
-                        icon = {
-                            RadioButton(
-                                selected = excludeReplies,
-                                onClick = {
-                                    setExcludeReplies(true)
-                                    showDropdown = false
-                                },
-                            )
-                        }
-                    ) {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_profile_filter_exclude_replies))
-                    }
-                }
-            }
-            IconButton(
+      } else {
+        stringResource(
+          res = com.twidere.twiderex.MR.strings.common_countable_tweet_multiple,
+          user.metrics.status
+        )
+      }
+    )
+    Box {
+      var showDropdown by remember {
+        mutableStateOf(false)
+      }
+      DropdownMenu(
+        expanded = showDropdown,
+        onDismissRequest = { showDropdown = false },
+      ) {
+        DropdownMenuItem(
+          onClick = {
+            setExcludeReplies(false)
+            showDropdown = false
+          }
+        ) {
+          ListItem(
+            icon = {
+              RadioButton(
+                selected = !excludeReplies,
                 onClick = {
-                    showDropdown = !showDropdown
-                }
-            ) {
-                Icon(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_filter),
-                    contentDescription = null,
-                )
+                  setExcludeReplies(false)
+                  showDropdown = false
+                },
+              )
             }
+          ) {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_profile_filter_all))
+          }
         }
+        DropdownMenuItem(
+          onClick = {
+            setExcludeReplies(true)
+            showDropdown = false
+          }
+        ) {
+          ListItem(
+            icon = {
+              RadioButton(
+                selected = excludeReplies,
+                onClick = {
+                  setExcludeReplies(true)
+                  showDropdown = false
+                },
+              )
+            }
+          ) {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_profile_filter_exclude_replies))
+          }
+        }
+      }
+      IconButton(
+        onClick = {
+          showDropdown = !showDropdown
+        }
+      ) {
+        Icon(
+          painter = painterResource(res = com.twidere.twiderex.MR.files.ic_filter),
+          contentDescription = null,
+        )
+      }
     }
+  }
 }
 
 private object UserStatusTimelineFilterDefaults {
-    val StartSpacing = 16.dp
+  val StartSpacing = 16.dp
 }
 
 @Composable
 fun UserMediaTimeline(
-    userKey: MicroBlogKey,
+  userKey: MicroBlogKey,
 ) {
-    val mediaViewModel: UserMediaTimelineViewModel = getViewModel {
-        parametersOf(userKey)
-    }
-    val mediaSource = mediaViewModel.source.collectAsLazyPagingItems()
-    // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
-    @Suppress("UNUSED_VARIABLE")
-    mediaSource.loadState
-    LazyUiStatusImageList(mediaSource)
+  val mediaViewModel: UserMediaTimelineViewModel = getViewModel {
+    parametersOf(userKey)
+  }
+  val mediaSource = mediaViewModel.source.collectAsLazyPagingItems()
+  // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
+  @Suppress("UNUSED_VARIABLE")
+  mediaSource.loadState
+  LazyUiStatusImageList(mediaSource)
 }
 
 @Composable
 fun UserFavouriteTimeline(
-    userKey: MicroBlogKey,
+  userKey: MicroBlogKey,
 ) {
-    val timelineViewModel: UserFavouriteTimelineViewModel = getViewModel {
-        parametersOf(userKey)
-    }
-    val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
-    // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
-    @Suppress("UNUSED_VARIABLE")
-    timelineSource.loadState
-    LazyUiStatusList(
-        items = timelineSource,
-    )
+  val timelineViewModel: UserFavouriteTimelineViewModel = getViewModel {
+    parametersOf(userKey)
+  }
+  val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
+  // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
+  @Suppress("UNUSED_VARIABLE")
+  timelineSource.loadState
+  LazyUiStatusList(
+    items = timelineSource,
+  )
 }
 
 val maxBannerSize = 200.dp
 
 @Composable
 fun UserInfo(
-    viewModel: UserViewModel,
+  viewModel: UserViewModel,
 ) {
-    val user by viewModel.user.observeAsState(initial = null)
-    val navController = LocalNavController.current
-    val isMe by viewModel.isMe.observeAsState(initial = false)
-    Box(
-        modifier = Modifier
-            .background(MaterialTheme.colors.surface.withElevation())
-    ) {
-        // TODO: parallax effect
-        user?.profileBackgroundImage?.let {
-            UserBanner(navController, it)
-        }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            BoxWithConstraints {
-                Spacer(
-                    modifier = Modifier.height(
-                        min(
-                            maxWidth * UserInfoDefaults.BannerAspectRatio - UserInfoDefaults.AvatarSize / 2,
-                            maxBannerSize - UserInfoDefaults.AvatarSize / 2
-                        )
-                    )
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Spacer(
-                    modifier = Modifier
-                        .size(UserInfoDefaults.AvatarSize + UserInfoDefaults.AvatarSpacing)
-                        .withAvatarClip()
-                        .clipToBounds()
-                        .background(MaterialTheme.colors.surface.withElevation())
-                )
-                user?.let { user ->
-                    UserAvatar(
-                        user = user,
-                        size = UserInfoDefaults.AvatarSize
-                    ) {
-                        navController.navigate(Root.Media.Raw(MediaType.photo, user.profileImage))
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(UserInfoDefaults.AvatarSpacing))
-            user?.let { user ->
-                UserInfoName(user)
-            }
-            if (!isMe) {
-                Spacer(modifier = Modifier.height(UserInfoDefaults.RelationshipSpacing))
-                UserRelationship(viewModel)
-            }
-            user?.let { user ->
-                UserDescText(
-                    modifier = Modifier.padding(UserInfoDefaults.DescPaddingValue),
-                    htmlDesc = user.htmlDesc,
-                    url = user.twitterExtra?.url ?: emptyList(),
-                )
-            }
-            user?.website?.let {
-                val navigator = LocalNavigator.current
-                ProfileItem(
-                    modifier = Modifier
-                        .clickable(
-                            onClick = {
-                                navigator.openLink(it)
-                            }
-                        )
-                        .padding(UserInfoDefaults.WebsitePaddingValue)
-                        .fillMaxWidth(),
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_globe),
-                    contentDescription = stringResource(
-                        res = com.twidere.twiderex.MR.strings.accessibility_scene_user_website
-                    ),
-                    text = it,
-                    textColor = MaterialTheme.colors.primary,
-                )
-                Spacer(modifier = Modifier.height(UserInfoDefaults.WebsiteSpacing))
-            }
-            user?.location?.takeIf { it.isNotEmpty() }?.let {
-                ProfileItem(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
-                    contentDescription = stringResource(
-                        res = com.twidere.twiderex.MR.strings.accessibility_scene_user_location
-                    ),
-                    text = it
-                )
-                Spacer(modifier = Modifier.height(UserInfoDefaults.LocationSpacing))
-            }
-            user?.let {
-                MastodonUserField(it)
-            }
-            Spacer(modifier = Modifier.height(UserInfoDefaults.UserMetricsSpacing))
-            user?.let { UserMetrics(it) }
-            Spacer(modifier = Modifier.height(UserInfoDefaults.UserMetricsSpacing))
-        }
+  val user by viewModel.user.observeAsState(initial = null)
+  val navController = LocalNavController.current
+  val isMe by viewModel.isMe.observeAsState(initial = false)
+  Box(
+    modifier = Modifier
+      .background(MaterialTheme.colors.surface.withElevation())
+  ) {
+    // TODO: parallax effect
+    user?.profileBackgroundImage?.let {
+      UserBanner(navController, it)
     }
+    Column(
+      horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+      BoxWithConstraints {
+        Spacer(
+          modifier = Modifier.height(
+            min(
+              maxWidth * UserInfoDefaults.BannerAspectRatio - UserInfoDefaults.AvatarSize / 2,
+              maxBannerSize - UserInfoDefaults.AvatarSize / 2
+            )
+          )
+        )
+      }
+      Box(
+        modifier = Modifier
+          .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+      ) {
+        Spacer(
+          modifier = Modifier
+            .size(UserInfoDefaults.AvatarSize + UserInfoDefaults.AvatarSpacing)
+            .withAvatarClip()
+            .clipToBounds()
+            .background(MaterialTheme.colors.surface.withElevation())
+        )
+        user?.let { user ->
+          UserAvatar(
+            user = user,
+            size = UserInfoDefaults.AvatarSize
+          ) {
+            navController.navigate(Root.Media.Raw(MediaType.photo, user.profileImage))
+          }
+        }
+      }
+      Spacer(modifier = Modifier.height(UserInfoDefaults.AvatarSpacing))
+      user?.let { user ->
+        UserInfoName(user)
+      }
+      if (!isMe) {
+        Spacer(modifier = Modifier.height(UserInfoDefaults.RelationshipSpacing))
+        UserRelationship(viewModel)
+      }
+      user?.let { user ->
+        UserDescText(
+          modifier = Modifier.padding(UserInfoDefaults.DescPaddingValue),
+          htmlDesc = user.htmlDesc,
+          url = user.twitterExtra?.url ?: emptyList(),
+        )
+      }
+      user?.website?.let {
+        val navigator = LocalNavigator.current
+        ProfileItem(
+          modifier = Modifier
+            .clickable(
+              onClick = {
+                navigator.openLink(it)
+              }
+            )
+            .padding(UserInfoDefaults.WebsitePaddingValue)
+            .fillMaxWidth(),
+          painter = painterResource(res = com.twidere.twiderex.MR.files.ic_globe),
+          contentDescription = stringResource(
+            res = com.twidere.twiderex.MR.strings.accessibility_scene_user_website
+          ),
+          text = it,
+          textColor = MaterialTheme.colors.primary,
+        )
+        Spacer(modifier = Modifier.height(UserInfoDefaults.WebsiteSpacing))
+      }
+      user?.location?.takeIf { it.isNotEmpty() }?.let {
+        ProfileItem(
+          painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
+          contentDescription = stringResource(
+            res = com.twidere.twiderex.MR.strings.accessibility_scene_user_location
+          ),
+          text = it
+        )
+        Spacer(modifier = Modifier.height(UserInfoDefaults.LocationSpacing))
+      }
+      user?.let {
+        MastodonUserField(it)
+      }
+      Spacer(modifier = Modifier.height(UserInfoDefaults.UserMetricsSpacing))
+      user?.let { UserMetrics(it) }
+      Spacer(modifier = Modifier.height(UserInfoDefaults.UserMetricsSpacing))
+    }
+  }
 }
 
 object UserInfoDefaults {
-    val AvatarSize = 88.dp
-    val AvatarSpacing = 8.dp
-    val RelationshipSpacing = 8.dp
-    val WebsiteSpacing = 8.dp
-    val WebsitePaddingValue = PaddingValues(
-        horizontal = 0.dp,
-        vertical = 8.dp
-    )
-    val LocationSpacing = 8.dp
-    val DescPaddingValue = PaddingValues(
-        horizontal = 16.dp,
-        vertical = 8.dp
-    )
-    val UserMetricsSpacing = 8.dp
-    const val BannerAspectRatio = 160f / 320f
+  val AvatarSize = 88.dp
+  val AvatarSpacing = 8.dp
+  val RelationshipSpacing = 8.dp
+  val WebsiteSpacing = 8.dp
+  val WebsitePaddingValue = PaddingValues(
+    horizontal = 0.dp,
+    vertical = 8.dp
+  )
+  val LocationSpacing = 8.dp
+  val DescPaddingValue = PaddingValues(
+    horizontal = 16.dp,
+    vertical = 8.dp
+  )
+  val UserMetricsSpacing = 8.dp
+  const val BannerAspectRatio = 160f / 320f
 }
 
 @Composable
 private fun UserInfoName(user: UiUser) {
-    Row(
-        modifier = Modifier.padding(UserInfoNameDefaults.ContentPadding)
-    ) {
-        if (user.platformType == PlatformType.Mastodon && user.mastodonExtra?.locked == true) {
-            CompositionLocalProvider(
-                LocalContentAlpha provides ContentAlpha.medium,
-            ) {
-                Icon(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_lock),
-                    contentDescription = null
-                )
-            }
-            Spacer(modifier = Modifier.width(UserInfoNameDefaults.IconSpacing))
-        }
-        UserName(
-            user = user,
-            style = MaterialTheme.typography.h6,
-            maxLines = Int.MAX_VALUE,
-            textAlign = TextAlign.Center
+  Row(
+    modifier = Modifier.padding(UserInfoNameDefaults.ContentPadding)
+  ) {
+    if (user.platformType == PlatformType.Mastodon && user.mastodonExtra?.locked == true) {
+      CompositionLocalProvider(
+        LocalContentAlpha provides ContentAlpha.medium,
+      ) {
+        Icon(
+          painter = painterResource(res = com.twidere.twiderex.MR.files.ic_lock),
+          contentDescription = null
         )
+      }
+      Spacer(modifier = Modifier.width(UserInfoNameDefaults.IconSpacing))
     }
-    UserScreenName(user = user)
+    UserName(
+      user = user,
+      style = MaterialTheme.typography.h6,
+      maxLines = Int.MAX_VALUE,
+      textAlign = TextAlign.Center
+    )
+  }
+  UserScreenName(user = user)
 }
 
 private object UserInfoNameDefaults {
-    val ContentPadding = PaddingValues(
-        horizontal = 16.dp,
-        vertical = 0.dp
-    )
-    val IconSpacing = 4.dp
+  val ContentPadding = PaddingValues(
+    horizontal = 16.dp,
+    vertical = 0.dp
+  )
+  val IconSpacing = 4.dp
 }
 
 @Composable
 fun MastodonUserField(user: UiUser) {
-    if (user.platformType != PlatformType.Mastodon || user.mastodonExtra == null) {
-        return
+  if (user.platformType != PlatformType.Mastodon || user.mastodonExtra == null) {
+    return
+  }
+  user.mastodonExtra.fields.forEachIndexed { index, field ->
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(MastodonUserFieldDefaults.ContentPadding)
+    ) {
+      CompositionLocalProvider(
+        LocalContentAlpha provides ContentAlpha.medium
+      ) {
+        field.name?.let { Text(text = it) }
+      }
+      Spacer(modifier = Modifier.width(MastodonUserFieldDefaults.NameSpacing))
+      field.value?.let {
+        HtmlText(
+          htmlText = it,
+        )
+      }
     }
-    user.mastodonExtra.fields.forEachIndexed { index, field ->
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(MastodonUserFieldDefaults.ContentPadding)
-        ) {
-            CompositionLocalProvider(
-                LocalContentAlpha provides ContentAlpha.medium
-            ) {
-                field.name?.let { Text(text = it) }
-            }
-            Spacer(modifier = Modifier.width(MastodonUserFieldDefaults.NameSpacing))
-            field.value?.let {
-                HtmlText(
-                    htmlText = it,
-                )
-            }
-        }
-        if (index != user.mastodonExtra.fields.lastIndex) {
-            Spacer(modifier = Modifier.height(MastodonUserFieldDefaults.ItemSpacing))
-        }
+    if (index != user.mastodonExtra.fields.lastIndex) {
+      Spacer(modifier = Modifier.height(MastodonUserFieldDefaults.ItemSpacing))
     }
+  }
 }
 
 object MastodonUserFieldDefaults {
-    val ContentPadding = PaddingValues(
-        horizontal = 16.dp,
-        vertical = 0.dp
-    )
-    val NameSpacing = 8.dp
-    val ItemSpacing = 8.dp
+  val ContentPadding = PaddingValues(
+    horizontal = 16.dp,
+    vertical = 0.dp
+  )
+  val NameSpacing = 8.dp
+  val ItemSpacing = 8.dp
 }
 
 @Composable
 private fun ProfileItem(
-    modifier: Modifier = Modifier,
-    painter: Painter,
-    contentDescription: String?,
-    text: String,
-    textColor: Color = Color.Unspecified,
+  modifier: Modifier = Modifier,
+  painter: Painter,
+  contentDescription: String?,
+  text: String,
+  textColor: Color = Color.Unspecified,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(ProfileItemDefaults.ContentPadding),
-    ) {
-        Icon(
-            painter = painter,
-            contentDescription = contentDescription
-        )
-        Spacer(modifier = Modifier.width(ProfileItemDefaults.IconSpacing))
-        Text(
-            text = text,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            color = textColor,
-        )
-    }
+  Row(
+    modifier = modifier
+      .fillMaxWidth()
+      .padding(ProfileItemDefaults.ContentPadding),
+  ) {
+    Icon(
+      painter = painter,
+      contentDescription = contentDescription
+    )
+    Spacer(modifier = Modifier.width(ProfileItemDefaults.IconSpacing))
+    Text(
+      text = text,
+      maxLines = 1,
+      overflow = TextOverflow.Ellipsis,
+      color = textColor,
+    )
+  }
 }
 
 private object ProfileItemDefaults {
-    val ContentPadding = PaddingValues(
-        horizontal = 16.dp,
-        vertical = 8.dp
-    )
-    val IconSpacing = 8.dp
+  val ContentPadding = PaddingValues(
+    horizontal = 16.dp,
+    vertical = 8.dp
+  )
+  val IconSpacing = 8.dp
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun UserRelationship(viewModel: UserViewModel) {
-    val relationship by viewModel.relationship.observeAsState(initial = null)
-    val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
-    val shape = RoundedCornerShape(percent = 50)
-    val blockingBackgroundColor = Color(0xFFFF2D55)
-    relationship?.takeIf { !loadingRelationship }
-        ?.takeIf { !it.blockedBy || it.blocking }
-        ?.let { relationshipResult ->
-            Surface(
-                modifier = Modifier
-                    .let {
-                        if (relationshipResult.followedBy) {
-                            it
-                        } else {
-                            it.border(
-                                1.dp,
-                                if (relationshipResult.blocking) blockingBackgroundColor else MaterialTheme.colors.primary,
-                                shape = shape,
-                            )
-                        }
-                    }
-                    .clip(shape)
-                    .clickable {
-                        when {
-                            relationshipResult.blocking -> {
-                                viewModel.unblock()
-                            }
-                            relationshipResult.followedBy -> {
-                                viewModel.unfollow()
-                            }
-                            else -> {
-                                viewModel.follow()
-                            }
-                        }
-                    },
-                contentColor = when {
-                    relationshipResult.blocking -> MaterialTheme.colors.onPrimary
-                    relationshipResult.followedBy -> contentColorFor(backgroundColor = MaterialTheme.colors.primary)
-                    else -> MaterialTheme.colors.primary
-                },
-                color = when {
-                    relationshipResult.blocking -> blockingBackgroundColor
-                    relationshipResult.followedBy -> MaterialTheme.colors.primary
-                    else -> MaterialTheme.colors.background
-                },
-            ) {
-                Text(
-                    modifier = Modifier
-                        .padding(ButtonDefaults.ContentPadding),
-                    text = when {
-                        relationshipResult.blocking -> {
-                            stringResource(res = com.twidere.twiderex.MR.strings.common_controls_friendship_actions_blocked)
-                        }
-                        relationshipResult.followedBy -> {
-                            stringResource(res = com.twidere.twiderex.MR.strings.common_controls_friendship_actions_unfollow)
-                        }
-                        else -> {
-                            stringResource(res = com.twidere.twiderex.MR.strings.common_controls_friendship_actions_follow)
-                        }
-                    },
-                )
+  val relationship by viewModel.relationship.observeAsState(initial = null)
+  val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
+  val shape = RoundedCornerShape(percent = 50)
+  val blockingBackgroundColor = Color(0xFFFF2D55)
+  relationship?.takeIf { !loadingRelationship }
+    ?.takeIf { !it.blockedBy || it.blocking }
+    ?.let { relationshipResult ->
+      Surface(
+        modifier = Modifier
+          .let {
+            if (relationshipResult.followedBy) {
+              it
+            } else {
+              it.border(
+                1.dp,
+                if (relationshipResult.blocking) blockingBackgroundColor else MaterialTheme.colors.primary,
+                shape = shape,
+              )
             }
+          }
+          .clip(shape)
+          .clickable {
+            when {
+              relationshipResult.blocking -> {
+                viewModel.unblock()
+              }
+              relationshipResult.followedBy -> {
+                viewModel.unfollow()
+              }
+              else -> {
+                viewModel.follow()
+              }
+            }
+          },
+        contentColor = when {
+          relationshipResult.blocking -> MaterialTheme.colors.onPrimary
+          relationshipResult.followedBy -> contentColorFor(backgroundColor = MaterialTheme.colors.primary)
+          else -> MaterialTheme.colors.primary
+        },
+        color = when {
+          relationshipResult.blocking -> blockingBackgroundColor
+          relationshipResult.followedBy -> MaterialTheme.colors.primary
+          else -> MaterialTheme.colors.background
+        },
+      ) {
+        Text(
+          modifier = Modifier
+            .padding(ButtonDefaults.ContentPadding),
+          text = when {
+            relationshipResult.blocking -> {
+              stringResource(res = com.twidere.twiderex.MR.strings.common_controls_friendship_actions_blocked)
+            }
+            relationshipResult.followedBy -> {
+              stringResource(res = com.twidere.twiderex.MR.strings.common_controls_friendship_actions_unfollow)
+            }
+            else -> {
+              stringResource(res = com.twidere.twiderex.MR.strings.common_controls_friendship_actions_follow)
+            }
+          },
+        )
+      }
 
-            Spacer(modifier = Modifier.height(UserRelationshipDefaults.FollowingSpacing))
-            if (relationshipResult.following) {
-                Text(
-                    text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_friendship_follows_you),
-                    style = MaterialTheme.typography.caption,
-                )
-            }
-        } ?: run {
-        CircularProgressIndicator()
-    }
+      Spacer(modifier = Modifier.height(UserRelationshipDefaults.FollowingSpacing))
+      if (relationshipResult.following) {
+        Text(
+          text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_friendship_follows_you),
+          style = MaterialTheme.typography.caption,
+        )
+      }
+    } ?: run {
+    CircularProgressIndicator()
+  }
 }
 
 private object UserRelationshipDefaults {
-    val FollowingSpacing = 4.dp
+  val FollowingSpacing = 4.dp
 }
 
 @Composable
@@ -730,111 +730,111 @@ private fun UserBanner(
     navController: Navigator,
     bannerUrl: String
 ) {
-    Box(
-        modifier = Modifier
-            .heightIn(max = maxBannerSize)
-            .clickable(
-                onClick = {
-                    navController.navigate(Root.Media.Raw(MediaType.photo, bannerUrl))
-                },
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() },
-            )
-    ) {
-        NetworkImage(
-            modifier = Modifier.fillMaxSize(),
-            data = bannerUrl,
-            placeholder = {
-                Placeholder(modifier = Modifier.fillMaxSize())
-            }
-        )
-    }
+  Box(
+    modifier = Modifier
+      .heightIn(max = maxBannerSize)
+      .clickable(
+        onClick = {
+          navController.navigate(Root.Media.Raw(MediaType.photo, bannerUrl))
+        },
+        indication = null,
+        interactionSource = remember { MutableInteractionSource() },
+      )
+  ) {
+    NetworkImage(
+      modifier = Modifier.fillMaxSize(),
+      data = bannerUrl,
+      placeholder = {
+        Placeholder(modifier = Modifier.fillMaxSize())
+      }
+    )
+  }
 }
 
 @Composable
 fun UserMetrics(
-    user: UiUser,
+  user: UiUser,
 ) {
-    val navController = LocalNavController.current
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        MetricsItem(
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    navController.navigate(Root.Following(user.userKey))
-                },
-            primaryText = user.metrics.follow.toString(),
-            secondaryText = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_profile_dashboard_following),
-        )
-        HorizontalDivider(
-            modifier = Modifier.height(LocalTextStyle.current.fontSize.value.dp * 2)
-        )
-        MetricsItem(
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    navController.navigate(Root.Followers(user.userKey))
-                },
-            primaryText = user.metrics.fans.toString(),
-            secondaryText = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_profile_dashboard_followers),
-        )
-        if (user.platformType == PlatformType.Twitter) {
-            HorizontalDivider(
-                modifier = Modifier.height(LocalTextStyle.current.fontSize.value.dp * 2)
-            )
-            MetricsItem(
-                modifier = Modifier
-                    .weight(1f),
-                primaryText = user.metrics.listed.toString(),
-                secondaryText = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_profile_dashboard_listed),
-            )
-        }
+  val navController = LocalNavController.current
+  Row(
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    MetricsItem(
+      modifier = Modifier
+        .weight(1f)
+        .clickable {
+          navController.navigate(Root.Following(user.userKey))
+        },
+      primaryText = user.metrics.follow.toString(),
+      secondaryText = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_profile_dashboard_following),
+    )
+    HorizontalDivider(
+      modifier = Modifier.height(LocalTextStyle.current.fontSize.value.dp * 2)
+    )
+    MetricsItem(
+      modifier = Modifier
+        .weight(1f)
+        .clickable {
+          navController.navigate(Root.Followers(user.userKey))
+        },
+      primaryText = user.metrics.fans.toString(),
+      secondaryText = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_profile_dashboard_followers),
+    )
+    if (user.platformType == PlatformType.Twitter) {
+      HorizontalDivider(
+        modifier = Modifier.height(LocalTextStyle.current.fontSize.value.dp * 2)
+      )
+      MetricsItem(
+        modifier = Modifier
+          .weight(1f),
+        primaryText = user.metrics.listed.toString(),
+        secondaryText = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_profile_dashboard_listed),
+      )
     }
+  }
 }
 
 @Composable
 fun MetricsItem(
-    modifier: Modifier = Modifier,
-    primaryText: String,
-    secondaryText: String,
+  modifier: Modifier = Modifier,
+  primaryText: String,
+  secondaryText: String,
 ) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(text = primaryText)
-        Text(text = secondaryText)
-    }
+  Column(
+    modifier = modifier,
+    horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    Text(text = primaryText)
+    Text(text = secondaryText)
+  }
 }
 
 @Composable
 fun UserDescText(
-    modifier: Modifier = Modifier,
-    htmlDesc: String,
-    url: List<UiUrlEntity>,
+  modifier: Modifier = Modifier,
+  htmlDesc: String,
+  url: List<UiUrlEntity>,
 ) {
-    key(
-        htmlDesc,
-        url,
-    ) {
-        HtmlText(
-            modifier = modifier,
-            htmlText = htmlDesc,
-            linkResolver = { href ->
-                val entity = url.firstOrNull { it.url == href }
-                if (entity != null) {
-                    ResolvedLink(
-                        expanded = entity.expandedUrl,
-                        display = entity.displayUrl,
-                    )
-                } else if (!href.startsWith(twidereXSchema)) {
-                    ResolvedLink(expanded = href)
-                } else {
-                    ResolvedLink(expanded = null)
-                }
-            }
-        )
-    }
+  key(
+    htmlDesc,
+    url,
+  ) {
+    HtmlText(
+      modifier = modifier,
+      htmlText = htmlDesc,
+      linkResolver = { href ->
+        val entity = url.firstOrNull { it.url == href }
+        if (entity != null) {
+          ResolvedLink(
+            expanded = entity.expandedUrl,
+            display = entity.displayUrl,
+          )
+        } else if (!href.startsWith(twidereXSchema)) {
+          ResolvedLink(expanded = href)
+        } else {
+          ResolvedLink(expanded = null)
+        }
+      }
+    )
+  }
 }

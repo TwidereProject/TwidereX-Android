@@ -21,31 +21,31 @@
 package com.twidere.twiderex.paging
 
 interface IPagingList<T, P : IPagination> : List<T> {
-    val nextPage: P?
+  val nextPage: P?
 }
 
 interface IPagination
 
 data class SinceMaxPagination(
-    val maxId: String? = null,
-    val sinceId: String? = null,
+  val maxId: String? = null,
+  val sinceId: String? = null,
 ) : IPagination
 
 data class CursorPagination(
-    val cursor: String?,
+  val cursor: String?,
 ) : IPagination
 
 class PagingList<T, P : IPagination>(
-    data: List<T>,
-    override val nextPage: P? = null,
+  data: List<T>,
+  override val nextPage: P? = null,
 ) : ArrayListCompat<T>(data), IPagingList<T, P>
 
 // FIXME: 2021/3/31 workaround for java.lang.NoSuchMethodError: No virtual method getSize()I
 open class ArrayListCompat<T>(
-    private val data: List<T>
+  private val data: List<T>
 ) : AbstractList<T>() {
-    override val size: Int
-        get() = data.size
+  override val size: Int
+    get() = data.size
 
-    override fun get(index: Int): T = data[index]
+  override fun get(index: Int): T = data[index]
 }

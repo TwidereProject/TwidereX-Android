@@ -29,19 +29,19 @@ import moe.tlaster.precompose.ui.LocalBackDispatcherOwner
 
 @Composable
 fun RequireAuthorization(
-    content: @Composable () -> Unit,
+  content: @Composable () -> Unit,
 ) {
-    val account = LocalActiveAccount.current
-    if (account == null) {
-        val navController = LocalNavController.current
-        val backDispatcher = LocalBackDispatcherOwner.current?.backDispatcher
-        LaunchedEffect(Unit) {
-            val result = navController.navigateForResult(Root.SignIn.General)
-            if (result == null) {
-                backDispatcher?.onBackPress()
-            }
-        }
-    } else {
-        content.invoke()
+  val account = LocalActiveAccount.current
+  if (account == null) {
+    val navController = LocalNavController.current
+    val backDispatcher = LocalBackDispatcherOwner.current?.backDispatcher
+    LaunchedEffect(Unit) {
+      val result = navController.navigateForResult(Root.SignIn.General)
+      if (result == null) {
+        backDispatcher?.onBackPress()
+      }
     }
+  } else {
+    content.invoke()
+  }
 }

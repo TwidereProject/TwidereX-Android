@@ -43,48 +43,48 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class DMNewConversationViewModel(
-    private val dmRepository: DirectMessageRepository,
-    private val accountRepository: AccountRepository,
+  private val dmRepository: DirectMessageRepository,
+  private val accountRepository: AccountRepository,
 ) : ViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
+
+  val input = MutableStateFlow("")
+
+  @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+  val sourceFlow = input.debounce(666L).filterNot { it.isEmpty() }.flatMapLatest { str ->
+    account.mapNotNull { it }.flatMapLatest { account ->
+      Pager(
+        config = PagingConfig(
+          pageSize = defaultLoadCount,
+          enablePlaceholders = false,
+        )
+      ) {
+        SearchUserPagingSource(
+          accountKey = account.accountKey,
+          str,
+          account.service as SearchService,
+        )
+      }.flow
     }
+  }.cachedIn(viewModelScope)
 
-    val input = MutableStateFlow("")
-
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val sourceFlow = input.debounce(666L).filterNot { it.isEmpty() }.flatMapLatest { str ->
-        account.mapNotNull { it }.flatMapLatest { account ->
-            Pager(
-                config = PagingConfig(
-                    pageSize = defaultLoadCount,
-                    enablePlaceholders = false,
-                )
-            ) {
-                SearchUserPagingSource(
-                    accountKey = account.accountKey,
-                    str,
-                    account.service as SearchService,
-                )
-            }.flow
+  fun createNewConversation(receiver: UiUser, onResult: (key: MicroBlogKey?) -> Unit) {
+    viewModelScope.launch {
+      runCatching {
+        account.firstOrNull()?.let { account ->
+          dmRepository.createNewConversation(
+            receiver = receiver,
+            accountKey = account.accountKey,
+            platformType = account.type
+          )
         }
-    }.cachedIn(viewModelScope)
-
-    fun createNewConversation(receiver: UiUser, onResult: (key: MicroBlogKey?) -> Unit) {
-        viewModelScope.launch {
-            runCatching {
-                account.firstOrNull()?.let { account ->
-                    dmRepository.createNewConversation(
-                        receiver = receiver,
-                        accountKey = account.accountKey,
-                        platformType = account.type
-                    )
-                }
-            }.onSuccess {
-                onResult(it)
-            }.onFailure {
-                onResult(null)
-            }
-        }
+      }.onSuccess {
+        onResult(it)
+      }.onFailure {
+        onResult(null)
+      }
     }
+  }
 }

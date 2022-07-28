@@ -29,12 +29,12 @@ import com.twidere.twiderex.room.db.model.DbStatusReaction
 
 @Dao
 internal interface RoomReactionDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(media: List<DbStatusReaction>)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertAll(media: List<DbStatusReaction>)
 
-    @Query("SELECT * FROM status_reactions WHERE statusKey == :statusKey AND accountKey == :accountKey")
-    suspend fun findWithStatusKey(statusKey: MicroBlogKey, accountKey: MicroBlogKey): DbStatusReaction?
+  @Query("SELECT * FROM status_reactions WHERE statusKey == :statusKey AND accountKey == :accountKey")
+  suspend fun findWithStatusKey(statusKey: MicroBlogKey, accountKey: MicroBlogKey): DbStatusReaction?
 
-    @Query("DELETE FROM status_reactions WHERE statusKey == :statusKey")
-    suspend fun delete(statusKey: MicroBlogKey)
+  @Query("DELETE FROM status_reactions WHERE statusKey == :statusKey")
+  suspend fun delete(statusKey: MicroBlogKey)
 }

@@ -27,19 +27,19 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface AccountResources {
-    @GET("/api/v1/accounts/{id}/followers")
-    suspend fun followers(
-        @Path(value = "id") id: String,
-        @Query("max_id") max_id: String? = null,
-        @Query("since_id") since_id: String? = null,
-        @Query("limit") limit: Int? = null,
-    ): Response<List<Account>>
+  @GET("/api/v1/accounts/{id}/followers")
+  suspend fun followers(
+    @Path(value = "id") id: String,
+    @Query("max_id") max_id: String? = null,
+    @Query("since_id") since_id: String? = null,
+    @Query("limit") limit: Int? = null,
+  ): Response<List<Account>>
 
-    @GET("/api/v1/accounts/{id}/following")
-    suspend fun following(
-        @Path(value = "id") id: String,
-        @Query("max_id") max_id: String? = null,
-        @Query("since_id") since_id: String? = null,
-        @Query("limit") limit: Int? = null,
-    ): Response<List<Account>>
+  @GET("/api/v1/accounts/{id}/following")
+  suspend fun following(
+    @Path(value = "id") id: String,
+    @Query("max_id") max_id: String? = null,
+    @Query("since_id") since_id: String? = null,
+    @Query("limit") limit: Int? = null,
+  ): Response<List<Account>>
 }

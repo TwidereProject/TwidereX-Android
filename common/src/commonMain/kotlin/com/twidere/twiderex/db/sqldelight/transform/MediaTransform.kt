@@ -24,27 +24,27 @@ import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.sqldelight.table.DbMedia
 
 internal fun DbMedia.toUi() = UiMedia(
-    url = url,
-    belongToKey = belongToKey,
-    mediaUrl = mediaUrl,
-    previewUrl = previewUrl,
-    type = type,
-    width = width,
-    height = height,
-    pageUrl = pageUrl,
-    altText = altText,
-    order = orderIndex.toInt()
+  url = url,
+  belongToKey = belongToKey,
+  mediaUrl = mediaUrl,
+  previewUrl = previewUrl,
+  type = type,
+  width = width,
+  height = height,
+  pageUrl = pageUrl,
+  altText = altText,
+  order = orderIndex.toInt()
 )
 
 internal fun UiMedia.toDbMedia() = DbMedia(
-    url = url,
-    belongToKey = belongToKey,
-    mediaUrl = mediaUrl,
-    previewUrl = previewUrl?.toString(),
-    type = type,
-    width = width,
-    height = height,
-    pageUrl = pageUrl,
-    altText = altText,
-    orderIndex = order.toLong(),
+  url = url,
+  belongToKey = belongToKey,
+  mediaUrl = mediaUrl,
+  previewUrl = previewUrl?.toString(),
+  type = type,
+  width = width,
+  height = height,
+  pageUrl = pageUrl,
+  altText = altText,
+  orderIndex = order.toLong(),
 )

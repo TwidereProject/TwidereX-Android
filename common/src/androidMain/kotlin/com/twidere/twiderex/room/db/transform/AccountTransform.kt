@@ -24,10 +24,10 @@ import android.accounts.Account
 import com.twidere.twiderex.model.TwidereAccount
 
 fun Account.toTwidere() = TwidereAccount(
-    name = name,
-    type = type
+  name = name,
+  type = type
 )
 
 fun TwidereAccount.toAndroid() = Account(
-    name, type
+  name, type
 )

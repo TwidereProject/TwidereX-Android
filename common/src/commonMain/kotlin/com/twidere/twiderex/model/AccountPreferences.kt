@@ -30,56 +30,56 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.map
 
 class AccountPreferences(
-    private val dataStore: DataStore<Preferences>,
-    private val scope: CoroutineScope,
+  private val dataStore: DataStore<Preferences>,
+  private val scope: CoroutineScope,
 ) {
-    private val isNotificationEnabledKey = booleanPreferencesKey("isNotificationEnabled")
-    val isNotificationEnabled
-        get() = dataStore.data.map { preferences ->
-            preferences[isNotificationEnabledKey] ?: true
-        }
-    val homeMenuOrder
-        get() = dataStore.data.map { preferences ->
-            if (!preferences.contains(homeMenuOrderKey) || !preferences.contains(visibleHomeMenuKey)) {
-                HomeMenus.values().map { it to it.showDefault }
-            } else {
-                val order = preferences[homeMenuOrderKey].orEmpty()
-                    .split(",")
-                    .withIndex()
-                    .associate { HomeMenus.valueOf(it.value) to it.index }
-                val visible = preferences[visibleHomeMenuKey].orEmpty().split(",")
-                HomeMenus.values().sortedBy {
-                    order[it]
-                }.map { it to visible.contains(it.name) }
-            }
-        }
-
-    suspend fun setIsNotificationEnabled(value: Boolean) {
-        dataStore.edit {
-            it[isNotificationEnabledKey] = value
-        }
+  private val isNotificationEnabledKey = booleanPreferencesKey("isNotificationEnabled")
+  val isNotificationEnabled
+    get() = dataStore.data.map { preferences ->
+      preferences[isNotificationEnabledKey] ?: true
+    }
+  val homeMenuOrder
+    get() = dataStore.data.map { preferences ->
+      if (!preferences.contains(homeMenuOrderKey) || !preferences.contains(visibleHomeMenuKey)) {
+        HomeMenus.values().map { it to it.showDefault }
+      } else {
+        val order = preferences[homeMenuOrderKey].orEmpty()
+          .split(",")
+          .withIndex()
+          .associate { HomeMenus.valueOf(it.value) to it.index }
+        val visible = preferences[visibleHomeMenuKey].orEmpty().split(",")
+        HomeMenus.values().sortedBy {
+          order[it]
+        }.map { it to visible.contains(it.name) }
+      }
     }
 
-    fun close() {
-        // cancel scope will remove file from activeFiles in Datastore
-        // prevent crashes caused by multiple DataStores active for the same file
-        scope.cancel()
+  suspend fun setIsNotificationEnabled(value: Boolean) {
+    dataStore.edit {
+      it[isNotificationEnabledKey] = value
     }
+  }
 
-    private val homeMenuOrderKey = stringPreferencesKey("homeMenuOrder")
-    private val visibleHomeMenuKey = stringPreferencesKey("visibleHomeMenu")
-    suspend fun setHomeMenuOrder(
-        data: List<Pair<HomeMenus, Boolean>>,
-    ) {
-        dataStore.edit {
-            it[visibleHomeMenuKey] = data.filter { it.second }.joinToString(",") { it.first.name }
-        }
-        dataStore.edit {
-            it[homeMenuOrderKey] = data.joinToString(",") { it.first.name }
-        }
+  fun close() {
+    // cancel scope will remove file from activeFiles in Datastore
+    // prevent crashes caused by multiple DataStores active for the same file
+    scope.cancel()
+  }
+
+  private val homeMenuOrderKey = stringPreferencesKey("homeMenuOrder")
+  private val visibleHomeMenuKey = stringPreferencesKey("visibleHomeMenu")
+  suspend fun setHomeMenuOrder(
+    data: List<Pair<HomeMenus, Boolean>>,
+  ) {
+    dataStore.edit {
+      it[visibleHomeMenuKey] = data.filter { it.second }.joinToString(",") { it.first.name }
     }
+    dataStore.edit {
+      it[homeMenuOrderKey] = data.joinToString(",") { it.first.name }
+    }
+  }
 }
 
 expect class AccountPreferencesFactory {
-    fun create(accountKey: MicroBlogKey): AccountPreferences
+  fun create(accountKey: MicroBlogKey): AccountPreferences
 }

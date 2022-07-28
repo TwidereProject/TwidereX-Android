@@ -37,31 +37,31 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun MastodonHashtagScene(keyword: String) {
-    val viewModel: MastodonHashtagViewModel = getViewModel {
-        parametersOf(keyword)
+  val viewModel: MastodonHashtagViewModel = getViewModel {
+    parametersOf(keyword)
+  }
+  val source = viewModel.source.collectAsLazyPagingItems()
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = keyword)
+          }
+        )
+      }
+    ) {
+      SwipeToRefreshLayout(
+        refreshingState = source.loadState.refresh is LoadState.Loading,
+        onRefresh = {
+          source.refreshOrRetry()
+        },
+      ) {
+        LazyUiStatusList(items = source)
+      }
     }
-    val source = viewModel.source.collectAsLazyPagingItems()
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = keyword)
-                    }
-                )
-            }
-        ) {
-            SwipeToRefreshLayout(
-                refreshingState = source.loadState.refresh is LoadState.Loading,
-                onRefresh = {
-                    source.refreshOrRetry()
-                },
-            ) {
-                LazyUiStatusList(items = source)
-            }
-        }
-    }
+  }
 }

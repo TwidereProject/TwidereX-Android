@@ -30,31 +30,31 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ColumnScope.ItemDivider(
-    modifier: Modifier = Modifier,
-    thickness: Dp = 1.dp,
-    startIndent: Dp = ItemDividerDefaults.StartIndent,
+  modifier: Modifier = Modifier,
+  thickness: Dp = 1.dp,
+  startIndent: Dp = ItemDividerDefaults.StartIndent,
 ) {
-    Divider(
-        modifier = modifier,
-        thickness = thickness,
-        startIndent = startIndent,
-    )
+  Divider(
+    modifier = modifier,
+    thickness = thickness,
+    startIndent = startIndent,
+  )
 }
 
 fun LazyListScope.divider(
-    modifier: Modifier = Modifier,
-    thickness: Dp = 1.dp,
-    startIndent: Dp = ItemDividerDefaults.StartIndent,
+  modifier: Modifier = Modifier,
+  thickness: Dp = 1.dp,
+  startIndent: Dp = ItemDividerDefaults.StartIndent,
 ) {
-    item {
-        Divider(
-            modifier = modifier,
-            thickness = thickness,
-            startIndent = startIndent,
-        )
-    }
+  item {
+    Divider(
+      modifier = modifier,
+      thickness = thickness,
+      startIndent = startIndent,
+    )
+  }
 }
 
 object ItemDividerDefaults {
-    val StartIndent = 8.dp
+  val StartIndent = 8.dp
 }

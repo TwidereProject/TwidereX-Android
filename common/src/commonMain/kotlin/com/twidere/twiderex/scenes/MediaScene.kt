@@ -118,125 +118,125 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
-    val viewModel = getViewModel<MediaViewModel> {
-        parametersOf(statusKey)
-    }
-    val status by viewModel.status.observeAsState(null)
-    val loading by viewModel.loading.observeAsState(initial = false)
-    TwidereDialog(
-        requireDarkTheme = true,
-        extendViewIntoStatusBar = true,
-        extendViewIntoNavigationBar = true,
-    ) {
-        if (loading && status == null) {
-            Scaffold {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    LoadingProgress()
-                }
-            }
+  val viewModel = getViewModel<MediaViewModel> {
+    parametersOf(statusKey)
+  }
+  val status by viewModel.status.observeAsState(null)
+  val loading by viewModel.loading.observeAsState(initial = false)
+  TwidereDialog(
+    requireDarkTheme = true,
+    extendViewIntoStatusBar = true,
+    extendViewIntoNavigationBar = true,
+  ) {
+    if (loading && status == null) {
+      Scaffold {
+        Column(
+          modifier = Modifier
+            .fillMaxSize(),
+          verticalArrangement = Arrangement.Center,
+          horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+          LoadingProgress()
         }
-        status?.let {
-            CompositionLocalProvider(
-                LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
-            ) {
-                StatusMediaScene(
-                    status = it,
-                    selectedIndex = selectedIndex.coerceIn(0, it.media.lastIndex),
-                    viewModel = viewModel,
-                )
-            }
-        }
+      }
     }
+    status?.let {
+      CompositionLocalProvider(
+        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
+      ) {
+        StatusMediaScene(
+          status = it,
+          selectedIndex = selectedIndex.coerceIn(0, it.media.lastIndex),
+          viewModel = viewModel,
+        )
+      }
+    }
+  }
 }
 
 @Composable
 fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
-    val window = LocalPlatformWindow.current
-    var controlVisibility by remember { mutableStateOf(true) }
-    val navigator = LocalNavigator.current
-    val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
-    val navController = LocalNavController.current
-    val pagerState = rememberPagerState(
-        initialPage = selectedIndex,
-        pageCount = status.media.size,
-    )
-    val currentMedia = status.media[pagerState.currentPage]
+  val window = LocalPlatformWindow.current
+  var controlVisibility by remember { mutableStateOf(true) }
+  val navigator = LocalNavigator.current
+  val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
+  val navController = LocalNavController.current
+  val pagerState = rememberPagerState(
+    initialPage = selectedIndex,
+    pageCount = status.media.size,
+  )
+  val currentMedia = status.media[pagerState.currentPage]
 
-    val videoPlayerState = mutableStateOf<VideoPlayerState?>(null)
+  val videoPlayerState = mutableStateOf<VideoPlayerState?>(null)
 
-    val swiperState = rememberSwiperState(
-        onDismiss = {
-            navController.popBackStack()
-        },
-    )
-    StatusMediaSceneLayout(
-        backgroundColor = Color.Transparent,
-        contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
-        bottomView = {
-            StatusMediaBottomContent(
-                status = status,
-                visible = controlVisibility && swiperState.progress == 0f,
-                controlPanelColor = controlPanelColor,
-                navigator = navigator,
-                videoPlayerState = videoPlayerState.value,
-                viewModel = viewModel,
-                currentMedia = currentMedia,
-                pagerState = pagerState
+  val swiperState = rememberSwiperState(
+    onDismiss = {
+      navController.popBackStack()
+    },
+  )
+  StatusMediaSceneLayout(
+    backgroundColor = Color.Transparent,
+    contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
+    bottomView = {
+      StatusMediaBottomContent(
+        status = status,
+        visible = controlVisibility && swiperState.progress == 0f,
+        controlPanelColor = controlPanelColor,
+        navigator = navigator,
+        videoPlayerState = videoPlayerState.value,
+        viewModel = viewModel,
+        currentMedia = currentMedia,
+        pagerState = pagerState
+      )
+    },
+    closeButton = {
+      StatusMediaCloseButton(
+        visible = controlVisibility && swiperState.progress == 0f,
+        backgroundColor = controlPanelColor,
+        navController = navController
+      )
+    },
+    mediaView = {
+      MediaView(
+        media = status.media.mapNotNull {
+          it.mediaUrl?.let { it1 ->
+            MediaData(
+              it1,
+              it.type
             )
+          }
         },
-        closeButton = {
-            StatusMediaCloseButton(
-                visible = controlVisibility && swiperState.progress == 0f,
-                backgroundColor = controlPanelColor,
-                navController = navController
-            )
+        swiperState = swiperState,
+        onVideoPlayerStateSet = { videoPlayerState.value = it },
+        pagerState = pagerState,
+        volume = 1f,
+        onClick = {
+          if (controlVisibility) {
+            window.hideControls()
+          } else {
+            window.showControls()
+          }
         },
-        mediaView = {
-            MediaView(
-                media = status.media.mapNotNull {
-                    it.mediaUrl?.let { it1 ->
-                        MediaData(
-                            it1,
-                            it.type
-                        )
-                    }
-                },
-                swiperState = swiperState,
-                onVideoPlayerStateSet = { videoPlayerState.value = it },
-                pagerState = pagerState,
-                volume = 1f,
-                onClick = {
-                    if (controlVisibility) {
-                        window.hideControls()
-                    } else {
-                        window.showControls()
-                    }
-                },
-                backgroundColor = MaterialTheme.colors.background
-            )
-            val windowBarVisibility by window.windowBarVisibility.observeAsState(true)
-            LaunchedEffect(windowBarVisibility) {
-                controlVisibility = windowBarVisibility
-            }
-            DisposableEffect(Unit) {
-                onDispose {
-                    window.showControls()
-                }
-            }
-        },
-        backgroundView = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
-            )
+        backgroundColor = MaterialTheme.colors.background
+      )
+      val windowBarVisibility by window.windowBarVisibility.observeAsState(true)
+      LaunchedEffect(windowBarVisibility) {
+        controlVisibility = windowBarVisibility
+      }
+      DisposableEffect(Unit) {
+        onDispose {
+          window.showControls()
         }
-    )
+      }
+    },
+    backgroundView = {
+      Box(
+        modifier = Modifier
+          .fillMaxSize()
+          .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
+      )
+    }
+  )
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -246,294 +246,294 @@ private fun StatusMediaCloseButton(
     backgroundColor: Color,
     navController: Navigator
 ) {
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn() + expandVertically(),
-        exit = shrinkVertically() + fadeOut()
+  AnimatedVisibility(
+    visible = visible,
+    enter = fadeIn() + expandVertically(),
+    exit = shrinkVertically() + fadeOut()
+  ) {
+    Box(
+      modifier = Modifier
+        .topInsetsPadding()
+        .padding(16.dp),
     ) {
-        Box(
-            modifier = Modifier
-                .topInsetsPadding()
-                .padding(16.dp),
+      Box(
+        modifier = Modifier
+          .align(Alignment.TopStart)
+          .clip(MaterialTheme.shapes.small)
+          .background(
+            color = backgroundColor,
+            shape = MaterialTheme.shapes.small
+          )
+          .clipToBounds()
+      ) {
+        IconButton(
+          onClick = {
+            navController.popBackStack()
+          }
         ) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .clip(MaterialTheme.shapes.small)
-                    .background(
-                        color = backgroundColor,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .clipToBounds()
-            ) {
-                IconButton(
-                    onClick = {
-                        navController.popBackStack()
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
-                        contentDescription = stringResource(
-                            res = com.twidere.twiderex.MR.strings.accessibility_common_close
-                        )
-                    )
-                }
-            }
+          Icon(
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
+            contentDescription = stringResource(
+              res = com.twidere.twiderex.MR.strings.accessibility_common_close
+            )
+          )
         }
+      }
     }
+  }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun StatusMediaBottomContent(
-    status: UiStatus,
-    visible: Boolean,
-    controlPanelColor: Color,
-    navigator: INavigator,
-    videoPlayerState: VideoPlayerState?,
-    viewModel: MediaViewModel,
-    currentMedia: UiMedia,
-    pagerState: PagerState
+  status: UiStatus,
+  visible: Boolean,
+  controlPanelColor: Color,
+  navigator: INavigator,
+  videoPlayerState: VideoPlayerState?,
+  viewModel: MediaViewModel,
+  currentMedia: UiMedia,
+  pagerState: PagerState
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        if (status.media.size > 1) {
-            HorizontalPagerIndicator(
-                pagerState = pagerState,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .align(Alignment.CenterHorizontally),
-            )
-            AnimatedVisibility(
-                visible = !(visible),
-                enter = expandVertically(),
-                exit = shrinkVertically(),
-            ) {
-                Spacer(modifier = Modifier.bottomInsetsHeight())
-            }
-        }
-        AnimatedVisibility(
-            visible = visible,
-            enter = fadeIn() + expandVertically(),
-            exit = shrinkVertically() + fadeOut()
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(color = controlPanelColor)
-                    .bottomInsetsPadding()
-                    .clickable { navigator.status(status = status) },
-            ) {
-                StatusMediaInfo(
-                    videoPlayerState, status, viewModel, currentMedia,
-                )
-            }
-        }
+  Column(
+    modifier = Modifier.fillMaxWidth()
+  ) {
+    if (status.media.size > 1) {
+      HorizontalPagerIndicator(
+        pagerState = pagerState,
+        modifier = Modifier
+          .padding(16.dp)
+          .align(Alignment.CenterHorizontally),
+      )
+      AnimatedVisibility(
+        visible = !(visible),
+        enter = expandVertically(),
+        exit = shrinkVertically(),
+      ) {
+        Spacer(modifier = Modifier.bottomInsetsHeight())
+      }
     }
+    AnimatedVisibility(
+      visible = visible,
+      enter = fadeIn() + expandVertically(),
+      exit = shrinkVertically() + fadeOut()
+    ) {
+      Box(
+        modifier = Modifier
+          .background(color = controlPanelColor)
+          .bottomInsetsPadding()
+          .clickable { navigator.status(status = status) },
+      ) {
+        StatusMediaInfo(
+          videoPlayerState, status, viewModel, currentMedia,
+        )
+      }
+    }
+  }
 }
 
 @OptIn(ExperimentalUnitApi::class)
 @Composable
 private fun StatusMediaInfo(
-    videoPlayerState: VideoPlayerState?,
-    status: UiStatus,
-    viewModel: MediaViewModel,
-    currentMedia: UiMedia,
+  videoPlayerState: VideoPlayerState?,
+  status: UiStatus,
+  viewModel: MediaViewModel,
+  currentMedia: UiMedia,
 ) {
-    val scope = rememberCoroutineScope()
+  val scope = rememberCoroutineScope()
 
-    val text = renderContentAnnotatedString(
-        htmlText = status.htmlText,
-        linkResolver = { status.resolveLink(it) },
-    )
-    Column(
-        modifier = Modifier
-            .padding(StatusMediaInfoDefaults.ContentPadding),
-    ) {
-        if (videoPlayerState != null) {
-            CustomVideoControl(state = videoPlayerState)
-        }
-        StatusText(status = status, maxLines = 2, showMastodonPoll = false)
-        Spacer(modifier = Modifier.height(StatusMediaInfoDefaults.TextSpacing))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Row(
-                modifier = Modifier
-                    .weight(1f),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                UserAvatar(user = status.user)
-                Spacer(modifier = Modifier.width(StatusMediaInfoDefaults.AvatarSpacing))
-                UserName(user = status.user)
-                Spacer(modifier = Modifier.width(StatusMediaInfoDefaults.NameSpacing))
-                UserScreenName(user = status.user)
-            }
-            ReplyButton(status = status, withNumber = false)
-            RetweetButton(status = status, withNumber = false)
-            LikeButton(status = status, withNumber = false)
-            ShareButton(status = status) { callback ->
-                DropdownMenuItem(
-                    onClick = {
-                        scope.launch {
-                            callback.invoke()
-                            viewModel.saveFile(currentMedia, target = {
-                                FilePicker.createFile(it)?.path
-                            })
-                        }
-                    }
-                ) {
-                    Text(
-                        text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_save),
-                    )
-                }
-                DropdownMenuItem(
-                    onClick = {
-                        callback.invoke()
-                        currentMedia.fileName?.let {
-                            scope.launch {
-                                viewModel.shareMedia(
-                                    currentMedia = currentMedia,
-                                    extraText = buildString {
-                                        append(text)
-                                        append(System.lineSeparator())
-                                        append(System.lineSeparator())
-                                        append(status.generateShareLink())
-                                    }
-                                )
-                            }
-                        }
-                    }
-                ) {
-                    Text(
-                        text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_share_media),
-                    )
-                }
-            }
-        }
+  val text = renderContentAnnotatedString(
+    htmlText = status.htmlText,
+    linkResolver = { status.resolveLink(it) },
+  )
+  Column(
+    modifier = Modifier
+      .padding(StatusMediaInfoDefaults.ContentPadding),
+  ) {
+    if (videoPlayerState != null) {
+      CustomVideoControl(state = videoPlayerState)
     }
+    StatusText(status = status, maxLines = 2, showMastodonPoll = false)
+    Spacer(modifier = Modifier.height(StatusMediaInfoDefaults.TextSpacing))
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Row(
+        modifier = Modifier
+          .weight(1f),
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        UserAvatar(user = status.user)
+        Spacer(modifier = Modifier.width(StatusMediaInfoDefaults.AvatarSpacing))
+        UserName(user = status.user)
+        Spacer(modifier = Modifier.width(StatusMediaInfoDefaults.NameSpacing))
+        UserScreenName(user = status.user)
+      }
+      ReplyButton(status = status, withNumber = false)
+      RetweetButton(status = status, withNumber = false)
+      LikeButton(status = status, withNumber = false)
+      ShareButton(status = status) { callback ->
+        DropdownMenuItem(
+          onClick = {
+            scope.launch {
+              callback.invoke()
+              viewModel.saveFile(currentMedia, target = {
+                FilePicker.createFile(it)?.path
+              })
+            }
+          }
+        ) {
+          Text(
+            text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_save),
+          )
+        }
+        DropdownMenuItem(
+          onClick = {
+            callback.invoke()
+            currentMedia.fileName?.let {
+              scope.launch {
+                viewModel.shareMedia(
+                  currentMedia = currentMedia,
+                  extraText = buildString {
+                    append(text)
+                    append(System.lineSeparator())
+                    append(System.lineSeparator())
+                    append(status.generateShareLink())
+                  }
+                )
+              }
+            }
+          }
+        ) {
+          Text(
+            text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_share_media),
+          )
+        }
+      }
+    }
+  }
 }
 
 private object StatusMediaInfoDefaults {
-    val ContentPadding = PaddingValues(8.dp)
-    val TextSpacing = 8.dp
-    val AvatarSpacing = 8.dp
-    val NameSpacing = 8.dp
+  val ContentPadding = PaddingValues(8.dp)
+  val TextSpacing = 8.dp
+  val AvatarSpacing = 8.dp
+  val NameSpacing = 8.dp
 }
 
 @Composable
 fun RawMediaScene(url: String, type: MediaType) {
-    TwidereDialog(
-        requireDarkTheme = true,
-        extendViewIntoStatusBar = true,
-        extendViewIntoNavigationBar = true,
+  TwidereDialog(
+    requireDarkTheme = true,
+    extendViewIntoStatusBar = true,
+    extendViewIntoNavigationBar = true,
+  ) {
+    Scaffold(
+      backgroundColor = Color.Transparent
     ) {
-        Scaffold(
-            backgroundColor = Color.Transparent
-        ) {
-            val navController = LocalNavController.current
-            val swiperState = rememberSwiperState(
-                onDismiss = {
-                    navController.popBackStack()
-                },
-            )
-            Box {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
-                )
-                MediaView(media = listOf(MediaData(url, type)), swiperState = swiperState, onClick = {
-                    navController.popBackStack()
-                }, backgroundColor = MaterialTheme.colors.background)
-            }
-        }
+      val navController = LocalNavController.current
+      val swiperState = rememberSwiperState(
+        onDismiss = {
+          navController.popBackStack()
+        },
+      )
+      Box {
+        Box(
+          modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
+        )
+        MediaView(media = listOf(MediaData(url, type)), swiperState = swiperState, onClick = {
+          navController.popBackStack()
+        }, backgroundColor = MaterialTheme.colors.background)
+      }
     }
+  }
 }
 
 data class MediaData(
-    val url: String,
-    val type: MediaType,
+  val url: String,
+  val type: MediaType,
 )
 
 @Composable
 fun MediaView(
-    backgroundColor: Color? = null,
-    modifier: Modifier = Modifier,
-    media: List<MediaData>,
-    swiperState: SwiperState = rememberSwiperState(),
-    pagerState: PagerState = rememberPagerState(
-        initialPage = 0,
-        pageCount = media.size,
-    ),
-    onVideoPlayerStateSet: (VideoPlayerState?) -> Unit = {},
-    volume: Float = 1f,
-    onClick: () -> Unit = {}
+  backgroundColor: Color? = null,
+  modifier: Modifier = Modifier,
+  media: List<MediaData>,
+  swiperState: SwiperState = rememberSwiperState(),
+  pagerState: PagerState = rememberPagerState(
+    initialPage = 0,
+    pageCount = media.size,
+  ),
+  onVideoPlayerStateSet: (VideoPlayerState?) -> Unit = {},
+  volume: Float = 1f,
+  onClick: () -> Unit = {}
 ) {
-    Swiper(
-        modifier = modifier,
-        state = swiperState,
+  Swiper(
+    modifier = modifier,
+    state = swiperState,
+  ) {
+    Pager(
+      state = pagerState,
     ) {
-        Pager(
-            state = pagerState,
-        ) {
-            val data = media[page]
-            when (data.type) {
-                MediaType.photo ->
-                    Zoomable(
-                        onClick = onClick
-                    ) {
-                        onVideoPlayerStateSet(null)
-                        NetworkImage(
-                            modifier = Modifier.fillMaxSize(),
-                            data = data.url,
-                            contentScale = ContentScale.Fit,
-                            placeholder = {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            },
-                            zoomable = true
-                        )
-                    }
+      val data = media[page]
+      when (data.type) {
+        MediaType.photo ->
+          Zoomable(
+            onClick = onClick
+          ) {
+            onVideoPlayerStateSet(null)
+            NetworkImage(
+              modifier = Modifier.fillMaxSize(),
+              data = data.url,
+              contentScale = ContentScale.Fit,
+              placeholder = {
+                Box(
+                  modifier = Modifier.fillMaxSize(),
+                  contentAlignment = Alignment.Center,
+                ) {
+                  CircularProgressIndicator()
+                }
+              },
+              zoomable = true
+            )
+          }
 
-                MediaType.video, MediaType.animated_gif, MediaType.audio ->
-                    Box(
-                        modifier = Modifier.clickable {
-                            onClick.invoke()
-                        }
-                    ) {
-                        val state = rememberVideoPlayerState(
-                            url = data.url,
-                            volume = volume,
-                            isMute = LocalDisplayPreferences.current.muteByDefault
-                        )
-                        if (data.type == MediaType.animated_gif) {
-                            onVideoPlayerStateSet(null)
-                        } else {
-                            onVideoPlayerStateSet(state)
-                        }
-                        VideoPlayer(
-                            playEnable = LocalVideoPlayback.current.playEnable(),
-                            videoState = state,
-                            zOrderMediaOverlay = true,
-                            keepScreenOn = true,
-                            backgroundColor = backgroundColor,
-                            // Pass the click event to swing on JVM
-                            onClick = if (
-                                currentPlatform == Platform.JVM
-                            ) {
-                                onClick
-                            } else {
-                                null
-                            }
-                        )
-                    }
-                MediaType.other -> Unit
+        MediaType.video, MediaType.animated_gif, MediaType.audio ->
+          Box(
+            modifier = Modifier.clickable {
+              onClick.invoke()
             }
-        }
+          ) {
+            val state = rememberVideoPlayerState(
+              url = data.url,
+              volume = volume,
+              isMute = LocalDisplayPreferences.current.muteByDefault
+            )
+            if (data.type == MediaType.animated_gif) {
+              onVideoPlayerStateSet(null)
+            } else {
+              onVideoPlayerStateSet(state)
+            }
+            VideoPlayer(
+              playEnable = LocalVideoPlayback.current.playEnable(),
+              videoState = state,
+              zOrderMediaOverlay = true,
+              keepScreenOn = true,
+              backgroundColor = backgroundColor,
+              // Pass the click event to swing on JVM
+              onClick = if (
+                currentPlatform == Platform.JVM
+              ) {
+                onClick
+              } else {
+                null
+              }
+            )
+          }
+        MediaType.other -> Unit
+      }
     }
+  }
 }

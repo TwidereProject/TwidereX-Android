@@ -29,16 +29,16 @@ import com.twidere.twiderex.room.db.model.DbTrendHistory
 
 @Dao
 internal interface RoomTrendHistoryDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(histories: List<DbTrendHistory>)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertAll(histories: List<DbTrendHistory>)
 
-    @Query("DELETE FROM trend_histories WHERE accountKey == :accountKey")
-    suspend fun clearAll(
-        accountKey: MicroBlogKey,
-    )
+  @Query("DELETE FROM trend_histories WHERE accountKey == :accountKey")
+  suspend fun clearAll(
+    accountKey: MicroBlogKey,
+  )
 
-    @Query("SELECT * FROM trend_histories WHERE accountKey == :accountKey")
-    suspend fun getAll(
-        accountKey: MicroBlogKey
-    ): List<DbTrendHistory>
+  @Query("SELECT * FROM trend_histories WHERE accountKey == :accountKey")
+  suspend fun getAll(
+    accountKey: MicroBlogKey
+  ): List<DbTrendHistory>
 }

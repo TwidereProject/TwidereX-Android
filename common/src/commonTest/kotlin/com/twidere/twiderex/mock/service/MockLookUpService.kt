@@ -29,30 +29,30 @@ import com.twidere.twiderex.mock.model.mockIUser
 import org.jetbrains.annotations.TestOnly
 
 internal class MockLookUpService @TestOnly constructor() : MicroBlogService, LookupService,
-    ErrorService() {
-    override suspend fun lookupStatus(id: String): IStatus {
-        return mockIStatus(id = id)
-    }
+  ErrorService() {
+  override suspend fun lookupStatus(id: String): IStatus {
+    return mockIStatus(id = id)
+  }
 
-    override suspend fun lookupUser(id: String): IUser {
-        return mockIUser(id = id)
-    }
+  override suspend fun lookupUser(id: String): IUser {
+    return mockIUser(id = id)
+  }
 
-    override suspend fun lookupUserByName(name: String): IUser {
-        return mockIUser(name = name)
-    }
+  override suspend fun lookupUserByName(name: String): IUser {
+    return mockIUser(name = name)
+  }
 
-    override suspend fun lookupUsersByName(name: List<String>): List<IUser> {
-        return name.map {
-            lookupUserByName(it)
-        }
+  override suspend fun lookupUsersByName(name: List<String>): List<IUser> {
+    return name.map {
+      lookupUserByName(it)
     }
+  }
 
-    override suspend fun userPinnedStatus(userId: String): List<IStatus> {
-        return listOf(
-            mockIStatus(
-                authorId = userId
-            )
-        )
-    }
+  override suspend fun userPinnedStatus(userId: String): List<IStatus> {
+    return listOf(
+      mockIStatus(
+        authorId = userId
+      )
+    )
+  }
 }

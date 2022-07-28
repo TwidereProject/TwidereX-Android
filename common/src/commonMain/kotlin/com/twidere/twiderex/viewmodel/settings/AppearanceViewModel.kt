@@ -27,48 +27,48 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class AppearanceViewModel(
-    private val appearancePreferences: DataStore<AppearancePreferences>
+  private val appearancePreferences: DataStore<AppearancePreferences>
 ) : ViewModel() {
 
-    fun setPrimaryColorIndex(index: Int) = viewModelScope.launch {
-        appearancePreferences.updateData {
-            it.copy(primaryColorIndex = index)
-        }
+  fun setPrimaryColorIndex(index: Int) = viewModelScope.launch {
+    appearancePreferences.updateData {
+      it.copy(primaryColorIndex = index)
     }
+  }
 
-    fun setTabPosition(position: AppearancePreferences.TabPosition) = viewModelScope.launch {
-        appearancePreferences.updateData {
-            it.copy(tabPosition = position)
-        }
+  fun setTabPosition(position: AppearancePreferences.TabPosition) = viewModelScope.launch {
+    appearancePreferences.updateData {
+      it.copy(tabPosition = position)
     }
+  }
 
-    fun setTheme(theme: AppearancePreferences.Theme) = viewModelScope.launch {
-        appearancePreferences.updateData {
-            it.copy(theme = theme)
-        }
+  fun setTheme(theme: AppearancePreferences.Theme) = viewModelScope.launch {
+    appearancePreferences.updateData {
+      it.copy(theme = theme)
     }
+  }
 
-    fun setHideTabBarWhenScrolling(hide: Boolean) = viewModelScope.launch {
-        appearancePreferences.updateData {
-            it.copy(hideTabBarWhenScroll = hide)
-        }
+  fun setHideTabBarWhenScrolling(hide: Boolean) = viewModelScope.launch {
+    appearancePreferences.updateData {
+      it.copy(hideTabBarWhenScroll = hide)
     }
+  }
 
-    fun setHideFabWhenScrolling(hide: Boolean) = viewModelScope.launch {
-        appearancePreferences.updateData {
-            it.copy(hideFabWhenScroll = hide)
-        }
+  fun setHideFabWhenScrolling(hide: Boolean) = viewModelScope.launch {
+    appearancePreferences.updateData {
+      it.copy(hideFabWhenScroll = hide)
     }
+  }
 
-    fun setHideAppBarWhenScrolling(hide: Boolean) = viewModelScope.launch {
-        appearancePreferences.updateData {
-            it.copy(hideAppBarWhenScroll = hide)
-        }
+  fun setHideAppBarWhenScrolling(hide: Boolean) = viewModelScope.launch {
+    appearancePreferences.updateData {
+      it.copy(hideAppBarWhenScroll = hide)
     }
+  }
 
-    fun setIsDarkModePureBlack(value: Boolean) = viewModelScope.launch {
-        appearancePreferences.updateData {
-            it.copy(isDarkModePureBlack = value)
-        }
+  fun setIsDarkModePureBlack(value: Boolean) = viewModelScope.launch {
+    appearancePreferences.updateData {
+      it.copy(isDarkModePureBlack = value)
     }
+  }
 }

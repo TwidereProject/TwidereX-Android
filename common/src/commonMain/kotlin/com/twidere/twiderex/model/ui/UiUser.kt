@@ -29,69 +29,69 @@ import com.twidere.twiderex.model.ui.twitter.TwitterUserExtra
 
 @Immutable
 data class UiUser(
-    val id: String,
-    val userKey: MicroBlogKey,
-    val acct: MicroBlogKey,
-    val name: String,
-    val screenName: String,
-    val profileImage: String,
-    val profileBackgroundImage: String?,
-    val metrics: UserMetrics,
-    val rawDesc: String,
-    val htmlDesc: String,
-    val website: String?,
-    val location: String?,
-    val verified: Boolean,
-    val protected: Boolean,
-    val platformType: PlatformType,
-    val extra: UserExtra? = null
+  val id: String,
+  val userKey: MicroBlogKey,
+  val acct: MicroBlogKey,
+  val name: String,
+  val screenName: String,
+  val profileImage: String,
+  val profileBackgroundImage: String?,
+  val metrics: UserMetrics,
+  val rawDesc: String,
+  val htmlDesc: String,
+  val website: String?,
+  val location: String?,
+  val verified: Boolean,
+  val protected: Boolean,
+  val platformType: PlatformType,
+  val extra: UserExtra? = null
 ) {
-    val displayName
-        get() = name.takeUnless { it.isEmpty() } ?: screenName
+  val displayName
+    get() = name.takeUnless { it.isEmpty() } ?: screenName
 
-    fun getDisplayScreenName(host: String?): String {
-        return if (host != null && host != acct.host) {
-            "@$screenName@${acct.host}"
-        } else {
-            "@$screenName"
-        }
+  fun getDisplayScreenName(host: String?): String {
+    return if (host != null && host != acct.host) {
+      "@$screenName@${acct.host}"
+    } else {
+      "@$screenName"
     }
-    val twitterExtra: TwitterUserExtra? = if (extra is TwitterUserExtra) extra else null
+  }
+  val twitterExtra: TwitterUserExtra? = if (extra is TwitterUserExtra) extra else null
 
-    val mastodonExtra: MastodonUserExtra? = if (extra is MastodonUserExtra) extra else null
+  val mastodonExtra: MastodonUserExtra? = if (extra is MastodonUserExtra) extra else null
 
-    companion object {
-        @Composable
-        fun sample() = UiUser(
-            id = "",
-            name = "Twidere",
-            screenName = "TwidereProject",
-            profileImage = "", // painterResource(res = com.twidere.twiderex.MR.files.ic_profile_image_twidere),
-            profileBackgroundImage = null,
-            metrics = UserMetrics(
-                fans = 0,
-                follow = 0,
-                status = 0,
-                listed = 0
-            ),
-            rawDesc = "",
-            htmlDesc = "",
-            website = null,
-            location = null,
-            verified = false,
-            protected = false,
-            userKey = MicroBlogKey.Empty,
-            platformType = PlatformType.Twitter,
-            acct = MicroBlogKey.twitter("TwidereProject")
-        )
-    }
+  companion object {
+    @Composable
+    fun sample() = UiUser(
+      id = "",
+      name = "Twidere",
+      screenName = "TwidereProject",
+      profileImage = "", // painterResource(res = com.twidere.twiderex.MR.files.ic_profile_image_twidere),
+      profileBackgroundImage = null,
+      metrics = UserMetrics(
+        fans = 0,
+        follow = 0,
+        status = 0,
+        listed = 0
+      ),
+      rawDesc = "",
+      htmlDesc = "",
+      website = null,
+      location = null,
+      verified = false,
+      protected = false,
+      userKey = MicroBlogKey.Empty,
+      platformType = PlatformType.Twitter,
+      acct = MicroBlogKey.twitter("TwidereProject")
+    )
+  }
 }
 
 interface UserExtra
 
 data class UserMetrics(
-    val fans: Long,
-    val follow: Long,
-    val status: Long,
-    val listed: Long
+  val fans: Long,
+  val follow: Long,
+  val status: Long,
+  val listed: Long
 )

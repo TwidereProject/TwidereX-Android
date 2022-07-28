@@ -26,20 +26,20 @@ import androidx.room.PrimaryKey
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
-    tableName = "lists",
-    indices = [Index(value = ["accountKey", "listKey"], unique = true)],
+  tableName = "lists",
+  indices = [Index(value = ["accountKey", "listKey"], unique = true)],
 )
 internal data class DbList(
-    @PrimaryKey
-    var _id: String,
-    val listId: String,
-    val ownerId: String,
-    val accountKey: MicroBlogKey,
-    val listKey: MicroBlogKey,
-    val title: String,
-    val description: String,
-    val mode: String,
-    val replyPolicy: String,
-    val isFollowed: Boolean,
-    val allowToSubscribe: Boolean
+  @PrimaryKey
+  var _id: String,
+  val listId: String,
+  val ownerId: String,
+  val accountKey: MicroBlogKey,
+  val listKey: MicroBlogKey,
+  val title: String,
+  val description: String,
+  val mode: String,
+  val replyPolicy: String,
+  val isFollowed: Boolean,
+  val allowToSubscribe: Boolean
 )

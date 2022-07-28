@@ -23,7 +23,7 @@ import android.content.Context
 import com.google.android.play.core.missingsplits.MissingSplitsManagerFactory
 
 class MissingSplitsCheckerImpl : TwidereApp.MissingSplitsChecker {
-    override fun requiredSplits(context: Context): Boolean {
-        return MissingSplitsManagerFactory.create(context).disableAppIfMissingRequiredSplits()
-    }
+  override fun requiredSplits(context: Context): Boolean {
+    return MissingSplitsManagerFactory.create(context).disableAppIfMissingRequiredSplits()
+  }
 }

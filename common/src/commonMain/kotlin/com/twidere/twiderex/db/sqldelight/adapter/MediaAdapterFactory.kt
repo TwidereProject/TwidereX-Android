@@ -24,8 +24,8 @@ import com.squareup.sqldelight.EnumColumnAdapter
 import com.twidere.twiderex.sqldelight.table.DbMedia
 
 internal object MediaAdapterFactory {
-    fun create() = DbMedia.Adapter(
-        belongToKeyAdapter = MicroBlogKeyColumnAdapter(),
-        typeAdapter = EnumColumnAdapter()
-    )
+  fun create() = DbMedia.Adapter(
+    belongToKeyAdapter = MicroBlogKeyColumnAdapter(),
+    typeAdapter = EnumColumnAdapter()
+  )
 }

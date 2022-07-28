@@ -27,6 +27,6 @@ import com.twidere.twiderex.extensions.formattedTimestamp
 
 @Composable
 fun FormattedTime(time: Long) {
-    val text = remember(time) { time.formattedTimestamp() }
-    Text(text = text)
+  val text = remember(time) { time.formattedTimestamp() }
+  Text(text = text)
 }

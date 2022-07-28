@@ -69,159 +69,159 @@ import org.koin.core.parameter.parametersOf
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun StatusScene(
-    statusKey: MicroBlogKey,
+  statusKey: MicroBlogKey,
 ) {
-    val viewModel = getViewModel<StatusViewModel> {
-        parametersOf(statusKey)
-    }
-    val source = viewModel.source.collectAsLazyPagingItems()
-    val status by viewModel.status.observeAsState(initial = null)
+  val viewModel = getViewModel<StatusViewModel> {
+    parametersOf(statusKey)
+  }
+  val source = viewModel.source.collectAsLazyPagingItems()
+  val status by viewModel.status.observeAsState(initial = null)
 
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_tabs_tweets))
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    }
-                )
-            }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_tabs_tweets))
+          },
+          navigationIcon = {
+            AppBarNavigationButton()
+          }
+        )
+      }
+    ) {
+      if (source.loadState.refresh is LoadState.Loading || source.loadState.refresh is LoadState.Error) {
+        val scrollState = rememberScrollState()
+        Column(
+          modifier = Modifier.verticalScroll(scrollState),
+          horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if (source.loadState.refresh is LoadState.Loading || source.loadState.refresh is LoadState.Error) {
-                val scrollState = rememberScrollState()
-                Column(
-                    modifier = Modifier.verticalScroll(scrollState),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    status?.let {
-                        DetailedStatusComponent(data = it)
-                    }
-                    Divider()
-                    when (val refresh = source.loadState.refresh) {
-                        is LoadState.Loading -> {
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier
-                                        .heightIn(min = ButtonDefaults.MinHeight)
-                                        .padding(ButtonDefaults.ContentPadding),
-                                )
-                            }
-                        }
-                        is LoadState.Error -> {
-                            ErrorPlaceholder(throwable = refresh.error.generateNotificationEvent())
-                        }
-                        else -> Unit
-                    }
-                }
-            }
-            if (
-                source.loadState.refresh is LoadState.NotLoading && source.itemCount > 0
-            ) {
-                val distance = with(LocalDensity.current) {
-                    -50.dp.toPx()
-                }
-                val firstVisibleIndex = remember {
-                    for (i in 0 until source.itemCount) {
-                        if (source.peek(i)?.statusKey == status?.statusKey) {
-                            return@remember i
-                        }
-                    }
-                    0
-                }
-                val state = rememberLazyListState(
-                    initialFirstVisibleItemIndex = firstVisibleIndex,
+          status?.let {
+            DetailedStatusComponent(data = it)
+          }
+          Divider()
+          when (val refresh = source.loadState.refresh) {
+            is LoadState.Loading -> {
+              Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+              ) {
+                CircularProgressIndicator(
+                  modifier = Modifier
+                    .heightIn(min = ButtonDefaults.MinHeight)
+                    .padding(ButtonDefaults.ContentPadding),
                 )
-                LaunchedEffect(Unit) {
-                    if (firstVisibleIndex != 0 && state.firstVisibleItemIndex == firstVisibleIndex && state.firstVisibleItemScrollOffset == 0) {
-                        state.animateScrollBy(distance, tween())
-                        state.animateScrollBy(-distance, tween())
-                    }
-                }
-
-                LazyColumn(
-                    state = state,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    if (source.loadState.refresh is LoadState.Loading || source.loadState.refresh is LoadState.Error) {
-                        status?.let {
-                            item(key = it.hashCode()) {
-                                DetailedStatusComponent(data = it)
-                            }
-                        }
-                        if (source.loadState.refresh is LoadState.Loading) {
-                            item {
-                                CircularProgressIndicator()
-                            }
-                        }
-                    } else {
-                        itemsIndexed(source) { index, it ->
-                            it?.let { item ->
-                                Layout(
-                                    content = {
-                                        Column {
-                                            if (item.statusKey == statusKey) {
-                                                DetailedStatusComponent(
-                                                    data = item,
-                                                    lineUp = firstVisibleIndex > 0
-                                                )
-                                            } else {
-                                                val lineUp = index > 0 && source.peek(index - 1)
-                                                    .let { previous ->
-                                                        // is reply to the previous status
-                                                        previous?.statusId == item.inReplyToStatusId &&
-                                                            // and if it is replying to the detail status, make sure it's the same author
-                                                            if (previous?.statusKey == statusKey) item.user.userKey == previous.user.userKey else true
-                                                    }
-                                                val lineDown = index < source.itemCount - 1 &&
-                                                    // make sure next status is replying to the current status
-                                                    source.peek(index + 1)?.inReplyToStatusId == item.statusId
-                                                TimelineStatusComponent(
-                                                    data = item,
-                                                    threadStyle = if (lineUp && !lineDown)
-                                                        StatusThreadStyle.TEXT_ONLY
-                                                    else
-                                                        StatusThreadStyle.NONE,
-                                                    lineUp = lineUp,
-                                                    lineDown = lineDown,
-                                                )
-                                            }
-                                            if (item.statusKey == statusKey) {
-                                                Divider()
-                                            } else {
-                                                StatusDivider()
-                                            }
-                                        }
-                                        if (index == source.itemCount - 1) {
-                                            Spacer(
-                                                Modifier.fillParentMaxHeight()
-                                            )
-                                        }
-                                    },
-                                    measurePolicy = { measurables, constraints ->
-                                        val placeables = measurables.map { measurable ->
-                                            measurable.measure(constraints)
-                                        }
-                                        var itemHeight = placeables.first().measuredHeight
-                                        if (index == source.itemCount - 1) {
-                                            var spacerHeight = placeables.last().measuredHeight
-                                            itemHeight = maxOf(itemHeight, spacerHeight)
-                                        }
-                                        layout(constraints.maxWidth, itemHeight) {
-                                            placeables.getOrNull(0)?.place(0, 0)
-                                        }
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
+              }
             }
+            is LoadState.Error -> {
+              ErrorPlaceholder(throwable = refresh.error.generateNotificationEvent())
+            }
+            else -> Unit
+          }
         }
+      }
+      if (
+        source.loadState.refresh is LoadState.NotLoading && source.itemCount > 0
+      ) {
+        val distance = with(LocalDensity.current) {
+          -50.dp.toPx()
+        }
+        val firstVisibleIndex = remember {
+          for (i in 0 until source.itemCount) {
+            if (source.peek(i)?.statusKey == status?.statusKey) {
+              return@remember i
+            }
+          }
+          0
+        }
+        val state = rememberLazyListState(
+          initialFirstVisibleItemIndex = firstVisibleIndex,
+        )
+        LaunchedEffect(Unit) {
+          if (firstVisibleIndex != 0 && state.firstVisibleItemIndex == firstVisibleIndex && state.firstVisibleItemScrollOffset == 0) {
+            state.animateScrollBy(distance, tween())
+            state.animateScrollBy(-distance, tween())
+          }
+        }
+
+        LazyColumn(
+          state = state,
+          horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+          if (source.loadState.refresh is LoadState.Loading || source.loadState.refresh is LoadState.Error) {
+            status?.let {
+              item(key = it.hashCode()) {
+                DetailedStatusComponent(data = it)
+              }
+            }
+            if (source.loadState.refresh is LoadState.Loading) {
+              item {
+                CircularProgressIndicator()
+              }
+            }
+          } else {
+            itemsIndexed(source) { index, it ->
+              it?.let { item ->
+                Layout(
+                  content = {
+                    Column {
+                      if (item.statusKey == statusKey) {
+                        DetailedStatusComponent(
+                          data = item,
+                          lineUp = firstVisibleIndex > 0
+                        )
+                      } else {
+                        val lineUp = index > 0 && source.peek(index - 1)
+                          .let { previous ->
+                            // is reply to the previous status
+                            previous?.statusId == item.inReplyToStatusId &&
+                              // and if it is replying to the detail status, make sure it's the same author
+                              if (previous?.statusKey == statusKey) item.user.userKey == previous.user.userKey else true
+                          }
+                        val lineDown = index < source.itemCount - 1 &&
+                          // make sure next status is replying to the current status
+                          source.peek(index + 1)?.inReplyToStatusId == item.statusId
+                        TimelineStatusComponent(
+                          data = item,
+                          threadStyle = if (lineUp && !lineDown)
+                            StatusThreadStyle.TEXT_ONLY
+                          else
+                            StatusThreadStyle.NONE,
+                          lineUp = lineUp,
+                          lineDown = lineDown,
+                        )
+                      }
+                      if (item.statusKey == statusKey) {
+                        Divider()
+                      } else {
+                        StatusDivider()
+                      }
+                    }
+                    if (index == source.itemCount - 1) {
+                      Spacer(
+                        Modifier.fillParentMaxHeight()
+                      )
+                    }
+                  },
+                  measurePolicy = { measurables, constraints ->
+                    val placeables = measurables.map { measurable ->
+                      measurable.measure(constraints)
+                    }
+                    var itemHeight = placeables.first().measuredHeight
+                    if (index == source.itemCount - 1) {
+                      var spacerHeight = placeables.last().measuredHeight
+                      itemHeight = maxOf(itemHeight, spacerHeight)
+                    }
+                    layout(constraints.maxWidth, itemHeight) {
+                      placeables.getOrNull(0)?.place(0, 0)
+                    }
+                  }
+                )
+              }
+            }
+          }
+        }
+      }
     }
+  }
 }

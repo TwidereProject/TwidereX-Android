@@ -21,5 +21,5 @@
 package com.twidere.twiderex.mock
 
 interface Observer<T> {
-    fun onChanged(value: T)
+  fun onChanged(value: T)
 }

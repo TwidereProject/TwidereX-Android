@@ -41,63 +41,63 @@ private const val ImageSuffix = ".jpg"
 
 @Composable
 actual fun PlatformMediaWrapper(
-    scope: CoroutineScope,
-    onResult: (List<UiMediaInsert>) -> Unit,
-    content: @Composable (launchCamera: () -> Unit, launchVideo: () -> Unit) -> Unit
+  scope: CoroutineScope,
+  onResult: (List<UiMediaInsert>) -> Unit,
+  content: @Composable (launchCamera: () -> Unit, launchVideo: () -> Unit) -> Unit
 ) {
 
-    var cameraTempUri by remember {
-        mutableStateOf(Uri.EMPTY)
+  var cameraTempUri by remember {
+    mutableStateOf(Uri.EMPTY)
+  }
+
+  var videoTempUri by remember {
+    mutableStateOf(Uri.EMPTY)
+  }
+
+  val mediaInsertProvider = get<MediaInsertProvider>()
+
+  val storageProvider = get<StorageProvider>()
+
+  val context = LocalContext.current
+
+  val cameraLauncher = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.TakePicture(),
+    onResult = {
+      scope.launch {
+        if (it) onResult(listOf(cameraTempUri).toUi(mediaInsertProvider))
+      }
+    },
+  )
+
+  val videoRecordLauncher = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.CaptureVideo(),
+    onResult = {
+      scope.launch {
+        if (it) onResult(listOf(mediaInsertProvider.provideUiMediaInsert(videoTempUri.toString())))
+      }
+    },
+  )
+
+  val launchCamera = remember {
+    {
+      cameraTempUri =
+        storageProvider.appFiles.mediaFile("${System.currentTimeMillis()}$ImageSuffix")
+          .mkFile().toUri(context)
+      cameraLauncher.launch(cameraTempUri)
     }
+  }
 
-    var videoTempUri by remember {
-        mutableStateOf(Uri.EMPTY)
+  val launchVideo = remember {
+    {
+      videoTempUri =
+        storageProvider.appFiles.mediaFile("${UUID.randomUUID()}$VideoSuffix").mkFile()
+          .toUri(context)
+      videoRecordLauncher.launch(videoTempUri)
     }
-
-    val mediaInsertProvider = get<MediaInsertProvider>()
-
-    val storageProvider = get<StorageProvider>()
-
-    val context = LocalContext.current
-
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(),
-        onResult = {
-            scope.launch {
-                if (it) onResult(listOf(cameraTempUri).toUi(mediaInsertProvider))
-            }
-        },
-    )
-
-    val videoRecordLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CaptureVideo(),
-        onResult = {
-            scope.launch {
-                if (it) onResult(listOf(mediaInsertProvider.provideUiMediaInsert(videoTempUri.toString())))
-            }
-        },
-    )
-
-    val launchCamera = remember {
-        {
-            cameraTempUri =
-                storageProvider.appFiles.mediaFile("${System.currentTimeMillis()}$ImageSuffix")
-                    .mkFile().toUri(context)
-            cameraLauncher.launch(cameraTempUri)
-        }
-    }
-
-    val launchVideo = remember {
-        {
-            videoTempUri =
-                storageProvider.appFiles.mediaFile("${UUID.randomUUID()}$VideoSuffix").mkFile()
-                    .toUri(context)
-            videoRecordLauncher.launch(videoTempUri)
-        }
-    }
-    content.invoke(launchCamera, launchVideo)
+  }
+  content.invoke(launchCamera, launchVideo)
 }
 
 private suspend fun List<Uri>.toUi(mediaInsertProvider: MediaInsertProvider) = map {
-    mediaInsertProvider.provideUiMediaInsert(it.toString())
+  mediaInsertProvider.provideUiMediaInsert(it.toString())
 }

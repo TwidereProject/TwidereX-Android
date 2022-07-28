@@ -32,25 +32,25 @@ import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingMediator(
-    val database: CacheDatabase,
-    val accountKey: MicroBlogKey,
+  val database: CacheDatabase,
+  val accountKey: MicroBlogKey,
 ) : RemoteMediator<Int, PagingTimeLineWithStatus>() {
-    abstract val pagingKey: String
+  abstract val pagingKey: String
 }
 
 @OptIn(ExperimentalPagingApi::class)
 fun PagingMediator.pager(
-    config: PagingConfig = PagingConfig(
-        pageSize = defaultLoadCount,
-        enablePlaceholders = true,
-    ),
-    pagingSourceFactory: () -> PagingSource<Int, PagingTimeLineWithStatus> = {
-        database.pagingTimelineDao().getPagingSource(pagingKey = pagingKey, accountKey = accountKey)
-    }
+  config: PagingConfig = PagingConfig(
+    pageSize = defaultLoadCount,
+    enablePlaceholders = true,
+  ),
+  pagingSourceFactory: () -> PagingSource<Int, PagingTimeLineWithStatus> = {
+    database.pagingTimelineDao().getPagingSource(pagingKey = pagingKey, accountKey = accountKey)
+  }
 ): Pager<Int, PagingTimeLineWithStatus> {
-    return Pager(
-        config = config,
-        remoteMediator = this,
-        pagingSourceFactory = pagingSourceFactory,
-    )
+  return Pager(
+    config = config,
+    remoteMediator = this,
+    pagingSourceFactory = pagingSourceFactory,
+  )
 }

@@ -30,69 +30,69 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 interface NotificationEvent {
-    @Composable
-    fun getMessage(): String
+  @Composable
+  fun getMessage(): String
 }
 data class EventActionContext(
-    val remoteNavigator: RemoteNavigator
+  val remoteNavigator: RemoteNavigator
 )
 interface NotificationWithActionEvent : NotificationEvent {
-    @Composable
-    fun getActionMessage(): String
-    val action: EventActionContext.() -> Unit
+  @Composable
+  fun getActionMessage(): String
+  val action: EventActionContext.() -> Unit
 }
 
 class StringNotificationEvent(
-    private val message: String,
+  private val message: String,
 ) : NotificationEvent {
-    @Composable
-    override fun getMessage(): String {
-        return message
-    }
+  @Composable
+  override fun getMessage(): String {
+    return message
+  }
 
-    companion object {
-        fun InAppNotification.show(message: String) {
-            show(StringNotificationEvent(message = message))
-        }
+  companion object {
+    fun InAppNotification.show(message: String) {
+      show(StringNotificationEvent(message = message))
     }
+  }
 }
 
 open class StringResNotificationEvent(
-    val message: StringResource,
+  val message: StringResource,
 ) : NotificationEvent {
-    @Composable
-    override fun getMessage(): String {
-        return LocalResLoader.current.getString(message)
-    }
+  @Composable
+  override fun getMessage(): String {
+    return LocalResLoader.current.getString(message)
+  }
 }
 
 class StringResWithActionNotificationEvent(
-    private vararg val message: StringResource,
-    private val separator: String = System.lineSeparator(),
-    private val actionStr: StringResource,
-    override val action: EventActionContext.() -> Unit,
+  private vararg val message: StringResource,
+  private val separator: String = System.lineSeparator(),
+  private val actionStr: StringResource,
+  override val action: EventActionContext.() -> Unit,
 ) : NotificationWithActionEvent {
-    @Composable
-    override fun getActionMessage(): String {
-        return LocalResLoader.current.getString(actionStr)
-    }
+  @Composable
+  override fun getActionMessage(): String {
+    return LocalResLoader.current.getString(actionStr)
+  }
 
-    @Composable
-    override fun getMessage(): String {
-        return message.map { LocalResLoader.current.getString(it) }.joinToString(separator)
-    }
+  @Composable
+  override fun getMessage(): String {
+    return message.map { LocalResLoader.current.getString(it) }.joinToString(separator)
+  }
 }
 
 class InAppNotification {
-    private val _source = MutableStateFlow<Event<NotificationEvent?>?>(null)
-    val source
-        get() = _source.asSharedFlow()
+  private val _source = MutableStateFlow<Event<NotificationEvent?>?>(null)
+  val source
+    get() = _source.asSharedFlow()
 
-    fun show(event: NotificationEvent) {
-        _source.value = ((Event(event)))
-    }
+  fun show(event: NotificationEvent) {
+    _source.value = ((Event(event)))
+  }
 
-    @Composable
-    fun observeAsState(initial: Event<NotificationEvent?>? = null) =
-        source.observeAsState(initial = initial)
+  @Composable
+  fun observeAsState(initial: Event<NotificationEvent?>? = null) =
+    source.observeAsState(initial = initial)
 }

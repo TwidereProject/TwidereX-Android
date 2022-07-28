@@ -40,60 +40,60 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class GifViewModel(
-    private val gifRepository: GifRepository,
-    private val storageProvider: StorageProvider,
-    private val inAppNotification: InAppNotification,
+  private val gifRepository: GifRepository,
+  private val storageProvider: StorageProvider,
+  private val inAppNotification: InAppNotification,
 ) : ViewModel() {
 
-    val input = MutableStateFlow("")
+  val input = MutableStateFlow("")
 
-    val selectedItem = MutableStateFlow<UiGif?>(null)
+  val selectedItem = MutableStateFlow<UiGif?>(null)
 
-    val enable = selectedItem.map { it != null }
+  val enable = selectedItem.map { it != null }
 
-    private val service = TwidereServiceFactory.createGifService()
+  private val service = TwidereServiceFactory.createGifService()
 
-    @OptIn(FlowPreview::class)
-    val searchFlow = input.debounce(666L).map {
-        it.takeIf { it.isNotEmpty() }?.let { query ->
-            gifRepository.gifSearch(
-                service = service,
-                query = query,
-                lang = Locale.current.language
-            )
-        }
+  @OptIn(FlowPreview::class)
+  val searchFlow = input.debounce(666L).map {
+    it.takeIf { it.isNotEmpty() }?.let { query ->
+      gifRepository.gifSearch(
+        service = service,
+        query = query,
+        lang = Locale.current.language
+      )
     }
+  }
 
-    val trendSource = gifRepository.gifTrending(service = service).cachedIn(viewModelScope)
+  val trendSource = gifRepository.gifTrending(service = service).cachedIn(viewModelScope)
 
-    private val _commitLoading = MutableStateFlow(false)
+  private val _commitLoading = MutableStateFlow(false)
 
-    val commitLoading get() = _commitLoading
+  val commitLoading get() = _commitLoading
 
-    fun commit(platform: PlatformType, onSuccess: (path: String) -> Unit) {
-        selectedItem.value?.let {
-            // mastodon support image/video only
-            val url = when (platform) {
-                PlatformType.Mastodon -> it.mp4
-                else -> it.url
-            }
-            val suffix = when (platform) {
-                PlatformType.Mastodon -> "mp4"
-                else -> it.type
-            }
-            viewModelScope.launch {
-                _commitLoading.value = true
-                try {
-                    val target = storageProvider.appFiles.mediaFile("${it.id}.$suffix").mkFile()
-                    gifRepository.download(target = target, source = url, service = service)
-                    onSuccess(target)
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                    inAppNotification.notifyError(e)
-                } finally {
-                    _commitLoading.value = false
-                }
-            }
+  fun commit(platform: PlatformType, onSuccess: (path: String) -> Unit) {
+    selectedItem.value?.let {
+      // mastodon support image/video only
+      val url = when (platform) {
+        PlatformType.Mastodon -> it.mp4
+        else -> it.url
+      }
+      val suffix = when (platform) {
+        PlatformType.Mastodon -> "mp4"
+        else -> it.type
+      }
+      viewModelScope.launch {
+        _commitLoading.value = true
+        try {
+          val target = storageProvider.appFiles.mediaFile("${it.id}.$suffix").mkFile()
+          gifRepository.download(target = target, source = url, service = service)
+          onSuccess(target)
+        } catch (e: Throwable) {
+          e.printStackTrace()
+          inAppNotification.notifyError(e)
+        } finally {
+          _commitLoading.value = false
         }
+      }
     }
+  }
 }

@@ -31,22 +31,22 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class MastodonHashtagViewModel(
-    private val repository: TimelineRepository,
-    private val accountRepository: AccountRepository,
-    keyword: String,
+  private val repository: TimelineRepository,
+  private val accountRepository: AccountRepository,
+  keyword: String,
 ) : ViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val source by lazy {
-        account.flatMapLatest {
-            repository.mastodonHashtagTimeline(
-                keyword = keyword,
-                accountKey = it.accountKey,
-                service = it.service as MastodonService
-            )
-        }.cachedIn(viewModelScope)
-    }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  val source by lazy {
+    account.flatMapLatest {
+      repository.mastodonHashtagTimeline(
+        keyword = keyword,
+        accountKey = it.accountKey,
+        service = it.service as MastodonService
+      )
+    }.cachedIn(viewModelScope)
+  }
 }

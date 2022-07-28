@@ -65,106 +65,106 @@ import java.util.Locale
 
 @Composable
 fun ListsMembersScene(
-    listKey: MicroBlogKey,
-    owned: Boolean,
+  listKey: MicroBlogKey,
+  owned: Boolean,
 ) {
-    val navController = LocalNavController.current
-    val viewModel: ListsUserViewModel = getViewModel {
-        parametersOf(listKey.id, true)
-    }
-    val source = viewModel.source.collectAsLazyPagingItems()
-    val navigator = LocalNavigator.current
-    val scope = rememberCoroutineScope()
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_tabs_members))
-                    }
-                )
-            },
-            floatingActionButton = {
-                if (owned) FloatingActionButton(
-                    onClick = {
-                        scope.launch {
-                            val result =
-                                navController.navigateForResult(Root.Lists.AddMembers(listKey = listKey)) as? List<*>?
-                            if (result != null && result.isNotEmpty()) source.refresh()
-                        }
-                    }
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(ListsMembersSceneDefaults.Fab.ContentPadding)
-                    ) {
-                        Icon(
-                            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_add),
-                            contentDescription = stringResource(
-                                res = com.twidere.twiderex.MR.strings.scene_lists_details_add_members
-                            ),
-                            modifier = Modifier.padding(ListsMembersSceneDefaults.Fab.IconPadding)
-                        )
-                        Text(
-                            text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_users_add_title)
-                                .uppercase(Locale.getDefault()),
-                            style = MaterialTheme.typography.button
-                        )
-                    }
-                }
-            },
-            floatingActionButtonPosition = FabPosition.Center
-        ) {
-            SwipeToRefreshLayout(
-                refreshingState = source.loadState.refresh is LoadState.Loading,
-                onRefresh = {
-                    source.refreshOrRetry()
-                }
-            ) {
-                LazyUiUserList(
-                    items = source, onItemClicked = { navigator.user(it) },
-                    action = {
-                        if (!owned) return@LazyUiUserList
-                        var menuExpand by remember {
-                            mutableStateOf(false)
-                        }
-                        IconButton(onClick = { menuExpand = !menuExpand }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = stringResource(
-                                    res = com.twidere.twiderex.MR.strings.scene_lists_users_menu_actions_remove
-                                )
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = menuExpand,
-                            onDismissRequest = { menuExpand = false }
-                        ) {
-                            DropdownMenuItem(
-                                onClick = {
-                                    viewModel.removeMember(it)
-                                }
-                            ) {
-                                Text(
-                                    text = stringResource(
-                                        com.twidere.twiderex.MR.strings.scene_lists_users_menu_actions_remove
-                                    )
-                                )
-                            }
-                        }
-                    }
-                )
+  val navController = LocalNavController.current
+  val viewModel: ListsUserViewModel = getViewModel {
+    parametersOf(listKey.id, true)
+  }
+  val source = viewModel.source.collectAsLazyPagingItems()
+  val navigator = LocalNavigator.current
+  val scope = rememberCoroutineScope()
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_tabs_members))
+          }
+        )
+      },
+      floatingActionButton = {
+        if (owned) FloatingActionButton(
+          onClick = {
+            scope.launch {
+              val result =
+                navController.navigateForResult(Root.Lists.AddMembers(listKey = listKey)) as? List<*>?
+              if (result != null && result.isNotEmpty()) source.refresh()
             }
+          }
+        ) {
+          Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(ListsMembersSceneDefaults.Fab.ContentPadding)
+          ) {
+            Icon(
+              painter = painterResource(res = com.twidere.twiderex.MR.files.ic_add),
+              contentDescription = stringResource(
+                res = com.twidere.twiderex.MR.strings.scene_lists_details_add_members
+              ),
+              modifier = Modifier.padding(ListsMembersSceneDefaults.Fab.IconPadding)
+            )
+            Text(
+              text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_users_add_title)
+                .uppercase(Locale.getDefault()),
+              style = MaterialTheme.typography.button
+            )
+          }
         }
+      },
+      floatingActionButtonPosition = FabPosition.Center
+    ) {
+      SwipeToRefreshLayout(
+        refreshingState = source.loadState.refresh is LoadState.Loading,
+        onRefresh = {
+          source.refreshOrRetry()
+        }
+      ) {
+        LazyUiUserList(
+          items = source, onItemClicked = { navigator.user(it) },
+          action = {
+            if (!owned) return@LazyUiUserList
+            var menuExpand by remember {
+              mutableStateOf(false)
+            }
+            IconButton(onClick = { menuExpand = !menuExpand }) {
+              Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(
+                  res = com.twidere.twiderex.MR.strings.scene_lists_users_menu_actions_remove
+                )
+              )
+            }
+            DropdownMenu(
+              expanded = menuExpand,
+              onDismissRequest = { menuExpand = false }
+            ) {
+              DropdownMenuItem(
+                onClick = {
+                  viewModel.removeMember(it)
+                }
+              ) {
+                Text(
+                  text = stringResource(
+                    com.twidere.twiderex.MR.strings.scene_lists_users_menu_actions_remove
+                  )
+                )
+              }
+            }
+          }
+        )
+      }
     }
+  }
 }
 
 private object ListsMembersSceneDefaults {
-    object Fab {
-        val ContentPadding = PaddingValues(horizontal = 22.dp)
-        val IconPadding = PaddingValues(end = 17.dp)
-    }
+  object Fab {
+    val ContentPadding = PaddingValues(horizontal = 22.dp)
+    val IconPadding = PaddingValues(end = 17.dp)
+  }
 }

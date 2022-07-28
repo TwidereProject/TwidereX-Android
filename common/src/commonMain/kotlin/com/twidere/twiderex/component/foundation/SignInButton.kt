@@ -37,30 +37,30 @@ import androidx.compose.ui.graphics.Color
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SignInButton(
-    border: BorderStroke? = null,
-    color: Color = MaterialTheme.colors.primary,
-    contentColor: Color = contentColorFor(backgroundColor = color),
-    onClick: () -> Unit = {},
-    content: @Composable () -> Unit,
+  border: BorderStroke? = null,
+  color: Color = MaterialTheme.colors.primary,
+  contentColor: Color = contentColorFor(backgroundColor = color),
+  onClick: () -> Unit = {},
+  content: @Composable () -> Unit,
 ) {
-    Surface(
-        modifier = Modifier
-            .clip(MaterialTheme.shapes.small)
-            .clipToBounds(),
-        shape = MaterialTheme.shapes.small,
-        border = border,
-        contentColor = contentColor,
-        color = color,
-        onClick = onClick
+  Surface(
+    modifier = Modifier
+      .clip(MaterialTheme.shapes.small)
+      .clipToBounds(),
+    shape = MaterialTheme.shapes.small,
+    border = border,
+    contentColor = contentColor,
+    color = color,
+    onClick = onClick
+  ) {
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            ProvideTextStyle(
-                value = MaterialTheme.typography.button
-            ) {
-                content.invoke()
-            }
-        }
+      ProvideTextStyle(
+        value = MaterialTheme.typography.button
+      ) {
+        content.invoke()
+      }
     }
+  }
 }

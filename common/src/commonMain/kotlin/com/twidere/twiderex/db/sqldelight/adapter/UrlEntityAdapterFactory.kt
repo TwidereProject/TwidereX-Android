@@ -23,7 +23,7 @@ package com.twidere.twiderex.db.sqldelight.adapter
 import com.twidere.twiderex.sqldelight.table.DbUrlEntity
 
 internal object UrlEntityAdapterFactory {
-    fun create() = DbUrlEntity.Adapter(
-        belongToKeyAdapter = MicroBlogKeyColumnAdapter(),
-    )
+  fun create() = DbUrlEntity.Adapter(
+    belongToKeyAdapter = MicroBlogKeyColumnAdapter(),
+  )
 }

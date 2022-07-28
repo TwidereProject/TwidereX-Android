@@ -38,37 +38,37 @@ import kotlin.test.Test
 import kotlin.test.assertNotNull
 
 internal class UserMediaTimelineViewModelTest : AccountViewModelTestBase() {
-    override val mockService: MicroBlogService
-        get() = MockTimelineService()
+  override val mockService: MicroBlogService
+    get() = MockTimelineService()
 
-    @MockK
-    private lateinit var repository: TimelineRepository
+  @MockK
+  private lateinit var repository: TimelineRepository
 
-    private lateinit var viewModel: UserMediaTimelineViewModel
+  private lateinit var viewModel: UserMediaTimelineViewModel
 
-    override fun setUp() {
-        super.setUp()
-        every { repository.mediaTimeline(any(), any(), any()) }.returns(
-            flowOf(
-                PagingData.from(
-                    (0..3).map {
-                        mockk<UiMedia>() to mockk()
-                    }
-                )
-            )
+  override fun setUp() {
+    super.setUp()
+    every { repository.mediaTimeline(any(), any(), any()) }.returns(
+      flowOf(
+        PagingData.from(
+          (0..3).map {
+            mockk<UiMedia>() to mockk()
+          }
         )
-        viewModel = UserMediaTimelineViewModel(
-            repository,
-            mockAccountRepository,
-            MicroBlogKey.twitter("321")
-        )
-    }
+      )
+    )
+    viewModel = UserMediaTimelineViewModel(
+      repository,
+      mockAccountRepository,
+      MicroBlogKey.twitter("321")
+    )
+  }
 
-    @Test
-    fun source_any(): Unit = runBlocking {
-        viewModel.source.firstOrNull().let {
-            assertNotNull(it)
-            assert(it.collectDataForTest().any())
-        }
+  @Test
+  fun source_any(): Unit = runBlocking {
+    viewModel.source.firstOrNull().let {
+      assertNotNull(it)
+      assert(it.collectDataForTest().any())
     }
+  }
 }

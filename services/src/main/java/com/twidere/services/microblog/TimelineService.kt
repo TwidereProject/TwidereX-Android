@@ -23,37 +23,37 @@ package com.twidere.services.microblog
 import com.twidere.services.microblog.model.IStatus
 
 interface TimelineService {
-    suspend fun homeTimeline(
-        count: Int = 20,
-        since_id: String? = null,
-        max_id: String? = null,
-    ): List<IStatus>
+  suspend fun homeTimeline(
+    count: Int = 20,
+    since_id: String? = null,
+    max_id: String? = null,
+  ): List<IStatus>
 
-    suspend fun mentionsTimeline(
-        count: Int = 20,
-        since_id: String? = null,
-        max_id: String? = null,
-    ): List<IStatus>
+  suspend fun mentionsTimeline(
+    count: Int = 20,
+    since_id: String? = null,
+    max_id: String? = null,
+  ): List<IStatus>
 
-    suspend fun userTimeline(
-        user_id: String,
-        count: Int = 20,
-        since_id: String? = null,
-        max_id: String? = null,
-        exclude_replies: Boolean = false,
-    ): List<IStatus>
+  suspend fun userTimeline(
+    user_id: String,
+    count: Int = 20,
+    since_id: String? = null,
+    max_id: String? = null,
+    exclude_replies: Boolean = false,
+  ): List<IStatus>
 
-    suspend fun favorites(
-        user_id: String,
-        count: Int = 20,
-        since_id: String? = null,
-        max_id: String? = null,
-    ): List<IStatus>
+  suspend fun favorites(
+    user_id: String,
+    count: Int = 20,
+    since_id: String? = null,
+    max_id: String? = null,
+  ): List<IStatus>
 
-    suspend fun listTimeline(
-        list_id: String,
-        count: Int = 20,
-        max_id: String? = null,
-        since_id: String? = null,
-    ): List<IStatus>
+  suspend fun listTimeline(
+    list_id: String,
+    count: Int = 20,
+    max_id: String? = null,
+    since_id: String? = null,
+  ): List<IStatus>
 }

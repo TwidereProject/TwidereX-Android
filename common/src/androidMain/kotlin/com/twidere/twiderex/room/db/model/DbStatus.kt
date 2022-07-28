@@ -37,39 +37,39 @@ import com.twidere.twiderex.room.db.RoomCacheDatabase
 import kotlinx.serialization.Serializable
 
 @Entity(
-    tableName = "status",
-    indices = [Index(value = ["statusKey"], unique = true)],
+  tableName = "status",
+  indices = [Index(value = ["statusKey"], unique = true)],
 )
 internal data class DbStatusV2(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    val _id: String,
-    /**
-     * Actual tweet/toots id
-     */
-    val statusId: String,
-    val statusKey: MicroBlogKey,
-    val htmlText: String,
-    val rawText: String,
-    val timestamp: Long,
-    var retweetCount: Long,
-    var likeCount: Long,
-    val replyCount: Long,
-    val placeString: String?,
-    val source: String,
-    val hasMedia: Boolean,
-    val userKey: MicroBlogKey,
-    val lang: String?,
-    val is_possibly_sensitive: Boolean,
-    val platformType: PlatformType,
-    val previewCard: DbPreviewCard? = null,
-    val inReplyToUserId: String? = null,
-    val inReplyToStatusId: String? = null,
-    val poll: DbPoll? = null,
-    val spoilerText: String? = null,
-    var extra: Json
+  /**
+   * Id that being used in the database
+   */
+  @PrimaryKey
+  val _id: String,
+  /**
+   * Actual tweet/toots id
+   */
+  val statusId: String,
+  val statusKey: MicroBlogKey,
+  val htmlText: String,
+  val rawText: String,
+  val timestamp: Long,
+  var retweetCount: Long,
+  var likeCount: Long,
+  val replyCount: Long,
+  val placeString: String?,
+  val source: String,
+  val hasMedia: Boolean,
+  val userKey: MicroBlogKey,
+  val lang: String?,
+  val is_possibly_sensitive: Boolean,
+  val platformType: PlatformType,
+  val previewCard: DbPreviewCard? = null,
+  val inReplyToUserId: String? = null,
+  val inReplyToStatusId: String? = null,
+  val poll: DbPoll? = null,
+  val spoilerText: String? = null,
+  var extra: Json
 )
 
 internal interface DbStatusExtra
@@ -77,77 +77,77 @@ internal interface DbStatusExtra
 @Immutable
 @Serializable
 internal data class DbPreviewCard(
-    val link: String,
-    val displayLink: String?,
-    val title: String?,
-    val desc: String?,
-    val image: String?,
+  val link: String,
+  val displayLink: String?,
+  val title: String?,
+  val desc: String?,
+  val image: String?,
 )
 
 @Immutable
 @Serializable
 internal data class DbPoll(
-    val id: String,
-    val options: List<DbPollOption>,
-    val expiresAt: Long?,
-    val expired: Boolean,
-    val multiple: Boolean,
-    val voted: Boolean,
-    val votesCount: Long? = null,
-    val votersCount: Long? = null,
-    val ownVotes: List<Int>? = null,
+  val id: String,
+  val options: List<DbPollOption>,
+  val expiresAt: Long?,
+  val expired: Boolean,
+  val multiple: Boolean,
+  val voted: Boolean,
+  val votesCount: Long? = null,
+  val votersCount: Long? = null,
+  val ownVotes: List<Int>? = null,
 )
 
 @Immutable
 @Serializable
 internal data class DbPollOption(
-    val text: String,
-    val count: Long,
+  val text: String,
+  val count: Long,
 )
 
 @Immutable
 @Serializable
 internal data class DbTwitterStatusExtra(
-    val reply_settings: TwitterReplySettings,
-    val quoteCount: Long? = null,
+  val reply_settings: TwitterReplySettings,
+  val quoteCount: Long? = null,
 ) : DbStatusExtra
 
 @Immutable
 @Serializable
 internal data class DbMastodonStatusExtra(
-    val type: MastodonStatusType,
-    val emoji: List<Emoji>,
-    val visibility: MastodonVisibility,
-    val mentions: List<Mention>?,
+  val type: MastodonStatusType,
+  val emoji: List<Emoji>,
+  val visibility: MastodonVisibility,
+  val mentions: List<Mention>?,
 ) : DbStatusExtra
 
 internal data class DbStatusWithMediaAndUser(
-    @Embedded
-    val data: DbStatusV2,
-    @Relation(parentColumn = "statusKey", entityColumn = "belongToKey")
-    val media: List<DbMedia>,
-    @Relation(parentColumn = "userKey", entityColumn = "userKey")
-    val user: DbUser,
-    @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
-    val reactions: List<DbStatusReaction>,
-    @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
-    val url: List<DbUrlEntity>,
+  @Embedded
+  val data: DbStatusV2,
+  @Relation(parentColumn = "statusKey", entityColumn = "belongToKey")
+  val media: List<DbMedia>,
+  @Relation(parentColumn = "userKey", entityColumn = "userKey")
+  val user: DbUser,
+  @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
+  val reactions: List<DbStatusReaction>,
+  @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
+  val url: List<DbUrlEntity>,
 )
 
 internal suspend fun List<DbStatusWithMediaAndUser>.saveToDb(
-    database: RoomCacheDatabase
+  database: RoomCacheDatabase
 ) {
-    map { it.user }.let {
-        database.userDao().insertAll(it)
-    }
-    database.mediaDao().insertAll(flatMap { it.media })
-    map { it.data }.let {
-        database.statusDao().insertAll(it)
-    }
-    flatMap { it.url }.let {
-        database.urlEntityDao().insertAll(it)
-    }
-    flatMap { it.reactions }.let {
-        database.reactionDao().insertAll(it)
-    }
+  map { it.user }.let {
+    database.userDao().insertAll(it)
+  }
+  database.mediaDao().insertAll(flatMap { it.media })
+  map { it.data }.let {
+    database.statusDao().insertAll(it)
+  }
+  flatMap { it.url }.let {
+    database.urlEntityDao().insertAll(it)
+  }
+  flatMap { it.reactions }.let {
+    database.reactionDao().insertAll(it)
+  }
 }

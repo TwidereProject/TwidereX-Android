@@ -24,15 +24,15 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
 internal class MemoryCachePagingSource<Value : Any>(
-    private val memoryCache: PagingMemoryCache<Value>,
-    dispatcher: CoroutineDispatcher = Dispatchers.IO
+  private val memoryCache: PagingMemoryCache<Value>,
+  dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : LimitOffsetPagingSource<Value>(dispatcher), OnInvalidateObserver {
 
-    override fun registerInvalidateObserver() = memoryCache.addWeakObserver(this)
+  override fun registerInvalidateObserver() = memoryCache.addWeakObserver(this)
 
-    override suspend fun queryItemCount() = memoryCache.size()
+  override suspend fun queryItemCount() = memoryCache.size()
 
-    override suspend fun queryData(offset: Int, limit: Int) = memoryCache.find(offset, limit)
+  override suspend fun queryData(offset: Int, limit: Int) = memoryCache.find(offset, limit)
 
-    override fun onInvalidate() = invalidate()
+  override fun onInvalidate() = invalidate()
 }

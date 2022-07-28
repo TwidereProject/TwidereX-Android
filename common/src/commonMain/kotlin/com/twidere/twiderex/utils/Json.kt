@@ -26,20 +26,20 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 private val JSON by lazy {
-    Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-        coerceInputValues = true
-    }
+  Json {
+    ignoreUnknownKeys = true
+    isLenient = true
+    coerceInputValues = true
+  }
 }
 
 @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 internal inline fun <reified T> T.json(): String =
-    JSON.encodeToString<T>(this)
+  JSON.encodeToString<T>(this)
 
 @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 internal inline fun <reified T> String.fromJson() =
-    JSON.decodeFromString<T>(this)
+  JSON.decodeFromString<T>(this)
 
 fun <T> T.json(serializer: KSerializer<T>) = JSON.encodeToString(serializer, this)
 

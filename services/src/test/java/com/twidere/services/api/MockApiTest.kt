@@ -32,35 +32,35 @@ import kotlin.test.assertEquals
 
 @Serializable
 data class AssetTest(
-    val name: String
+  val name: String
 )
 
 interface MockApiService {
-    @GET("/asset_test")
-    suspend fun fetchAssetTest(): AssetTest
+  @GET("/asset_test")
+  suspend fun fetchAssetTest(): AssetTest
 }
 
 class MockApiTest {
-    @Test
-    fun testFetchAsset() {
-        val content = MockApiAsset.fetchAsset("/asset_test")
-        assertEquals("{\"name\":\"test\"}", content)
-    }
+  @Test
+  fun testFetchAsset() {
+    val content = MockApiAsset.fetchAsset("/asset_test")
+    assertEquals("{\"name\":\"test\"}", content)
+  }
 
-    @Test
-    fun testRetrofit() {
-        val service = mockRetrofit<MockApiService>(
-            "https://www.test.com",
-            object :
-                Request2AssetPathConvertor {
-                override fun url2Path(request: Request): String {
-                    return request.url.encodedPath
-                }
-            }
-        )
-        runBlocking {
-            val result = service.fetchAssetTest()
-            assertEquals("test", result.name)
+  @Test
+  fun testRetrofit() {
+    val service = mockRetrofit<MockApiService>(
+      "https://www.test.com",
+      object :
+        Request2AssetPathConvertor {
+        override fun url2Path(request: Request): String {
+          return request.url.encodedPath
         }
+      }
+    )
+    runBlocking {
+      val result = service.fetchAssetTest()
+      assertEquals("test", result.name)
     }
+  }
 }

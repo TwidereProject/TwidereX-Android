@@ -37,52 +37,52 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 
 @OptIn(ExperimentalSerializationApi::class)
 internal inline fun <reified T> mockRetrofit(
-    baseUrl: String,
-    pathConvertor: Request2AssetPathConvertor,
-    vararg interceptors: (chain: Interceptor.Chain) -> Response
+  baseUrl: String,
+  pathConvertor: Request2AssetPathConvertor,
+  vararg interceptors: (chain: Interceptor.Chain) -> Response
 ): T {
-    return Retrofit
+  return Retrofit
+    .Builder()
+    .baseUrl(baseUrl)
+    .client(
+      OkHttpClient
         .Builder()
-        .baseUrl(baseUrl)
-        .client(
-            OkHttpClient
-                .Builder()
-                .addInterceptor(
-                    Interceptor {
-                        val content = MockApiAsset.fetchAsset(path = pathConvertor.url2Path(it.request()))
-                        Response.Builder()
-                            .request(it.request())
-                            .code(200)
-                            .protocol(Protocol.HTTP_1_1)
-                            .message("api unit test")
-                            .body(content.toResponseBody("application/json".toMediaType()))
-                            .build()
-                    }
-                )
-                .apply {
-                    if (DEBUG) {
-                        addInterceptor(
-                            HttpLoggingInterceptor().apply {
-                                setLevel(HttpLoggingInterceptor.Level.BODY)
-                            }
-                        )
-                    }
-                    addInterceptor {
-                        it.proceed(
-                            it.request().let { request ->
-                                request.newBuilder().url(request.url.toString().replace("%20", "+")).build()
-                            }
-                        )
-                    }
-                    interceptors.forEach {
-                        addInterceptor(it)
-                    }
-                }
-                .build()
+        .addInterceptor(
+          Interceptor {
+            val content = MockApiAsset.fetchAsset(path = pathConvertor.url2Path(it.request()))
+            Response.Builder()
+              .request(it.request())
+              .code(200)
+              .protocol(Protocol.HTTP_1_1)
+              .message("api unit test")
+              .body(content.toResponseBody("application/json".toMediaType()))
+              .build()
+          }
         )
-        .addConverterFactory(ScalarsConverterFactory.create())
-        .addConverterFactory(JSON.asConverterFactory("application/json".toMediaType()))
-        .addConverterFactory(DateQueryConverterFactory())
+        .apply {
+          if (DEBUG) {
+            addInterceptor(
+              HttpLoggingInterceptor().apply {
+                setLevel(HttpLoggingInterceptor.Level.BODY)
+              }
+            )
+          }
+          addInterceptor {
+            it.proceed(
+              it.request().let { request ->
+                request.newBuilder().url(request.url.toString().replace("%20", "+")).build()
+              }
+            )
+          }
+          interceptors.forEach {
+            addInterceptor(it)
+          }
+        }
         .build()
-        .create(T::class.java)
+    )
+    .addConverterFactory(ScalarsConverterFactory.create())
+    .addConverterFactory(JSON.asConverterFactory("application/json".toMediaType()))
+    .addConverterFactory(DateQueryConverterFactory())
+    .build()
+    .create(T::class.java)
 }

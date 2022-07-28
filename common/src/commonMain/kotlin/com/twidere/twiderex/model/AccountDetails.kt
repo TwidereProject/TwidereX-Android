@@ -34,66 +34,66 @@ import com.twidere.twiderex.model.ui.UserMetrics
 import com.twidere.twiderex.utils.fromJson
 
 data class AccountDetails(
-    val account: TwidereAccount,
-    val type: PlatformType,
-    // Note that UserKey that being used in AccountDetails is idStr@domain, not screenName@domain
-    val accountKey: MicroBlogKey,
-    val credentials_type: CredentialsType,
-    var credentials_json: String,
-    val extras_json: String,
-    var user: AmUser,
-    var lastActive: Long,
-    val preferences: AccountPreferences,
+  val account: TwidereAccount,
+  val type: PlatformType,
+  // Note that UserKey that being used in AccountDetails is idStr@domain, not screenName@domain
+  val accountKey: MicroBlogKey,
+  val credentials_type: CredentialsType,
+  var credentials_json: String,
+  val extras_json: String,
+  var user: AmUser,
+  var lastActive: Long,
+  val preferences: AccountPreferences,
 ) {
-    val credentials: Credentials
-        get() = when (credentials_type) {
-            CredentialsType.OAuth,
-            CredentialsType.XAuth -> credentials_json.fromJson<OAuthCredentials>()
-            CredentialsType.Basic -> credentials_json.fromJson<BasicCredentials>()
-            CredentialsType.Empty -> credentials_json.fromJson<EmptyCredentials>()
-            CredentialsType.OAuth2 -> credentials_json.fromJson<OAuth2Credentials>()
-        }
-
-    val service by lazy {
-        TwidereServiceFactory.createApiService(
-            type = type,
-            credentials = credentials,
-            accountKey = accountKey
-        )
+  val credentials: Credentials
+    get() = when (credentials_type) {
+      CredentialsType.OAuth,
+      CredentialsType.XAuth -> credentials_json.fromJson<OAuthCredentials>()
+      CredentialsType.Basic -> credentials_json.fromJson<BasicCredentials>()
+      CredentialsType.Empty -> credentials_json.fromJson<EmptyCredentials>()
+      CredentialsType.OAuth2 -> credentials_json.fromJson<OAuth2Credentials>()
     }
 
-    val listType: ListType
-        get() = when (type) {
-            PlatformType.Twitter -> ListType.All
-            PlatformType.StatusNet -> TODO()
-            PlatformType.Fanfou -> TODO()
-            PlatformType.Mastodon -> ListType.Owned
-        }
+  val service by lazy {
+    TwidereServiceFactory.createApiService(
+      type = type,
+      credentials = credentials,
+      accountKey = accountKey
+    )
+  }
 
-    val supportDirectMessage = type == PlatformType.Twitter
-
-    fun toUi() = with(user) {
-        UiUser(
-            id = userId,
-            name = name,
-            screenName = screenName,
-            profileImage = profileImage,
-            profileBackgroundImage = profileBackgroundImage,
-            metrics = UserMetrics(
-                fans = followersCount,
-                follow = friendsCount,
-                listed = listedCount,
-                status = 0
-            ),
-            rawDesc = desc,
-            htmlDesc = desc,
-            website = website,
-            location = location,
-            verified = verified,
-            protected = isProtected,
-            userKey = userKey,
-            platformType = type,
-            acct = userKey.copy(id = screenName),
-        )
+  val listType: ListType
+    get() = when (type) {
+      PlatformType.Twitter -> ListType.All
+      PlatformType.StatusNet -> TODO()
+      PlatformType.Fanfou -> TODO()
+      PlatformType.Mastodon -> ListType.Owned
     }
+
+  val supportDirectMessage = type == PlatformType.Twitter
+
+  fun toUi() = with(user) {
+    UiUser(
+      id = userId,
+      name = name,
+      screenName = screenName,
+      profileImage = profileImage,
+      profileBackgroundImage = profileBackgroundImage,
+      metrics = UserMetrics(
+        fans = followersCount,
+        follow = friendsCount,
+        listed = listedCount,
+        status = 0
+      ),
+      rawDesc = desc,
+      htmlDesc = desc,
+      website = website,
+      location = location,
+      verified = verified,
+      protected = isProtected,
+      userKey = userKey,
+      platformType = type,
+      acct = userKey.copy(id = screenName),
+    )
+  }
 }

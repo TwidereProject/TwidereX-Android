@@ -27,19 +27,19 @@ import java.time.temporal.ChronoUnit
 import java.util.Date
 
 actual object TimeUtils {
-    private val prettyTime = PrettyTime()
-    private const val week = 7 * 24 * 60
-    actual fun humanizedTimestamp(time: Long): String {
-        val now: Instant = Instant.now()
-        val instant: Instant = Instant.ofEpochMilli(time)
-        val relativeMinute = ChronoUnit.MINUTES.between(instant, now)
-        return when {
-            relativeMinute < week -> prettyTime.format(instant)
-            else -> SimpleDateFormat.getDateTimeInstance().format(Date(time))
-        }
+  private val prettyTime = PrettyTime()
+  private const val week = 7 * 24 * 60
+  actual fun humanizedTimestamp(time: Long): String {
+    val now: Instant = Instant.now()
+    val instant: Instant = Instant.ofEpochMilli(time)
+    val relativeMinute = ChronoUnit.MINUTES.between(instant, now)
+    return when {
+      relativeMinute < week -> prettyTime.format(instant)
+      else -> SimpleDateFormat.getDateTimeInstance().format(Date(time))
     }
+  }
 
-    actual fun humanizedDateTime(time: Long): String {
-        return humanizedTimestamp(time)
-    }
+  actual fun humanizedDateTime(time: Long): String {
+    return humanizedTimestamp(time)
+  }
 }

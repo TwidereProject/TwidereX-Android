@@ -38,42 +38,42 @@ import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalPagingApi::class)
 class ListsMediator(
-    private val database: CacheDatabase,
-    private val service: ListsService,
-    private val accountKey: MicroBlogKey
+  private val database: CacheDatabase,
+  private val service: ListsService,
+  private val accountKey: MicroBlogKey
 ) : RemoteMediator<Int, UiList>() {
 
-    override suspend fun load(loadType: LoadType, state: PagingState<Int, UiList>): MediatorResult {
-        return try {
-            if (loadType == LoadType.REFRESH) {
-                val lists = service.lists().map { it.toUi(accountKey) }
-                database.listsDao().insertAll(lists)
-            }
-            MediatorResult.Success(endOfPaginationReached = true)
-        } catch (e: Throwable) {
-            MediatorResult.Error(e)
-        }
+  override suspend fun load(loadType: LoadType, state: PagingState<Int, UiList>): MediatorResult {
+    return try {
+      if (loadType == LoadType.REFRESH) {
+        val lists = service.lists().map { it.toUi(accountKey) }
+        database.listsDao().insertAll(lists)
+      }
+      MediatorResult.Success(endOfPaginationReached = true)
+    } catch (e: Throwable) {
+      MediatorResult.Error(e)
     }
+  }
 
-    fun pager(
-        config: PagingConfig = PagingConfig(
-            pageSize = defaultLoadCount,
-            enablePlaceholders = false
-        ),
-        pagingSourceFactory: () -> PagingSource<Int, UiList> = {
-            database.listsDao().getPagingSource(accountKey = accountKey)
-        }
-    ): Pager<Int, UiList> {
-        return Pager(
-            config = config,
-            remoteMediator = this,
-            pagingSourceFactory = pagingSourceFactory,
-        )
+  fun pager(
+    config: PagingConfig = PagingConfig(
+      pageSize = defaultLoadCount,
+      enablePlaceholders = false
+    ),
+    pagingSourceFactory: () -> PagingSource<Int, UiList> = {
+      database.listsDao().getPagingSource(accountKey = accountKey)
     }
+  ): Pager<Int, UiList> {
+    return Pager(
+      config = config,
+      remoteMediator = this,
+      pagingSourceFactory = pagingSourceFactory,
+    )
+  }
 
-    companion object {
-        fun Pager<Int, UiList>.toUi(): Flow<PagingData<UiList>> {
-            return this.flow
-        }
+  companion object {
+    fun Pager<Int, UiList>.toUi(): Flow<PagingData<UiList>> {
+      return this.flow
     }
+  }
 }

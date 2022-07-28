@@ -33,13 +33,13 @@ import com.twidere.twiderex.model.ui.UiTrend
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TwitterTrendItem(trend: UiTrend, onClick: (UiTrend) -> Unit) {
-    Column {
-        ListItem(
-            modifier = Modifier.clickable(
-                onClick = { onClick(trend) }
-            )
-        ) {
-            Text(text = trend.displayName, style = MaterialTheme.typography.subtitle1)
-        }
+  Column {
+    ListItem(
+      modifier = Modifier.clickable(
+        onClick = { onClick(trend) }
+      )
+    ) {
+      Text(text = trend.displayName, style = MaterialTheme.typography.subtitle1)
     }
+  }
 }

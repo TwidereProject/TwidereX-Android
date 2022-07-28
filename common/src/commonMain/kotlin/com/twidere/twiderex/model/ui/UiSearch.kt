@@ -23,8 +23,8 @@ package com.twidere.twiderex.model.ui
 import com.twidere.twiderex.model.MicroBlogKey
 
 data class UiSearch(
-    val content: String,
-    val lastActive: Long,
-    val saved: Boolean,
-    val accountKey: MicroBlogKey
+  val content: String,
+  val lastActive: Long,
+  val saved: Boolean,
+  val accountKey: MicroBlogKey
 )

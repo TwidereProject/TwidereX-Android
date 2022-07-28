@@ -24,9 +24,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class IncludesV2(
-    val users: List<UserV2>? = null,
-    val tweets: List<StatusV2>? = null,
-    val media: List<MediaV2>? = null,
-    val places: List<PlaceV2>? = null,
-    val polls: List<PollV2>? = null,
+  val users: List<UserV2>? = null,
+  val tweets: List<StatusV2>? = null,
+  val media: List<MediaV2>? = null,
+  val places: List<PlaceV2>? = null,
+  val polls: List<PollV2>? = null,
 )

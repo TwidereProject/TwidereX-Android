@@ -25,13 +25,13 @@ import moe.tlaster.precompose.navigation.QueryString
 import moe.tlaster.precompose.navigation.query
 
 class OAuthLauncher(
-    private val navigator: RemoteNavigator
+  private val navigator: RemoteNavigator
 ) {
-    suspend fun launchOAuth(
-        uri: String,
-        queryParameterName: String,
-    ): String {
-        navigator.launchOAuthUri(uri)
-        return QueryString(CustomTabSignInChannel.waitOne()).query(queryParameterName, "") ?: ""
-    }
+  suspend fun launchOAuth(
+    uri: String,
+    queryParameterName: String,
+  ): String {
+    navigator.launchOAuthUri(uri)
+    return QueryString(CustomTabSignInChannel.waitOne()).query(queryParameterName, "") ?: ""
+  }
 }

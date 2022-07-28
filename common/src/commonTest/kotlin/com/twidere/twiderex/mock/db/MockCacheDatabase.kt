@@ -42,61 +42,61 @@ import com.twidere.twiderex.mock.db.dao.MockUserDao
 import org.jetbrains.annotations.TestOnly
 
 class MockCacheDatabase @TestOnly constructor() : CacheDatabase {
-    private val statusDao = MockStatusDao()
-    override fun statusDao(): StatusDao {
-        return statusDao
-    }
+  private val statusDao = MockStatusDao()
+  override fun statusDao(): StatusDao {
+    return statusDao
+  }
 
-    private val mediaDao = MockMediaDao()
-    override fun mediaDao(): MediaDao {
-        return mediaDao
-    }
+  private val mediaDao = MockMediaDao()
+  override fun mediaDao(): MediaDao {
+    return mediaDao
+  }
 
-    private val userDao = MockUserDao()
-    override fun userDao(): UserDao {
-        return userDao
-    }
+  private val userDao = MockUserDao()
+  override fun userDao(): UserDao {
+    return userDao
+  }
 
-    private val pagingTimelineDao = MockPagingTimelineDao(statusDao)
-    override fun pagingTimelineDao(): PagingTimelineDao {
-        return pagingTimelineDao
-    }
+  private val pagingTimelineDao = MockPagingTimelineDao(statusDao)
+  override fun pagingTimelineDao(): PagingTimelineDao {
+    return pagingTimelineDao
+  }
 
-    private val listsDao = MockListsDao()
-    override fun listsDao(): ListsDao {
-        return listsDao
-    }
+  private val listsDao = MockListsDao()
+  override fun listsDao(): ListsDao {
+    return listsDao
+  }
 
-    private val notificationCursorDao = MockNotificationCursorDao()
-    override fun notificationCursorDao(): NotificationCursorDao {
-        return notificationCursorDao
-    }
+  private val notificationCursorDao = MockNotificationCursorDao()
+  override fun notificationCursorDao(): NotificationCursorDao {
+    return notificationCursorDao
+  }
 
-    private val trendDao = MockTrendDao()
-    override fun trendDao(): TrendDao {
-        return trendDao
-    }
+  private val trendDao = MockTrendDao()
+  override fun trendDao(): TrendDao {
+    return trendDao
+  }
 
-    private val dmDao = MockDirectMessageEventDao()
-    override fun directMessageDao(): DirectMessageEventDao {
-        return dmDao
-    }
+  private val dmDao = MockDirectMessageEventDao()
+  override fun directMessageDao(): DirectMessageEventDao {
+    return dmDao
+  }
 
-    private val conversationDao = MockDirectMessageConversationDao(dmDao)
-    override fun directMessageConversationDao(): DirectMessageConversationDao {
-        return conversationDao
-    }
+  private val conversationDao = MockDirectMessageConversationDao(dmDao)
+  override fun directMessageConversationDao(): DirectMessageConversationDao {
+    return conversationDao
+  }
 
-    private var cleared = false
-    override suspend fun clearAllTables() {
-        cleared = true
-    }
+  private var cleared = false
+  override suspend fun clearAllTables() {
+    cleared = true
+  }
 
-    override suspend fun <R> withTransaction(block: suspend () -> R): R {
-        return block.invoke()
-    }
+  override suspend fun <R> withTransaction(block: suspend () -> R): R {
+    return block.invoke()
+  }
 
-    fun isAllTablesCleared(): Boolean {
-        return cleared
-    }
+  fun isAllTablesCleared(): Boolean {
+    return cleared
+  }
 }

@@ -26,14 +26,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MastodonUserExtra(
-    val fields: List<Field>,
-    val emoji: List<UiEmojiCategory>,
-    val bot: Boolean,
-    val locked: Boolean,
+  val fields: List<Field>,
+  val emoji: List<UiEmojiCategory>,
+  val bot: Boolean,
+  val locked: Boolean,
 ) : UserExtra
 
 @Serializable
 data class Field(
-    val name: String?,
-    val value: String?
+  val name: String?,
+  val value: String?
 )

@@ -54,123 +54,123 @@ import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
 
 enum class MediaLibraryType(
-    val extensions: List<String>,
+  val extensions: List<String>,
 ) {
-    Video(listOf("mp4")),
-    Image(listOf("jpg", "png", "jpeg")),
+  Video(listOf("mp4")),
+  Image(listOf("jpg", "png", "jpeg")),
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MediaInsertMenu(
-    modifier: Modifier = Modifier,
-    supportMultipleSelect: Boolean = true,
-    librariesSupported: Array<MediaLibraryType> = MediaLibraryType.values(),
-    disableList: List<MediaInsertType> = emptyList(),
-    onResult: (List<UiMediaInsert>) -> Unit
+  modifier: Modifier = Modifier,
+  supportMultipleSelect: Boolean = true,
+  librariesSupported: Array<MediaLibraryType> = MediaLibraryType.values(),
+  disableList: List<MediaInsertType> = emptyList(),
+  onResult: (List<UiMediaInsert>) -> Unit
 ) {
-    val navController = LocalNavController.current
-    val mediaInsertProvider = get<MediaInsertProvider>()
-    val scope = rememberCoroutineScope()
+  val navController = LocalNavController.current
+  val mediaInsertProvider = get<MediaInsertProvider>()
+  val scope = rememberCoroutineScope()
 
-    var showDropdown by remember {
-        mutableStateOf(false)
-    }
+  var showDropdown by remember {
+    mutableStateOf(false)
+  }
 
-    PlatformMediaWrapper(
-        scope,
-        onResult = onResult
-    ) { launchCamera, launchVideo ->
-        Box(modifier) {
-            DropdownMenu(expanded = showDropdown, onDismissRequest = { showDropdown = false }) {
-                MediaInsertType.values().forEach loop@{
-                    if ((it == MediaInsertType.CAMERA || it == MediaInsertType.RECORD_VIDEO) && currentPlatform != Platform.Android) {
-                        return@loop
-                    }
-                    val enabled = !disableList.contains(it)
-                    DropdownMenuItem(
-                        onClick = {
-                            when (it) {
-                                MediaInsertType.CAMERA -> {
-                                    launchCamera.invoke()
-                                }
-                                MediaInsertType.RECORD_VIDEO -> {
-                                    launchVideo.invoke()
-                                }
-                                MediaInsertType.LIBRARY -> {
-                                    scope.launch {
-                                        onResult.invoke(
-                                            FilePicker.pickFiles(
-                                                allowMultiple = supportMultipleSelect,
-                                                allowedExtensions = librariesSupported.flatMap { it.extensions }
-                                            ).map {
-                                                mediaInsertProvider.provideUiMediaInsert(it.path)
-                                            }
-                                        )
-                                    }
-                                }
-                                MediaInsertType.GIF -> scope.launch {
-                                    navController.navigateForResult(Root.Gif.Home)
-                                        ?.let { result ->
-                                            onResult(
-                                                listOf(result as String).map {
-                                                    mediaInsertProvider.provideUiMediaInsert(
-                                                        it
-                                                    )
-                                                }
-                                            )
-                                        }
-                                }
-                            }
-                            showDropdown = false
-                        },
-                        enabled = enabled
-                    ) {
-                        ListItem(
-                            text = {
-                                Text(text = it.stringName())
-                            },
-                            icon = {
-                                Icon(
-                                    painter = it.icon(),
-                                    contentDescription = it.stringName(),
-                                    tint = if (enabled) MaterialTheme.colors.primary else LocalContentColor.current.copy(
-                                        alpha = LocalContentAlpha.current
-                                    )
-                                )
-                            }
-                        )
+  PlatformMediaWrapper(
+    scope,
+    onResult = onResult
+  ) { launchCamera, launchVideo ->
+    Box(modifier) {
+      DropdownMenu(expanded = showDropdown, onDismissRequest = { showDropdown = false }) {
+        MediaInsertType.values().forEach loop@{
+          if ((it == MediaInsertType.CAMERA || it == MediaInsertType.RECORD_VIDEO) && currentPlatform != Platform.Android) {
+            return@loop
+          }
+          val enabled = !disableList.contains(it)
+          DropdownMenuItem(
+            onClick = {
+              when (it) {
+                MediaInsertType.CAMERA -> {
+                  launchCamera.invoke()
+                }
+                MediaInsertType.RECORD_VIDEO -> {
+                  launchVideo.invoke()
+                }
+                MediaInsertType.LIBRARY -> {
+                  scope.launch {
+                    onResult.invoke(
+                      FilePicker.pickFiles(
+                        allowMultiple = supportMultipleSelect,
+                        allowedExtensions = librariesSupported.flatMap { it.extensions }
+                      ).map {
+                        mediaInsertProvider.provideUiMediaInsert(it.path)
+                      }
+                    )
+                  }
+                }
+                MediaInsertType.GIF -> scope.launch {
+                  navController.navigateForResult(Root.Gif.Home)
+                    ?.let { result ->
+                      onResult(
+                        listOf(result as String).map {
+                          mediaInsertProvider.provideUiMediaInsert(
+                            it
+                          )
+                        }
+                      )
                     }
                 }
-            }
-        }
-    }
-    IconButton(
-        onClick = {
-            showDropdown = !showDropdown
-        }
-    ) {
-        Icon(
-            painter = painterResource(res = MR.files.ic_photo),
-            contentDescription = stringResource(
-                res = MR.strings.accessibility_scene_compose_image
+              }
+              showDropdown = false
+            },
+            enabled = enabled
+          ) {
+            ListItem(
+              text = {
+                Text(text = it.stringName())
+              },
+              icon = {
+                Icon(
+                  painter = it.icon(),
+                  contentDescription = it.stringName(),
+                  tint = if (enabled) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                    alpha = LocalContentAlpha.current
+                  )
+                )
+              }
             )
-        )
+          }
+        }
+      }
     }
+  }
+  IconButton(
+    onClick = {
+      showDropdown = !showDropdown
+    }
+  ) {
+    Icon(
+      painter = painterResource(res = MR.files.ic_photo),
+      contentDescription = stringResource(
+        res = MR.strings.accessibility_scene_compose_image
+      )
+    )
+  }
 }
 
 @Composable
 private fun MediaInsertType.stringName() = when (this) {
-    MediaInsertType.CAMERA -> stringResource(res = MR.strings.accessibility_scene_compose_media_insert_camera)
-    MediaInsertType.RECORD_VIDEO -> stringResource(res = MR.strings.accessibility_scene_compose_media_insert_record_video)
-    MediaInsertType.LIBRARY -> stringResource(res = MR.strings.accessibility_scene_compose_media_insert_library)
-    MediaInsertType.GIF -> stringResource(res = MR.strings.accessibility_scene_compose_media_insert_gif)
+  MediaInsertType.CAMERA -> stringResource(res = MR.strings.accessibility_scene_compose_media_insert_camera)
+  MediaInsertType.RECORD_VIDEO -> stringResource(res = MR.strings.accessibility_scene_compose_media_insert_record_video)
+  MediaInsertType.LIBRARY -> stringResource(res = MR.strings.accessibility_scene_compose_media_insert_library)
+  MediaInsertType.GIF -> stringResource(res = MR.strings.accessibility_scene_compose_media_insert_gif)
 }
 
 @Composable
 private fun MediaInsertType.icon() = when (this) {
-    MediaInsertType.CAMERA -> painterResource(res = MR.files.ic_camera)
-    MediaInsertType.RECORD_VIDEO -> painterResource(res = MR.files.ic_video)
-    MediaInsertType.LIBRARY -> painterResource(res = MR.files.ic_photo)
-    MediaInsertType.GIF -> painterResource(res = MR.files.ic_gif)
+  MediaInsertType.CAMERA -> painterResource(res = MR.files.ic_camera)
+  MediaInsertType.RECORD_VIDEO -> painterResource(res = MR.files.ic_video)
+  MediaInsertType.LIBRARY -> painterResource(res = MR.files.ic_photo)
+  MediaInsertType.GIF -> painterResource(res = MR.files.ic_gif)
 }

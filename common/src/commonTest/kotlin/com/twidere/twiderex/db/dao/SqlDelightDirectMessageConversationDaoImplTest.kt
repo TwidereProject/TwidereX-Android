@@ -37,94 +37,94 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 internal class SqlDelightDirectMessageConversationDaoImplTest : BaseCacheDatabaseTest() {
-    private lateinit var dao: SqlDelightDirectMessageConversationDaoImpl
-    private val accountKey = MicroBlogKey.twitter("account")
-    override fun setUp() {
-        super.setUp()
-        dao = SqlDelightDirectMessageConversationDaoImpl(
-            database = database
-        )
-    }
+  private lateinit var dao: SqlDelightDirectMessageConversationDaoImpl
+  private val accountKey = MicroBlogKey.twitter("account")
+  override fun setUp() {
+    super.setUp()
+    dao = SqlDelightDirectMessageConversationDaoImpl(
+      database = database
+    )
+  }
 
-    @Test
-    fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
-        val list = listOf(
-            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other1")
-                .toUi(accountKey, mockIUser(id = "other1").toUi(accountKey)),
-            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other2")
-                .toUi(accountKey, mockIUser(id = "other2").toUi(accountKey)),
-            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other3")
-                .toUi(accountKey, mockIUser(id = "other3").toUi(accountKey)),
-        )
-        val eventDao = SqlDelightDirectMessageEventDaoImpl(database)
-        eventDao.insertAll(list)
-        dao.insertAll(list.map { it.toConversation() })
-        val pagingSource = dao.getPagingSource(
-            accountKey = accountKey,
-        )
-        val limit = 2
-        val result = pagingSource.load(params = PagingSource.LoadParams.Refresh(0, limit, false))
-        assert(result is PagingSource.LoadResult.Page)
-        assertEquals(limit, (result as PagingSource.LoadResult.Page).nextKey)
-        assertEquals(limit, result.data.size)
+  @Test
+  fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
+    val list = listOf(
+      mockIDirectMessage(accountId = accountKey.id, otherUserID = "other1")
+        .toUi(accountKey, mockIUser(id = "other1").toUi(accountKey)),
+      mockIDirectMessage(accountId = accountKey.id, otherUserID = "other2")
+        .toUi(accountKey, mockIUser(id = "other2").toUi(accountKey)),
+      mockIDirectMessage(accountId = accountKey.id, otherUserID = "other3")
+        .toUi(accountKey, mockIUser(id = "other3").toUi(accountKey)),
+    )
+    val eventDao = SqlDelightDirectMessageEventDaoImpl(database)
+    eventDao.insertAll(list)
+    dao.insertAll(list.map { it.toConversation() })
+    val pagingSource = dao.getPagingSource(
+      accountKey = accountKey,
+    )
+    val limit = 2
+    val result = pagingSource.load(params = PagingSource.LoadParams.Refresh(0, limit, false))
+    assert(result is PagingSource.LoadResult.Page)
+    assertEquals(limit, (result as PagingSource.LoadResult.Page).nextKey)
+    assertEquals(limit, result.data.size)
 
-        val loadMoreResult = pagingSource.load(params = PagingSource.LoadParams.Append(result.nextKey ?: 0, limit, false))
-        assert(loadMoreResult is PagingSource.LoadResult.Page)
-        assertEquals(null, (loadMoreResult as PagingSource.LoadResult.Page).nextKey)
-    }
+    val loadMoreResult = pagingSource.load(params = PagingSource.LoadParams.Append(result.nextKey ?: 0, limit, false))
+    assert(loadMoreResult is PagingSource.LoadResult.Page)
+    assertEquals(null, (loadMoreResult as PagingSource.LoadResult.Page).nextKey)
+  }
 
-    @Test
-    fun getPagingSource_pagingSourceInvalidateAfterDbUpdate() = runBlocking {
-        val message = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
-            .toUi(accountKey, mockIUser(id = "other").toUi(accountKey))
-        var invalidate = false
-        dao.getPagingSource(
-            accountKey = accountKey,
-        ).apply {
-            registerInvalidatedCallback {
-                invalidate = true
-            }
-            load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
-        }
-        val eventDao = SqlDelightDirectMessageEventDaoImpl(database)
-        eventDao.insertAll(listOf(message))
-        dao.insertAll(listOf(message.toConversation()))
-        val start = System.currentTimeMillis()
-        while (!invalidate && System.currentTimeMillis() - start < 3000) {
-            continue
-        }
-        assert(invalidate)
+  @Test
+  fun getPagingSource_pagingSourceInvalidateAfterDbUpdate() = runBlocking {
+    val message = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
+      .toUi(accountKey, mockIUser(id = "other").toUi(accountKey))
+    var invalidate = false
+    dao.getPagingSource(
+      accountKey = accountKey,
+    ).apply {
+      registerInvalidatedCallback {
+        invalidate = true
+      }
+      load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
     }
+    val eventDao = SqlDelightDirectMessageEventDaoImpl(database)
+    eventDao.insertAll(listOf(message))
+    dao.insertAll(listOf(message.toConversation()))
+    val start = System.currentTimeMillis()
+    while (!invalidate && System.currentTimeMillis() - start < 3000) {
+      continue
+    }
+    assert(invalidate)
+  }
 
-    @Test
-    fun findWithConversationKeyFlow_FlowUpdatesAfterDbUpdate() = runBlocking {
-        val message = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
-            .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)).toConversation()
-        val flow = dao.findWithConversationKeyFlow(accountKey = accountKey, conversationKey = message.conversationKey)
-        assertNull(flow.firstOrNull())
-        dao.insertAll(listOf(message))
-        assertNotNull(flow.firstOrNull())
-        dao.insertAll(listOf(message.copy(conversationName = "update")))
-        assertEquals("update", flow.firstOrNull()?.conversationName)
-    }
+  @Test
+  fun findWithConversationKeyFlow_FlowUpdatesAfterDbUpdate() = runBlocking {
+    val message = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
+      .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)).toConversation()
+    val flow = dao.findWithConversationKeyFlow(accountKey = accountKey, conversationKey = message.conversationKey)
+    assertNull(flow.firstOrNull())
+    dao.insertAll(listOf(message))
+    assertNotNull(flow.firstOrNull())
+    dao.insertAll(listOf(message.copy(conversationName = "update")))
+    assertEquals("update", flow.firstOrNull()?.conversationName)
+  }
 
-    @Test
-    fun delete_DeleteConversationAndAllMessagesItContainsFromDb() = runBlocking {
-        val list = listOf(
-            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other1")
-                .toUi(accountKey, mockIUser(id = "other1").toUi(accountKey)),
-            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other2")
-                .toUi(accountKey, mockIUser(id = "other2").toUi(accountKey)),
-            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other3")
-                .toUi(accountKey, mockIUser(id = "other3").toUi(accountKey)),
-        )
-        val eventDao = SqlDelightDirectMessageEventDaoImpl(database)
-        eventDao.insertAll(list)
-        dao.insertAll(list.map { it.toConversation() })
-        assertEquals(1, database.dMEventQueries.getMessagesPagingCount(accountKey = accountKey, conversationKey = list.first().conversationKey).executeAsOne())
-        assertEquals(3, dao.find(accountKey = accountKey).size)
-        dao.delete(list.first().toConversation())
-        assertNull(dao.findWithConversationKey(accountKey = accountKey, conversationKey = list.first().conversationKey))
-        assertEquals(0, database.dMEventQueries.getMessagesPagingCount(accountKey = accountKey, conversationKey = list.first().conversationKey).executeAsOne())
-    }
+  @Test
+  fun delete_DeleteConversationAndAllMessagesItContainsFromDb() = runBlocking {
+    val list = listOf(
+      mockIDirectMessage(accountId = accountKey.id, otherUserID = "other1")
+        .toUi(accountKey, mockIUser(id = "other1").toUi(accountKey)),
+      mockIDirectMessage(accountId = accountKey.id, otherUserID = "other2")
+        .toUi(accountKey, mockIUser(id = "other2").toUi(accountKey)),
+      mockIDirectMessage(accountId = accountKey.id, otherUserID = "other3")
+        .toUi(accountKey, mockIUser(id = "other3").toUi(accountKey)),
+    )
+    val eventDao = SqlDelightDirectMessageEventDaoImpl(database)
+    eventDao.insertAll(list)
+    dao.insertAll(list.map { it.toConversation() })
+    assertEquals(1, database.dMEventQueries.getMessagesPagingCount(accountKey = accountKey, conversationKey = list.first().conversationKey).executeAsOne())
+    assertEquals(3, dao.find(accountKey = accountKey).size)
+    dao.delete(list.first().toConversation())
+    assertNull(dao.findWithConversationKey(accountKey = accountKey, conversationKey = list.first().conversationKey))
+    assertEquals(0, database.dMEventQueries.getMessagesPagingCount(accountKey = accountKey, conversationKey = list.first().conversationKey).executeAsOne())
+  }
 }

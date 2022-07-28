@@ -44,42 +44,42 @@ import kotlin.math.max
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 actual fun PlatformEmojiPanel(
-    items: List<UiEmojiCategory>,
-    showEmoji: Boolean,
-    onEmojiSelected: (UiEmoji) -> Unit,
+  items: List<UiEmojiCategory>,
+  showEmoji: Boolean,
+  onEmojiSelected: (UiEmoji) -> Unit,
 ) {
-    var height by remember { mutableStateOf(0) }
-    ImeHeightWithInsets(
-        filter = {
-            it > 0
-        },
-        collectIme = {
-            height = max(height, it)
-        }
+  var height by remember { mutableStateOf(0) }
+  ImeHeightWithInsets(
+    filter = {
+      it > 0
+    },
+    collectIme = {
+      height = max(height, it)
+    }
 
-    )
-    val targetHeight = with(LocalDensity.current) {
-        height.toDp()
+  )
+  val targetHeight = with(LocalDensity.current) {
+    height.toDp()
+  }
+  val bottom = imeBottomInsets()
+  var visibility by remember { mutableStateOf(false) }
+  LaunchedEffect(showEmoji, bottom) {
+    if (bottom == targetHeight || showEmoji) {
+      visibility = showEmoji
     }
-    val bottom = imeBottomInsets()
-    var visibility by remember { mutableStateOf(false) }
-    LaunchedEffect(showEmoji, bottom) {
-        if (bottom == targetHeight || showEmoji) {
-            visibility = showEmoji
+  }
+  Box(
+    modifier = Modifier
+      .height(
+        height = if (visibility) {
+          (targetHeight - bottom).coerceAtLeast(0.dp)
+        } else {
+          0.dp
         }
-    }
-    Box(
-        modifier = Modifier
-            .height(
-                height = if (visibility) {
-                    (targetHeight - bottom).coerceAtLeast(0.dp)
-                } else {
-                    0.dp
-                }
-            )
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center,
-    ) {
-        EmojiList(items = items, onEmojiSelected = onEmojiSelected)
-    }
+      )
+      .fillMaxWidth(),
+    contentAlignment = Alignment.Center,
+  ) {
+    EmojiList(items = items, onEmojiSelected = onEmojiSelected)
+  }
 }

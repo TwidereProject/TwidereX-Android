@@ -31,63 +31,63 @@ import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
 
 internal class ExtraConverter {
-    @TypeConverter
-    fun fromDbTwitterStatusExtraString(value: String?): DbTwitterStatusExtra? {
-        return value?.fromJson()
-    }
+  @TypeConverter
+  fun fromDbTwitterStatusExtraString(value: String?): DbTwitterStatusExtra? {
+    return value?.fromJson()
+  }
 
-    @TypeConverter
-    fun fromTarget(target: DbTwitterStatusExtra?): String? {
-        return target?.json()
-    }
+  @TypeConverter
+  fun fromTarget(target: DbTwitterStatusExtra?): String? {
+    return target?.json()
+  }
 
-    @TypeConverter
-    fun fromDbMastodonStatusExtraString(value: String?): DbMastodonStatusExtra? {
-        return value?.fromJson()
-    }
+  @TypeConverter
+  fun fromDbMastodonStatusExtraString(value: String?): DbMastodonStatusExtra? {
+    return value?.fromJson()
+  }
 
-    @TypeConverter
-    fun fromTarget(target: DbMastodonStatusExtra?): String? {
-        return target?.json()
-    }
+  @TypeConverter
+  fun fromTarget(target: DbMastodonStatusExtra?): String? {
+    return target?.json()
+  }
 
-    @TypeConverter
-    fun fromDbTwitterUserExtraString(value: String?): DbTwitterUserExtra? {
-        return value?.fromJson()
-    }
+  @TypeConverter
+  fun fromDbTwitterUserExtraString(value: String?): DbTwitterUserExtra? {
+    return value?.fromJson()
+  }
 
-    @TypeConverter
-    fun fromTarget(target: DbTwitterUserExtra?): String? {
-        return target?.json()
-    }
+  @TypeConverter
+  fun fromTarget(target: DbTwitterUserExtra?): String? {
+    return target?.json()
+  }
 
-    @TypeConverter
-    fun fromDbMastodonUserExtraString(value: String?): DbMastodonUserExtra? {
-        return value?.fromJson()
-    }
+  @TypeConverter
+  fun fromDbMastodonUserExtraString(value: String?): DbMastodonUserExtra? {
+    return value?.fromJson()
+  }
 
-    @TypeConverter
-    fun fromTarget(target: DbMastodonUserExtra?): String? {
-        return target?.json()
-    }
+  @TypeConverter
+  fun fromTarget(target: DbMastodonUserExtra?): String? {
+    return target?.json()
+  }
 
-    @TypeConverter
-    fun fromDbPreviewCard(value: String?): DbPreviewCard? {
-        return value?.fromJson()
-    }
+  @TypeConverter
+  fun fromDbPreviewCard(value: String?): DbPreviewCard? {
+    return value?.fromJson()
+  }
 
-    @TypeConverter
-    fun fromTarget(target: DbPreviewCard?): String? {
-        return target?.json()
-    }
+  @TypeConverter
+  fun fromTarget(target: DbPreviewCard?): String? {
+    return target?.json()
+  }
 
-    @TypeConverter
-    fun fromDbPoll(value: String?): DbPoll? {
-        return value?.fromJson()
-    }
+  @TypeConverter
+  fun fromDbPoll(value: String?): DbPoll? {
+    return value?.fromJson()
+  }
 
-    @TypeConverter
-    fun fromTarget(target: DbPoll?): String? {
-        return target?.json()
-    }
+  @TypeConverter
+  fun fromTarget(target: DbPoll?): String? {
+    return target?.json()
+  }
 }

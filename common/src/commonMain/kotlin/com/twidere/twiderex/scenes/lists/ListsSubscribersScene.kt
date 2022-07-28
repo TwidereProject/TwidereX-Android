@@ -35,25 +35,25 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ListsSubscribersScene(
-    listKey: MicroBlogKey,
+  listKey: MicroBlogKey,
 ) {
-    val viewModel: ListsUserViewModel = getViewModel {
-        parametersOf(listKey.id, false)
+  val viewModel: ListsUserViewModel = getViewModel {
+    parametersOf(listKey.id, false)
+  }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_tabs_subscriber))
+          }
+        )
+      },
+    ) {
+      UserListComponent(viewModel = viewModel)
     }
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_tabs_subscriber))
-                    }
-                )
-            },
-        ) {
-            UserListComponent(viewModel = viewModel)
-        }
-    }
+  }
 }

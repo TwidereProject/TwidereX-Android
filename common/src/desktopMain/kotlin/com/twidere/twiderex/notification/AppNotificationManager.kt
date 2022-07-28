@@ -24,17 +24,17 @@ import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 actual class AppNotificationManager {
-    actual fun notify(
-        notificationId: Int,
-        appNotification: AppNotification
-    ) {
-    }
+  actual fun notify(
+    notificationId: Int,
+    appNotification: AppNotification
+  ) {
+  }
 
-    @OptIn(ExperimentalTime::class)
-    actual fun notifyTransient(
-        notificationId: Int,
-        appNotification: AppNotification,
-        duration: Duration
-    ) {
-    }
+  @OptIn(ExperimentalTime::class)
+  actual fun notifyTransient(
+    notificationId: Int,
+    appNotification: AppNotification,
+    duration: Duration
+  ) {
+  }
 }

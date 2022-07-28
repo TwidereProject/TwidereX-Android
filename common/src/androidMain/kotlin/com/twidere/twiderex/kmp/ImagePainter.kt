@@ -50,92 +50,92 @@ import java.net.URL
 @OptIn(coil.annotation.ExperimentalCoilApi::class)
 @Composable
 internal actual fun rememberNetworkImagePainter(
-    data: Any,
-    authorization: Authorization,
-    httpConfig: HttpConfig,
-    effects: ImageEffects,
-    cacheDir: String,
-    onImageStateChanged: (NetworkImageState) -> Unit
+  data: Any,
+  authorization: Authorization,
+  httpConfig: HttpConfig,
+  effects: ImageEffects,
+  cacheDir: String,
+  onImageStateChanged: (NetworkImageState) -> Unit
 ): Painter {
-    val context = LocalContext.current
-    val listener = remember {
-        object : ImageRequest.Listener {
-            override fun onStart(request: ImageRequest) {
-                onImageStateChanged(NetworkImageState.LOADING)
-            }
+  val context = LocalContext.current
+  val listener = remember {
+    object : ImageRequest.Listener {
+      override fun onStart(request: ImageRequest) {
+        onImageStateChanged(NetworkImageState.LOADING)
+      }
 
-            override fun onError(request: ImageRequest, result: ErrorResult) {
-                onImageStateChanged(NetworkImageState.ERROR)
-            }
+      override fun onError(request: ImageRequest, result: ErrorResult) {
+        onImageStateChanged(NetworkImageState.ERROR)
+      }
 
-            override fun onSuccess(request: ImageRequest, result: SuccessResult) {
-                onImageStateChanged(NetworkImageState.SUCCESS)
-            }
+      override fun onSuccess(request: ImageRequest, result: SuccessResult) {
+        onImageStateChanged(NetworkImageState.SUCCESS)
+      }
 
-            override fun onCancel(request: ImageRequest) {
-                onImageStateChanged(NetworkImageState.ERROR)
-            }
-        }
+      override fun onCancel(request: ImageRequest) {
+        onImageStateChanged(NetworkImageState.ERROR)
+      }
     }
-    return rememberAsyncImagePainter(
-        model = ImageRequest
-            .Builder(context)
-            .data(data)
-            .apply {
-                size(Size.ORIGINAL)
-                crossfade(effects.crossFade)
-                if (effects.blur != null) {
-                    transformations(
-                        BlurTransformation(
-                            context = context,
-                            radius = effects.blur.blurRadius,
-                        )
-                    )
-                }
-                listener(listener)
-                if (authorization.hasAuthorization) {
-                    addHeader(
-                        "Authorization",
-                        authorization.getAuthorizationHeader(
-                            Request.Builder()
-                                .url(URL(data.toString()))
-                                .build()
-                        )
-                    )
-                }
-            }
-            .build(),
-        imageLoader = buildImageLoader(cacheDir)
-    )
+  }
+  return rememberAsyncImagePainter(
+    model = ImageRequest
+      .Builder(context)
+      .data(data)
+      .apply {
+        size(Size.ORIGINAL)
+        crossfade(effects.crossFade)
+        if (effects.blur != null) {
+          transformations(
+            BlurTransformation(
+              context = context,
+              radius = effects.blur.blurRadius,
+            )
+          )
+        }
+        listener(listener)
+        if (authorization.hasAuthorization) {
+          addHeader(
+            "Authorization",
+            authorization.getAuthorizationHeader(
+              Request.Builder()
+                .url(URL(data.toString()))
+                .build()
+            )
+          )
+        }
+      }
+      .build(),
+    imageLoader = buildImageLoader(cacheDir)
+  )
 }
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
 private fun buildImageLoader(cacheDir: String): ImageLoader {
-    val httpConfig = LocalHttpConfig.current
-    return LocalContext.current.imageLoader
-        .newBuilder()
-        .apply {
-            if (httpConfig.proxyConfig.enable &&
-                httpConfig.proxyConfig.server.isNotEmpty()
-            ) {
-                callFactory {
-                    TwidereServiceFactory.createHttpClientFactory()
-                        .createHttpClientBuilder()
-                        .build()
-                }
-                diskCache {
-                    DiskCache.Builder()
-                        .directory(File(cacheDir))
-                        .build()
-                }
-            }
-        }.components {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                add(ImageDecoderDecoder.Factory())
-            } else {
-                add(GifDecoder.Factory())
-            }
+  val httpConfig = LocalHttpConfig.current
+  return LocalContext.current.imageLoader
+    .newBuilder()
+    .apply {
+      if (httpConfig.proxyConfig.enable &&
+        httpConfig.proxyConfig.server.isNotEmpty()
+      ) {
+        callFactory {
+          TwidereServiceFactory.createHttpClientFactory()
+            .createHttpClientBuilder()
+            .build()
         }
-        .build()
+        diskCache {
+          DiskCache.Builder()
+            .directory(File(cacheDir))
+            .build()
+        }
+      }
+    }.components {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        add(ImageDecoderDecoder.Factory())
+      } else {
+        add(GifDecoder.Factory())
+      }
+    }
+    .build()
 }

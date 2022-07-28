@@ -30,7 +30,7 @@ import moe.tlaster.precompose.navigation.Navigator
 val LocalNavController = staticCompositionLocalOf<Navigator> { error("No NavController") }
 val LocalActiveAccount = compositionLocalOf<AccountDetails?> { null }
 val LocalActiveAccountViewModel =
-    compositionLocalOf<com.twidere.twiderex.viewmodel.ActiveAccountViewModel> { error("No ActiveAccountViewModel") }
+  compositionLocalOf<com.twidere.twiderex.viewmodel.ActiveAccountViewModel> { error("No ActiveAccountViewModel") }
 // val LocalActivity = staticCompositionLocalOf<Activity> { error("NoActivity") }
 val LocalVideoPlayback = compositionLocalOf { DisplayPreferences.AutoPlayback.Auto }
 val LocalIsActiveNetworkMetered = compositionLocalOf { false }

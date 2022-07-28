@@ -31,28 +31,28 @@ import java.util.UUID
 import kotlin.test.assertEquals
 
 internal class DMEventTransformTest {
-    @Test
-    fun transform() {
-        val ui = UiDMEvent(
-            accountKey = MicroBlogKey.twitter("account"),
-            sender = mockIUser().toUi(MicroBlogKey.twitter("sender")),
-            sortId = System.currentTimeMillis(),
-            conversationKey = MicroBlogKey.twitter("conversation"),
-            messageId = System.currentTimeMillis().toString(),
-            messageKey = MicroBlogKey.twitter("messageKey"),
-            htmlText = "htmlText",
-            originText = "originText",
-            createdTimestamp = System.currentTimeMillis(),
-            messageType = "create",
-            senderAccountKey = MicroBlogKey.twitter("sender"),
-            recipientAccountKey = MicroBlogKey.twitter("recipient"),
-            sendStatus = UiDMEvent.SendStatus.SUCCESS,
-            media = listOf(mockUiMedia()),
-            urlEntity = listOf(mockUiUrlEntity())
-        )
-        val id = UUID.randomUUID().toString()
-        val db = ui.toDbEventWithAttachments(dbId = id)
-        assertEquals(ui, db.toUi())
-        assertEquals(id, db.event.id)
-    }
+  @Test
+  fun transform() {
+    val ui = UiDMEvent(
+      accountKey = MicroBlogKey.twitter("account"),
+      sender = mockIUser().toUi(MicroBlogKey.twitter("sender")),
+      sortId = System.currentTimeMillis(),
+      conversationKey = MicroBlogKey.twitter("conversation"),
+      messageId = System.currentTimeMillis().toString(),
+      messageKey = MicroBlogKey.twitter("messageKey"),
+      htmlText = "htmlText",
+      originText = "originText",
+      createdTimestamp = System.currentTimeMillis(),
+      messageType = "create",
+      senderAccountKey = MicroBlogKey.twitter("sender"),
+      recipientAccountKey = MicroBlogKey.twitter("recipient"),
+      sendStatus = UiDMEvent.SendStatus.SUCCESS,
+      media = listOf(mockUiMedia()),
+      urlEntity = listOf(mockUiUrlEntity())
+    )
+    val id = UUID.randomUUID().toString()
+    val db = ui.toDbEventWithAttachments(dbId = id)
+    assertEquals(ui, db.toUi())
+    assertEquals(id, db.event.id)
+  }
 }

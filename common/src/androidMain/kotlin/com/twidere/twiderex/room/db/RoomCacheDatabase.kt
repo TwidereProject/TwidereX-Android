@@ -61,47 +61,47 @@ import com.twidere.twiderex.room.db.model.converter.TwitterReplySettingsConverte
 import com.twidere.twiderex.room.db.model.converter.UserTimelineTypeConverter
 
 @Database(
-    entities = [
-        DbStatusV2::class,
-        DbMedia::class,
-        DbUser::class,
-        DbStatusReaction::class,
-        DbPagingTimeline::class,
-        DbUrlEntity::class,
-        DbStatusReference::class,
-        DbList::class,
-        DbNotificationCursor::class,
-        DbTrend::class,
-        DbTrendHistory::class,
-        DbDMConversation::class,
-        DbDMEvent::class
-    ],
-    version = 21,
+  entities = [
+    DbStatusV2::class,
+    DbMedia::class,
+    DbUser::class,
+    DbStatusReaction::class,
+    DbPagingTimeline::class,
+    DbUrlEntity::class,
+    DbStatusReference::class,
+    DbList::class,
+    DbNotificationCursor::class,
+    DbTrend::class,
+    DbTrendHistory::class,
+    DbDMConversation::class,
+    DbDMEvent::class
+  ],
+  version = 21,
 )
 @TypeConverters(
-    MicroBlogKeyConverter::class,
-    PlatformTypeConverter::class,
-    MediaTypeConverter::class,
-    UserTimelineTypeConverter::class,
-    StringListConverter::class,
-    NotificationTypeConverter::class,
-    ExtraConverter::class,
-    NotificationCursorTypeConverter::class,
-    TwitterReplySettingsConverter::class,
-    MastodonVisibilityConverter::class
+  MicroBlogKeyConverter::class,
+  PlatformTypeConverter::class,
+  MediaTypeConverter::class,
+  UserTimelineTypeConverter::class,
+  StringListConverter::class,
+  NotificationTypeConverter::class,
+  ExtraConverter::class,
+  NotificationCursorTypeConverter::class,
+  TwitterReplySettingsConverter::class,
+  MastodonVisibilityConverter::class
 )
 internal abstract class RoomCacheDatabase : RoomDatabase() {
-    abstract fun statusDao(): RoomStatusDao
-    abstract fun mediaDao(): RoomMediaDao
-    abstract fun userDao(): RoomUserDao
-    abstract fun reactionDao(): RoomReactionDao
-    abstract fun pagingTimelineDao(): RoomPagingTimelineDao
-    abstract fun urlEntityDao(): RoomUrlEntityDao
-    abstract fun statusReferenceDao(): RoomStatusReferenceDao
-    abstract fun listsDao(): RoomListsDao
-    abstract fun notificationCursorDao(): RoomNotificationCursorDao
-    abstract fun trendDao(): RoomTrendDao
-    abstract fun trendHistoryDao(): RoomTrendHistoryDao
-    abstract fun directMessageConversationDao(): RoomDirectMessageConversationDao
-    abstract fun directMessageDao(): RoomDirectMessageEventDao
+  abstract fun statusDao(): RoomStatusDao
+  abstract fun mediaDao(): RoomMediaDao
+  abstract fun userDao(): RoomUserDao
+  abstract fun reactionDao(): RoomReactionDao
+  abstract fun pagingTimelineDao(): RoomPagingTimelineDao
+  abstract fun urlEntityDao(): RoomUrlEntityDao
+  abstract fun statusReferenceDao(): RoomStatusReferenceDao
+  abstract fun listsDao(): RoomListsDao
+  abstract fun notificationCursorDao(): RoomNotificationCursorDao
+  abstract fun trendDao(): RoomTrendDao
+  abstract fun trendHistoryDao(): RoomTrendHistoryDao
+  abstract fun directMessageConversationDao(): RoomDirectMessageConversationDao
+  abstract fun directMessageDao(): RoomDirectMessageEventDao
 }

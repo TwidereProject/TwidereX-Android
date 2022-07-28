@@ -33,7 +33,12 @@ allprojects {
         kotlin {
             target("**/*.kt")
             targetExclude("$buildDir/**/*.kt", "bin/**/*.kt", "buildSrc/**/*.kt")
-            ktlint(Versions.ktlint)
+            ktlint(Versions.ktlint).editorConfigOverride(
+                mapOf(
+                    "indent_size" to 2,
+                    "continuation_indent_size" to 2
+                )
+            )
             licenseHeaderFile(rootProject.file("spotless/license"))
         }
         kotlinGradle {

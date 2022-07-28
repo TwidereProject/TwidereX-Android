@@ -34,42 +34,42 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 internal class SqlDelightSearchDaoImpl(private val queries: SearchQueries) : SearchDao {
-    override suspend fun insertAll(search: List<UiSearch>) {
-        queries.transaction {
-            search.forEach {
-                queries.insert(search = it.toDbSearch())
-            }
-        }
+  override suspend fun insertAll(search: List<UiSearch>) {
+    queries.transaction {
+      search.forEach {
+        queries.insert(search = it.toDbSearch())
+      }
     }
+  }
 
-    override fun getAll(accountKey: MicroBlogKey): Flow<List<UiSearch>> {
-        return queries.getAll(accountKey = accountKey)
-            .asUiFlow()
-    }
+  override fun getAll(accountKey: MicroBlogKey): Flow<List<UiSearch>> {
+    return queries.getAll(accountKey = accountKey)
+      .asUiFlow()
+  }
 
-    override fun getAllHistory(accountKey: MicroBlogKey): Flow<List<UiSearch>> {
-        return queries.getHistories(accountKey = accountKey)
-            .asUiFlow()
-    }
+  override fun getAllHistory(accountKey: MicroBlogKey): Flow<List<UiSearch>> {
+    return queries.getHistories(accountKey = accountKey)
+      .asUiFlow()
+  }
 
-    override fun getAllSaved(accountKey: MicroBlogKey): Flow<List<UiSearch>> {
-        return queries.getSaved(accountKey = accountKey)
-            .asUiFlow()
-    }
+  override fun getAllSaved(accountKey: MicroBlogKey): Flow<List<UiSearch>> {
+    return queries.getSaved(accountKey = accountKey)
+      .asUiFlow()
+  }
 
-    override suspend fun get(content: String, accountKey: MicroBlogKey): UiSearch? {
-        return queries.get(content = content, accountKey = accountKey).executeAsOneOrNull()?.toUi()
-    }
+  override suspend fun get(content: String, accountKey: MicroBlogKey): UiSearch? {
+    return queries.get(content = content, accountKey = accountKey).executeAsOneOrNull()?.toUi()
+  }
 
-    override suspend fun remove(search: UiSearch) {
-        queries.remove(content = search.content, accountKey = search.accountKey)
-    }
+  override suspend fun remove(search: UiSearch) {
+    queries.remove(content = search.content, accountKey = search.accountKey)
+  }
 
-    override suspend fun clear() {
-        queries.clear()
-    }
+  override suspend fun clear() {
+    queries.clear()
+  }
 
-    private fun Query<Search>.asUiFlow() = asFlow()
-        .mapToList()
-        .map { it.map { search -> search.toUi() } }
+  private fun Query<Search>.asUiFlow() = asFlow()
+    .mapToList()
+    .map { it.map { search -> search.toUi() } }
 }

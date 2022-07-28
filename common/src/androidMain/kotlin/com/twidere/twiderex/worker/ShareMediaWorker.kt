@@ -29,34 +29,34 @@ import androidx.work.WorkerParameters
 import com.twidere.twiderex.jobs.common.ShareMediaJob
 
 class ShareMediaWorker(
-    context: Context,
-    workerParams: WorkerParameters,
-    private val shareMediaJob: ShareMediaJob,
+  context: Context,
+  workerParams: WorkerParameters,
+  private val shareMediaJob: ShareMediaJob,
 ) : CoroutineWorker(context, workerParams) {
 
-    companion object {
-        fun create(
-            target: Uri,
-            extraText: String = "",
-        ) = OneTimeWorkRequestBuilder<ShareMediaWorker>()
-            .setInputData(
-                Data.Builder()
-                    .putString("target", target.toString())
-                    .putString("extraText", extraText)
-                    .build()
-            )
-            .build()
-    }
+  companion object {
+    fun create(
+      target: Uri,
+      extraText: String = "",
+    ) = OneTimeWorkRequestBuilder<ShareMediaWorker>()
+      .setInputData(
+        Data.Builder()
+          .putString("target", target.toString())
+          .putString("extraText", extraText)
+          .build()
+      )
+      .build()
+  }
 
-    override suspend fun doWork(): Result {
-        val target = inputData.getString("target") ?: return Result.failure()
-        val extraText = inputData.getString("extraText").orEmpty()
-        return try {
-            shareMediaJob.execute(target, extraText)
-            Result.success()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            Result.failure()
-        }
+  override suspend fun doWork(): Result {
+    val target = inputData.getString("target") ?: return Result.failure()
+    val extraText = inputData.getString("extraText").orEmpty()
+    return try {
+      shareMediaJob.execute(target, extraText)
+      Result.success()
+    } catch (e: Throwable) {
+      e.printStackTrace()
+      Result.failure()
     }
+  }
 }

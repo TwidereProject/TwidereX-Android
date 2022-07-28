@@ -35,52 +35,52 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 internal class SqlDelightListsDaoImpl(private val listQueries: ListQueries) : ListsDao {
-    override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiList> {
-        return QueryPagingSource(
-            countQuery = listQueries.getPagingCount(accountKey = accountKey),
-            transacter = listQueries,
-            queryProvider = { limit, offset, _ ->
-                listQueries.getPagingList(accountKey = accountKey, limit = limit, offSet = offset)
-                    .flatMap { it.toUi() }
-            }
-        )
-    }
+  override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiList> {
+    return QueryPagingSource(
+      countQuery = listQueries.getPagingCount(accountKey = accountKey),
+      transacter = listQueries,
+      queryProvider = { limit, offset, _ ->
+        listQueries.getPagingList(accountKey = accountKey, limit = limit, offSet = offset)
+          .flatMap { it.toUi() }
+      }
+    )
+  }
 
-    override fun findWithListKeyWithFlow(
-        listKey: MicroBlogKey,
-        accountKey: MicroBlogKey
-    ): Flow<UiList?> {
-        return listQueries.findWithListKey(listKey = listKey, accountKey = accountKey)
-            .asFlow()
-            .mapToOneOrNull()
-            .map { it?.toUi() }
-    }
+  override fun findWithListKeyWithFlow(
+    listKey: MicroBlogKey,
+    accountKey: MicroBlogKey
+  ): Flow<UiList?> {
+    return listQueries.findWithListKey(listKey = listKey, accountKey = accountKey)
+      .asFlow()
+      .mapToOneOrNull()
+      .map { it?.toUi() }
+  }
 
-    override suspend fun insertAll(listOf: List<UiList>) {
-        listQueries.transaction {
-            listOf.forEach { listQueries.insert(it.toDbList()) }
-        }
+  override suspend fun insertAll(listOf: List<UiList>) {
+    listQueries.transaction {
+      listOf.forEach { listQueries.insert(it.toDbList()) }
     }
+  }
 
-    override suspend fun findWithListKey(listKey: MicroBlogKey, accountKey: MicroBlogKey): UiList? {
-        return listQueries.findWithListKey(listKey = listKey, accountKey = accountKey)
-            .executeAsOneOrNull()
-            ?.toUi()
-    }
+  override suspend fun findWithListKey(listKey: MicroBlogKey, accountKey: MicroBlogKey): UiList? {
+    return listQueries.findWithListKey(listKey = listKey, accountKey = accountKey)
+      .executeAsOneOrNull()
+      ?.toUi()
+  }
 
-    override suspend fun update(listOf: List<UiList>) {
-        listQueries.transaction {
-            listOf.forEach { listQueries.insert(it.toDbList()) }
-        }
+  override suspend fun update(listOf: List<UiList>) {
+    listQueries.transaction {
+      listOf.forEach { listQueries.insert(it.toDbList()) }
     }
+  }
 
-    override suspend fun delete(listOf: List<UiList>) {
-        listQueries.transaction {
-            listOf.forEach { listQueries.delete(accountKey = it.accountKey, listKey = it.listKey) }
-        }
+  override suspend fun delete(listOf: List<UiList>) {
+    listQueries.transaction {
+      listOf.forEach { listQueries.delete(accountKey = it.accountKey, listKey = it.listKey) }
     }
+  }
 
-    override suspend fun clearAll(accountKey: MicroBlogKey) {
-        listQueries.clearAll(accountKey = accountKey)
-    }
+  override suspend fun clearAll(accountKey: MicroBlogKey) {
+    listQueries.clearAll(accountKey = accountKey)
+  }
 }

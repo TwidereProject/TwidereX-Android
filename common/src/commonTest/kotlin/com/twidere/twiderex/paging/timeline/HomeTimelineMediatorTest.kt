@@ -34,37 +34,37 @@ import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 
 class HomeTimelineMediatorTest {
-    @OptIn(ExperimentalPagingApi::class)
-    @Test
-    fun refresh_LoadReturnsSuccessDatabaseWhenSuccess() = runBlocking {
-        val mockDataBase = MockCacheDatabase()
-        val accountKey = MicroBlogKey.twitter("test")
-        val mediator = HomeTimelineMediator(
-            database = mockDataBase,
-            accountKey = accountKey,
-            service = MockTimelineService()
-        )
-        val pagingState = PagingState<Int, PagingTimeLineWithStatus>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
-        val result = mediator.load(LoadType.REFRESH, pagingState)
-        // when mediator get data from service, it store to database\
-        assert(result is RemoteMediator.MediatorResult.Success)
-        assert(!(result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
-    }
+  @OptIn(ExperimentalPagingApi::class)
+  @Test
+  fun refresh_LoadReturnsSuccessDatabaseWhenSuccess() = runBlocking {
+    val mockDataBase = MockCacheDatabase()
+    val accountKey = MicroBlogKey.twitter("test")
+    val mediator = HomeTimelineMediator(
+      database = mockDataBase,
+      accountKey = accountKey,
+      service = MockTimelineService()
+    )
+    val pagingState = PagingState<Int, PagingTimeLineWithStatus>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
+    val result = mediator.load(LoadType.REFRESH, pagingState)
+    // when mediator get data from service, it store to database\
+    assert(result is RemoteMediator.MediatorResult.Success)
+    assert(!(result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
+  }
 
-    @OptIn(ExperimentalPagingApi::class)
-    @Test
-    fun refresh_LoadReturnsErrorResultWhenErrorOccurs() = runBlocking {
-        val mockDataBase = MockCacheDatabase()
-        val accountKey = MicroBlogKey.twitter("test")
-        val mediator = HomeTimelineMediator(
-            database = mockDataBase,
-            accountKey = accountKey,
-            service = MockTimelineService().apply {
-                errorMsg = "throw test errors"
-            }
-        )
-        val pagingState = PagingState<Int, PagingTimeLineWithStatus>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
-        val result = mediator.load(LoadType.REFRESH, pagingState)
-        assert(result is RemoteMediator.MediatorResult.Error)
-    }
+  @OptIn(ExperimentalPagingApi::class)
+  @Test
+  fun refresh_LoadReturnsErrorResultWhenErrorOccurs() = runBlocking {
+    val mockDataBase = MockCacheDatabase()
+    val accountKey = MicroBlogKey.twitter("test")
+    val mediator = HomeTimelineMediator(
+      database = mockDataBase,
+      accountKey = accountKey,
+      service = MockTimelineService().apply {
+        errorMsg = "throw test errors"
+      }
+    )
+    val pagingState = PagingState<Int, PagingTimeLineWithStatus>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
+    val result = mediator.load(LoadType.REFRESH, pagingState)
+    assert(result is RemoteMediator.MediatorResult.Error)
+  }
 }

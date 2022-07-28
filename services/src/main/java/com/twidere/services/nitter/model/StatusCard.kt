@@ -23,14 +23,14 @@ package com.twidere.services.nitter.model
 import moe.tlaster.hson.annotations.HtmlSerializable
 
 data class StatusCard(
-    @HtmlSerializable("a", attr = "href")
-    val link: String? = null,
-    @HtmlSerializable("img", attr = "src")
-    val img: String? = null,
-    @HtmlSerializable(".card-title")
-    val title: String? = null,
-    @HtmlSerializable(".card-description")
-    val desc: String? = null,
-    @HtmlSerializable(".card-destination")
-    val destination: String? = null,
+  @HtmlSerializable("a", attr = "href")
+  val link: String? = null,
+  @HtmlSerializable("img", attr = "src")
+  val img: String? = null,
+  @HtmlSerializable(".card-title")
+  val title: String? = null,
+  @HtmlSerializable(".card-description")
+  val desc: String? = null,
+  @HtmlSerializable(".card-destination")
+  val destination: String? = null,
 )

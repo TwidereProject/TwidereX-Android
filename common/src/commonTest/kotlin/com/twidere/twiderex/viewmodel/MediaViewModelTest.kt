@@ -37,73 +37,73 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 internal class MediaViewModelTest : AccountViewModelTestBase() {
-    override val mockService: MicroBlogService = mockk()
-    private lateinit var viewModel: MediaViewModel
+  override val mockService: MicroBlogService = mockk()
+  private lateinit var viewModel: MediaViewModel
 
-    @MockK
-    private lateinit var repository: StatusRepository
+  @MockK
+  private lateinit var repository: StatusRepository
 
-    @MockK
-    private lateinit var mediaAction: MediaAction
+  @MockK
+  private lateinit var mediaAction: MediaAction
 
-    override fun setUp() {
-        super.setUp()
-        viewModel = MediaViewModel(
-            repository,
-            mockAccountRepository,
-            mediaAction,
-            MicroBlogKey.twitter("123")
-        )
-        coEvery { repository.loadStatus(any(), any()) }.returns(
-            flowOf(
-                mockk {
-                    every { statusKey }.returns(MicroBlogKey.twitter("123"))
-                }
-            )
-        )
-    }
-
-    @Test
-    fun load_status(): Unit = runBlocking {
-        viewModel.status.firstOrNull().let {
-            assertNotNull(it)
-            assertEquals(MicroBlogKey.twitter("123"), it.statusKey)
+  override fun setUp() {
+    super.setUp()
+    viewModel = MediaViewModel(
+      repository,
+      mockAccountRepository,
+      mediaAction,
+      MicroBlogKey.twitter("123")
+    )
+    coEvery { repository.loadStatus(any(), any()) }.returns(
+      flowOf(
+        mockk {
+          every { statusKey }.returns(MicroBlogKey.twitter("123"))
         }
-    }
+      )
+    )
+  }
 
-    @Test
-    fun saveFile_success(): Unit = runBlocking {
-        viewModel.saveFile(
-            mockk {
-                every { mediaUrl }.returns("123")
-                every { fileName }.returns("target")
-            }
-        ) {
-            it
-        }
-        verify(exactly = 1) {
-            mediaAction.download(
-                "123",
-                "target",
-                MicroBlogKey.twitter("123")
-            )
-        }
+  @Test
+  fun load_status(): Unit = runBlocking {
+    viewModel.status.firstOrNull().let {
+      assertNotNull(it)
+      assertEquals(MicroBlogKey.twitter("123"), it.statusKey)
     }
+  }
 
-    @Test
-    fun shareMedia_success(): Unit = runBlocking {
-        viewModel.shareMedia(
-            mockk {
-                every { mediaUrl }.returns("123")
-                every { fileName }.returns("target")
-            }
-        )
-        verify(exactly = 1) {
-            mediaAction.share(
-                "123",
-                "target",
-                MicroBlogKey.twitter("123")
-            )
-        }
+  @Test
+  fun saveFile_success(): Unit = runBlocking {
+    viewModel.saveFile(
+      mockk {
+        every { mediaUrl }.returns("123")
+        every { fileName }.returns("target")
+      }
+    ) {
+      it
     }
+    verify(exactly = 1) {
+      mediaAction.download(
+        "123",
+        "target",
+        MicroBlogKey.twitter("123")
+      )
+    }
+  }
+
+  @Test
+  fun shareMedia_success(): Unit = runBlocking {
+    viewModel.shareMedia(
+      mockk {
+        every { mediaUrl }.returns("123")
+        every { fileName }.returns("target")
+      }
+    )
+    verify(exactly = 1) {
+      mediaAction.share(
+        "123",
+        "target",
+        MicroBlogKey.twitter("123")
+      )
+    }
+  }
 }

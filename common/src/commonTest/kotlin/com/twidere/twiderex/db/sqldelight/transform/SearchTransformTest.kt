@@ -27,15 +27,15 @@ import kotlin.test.assertEquals
 
 internal class SearchTransformTest {
 
-    @Test
-    fun transform() {
-        val uiSearch = UiSearch(
-            content = "search",
-            lastActive = System.currentTimeMillis(),
-            accountKey = MicroBlogKey.valueOf("test"),
-            saved = true
-        )
-        val search = uiSearch.toDbSearch()
-        assertEquals(uiSearch, search.toUi())
-    }
+  @Test
+  fun transform() {
+    val uiSearch = UiSearch(
+      content = "search",
+      lastActive = System.currentTimeMillis(),
+      accountKey = MicroBlogKey.valueOf("test"),
+      saved = true
+    )
+    val search = uiSearch.toDbSearch()
+    assertEquals(uiSearch, search.toUi())
+  }
 }

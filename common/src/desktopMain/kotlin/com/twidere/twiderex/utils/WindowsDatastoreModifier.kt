@@ -23,13 +23,13 @@ package com.twidere.twiderex.utils
 import javassist.ClassPool
 
 object WindowsDatastoreModifier {
-    fun ensureWindowsDatastore() {
-        val pool = ClassPool.getDefault()
-        val dataStore = pool.getCtClass("androidx.datastore.core.SingleProcessDataStore")
-        val writeData = dataStore.getDeclaredMethod("writeData\$datastore_core")
-        val unCloseableStream = "androidx.datastore.core.SingleProcessDataStore\$UncloseableOutputStream"
-        writeData.setBody(
-            """
+  fun ensureWindowsDatastore() {
+    val pool = ClassPool.getDefault()
+    val dataStore = pool.getCtClass("androidx.datastore.core.SingleProcessDataStore")
+    val writeData = dataStore.getDeclaredMethod("writeData\$datastore_core")
+    val unCloseableStream = "androidx.datastore.core.SingleProcessDataStore\$UncloseableOutputStream"
+    writeData.setBody(
+      """
        { 
           java.io.File file = getFile();
           this.createParentDirectories(file);
@@ -68,8 +68,8 @@ object WindowsDatastoreModifier {
           return null;
       }
     """
-        )
-        dataStore.toClass()
-        dataStore.detach()
-    }
+    )
+    dataStore.toClass()
+    dataStore.detach()
+  }
 }

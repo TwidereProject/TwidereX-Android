@@ -32,26 +32,26 @@ import kotlinx.coroutines.flow.flowOf
 
 internal abstract class AccountViewModelTestBase : ViewModelTestBase() {
 
-    @MockK
-    protected lateinit var mockUser: AmUser
-    @MockK
-    protected lateinit var mockAccount: AccountDetails
-    @MockK
-    protected lateinit var mockAccountRepository: AccountRepository
+  @MockK
+  protected lateinit var mockUser: AmUser
+  @MockK
+  protected lateinit var mockAccount: AccountDetails
+  @MockK
+  protected lateinit var mockAccountRepository: AccountRepository
 
-    abstract val mockService: MicroBlogService
+  abstract val mockService: MicroBlogService
 
-    override fun setUp() {
-        super.setUp()
-        with(mockUser) {
-            every { userId }.returns("123")
-        }
-        with(mockAccount) {
-            every { service }.returns(mockService)
-            every { accountKey }.returns(MicroBlogKey.twitter("123"))
-            every { type }.returns(PlatformType.Twitter)
-            every { user }.returns(mockUser)
-        }
-        every { mockAccountRepository.activeAccount }.returns(flowOf(mockAccount))
+  override fun setUp() {
+    super.setUp()
+    with(mockUser) {
+      every { userId }.returns("123")
     }
+    with(mockAccount) {
+      every { service }.returns(mockService)
+      every { accountKey }.returns(MicroBlogKey.twitter("123"))
+      every { type }.returns(PlatformType.Twitter)
+      every { user }.returns(mockUser)
+    }
+    every { mockAccountRepository.activeAccount }.returns(flowOf(mockAccount))
+  }
 }

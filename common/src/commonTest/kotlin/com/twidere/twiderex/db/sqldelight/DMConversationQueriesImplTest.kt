@@ -34,46 +34,46 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 internal class DMConversationQueriesImplTest : BaseCacheDatabaseTest() {
-    @Test
-    fun insertAll_ReplaceWhenUniqueIndexEquals() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("accountId")
-        val insert = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
-            .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)).toConversation().toDbDMConversation()
-        database.dMConversationQueries.insert(insert.copy(conversationName = "insert"))
-        assertEquals("insert", database.dMConversationQueries.findWithConversationKey(accountKey = accountKey, conversationKey = insert.conversationKey).executeAsOneOrNull()?.conversationName)
-        database.dMConversationQueries.insert(insert.copy(conversationName = "replace"))
-        assertEquals("replace", database.dMConversationQueries.findWithConversationKey(accountKey = accountKey, conversationKey = insert.conversationKey).executeAsOneOrNull()?.conversationName)
-    }
+  @Test
+  fun insertAll_ReplaceWhenUniqueIndexEquals() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("accountId")
+    val insert = mockIDirectMessage(accountId = accountKey.id, otherUserID = "other")
+      .toUi(accountKey, mockIUser(id = "other").toUi(accountKey)).toConversation().toDbDMConversation()
+    database.dMConversationQueries.insert(insert.copy(conversationName = "insert"))
+    assertEquals("insert", database.dMConversationQueries.findWithConversationKey(accountKey = accountKey, conversationKey = insert.conversationKey).executeAsOneOrNull()?.conversationName)
+    database.dMConversationQueries.insert(insert.copy(conversationName = "replace"))
+    assertEquals("replace", database.dMConversationQueries.findWithConversationKey(accountKey = accountKey, conversationKey = insert.conversationKey).executeAsOneOrNull()?.conversationName)
+  }
 
-    @Test
-    fun delete_DeleteWithUniqueIndex() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("accountId")
-        val insert = mockIDirectMessage(accountId = accountKey.id, inCome = false).toUi(accountKey, mockIUser(id = accountKey.id).toUi(accountKey))
-            .toConversation().toDbDMConversation()
-        database.dMConversationQueries.insert(insert)
-        database.dMConversationQueries.delete(
-            accountKey = insert.accountKey,
-            conversationKey = MicroBlogKey.twitter("random"),
-        )
-        database.dMConversationQueries.delete(
-            accountKey = MicroBlogKey.twitter("random"),
-            conversationKey = insert.conversationKey,
-        )
-        assertNotNull(
-            database.dMConversationQueries.findWithConversationKey(
-                accountKey = insert.accountKey,
-                conversationKey = insert.conversationKey,
-            ).executeAsOneOrNull()
-        )
-        database.dMConversationQueries.delete(
-            accountKey = insert.accountKey,
-            conversationKey = insert.conversationKey,
-        )
-        assertNull(
-            database.dMConversationQueries.findWithConversationKey(
-                accountKey = insert.accountKey,
-                conversationKey = insert.conversationKey,
-            ).executeAsOneOrNull()
-        )
-    }
+  @Test
+  fun delete_DeleteWithUniqueIndex() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("accountId")
+    val insert = mockIDirectMessage(accountId = accountKey.id, inCome = false).toUi(accountKey, mockIUser(id = accountKey.id).toUi(accountKey))
+      .toConversation().toDbDMConversation()
+    database.dMConversationQueries.insert(insert)
+    database.dMConversationQueries.delete(
+      accountKey = insert.accountKey,
+      conversationKey = MicroBlogKey.twitter("random"),
+    )
+    database.dMConversationQueries.delete(
+      accountKey = MicroBlogKey.twitter("random"),
+      conversationKey = insert.conversationKey,
+    )
+    assertNotNull(
+      database.dMConversationQueries.findWithConversationKey(
+        accountKey = insert.accountKey,
+        conversationKey = insert.conversationKey,
+      ).executeAsOneOrNull()
+    )
+    database.dMConversationQueries.delete(
+      accountKey = insert.accountKey,
+      conversationKey = insert.conversationKey,
+    )
+    assertNull(
+      database.dMConversationQueries.findWithConversationKey(
+        accountKey = insert.accountKey,
+        conversationKey = insert.conversationKey,
+      ).executeAsOneOrNull()
+    )
+  }
 }

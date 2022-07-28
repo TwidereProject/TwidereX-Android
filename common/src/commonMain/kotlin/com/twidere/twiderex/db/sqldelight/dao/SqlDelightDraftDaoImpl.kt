@@ -33,17 +33,17 @@ import com.twidere.twiderex.sqldelight.table.DraftQueries
 import kotlinx.coroutines.flow.map
 
 internal class SqlDelightDraftDaoImpl(private val queries: DraftQueries) : DraftDao {
-    override fun getAll() = queries.getAll().asUiFlow()
+  override fun getAll() = queries.getAll().asUiFlow()
 
-    override fun getDraftCount() = queries.getDraftCount().asFlow().mapToOneNotNull()
+  override fun getDraftCount() = queries.getDraftCount().asFlow().mapToOneNotNull()
 
-    override suspend fun insert(it: UiDraft) = queries.insert(it.toDbDraft())
+  override suspend fun insert(it: UiDraft) = queries.insert(it.toDbDraft())
 
-    override suspend fun get(draftId: String) = queries.get(draftId).executeAsOneOrNull()?.toUi()
+  override suspend fun get(draftId: String) = queries.get(draftId).executeAsOneOrNull()?.toUi()
 
-    override suspend fun remove(draft: UiDraft) = queries.remove(draft.draftId)
+  override suspend fun remove(draft: UiDraft) = queries.remove(draft.draftId)
 
-    private fun Query<Draft>.asUiFlow() = asFlow()
-        .mapToList()
-        .map { it.map { draft -> draft.toUi() } }
+  private fun Query<Draft>.asUiFlow() = asFlow()
+    .mapToList()
+    .map { it.map { draft -> draft.toUi() } }
 }

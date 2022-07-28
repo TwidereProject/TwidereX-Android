@@ -37,66 +37,66 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 internal class SqlDelightDirectMessageConversationDaoImpl(
-    private val database: SqlDelightCacheDatabase
+  private val database: SqlDelightCacheDatabase
 ) : DirectMessageConversationDao {
-    private val dmConversationQueries = database.dMConversationQueries
-    override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiDMConversationWithLatestMessage> {
-        return QueryPagingSource(
-            countQuery = database.dMEventQueries.getLatestMessagesInEachConversationPagingCount(accountKey = accountKey),
-            transacter = database.dMEventQueries,
-            queryProvider = { limit, offset, _ ->
-                database.dMEventQueries.getLatestMessagesInEachConversationPagingList(
-                    accountKey = accountKey,
-                    limit = limit,
-                    offset = offset
-                ).flatMap {
-                    it.toDbDMConversationWithEvent(database).toUi()
-                }
-            }
-        )
-    }
-
-    override fun findWithConversationKeyFlow(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey
-    ): Flow<UiDMConversation?> {
-        return dmConversationQueries.findWithConversationKey(
-            accountKey = accountKey,
-            conversationKey = conversationKey
-        ).asFlow()
-            .mapToOneOrNull()
-            .map { it?.toUi() }
-    }
-
-    override suspend fun findWithConversationKey(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey
-    ): UiDMConversation? {
-        return dmConversationQueries.findWithConversationKey(
-            accountKey = accountKey,
-            conversationKey = conversationKey
-        ).executeAsOneOrNull()
-            ?.toUi()
-    }
-
-    override suspend fun insertAll(listOf: List<UiDMConversation>) {
-        dmConversationQueries.transaction {
-            listOf.forEach {
-                dmConversationQueries.insert(it.toDbDMConversation())
-            }
+  private val dmConversationQueries = database.dMConversationQueries
+  override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiDMConversationWithLatestMessage> {
+    return QueryPagingSource(
+      countQuery = database.dMEventQueries.getLatestMessagesInEachConversationPagingCount(accountKey = accountKey),
+      transacter = database.dMEventQueries,
+      queryProvider = { limit, offset, _ ->
+        database.dMEventQueries.getLatestMessagesInEachConversationPagingList(
+          accountKey = accountKey,
+          limit = limit,
+          offset = offset
+        ).flatMap {
+          it.toDbDMConversationWithEvent(database).toUi()
         }
-    }
+      }
+    )
+  }
 
-    override suspend fun find(accountKey: MicroBlogKey): List<UiDMConversationWithLatestMessage> {
-        return database.dMEventQueries.getLatestMessagesInEachConversation(accountKey = accountKey)
-            .executeAsList()
-            .map { it.toDbDMConversationWithEvent(database).toUi() }
-    }
+  override fun findWithConversationKeyFlow(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey
+  ): Flow<UiDMConversation?> {
+    return dmConversationQueries.findWithConversationKey(
+      accountKey = accountKey,
+      conversationKey = conversationKey
+    ).asFlow()
+      .mapToOneOrNull()
+      .map { it?.toUi() }
+  }
 
-    override suspend fun delete(conversation: UiDMConversation) {
-        dmConversationQueries.transaction {
-            dmConversationQueries.delete(accountKey = conversation.accountKey, conversationKey = conversation.conversationKey)
-            database.dMEventQueries.clearByConversationKey(accountKey = conversation.accountKey, conversationKey = conversation.conversationKey)
-        }
+  override suspend fun findWithConversationKey(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey
+  ): UiDMConversation? {
+    return dmConversationQueries.findWithConversationKey(
+      accountKey = accountKey,
+      conversationKey = conversationKey
+    ).executeAsOneOrNull()
+      ?.toUi()
+  }
+
+  override suspend fun insertAll(listOf: List<UiDMConversation>) {
+    dmConversationQueries.transaction {
+      listOf.forEach {
+        dmConversationQueries.insert(it.toDbDMConversation())
+      }
     }
+  }
+
+  override suspend fun find(accountKey: MicroBlogKey): List<UiDMConversationWithLatestMessage> {
+    return database.dMEventQueries.getLatestMessagesInEachConversation(accountKey = accountKey)
+      .executeAsList()
+      .map { it.toDbDMConversationWithEvent(database).toUi() }
+  }
+
+  override suspend fun delete(conversation: UiDMConversation) {
+    dmConversationQueries.transaction {
+      dmConversationQueries.delete(accountKey = conversation.accountKey, conversationKey = conversation.conversationKey)
+      database.dMEventQueries.clearByConversationKey(accountKey = conversation.accountKey, conversationKey = conversation.conversationKey)
+    }
+  }
 }

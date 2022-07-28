@@ -27,17 +27,17 @@ import com.twidere.twiderex.model.ui.UiStatus
 val LocalStatusActions = compositionLocalOf<IStatusActions> { error("No LocalStatusActions") }
 
 interface IStatusActions {
-    fun like(status: UiStatus, account: AccountDetails) {}
-    fun retweet(status: UiStatus, account: AccountDetails) {}
-    fun delete(status: UiStatus, account: AccountDetails) {}
-    fun vote(status: UiStatus, account: AccountDetails, votes: List<Int>) {}
+  fun like(status: UiStatus, account: AccountDetails) {}
+  fun retweet(status: UiStatus, account: AccountDetails) {}
+  fun delete(status: UiStatus, account: AccountDetails) {}
+  fun vote(status: UiStatus, account: AccountDetails, votes: List<Int>) {}
 }
 
 expect class StatusActions : IStatusActions {
-    override fun delete(status: UiStatus, account: AccountDetails)
-    override fun like(status: UiStatus, account: AccountDetails)
-    override fun retweet(status: UiStatus, account: AccountDetails)
-    override fun vote(status: UiStatus, account: AccountDetails, votes: List<Int>)
+  override fun delete(status: UiStatus, account: AccountDetails)
+  override fun like(status: UiStatus, account: AccountDetails)
+  override fun retweet(status: UiStatus, account: AccountDetails)
+  override fun vote(status: UiStatus, account: AccountDetails, votes: List<Int>)
 }
 
 object FakeStatusActions : IStatusActions

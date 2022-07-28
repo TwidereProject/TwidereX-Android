@@ -33,99 +33,99 @@ import com.twidere.twiderex.model.ui.twitter.TwitterStatusExtra
 
 @Immutable
 data class UiStatus(
-    val statusId: String,
-    val statusKey: MicroBlogKey,
-    val htmlText: String,
-    val rawText: String,
-    val timestamp: Long,
-    val metrics: StatusMetrics,
-    val sensitive: Boolean,
-    val retweeted: Boolean,
-    val liked: Boolean,
-    val geo: UiGeo,
-    val hasMedia: Boolean,
-    val user: UiUser,
-    val media: List<UiMedia>,
-    val source: String,
-    val isGap: Boolean,
-    val url: List<UiUrlEntity>,
-    val platformType: PlatformType,
-    val spoilerText: String? = null,
-    val card: UiCard? = null,
-    val poll: UiPoll? = null,
-    val referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
-    val inReplyToUserId: String? = null,
-    val inReplyToStatusId: String? = null,
-    val extra: StatusExtra? = null
+  val statusId: String,
+  val statusKey: MicroBlogKey,
+  val htmlText: String,
+  val rawText: String,
+  val timestamp: Long,
+  val metrics: StatusMetrics,
+  val sensitive: Boolean,
+  val retweeted: Boolean,
+  val liked: Boolean,
+  val geo: UiGeo,
+  val hasMedia: Boolean,
+  val user: UiUser,
+  val media: List<UiMedia>,
+  val source: String,
+  val isGap: Boolean,
+  val url: List<UiUrlEntity>,
+  val platformType: PlatformType,
+  val spoilerText: String? = null,
+  val card: UiCard? = null,
+  val poll: UiPoll? = null,
+  val referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
+  val inReplyToUserId: String? = null,
+  val inReplyToStatusId: String? = null,
+  val extra: StatusExtra? = null
 ) {
-    val mastodonExtra: MastodonStatusExtra? = if (extra is MastodonStatusExtra) extra else null
+  val mastodonExtra: MastodonStatusExtra? = if (extra is MastodonStatusExtra) extra else null
 
-    val twitterExtra: TwitterStatusExtra? = if (extra is TwitterStatusExtra) extra else null
+  val twitterExtra: TwitterStatusExtra? = if (extra is TwitterStatusExtra) extra else null
 
-    val retweet: UiStatus? by lazy {
-        if (platformType == PlatformType.Mastodon && mastodonExtra != null && mastodonExtra.type != MastodonStatusType.Status) {
-            referenceStatus[ReferenceType.MastodonNotification]
-        } else {
-            referenceStatus[ReferenceType.Retweet]?.copy(
-                referenceStatus = referenceStatus.filterNot { it.key == ReferenceType.Retweet }
-            )
-        }
+  val retweet: UiStatus? by lazy {
+    if (platformType == PlatformType.Mastodon && mastodonExtra != null && mastodonExtra.type != MastodonStatusType.Status) {
+      referenceStatus[ReferenceType.MastodonNotification]
+    } else {
+      referenceStatus[ReferenceType.Retweet]?.copy(
+        referenceStatus = referenceStatus.filterNot { it.key == ReferenceType.Retweet }
+      )
     }
+  }
 
-    val quote: UiStatus? by lazy {
-        referenceStatus[ReferenceType.Quote]
-    }
+  val quote: UiStatus? by lazy {
+    referenceStatus[ReferenceType.Quote]
+  }
 
-    fun isInThread(detailStatusId: String? = null): Boolean {
-        return if (detailStatusId == null) {
-            // show all reply as thread
-            inReplyToStatusId != null
-        } else {
-            // in detail scene only show thread when reply to other status
-            // or reply to self
-            inReplyToStatusId != detailStatusId || inReplyToUserId == user.id
-        }
+  fun isInThread(detailStatusId: String? = null): Boolean {
+    return if (detailStatusId == null) {
+      // show all reply as thread
+      inReplyToStatusId != null
+    } else {
+      // in detail scene only show thread when reply to other status
+      // or reply to self
+      inReplyToStatusId != detailStatusId || inReplyToUserId == user.id
     }
+  }
 
-    fun generateShareLink() = "https://${statusKey.host}" + when (platformType) {
-        PlatformType.Twitter -> (retweet ?: this).let { "/${it.user.screenName}/status/${it.statusId}" }
-        PlatformType.StatusNet -> TODO()
-        PlatformType.Fanfou -> TODO()
-        PlatformType.Mastodon -> "/web/statuses/$statusId"
-    }
+  fun generateShareLink() = "https://${statusKey.host}" + when (platformType) {
+    PlatformType.Twitter -> (retweet ?: this).let { "/${it.user.screenName}/status/${it.statusId}" }
+    PlatformType.StatusNet -> TODO()
+    PlatformType.Fanfou -> TODO()
+    PlatformType.Mastodon -> "/web/statuses/$statusId"
+  }
 
-    companion object {
-        @Composable
-        fun sample() = UiStatus(
-            statusId = "",
-            htmlText = autolink.autoLink(stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_preview_thank_for_using_twidere_x)),
-            timestamp = System.currentTimeMillis(),
-            metrics = StatusMetrics(
-                retweet = 1200,
-                like = 123,
-                reply = 1100,
-            ),
-            retweeted = false,
-            liked = false,
-            geo = UiGeo(""),
-            hasMedia = true,
-            user = UiUser.sample(),
-            media = UiMedia.sample(),
-            source = "TwidereX",
-            isGap = false,
-            url = emptyList(),
-            statusKey = MicroBlogKey.Empty,
-            rawText = "",
-            platformType = PlatformType.Twitter,
-            sensitive = false
-        )
-    }
+  companion object {
+    @Composable
+    fun sample() = UiStatus(
+      statusId = "",
+      htmlText = autolink.autoLink(stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_preview_thank_for_using_twidere_x)),
+      timestamp = System.currentTimeMillis(),
+      metrics = StatusMetrics(
+        retweet = 1200,
+        like = 123,
+        reply = 1100,
+      ),
+      retweeted = false,
+      liked = false,
+      geo = UiGeo(""),
+      hasMedia = true,
+      user = UiUser.sample(),
+      media = UiMedia.sample(),
+      source = "TwidereX",
+      isGap = false,
+      url = emptyList(),
+      statusKey = MicroBlogKey.Empty,
+      rawText = "",
+      platformType = PlatformType.Twitter,
+      sensitive = false
+    )
+  }
 }
 
 interface StatusExtra
 
 data class StatusMetrics(
-    val like: Long,
-    val reply: Long,
-    val retweet: Long
+  val like: Long,
+  val reply: Long,
+  val retweet: Long
 )

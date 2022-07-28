@@ -29,28 +29,28 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 
 class SearchUserPagingSource(
-    private val accountKey: MicroBlogKey,
-    private val query: String,
-    private val service: SearchService,
-    private val following: Boolean = false
+  private val accountKey: MicroBlogKey,
+  private val query: String,
+  private val service: SearchService,
+  private val following: Boolean = false
 ) : PagingSource<Int, UiUser>() {
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UiUser> {
-        return try {
-            val page = params.key ?: 0
-            val result = service.searchUsers(query, page = page, count = defaultLoadCount, following = following).map {
-                it.toUi(accountKey)
-            }
-            LoadResult.Page(
-                data = result,
-                prevKey = null,
-                nextKey = if (result.size == defaultLoadCount) page + 1 else null
-            )
-        } catch (e: Exception) {
-            LoadResult.Error(e)
-        }
+  override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UiUser> {
+    return try {
+      val page = params.key ?: 0
+      val result = service.searchUsers(query, page = page, count = defaultLoadCount, following = following).map {
+        it.toUi(accountKey)
+      }
+      LoadResult.Page(
+        data = result,
+        prevKey = null,
+        nextKey = if (result.size == defaultLoadCount) page + 1 else null
+      )
+    } catch (e: Exception) {
+      LoadResult.Error(e)
     }
+  }
 
-    override fun getRefreshKey(state: PagingState<Int, UiUser>): Int? {
-        return null
-    }
+  override fun getRefreshKey(state: PagingState<Int, UiUser>): Int? {
+    return null
+  }
 }

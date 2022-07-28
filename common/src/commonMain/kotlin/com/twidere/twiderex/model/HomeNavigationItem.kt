@@ -31,28 +31,28 @@ import com.twidere.twiderex.component.lazy.LazyListController
 
 abstract class HomeNavigationItem {
 
-    @Composable
-    abstract fun name(): String
+  @Composable
+  abstract fun name(): String
 
-    abstract val route: String
+  abstract val route: String
 
-    @Composable
-    abstract fun icon(): Painter
-    open val withAppBar = true
-    open val lazyListController = LazyListController()
+  @Composable
+  abstract fun icon(): Painter
+  open val withAppBar = true
+  open val lazyListController = LazyListController()
 
-    @Composable
-    abstract fun Content()
+  @Composable
+  abstract fun Content()
 
-    @Composable
-    open fun Fab() {
-        // implement this method to apply FloatingActionButton
-        // FIXME: 2021/6/17 Workaround for Scaffold#256 which will filter out fab when size == 0
-        Spacer(modifier = Modifier.sizeIn(minWidth = 1.dp, minHeight = 1.dp))
-    }
+  @Composable
+  open fun Fab() {
+    // implement this method to apply FloatingActionButton
+    // FIXME: 2021/6/17 Workaround for Scaffold#256 which will filter out fab when size == 0
+    Spacer(modifier = Modifier.sizeIn(minWidth = 1.dp, minHeight = 1.dp))
+  }
 
-    open val floatingActionButtonPosition = FabPosition.End
+  open val floatingActionButtonPosition = FabPosition.End
 
-    // offset to hide fab when scroll timeline
-    open val fabSize = 0.dp
+  // offset to hide fab when scroll timeline
+  open val fabSize = 0.dp
 }

@@ -34,34 +34,34 @@ import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalPagingApi::class)
 class DMEventMediator(
-    private val conversationKey: MicroBlogKey,
-    database: CacheDatabase,
-    accountKey: MicroBlogKey,
-    realFetch: suspend (key: String?) -> List<IDirectMessage>
+  private val conversationKey: MicroBlogKey,
+  database: CacheDatabase,
+  accountKey: MicroBlogKey,
+  realFetch: suspend (key: String?) -> List<IDirectMessage>
 ) : BaseDirectMessageMediator<Int, UiDMEvent>(database, accountKey, realFetch) {
 
-    override fun reverse() = true
+  override fun reverse() = true
 
-    fun pager(
-        config: PagingConfig = PagingConfig(
-            pageSize = defaultLoadCount,
-            enablePlaceholders = false
-        ),
-        pagingSourceFactory: () -> PagingSource<Int, UiDMEvent> = {
-            database.directMessageDao()
-                .getPagingSource(accountKey = accountKey, conversationKey = conversationKey)
-        }
-    ): Pager<Int, UiDMEvent> {
-        return Pager(
-            config = config,
-            remoteMediator = this,
-            pagingSourceFactory = pagingSourceFactory,
-        )
+  fun pager(
+    config: PagingConfig = PagingConfig(
+      pageSize = defaultLoadCount,
+      enablePlaceholders = false
+    ),
+    pagingSourceFactory: () -> PagingSource<Int, UiDMEvent> = {
+      database.directMessageDao()
+        .getPagingSource(accountKey = accountKey, conversationKey = conversationKey)
     }
+  ): Pager<Int, UiDMEvent> {
+    return Pager(
+      config = config,
+      remoteMediator = this,
+      pagingSourceFactory = pagingSourceFactory,
+    )
+  }
 
-    companion object {
-        fun Pager<Int, UiDMEvent>.toUi(): Flow<PagingData<UiDMEvent>> {
-            return this.flow
-        }
+  companion object {
+    fun Pager<Int, UiDMEvent>.toUi(): Flow<PagingData<UiDMEvent>> {
+      return this.flow
     }
+  }
 }

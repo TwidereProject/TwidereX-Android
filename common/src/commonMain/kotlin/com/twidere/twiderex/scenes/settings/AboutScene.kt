@@ -68,230 +68,230 @@ import com.twidere.twiderex.ui.TwidereScene
 
 @Composable
 fun AboutScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_title))
-                    }
-                )
-            }
-        ) {
-            AboutContent()
-        }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_title))
+          }
+        )
+      }
+    ) {
+      AboutContent()
     }
+  }
 }
 
 @Composable
 private fun AboutContent() {
-    val navigator = LocalNavigator.current
-    val navController = LocalNavController.current
-    val parallaxLayoutState = rememberParallaxLayoutState(maxRotate = 2f, maxTransition = 50f)
-    Column(
-        modifier = Modifier
-            .padding(AboutContentDefaults.ContentPadding)
-            .fillMaxWidth()
+  val navigator = LocalNavigator.current
+  val navController = LocalNavController.current
+  val parallaxLayoutState = rememberParallaxLayoutState(maxRotate = 2f, maxTransition = 50f)
+  Column(
+    modifier = Modifier
+      .padding(AboutContentDefaults.ContentPadding)
+      .fillMaxWidth()
+  ) {
+    // Background and header
+    Box(
+      modifier = Modifier
+        .weight(4F)
     ) {
-        // Background and header
-        Box(
+      val aspectRatio = 1.4f // from ui design
+
+      ParallaxLayout(
+        modifier = Modifier
+          .fillMaxHeight()
+          .align(Alignment.TopEnd)
+          .horizontalScroll(state = ScrollState(0), enabled = false),
+        alignment = Alignment.TopEnd,
+        backContentOffsetX = AboutContentDefaults.BackContentOffsetX,
+        backContentOffsetY = AboutContentDefaults.BackContentOffsetY,
+        parallaxLayoutState = parallaxLayoutState,
+        backContent = {
+          Image(
+            painter = painterResource(com.twidere.twiderex.MR.files.ic_about_gray_logo_shadow),
+            contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_logo_background_shadow),
             modifier = Modifier
-                .weight(4F)
-        ) {
-            val aspectRatio = 1.4f // from ui design
-
-            ParallaxLayout(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .align(Alignment.TopEnd)
-                    .horizontalScroll(state = ScrollState(0), enabled = false),
-                alignment = Alignment.TopEnd,
-                backContentOffsetX = AboutContentDefaults.BackContentOffsetX,
-                backContentOffsetY = AboutContentDefaults.BackContentOffsetY,
-                parallaxLayoutState = parallaxLayoutState,
-                backContent = {
-                    Image(
-                        painter = painterResource(com.twidere.twiderex.MR.files.ic_about_gray_logo_shadow),
-                        contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_logo_background_shadow),
-                        modifier = Modifier
-                            .blur(30.dp)
-                            .aspectRatio(aspectRatio)
-                            .fillMaxHeight()
-                            .padding(
-                                start = AboutContentDefaults.ParallaxPaddingStart,
-                                top = AboutContentDefaults.ParallaxPaddingTop,
-                                bottom = AboutContentDefaults.ParallaxPaddingBottom
-                            ),
-                    )
-                }
-            ) {
-                Image(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_about_gray_logo),
-                    contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_logo_background),
-                    modifier = Modifier
-                        .aspectRatio(aspectRatio)
-                        .fillMaxHeight()
-                        .padding(
-                            start = AboutContentDefaults.ParallaxPaddingStart,
-                            top = AboutContentDefaults.ParallaxPaddingTop,
-                            bottom = AboutContentDefaults.ParallaxPaddingBottom
-                        )
-                        .alpha(0.5f)
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .padding(AboutContentDefaults.Logo.ContentPadding)
-                    .align(Alignment.TopStart),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                LoginLogo(modifier = Modifier.width(AboutContentDefaults.Logo.Size))
-                Box(modifier = Modifier.width(AboutContentDefaults.Logo.IconSpacing))
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                    Text(
-                        text = "Twidere X",
-                        style = MaterialTheme.typography.h4,
-                    )
-                }
-            }
-
-            // version name
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(AboutContentDefaults.VersionName.ContentPadding)
-            ) {
-                Text(
-                    text = stringResource(
-                        res = com.twidere.twiderex.MR.strings.scene_settings_about_version,
-                        BuildConfig.VERSION_NAME
-                    ),
-                )
-                Box(modifier = Modifier.height(AboutContentDefaults.VersionName.Spacing))
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                    Text(
-                        text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_description),
-                        style = MaterialTheme.typography.body2,
-                    )
-                }
-            }
+              .blur(30.dp)
+              .aspectRatio(aspectRatio)
+              .fillMaxHeight()
+              .padding(
+                start = AboutContentDefaults.ParallaxPaddingStart,
+                top = AboutContentDefaults.ParallaxPaddingTop,
+                bottom = AboutContentDefaults.ParallaxPaddingBottom
+              ),
+          )
         }
+      ) {
+        Image(
+          painter = painterResource(res = com.twidere.twiderex.MR.files.ic_about_gray_logo),
+          contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_logo_background),
+          modifier = Modifier
+            .aspectRatio(aspectRatio)
+            .fillMaxHeight()
+            .padding(
+              start = AboutContentDefaults.ParallaxPaddingStart,
+              top = AboutContentDefaults.ParallaxPaddingTop,
+              bottom = AboutContentDefaults.ParallaxPaddingBottom
+            )
+            .alpha(0.5f)
+        )
+      }
 
-        Box(modifier = Modifier.weight(1F))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(AboutContentDefaults.Icon.ContentPadding),
-            verticalAlignment = Alignment.Bottom
-        ) {
-            Row {
-                IconButton(
-                    onClick = {
-                        navController.navigate(RootDeepLinks.Twitter.User("TwidereProject"))
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_twitter),
-                        tint = MaterialTheme.colors.onBackground,
-                        contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_logo_twitter)
-                    )
-                }
-                Box(modifier = Modifier.width(AboutContentDefaults.Icon.Spacing))
-                IconButton(
-                    onClick = {
-                        navigator.openLink("https://github.com/TwidereProject/TwidereX-Android")
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_github),
-                        tint = MaterialTheme.colors.onBackground,
-                        contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_logo_github)
-                    )
-                }
-                Box(modifier = Modifier.width(AboutContentDefaults.Icon.Spacing))
-                IconButton(
-                    onClick = {
-                        navigator.openLink("https://t.me/twidere_x")
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_telegram),
-                        tint = MaterialTheme.colors.onBackground,
-                        contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_logo_github)
-                    )
-                }
-            }
-            Box(modifier = Modifier.weight(1F))
-            TextButton(
-                onClick = {
-                    navigator.openLink("https://github.com/TwidereProject/TwidereX-Android/blob/develop/LICENSE")
-                },
-                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.typography.body1.color)
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .width(IntrinsicSize.Max)
-                ) {
-                    Text(
-                        text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_license),
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier
-                            .padding(AboutContentDefaults.License.TextPadding)
-                            .wrapContentWidth(Alignment.CenterHorizontally)
-                    )
-                    Box(modifier = Modifier.height(AboutContentDefaults.License.DividerSpacing))
-                    Divider(
-                        thickness = AboutContentDefaults.License.DividerThickness,
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colors.primary
-                    )
-                }
-            }
+      Row(
+        modifier = Modifier
+          .padding(AboutContentDefaults.Logo.ContentPadding)
+          .align(Alignment.TopStart),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        LoginLogo(modifier = Modifier.width(AboutContentDefaults.Logo.Size))
+        Box(modifier = Modifier.width(AboutContentDefaults.Logo.IconSpacing))
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+          Text(
+            text = "Twidere X",
+            style = MaterialTheme.typography.h4,
+          )
         }
+      }
+
+      // version name
+      Column(
+        modifier = Modifier
+          .align(Alignment.BottomStart)
+          .padding(AboutContentDefaults.VersionName.ContentPadding)
+      ) {
+        Text(
+          text = stringResource(
+            res = com.twidere.twiderex.MR.strings.scene_settings_about_version,
+            BuildConfig.VERSION_NAME
+          ),
+        )
+        Box(modifier = Modifier.height(AboutContentDefaults.VersionName.Spacing))
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+          Text(
+            text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_description),
+            style = MaterialTheme.typography.body2,
+          )
+        }
+      }
     }
+
+    Box(modifier = Modifier.weight(1F))
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(AboutContentDefaults.Icon.ContentPadding),
+      verticalAlignment = Alignment.Bottom
+    ) {
+      Row {
+        IconButton(
+          onClick = {
+            navController.navigate(RootDeepLinks.Twitter.User("TwidereProject"))
+          }
+        ) {
+          Icon(
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_twitter),
+            tint = MaterialTheme.colors.onBackground,
+            contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_logo_twitter)
+          )
+        }
+        Box(modifier = Modifier.width(AboutContentDefaults.Icon.Spacing))
+        IconButton(
+          onClick = {
+            navigator.openLink("https://github.com/TwidereProject/TwidereX-Android")
+          }
+        ) {
+          Icon(
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_github),
+            tint = MaterialTheme.colors.onBackground,
+            contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_logo_github)
+          )
+        }
+        Box(modifier = Modifier.width(AboutContentDefaults.Icon.Spacing))
+        IconButton(
+          onClick = {
+            navigator.openLink("https://t.me/twidere_x")
+          }
+        ) {
+          Icon(
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_telegram),
+            tint = MaterialTheme.colors.onBackground,
+            contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_logo_github)
+          )
+        }
+      }
+      Box(modifier = Modifier.weight(1F))
+      TextButton(
+        onClick = {
+          navigator.openLink("https://github.com/TwidereProject/TwidereX-Android/blob/develop/LICENSE")
+        },
+        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.typography.body1.color)
+      ) {
+        Column(
+          horizontalAlignment = Alignment.CenterHorizontally,
+          modifier = Modifier
+            .width(IntrinsicSize.Max)
+        ) {
+          Text(
+            text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_license),
+            style = MaterialTheme.typography.body1,
+            modifier = Modifier
+              .padding(AboutContentDefaults.License.TextPadding)
+              .wrapContentWidth(Alignment.CenterHorizontally)
+          )
+          Box(modifier = Modifier.height(AboutContentDefaults.License.DividerSpacing))
+          Divider(
+            thickness = AboutContentDefaults.License.DividerThickness,
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colors.primary
+          )
+        }
+      }
+    }
+  }
 }
 
 private object AboutContentDefaults {
+  val ContentPadding = PaddingValues(
+    horizontal = 0.dp,
+    vertical = 24.dp,
+  )
+  val ParallaxPaddingStart = 32.dp
+  val ParallaxPaddingTop = 40.dp
+  val ParallaxPaddingBottom = 80.dp
+  val BackContentOffsetX = (-24).dp
+  val BackContentOffsetY = 24.dp
+  object Logo {
+    val Size = 44.dp
+    val IconSpacing = 24.dp
     val ContentPadding = PaddingValues(
-        horizontal = 0.dp,
-        vertical = 24.dp,
+      horizontal = 24.dp,
+      vertical = 0.dp
     )
-    val ParallaxPaddingStart = 32.dp
-    val ParallaxPaddingTop = 40.dp
-    val ParallaxPaddingBottom = 80.dp
-    val BackContentOffsetX = (-24).dp
-    val BackContentOffsetY = 24.dp
-    object Logo {
-        val Size = 44.dp
-        val IconSpacing = 24.dp
-        val ContentPadding = PaddingValues(
-            horizontal = 24.dp,
-            vertical = 0.dp
-        )
-    }
-    object VersionName {
-        val ContentPadding = PaddingValues(
-            horizontal = 24.dp,
-            vertical = 0.dp
-        )
-        val Spacing = 24.dp
-    }
-    object Icon {
-        val ContentPadding = PaddingValues(
-            horizontal = 24.dp,
-            vertical = 0.dp
-        )
-        val Spacing = 24.dp
-    }
-    object License {
-        val DividerSpacing = 4.dp
-        val TextPadding = PaddingValues(8.dp)
-        val DividerThickness = 2.dp
-    }
+  }
+  object VersionName {
+    val ContentPadding = PaddingValues(
+      horizontal = 24.dp,
+      vertical = 0.dp
+    )
+    val Spacing = 24.dp
+  }
+  object Icon {
+    val ContentPadding = PaddingValues(
+      horizontal = 24.dp,
+      vertical = 0.dp
+    )
+    val Spacing = 24.dp
+  }
+  object License {
+    val DividerSpacing = 4.dp
+    val TextPadding = PaddingValues(8.dp)
+    val DividerThickness = 2.dp
+  }
 }

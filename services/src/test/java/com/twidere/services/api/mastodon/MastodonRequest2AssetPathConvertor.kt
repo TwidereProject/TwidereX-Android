@@ -24,10 +24,10 @@ import com.twidere.services.api.common.Request2AssetPathConvertor
 import okhttp3.Request
 
 class MastodonRequest2AssetPathConvertor : Request2AssetPathConvertor {
-    companion object {
-        private const val PathPrefix = "/mastodon"
-    }
-    override fun url2Path(request: Request): String {
-        return "$PathPrefix/${request.method.lowercase()}${request.url.encodedPath}/response"
-    }
+  companion object {
+    private const val PathPrefix = "/mastodon"
+  }
+  override fun url2Path(request: Request): String {
+    return "$PathPrefix/${request.method.lowercase()}${request.url.encodedPath}/response"
+  }
 }

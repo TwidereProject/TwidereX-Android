@@ -27,19 +27,19 @@ import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
 
 class DirectMessageDeleteJob(
-    private val repository: DirectMessageRepository,
-    private val accountRepository: AccountRepository,
+  private val repository: DirectMessageRepository,
+  private val accountRepository: AccountRepository,
 ) {
-    suspend fun execute(deleteData: DirectMessageDeleteData, accountKey: MicroBlogKey) {
-        val accountDetails = accountKey.let {
-            accountRepository.findByAccountKey(accountKey = it)
-        } ?: throw Error("Can't find any account matches:$$accountKey")
-        repository.deleteMessage(
-            accountKey = deleteData.accountKey,
-            conversationKey = deleteData.conversationKey,
-            messageId = deleteData.messageId,
-            messageKey = deleteData.messageKey,
-            service = accountDetails.service as DirectMessageService
-        )
-    }
+  suspend fun execute(deleteData: DirectMessageDeleteData, accountKey: MicroBlogKey) {
+    val accountDetails = accountKey.let {
+      accountRepository.findByAccountKey(accountKey = it)
+    } ?: throw Error("Can't find any account matches:$$accountKey")
+    repository.deleteMessage(
+      accountKey = deleteData.accountKey,
+      conversationKey = deleteData.conversationKey,
+      messageId = deleteData.messageId,
+      messageKey = deleteData.messageKey,
+      service = accountDetails.service as DirectMessageService
+    )
+  }
 }

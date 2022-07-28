@@ -23,5 +23,5 @@ package com.twidere.services.api.common
 import okhttp3.Request
 
 interface Request2AssetPathConvertor {
-    fun url2Path(request: Request): String
+  fun url2Path(request: Request): String
 }

@@ -25,62 +25,62 @@ import java.awt.image.ConvolveOp
 import java.awt.image.Kernel
 
 object ImageEffectsFilter {
-    fun applyBlurFilter(bitmap: BufferedImage, radius: Int, scale: Float): BufferedImage {
-        val scaledBitmap = applyPixelFilter(bitmap, scale)
-        var result = BufferedImage(scaledBitmap.getWidth(), scaledBitmap.getHeight(), scaledBitmap.type)
+  fun applyBlurFilter(bitmap: BufferedImage, radius: Int, scale: Float): BufferedImage {
+    val scaledBitmap = applyPixelFilter(bitmap, scale)
+    var result = BufferedImage(scaledBitmap.getWidth(), scaledBitmap.getHeight(), scaledBitmap.type)
 
-        val graphics = result.getGraphics()
-        graphics.drawImage(scaledBitmap, 0, 0, null)
-        graphics.dispose()
+    val graphics = result.getGraphics()
+    graphics.drawImage(scaledBitmap, 0, 0, null)
+    graphics.dispose()
 
-        val weight: Float = 1.0f / (radius * radius)
-        val matrix = FloatArray(radius * radius)
+    val weight: Float = 1.0f / (radius * radius)
+    val matrix = FloatArray(radius * radius)
 
-        for (i in matrix.indices) {
-            matrix[i] = weight
-        }
-
-        val kernel = Kernel(radius, radius, matrix)
-        val op = ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null)
-        result = op.filter(result, null)
-
-        return result.getSubimage(
-            radius,
-            radius,
-            result.width - radius * 2,
-            result.height - radius * 2
-        )
+    for (i in matrix.indices) {
+      matrix[i] = weight
     }
 
-    fun applyPixelFilter(bitmap: BufferedImage, scale: Float): BufferedImage {
-        val w: Int = bitmap.width
-        val h: Int = bitmap.height
-        var result = scaleBitmapAspectRatio(bitmap, (w * scale).toInt(), (h * scale).toInt())
-        result = scaleBitmapAspectRatio(result, w, h)
+    val kernel = Kernel(radius, radius, matrix)
+    val op = ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null)
+    result = op.filter(result, null)
 
-        return result
-    }
+    return result.getSubimage(
+      radius,
+      radius,
+      result.width - radius * 2,
+      result.height - radius * 2
+    )
+  }
 
-    private fun scaleBitmapAspectRatio(
-        bitmap: BufferedImage,
-        width: Int,
-        height: Int
-    ): BufferedImage {
-        val boundW: Float = width.toFloat()
-        val boundH: Float = height.toFloat()
+  fun applyPixelFilter(bitmap: BufferedImage, scale: Float): BufferedImage {
+    val w: Int = bitmap.width
+    val h: Int = bitmap.height
+    var result = scaleBitmapAspectRatio(bitmap, (w * scale).toInt(), (h * scale).toInt())
+    result = scaleBitmapAspectRatio(result, w, h)
 
-        val ratioX: Float = boundW / bitmap.width
-        val ratioY: Float = boundH / bitmap.height
-        val ratio: Float = if (ratioX < ratioY) ratioX else ratioY
+    return result
+  }
 
-        val resultH = (bitmap.height * ratio).toInt()
-        val resultW = (bitmap.width * ratio).toInt()
+  private fun scaleBitmapAspectRatio(
+    bitmap: BufferedImage,
+    width: Int,
+    height: Int
+  ): BufferedImage {
+    val boundW: Float = width.toFloat()
+    val boundH: Float = height.toFloat()
 
-        val result = BufferedImage(resultW, resultH, BufferedImage.TYPE_INT_ARGB)
-        val graphics = result.createGraphics()
-        graphics.drawImage(bitmap, 0, 0, resultW, resultH, null)
-        graphics.dispose()
+    val ratioX: Float = boundW / bitmap.width
+    val ratioY: Float = boundH / bitmap.height
+    val ratio: Float = if (ratioX < ratioY) ratioX else ratioY
 
-        return result
-    }
+    val resultH = (bitmap.height * ratio).toInt()
+    val resultW = (bitmap.width * ratio).toInt()
+
+    val result = BufferedImage(resultW, resultH, BufferedImage.TYPE_INT_ARGB)
+    val graphics = result.createGraphics()
+    graphics.drawImage(bitmap, 0, 0, resultW, resultH, null)
+    graphics.dispose()
+
+    return result
+  }
 }

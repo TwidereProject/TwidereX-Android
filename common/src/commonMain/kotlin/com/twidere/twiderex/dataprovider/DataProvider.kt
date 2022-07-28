@@ -24,12 +24,12 @@ import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
 
 expect class DataProvider {
-    companion object Factory {
-        fun create(): DataProvider
-    }
-    // data provide functions....
+  companion object Factory {
+    fun create(): DataProvider
+  }
+  // data provide functions....
 
-    val appDatabase: AppDatabase
+  val appDatabase: AppDatabase
 
-    val cacheDatabase: CacheDatabase
+  val cacheDatabase: CacheDatabase
 }

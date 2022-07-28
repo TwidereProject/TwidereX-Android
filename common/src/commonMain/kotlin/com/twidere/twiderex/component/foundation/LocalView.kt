@@ -26,5 +26,5 @@ import androidx.compose.runtime.Composable
 expect fun getLocalView(): LocalView
 
 expect class LocalView() {
-    fun performHapticFeedback()
+  fun performHapticFeedback()
 }

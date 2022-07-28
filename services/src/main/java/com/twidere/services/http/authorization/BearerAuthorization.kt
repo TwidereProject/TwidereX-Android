@@ -23,12 +23,12 @@ package com.twidere.services.http.authorization
 import okhttp3.Request
 
 class BearerAuthorization(
-    private val accessToken: String,
+  private val accessToken: String,
 ) : Authorization {
-    override val hasAuthorization: Boolean
-        get() = true
+  override val hasAuthorization: Boolean
+    get() = true
 
-    override fun getAuthorizationHeader(request: Request): String {
-        return "Bearer $accessToken"
-    }
+  override fun getAuthorizationHeader(request: Request): String {
+    return "Bearer $accessToken"
+  }
 }

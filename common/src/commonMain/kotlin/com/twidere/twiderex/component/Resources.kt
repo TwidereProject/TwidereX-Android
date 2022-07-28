@@ -29,12 +29,12 @@ import dev.icerock.moko.resources.StringResource
 
 @Composable
 fun stringResource(res: StringResource, vararg formatArgs: Any): String {
-    return LocalResLoader.current.getString(res, *formatArgs)
+  return LocalResLoader.current.getString(res, *formatArgs)
 }
 
 @Composable
 fun stringResource(res: StringResource): String {
-    return LocalResLoader.current.getString(res)
+  return LocalResLoader.current.getString(res)
 }
 
 /**
@@ -42,9 +42,9 @@ fun stringResource(res: StringResource): String {
  */
 @Composable
 fun painterResource(res: Any): Painter {
-    return when (res) {
-        is FileResource -> LocalResLoader.current.getSvg(res)
-        is ImageResource -> LocalResLoader.current.getImage(res)
-        else -> throw NotImplementedError()
-    }
+  return when (res) {
+    is FileResource -> LocalResLoader.current.getSvg(res)
+    is ImageResource -> LocalResLoader.current.getImage(res)
+    else -> throw NotImplementedError()
+  }
 }

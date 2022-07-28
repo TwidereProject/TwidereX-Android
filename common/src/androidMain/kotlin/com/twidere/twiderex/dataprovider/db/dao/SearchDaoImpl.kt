@@ -30,24 +30,24 @@ import com.twidere.twiderex.room.db.transform.toUiSearch
 import kotlinx.coroutines.flow.map
 
 internal class SearchDaoImpl(private val roomAppDatabase: RoomAppDatabase) : SearchDao {
-    override suspend fun insertAll(search: List<UiSearch>) = roomAppDatabase.searchDao().insertAll(search.map { it.toDbSearch() })
+  override suspend fun insertAll(search: List<UiSearch>) = roomAppDatabase.searchDao().insertAll(search.map { it.toDbSearch() })
 
-    override fun getAll(accountKey: MicroBlogKey) = roomAppDatabase.searchDao().getAll(accountKey).map { list -> list.map { it.toUiSearch() } }
+  override fun getAll(accountKey: MicroBlogKey) = roomAppDatabase.searchDao().getAll(accountKey).map { list -> list.map { it.toUiSearch() } }
 
-    override fun getAllHistory(accountKey: MicroBlogKey) = roomAppDatabase.searchDao().getAllHistory(accountKey).map { list -> list.map { it.toUiSearch() } }
+  override fun getAllHistory(accountKey: MicroBlogKey) = roomAppDatabase.searchDao().getAllHistory(accountKey).map { list -> list.map { it.toUiSearch() } }
 
-    override fun getAllSaved(accountKey: MicroBlogKey) = roomAppDatabase.searchDao().getAllSaved(accountKey).map { list -> list.map { it.toUiSearch() } }
+  override fun getAllSaved(accountKey: MicroBlogKey) = roomAppDatabase.searchDao().getAllSaved(accountKey).map { list -> list.map { it.toUiSearch() } }
 
-    override suspend fun get(content: String, accountKey: MicroBlogKey) = roomAppDatabase.searchDao().get(content, accountKey)?.toUiSearch()
+  override suspend fun get(content: String, accountKey: MicroBlogKey) = roomAppDatabase.searchDao().get(content, accountKey)?.toUiSearch()
 
-    override suspend fun remove(search: UiSearch) {
-        roomAppDatabase.withTransaction {
-            roomAppDatabase.searchDao().get(content = search.content, accountKey = search.accountKey)
-                ?.let {
-                    roomAppDatabase.searchDao().remove(search.toDbSearch(id = it._id))
-                }
+  override suspend fun remove(search: UiSearch) {
+    roomAppDatabase.withTransaction {
+      roomAppDatabase.searchDao().get(content = search.content, accountKey = search.accountKey)
+        ?.let {
+          roomAppDatabase.searchDao().remove(search.toDbSearch(id = it._id))
         }
     }
+  }
 
-    override suspend fun clear() = roomAppDatabase.searchDao().clear()
+  override suspend fun clear() = roomAppDatabase.searchDao().clear()
 }

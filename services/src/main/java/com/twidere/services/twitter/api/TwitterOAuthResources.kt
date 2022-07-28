@@ -25,11 +25,11 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
 interface TwitterOAuthResources {
-    @FormUrlEncoded
-    @POST("/oauth/request_token")
-    suspend fun requestToken(@Field("oauth_callback") oauthCallback: String): String
+  @FormUrlEncoded
+  @POST("/oauth/request_token")
+  suspend fun requestToken(@Field("oauth_callback") oauthCallback: String): String
 
-    @FormUrlEncoded
-    @POST("/oauth/access_token")
-    suspend fun accessToken(@Field("oauth_verifier") oauthVerifier: String): String
+  @FormUrlEncoded
+  @POST("/oauth/access_token")
+  suspend fun accessToken(@Field("oauth_verifier") oauthVerifier: String): String
 }

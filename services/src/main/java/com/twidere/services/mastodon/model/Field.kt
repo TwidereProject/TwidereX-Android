@@ -27,9 +27,9 @@ import org.joda.time.DateTime
 
 @Serializable
 data class Field(
-    val name: String? = null,
-    val value: String? = null,
-    @SerialName("verified_at")
-    @Serializable(with = DateSerializerV2WithOffset::class)
-    val verifiedAt: DateTime? = null,
+  val name: String? = null,
+  val value: String? = null,
+  @SerialName("verified_at")
+  @Serializable(with = DateSerializerV2WithOffset::class)
+  val verifiedAt: DateTime? = null,
 )

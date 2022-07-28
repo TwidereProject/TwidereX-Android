@@ -24,6 +24,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Symbol(
-    val text: String? = null,
-    val indices: List<Long>? = null
+  val text: String? = null,
+  val indices: List<Long>? = null
 )

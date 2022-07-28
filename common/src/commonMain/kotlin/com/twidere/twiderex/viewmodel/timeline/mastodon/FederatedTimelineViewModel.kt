@@ -33,28 +33,28 @@ import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class FederatedTimelineViewModel(
-    dataStore: DataStore<Preferences>,
-    database: CacheDatabase,
-    private val accountRepository: AccountRepository,
+  dataStore: DataStore<Preferences>,
+  database: CacheDatabase,
+  private val accountRepository: AccountRepository,
 ) : TimelineViewModel(dataStore) {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    override val pagingMediator by lazy {
-        account.map {
-            val mastodonService = it.service as? MastodonService ?: return@map null
-            FederatedTimelineMediator(
-                mastodonService,
-                it.accountKey,
-                database,
-            )
-        }.asStateIn(viewModelScope, null)
-    }
+  override val pagingMediator by lazy {
+    account.map {
+      val mastodonService = it.service as? MastodonService ?: return@map null
+      FederatedTimelineMediator(
+        mastodonService,
+        it.accountKey,
+        database,
+      )
+    }.asStateIn(viewModelScope, null)
+  }
 
-    override val savedStateKey by lazy {
-        account.map {
-            "${it.accountKey}_federated"
-        }.asStateIn(viewModelScope, null)
-    }
+  override val savedStateKey by lazy {
+    account.map {
+      "${it.accountKey}_federated"
+    }.asStateIn(viewModelScope, null)
+  }
 }

@@ -23,6 +23,6 @@ package com.twidere.twiderex.action
 import com.twidere.twiderex.model.job.ComposeData
 
 expect class DraftAction {
-    fun delete(id: String)
-    fun save(composeData: ComposeData)
+  fun delete(id: String)
+  fun save(composeData: ComposeData)
 }

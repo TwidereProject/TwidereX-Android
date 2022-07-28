@@ -23,5 +23,5 @@ package com.twidere.services.http
 import java.io.IOException
 
 abstract class MicroBlogException : IOException() {
-    abstract val microBlogErrorMessage: String?
+  abstract val microBlogErrorMessage: String?
 }

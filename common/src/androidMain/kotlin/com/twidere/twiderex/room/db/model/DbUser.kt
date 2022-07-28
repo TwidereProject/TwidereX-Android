@@ -29,56 +29,56 @@ import com.twidere.twiderex.model.enums.PlatformType
 import kotlinx.serialization.Serializable
 
 @Entity(
-    tableName = "user",
-    indices = [Index(value = ["userKey"], unique = true)],
+  tableName = "user",
+  indices = [Index(value = ["userKey"], unique = true)],
 )
 internal data class DbUser(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    var _id: String,
-    val userId: String,
-    val name: String,
-    val userKey: MicroBlogKey,
-    val acct: MicroBlogKey,
-    val screenName: String,
-    val profileImage: String,
-    val profileBackgroundImage: String?,
-    val followersCount: Long,
-    val friendsCount: Long,
-    val listedCount: Long,
-    val htmlDesc: String,
-    val rawDesc: String,
-    val website: String?,
-    val location: String?,
-    val verified: Boolean,
-    val isProtected: Boolean,
-    val platformType: PlatformType,
-    val statusesCount: Long,
-    val extra: Json
+  /**
+   * Id that being used in the database
+   */
+  @PrimaryKey
+  var _id: String,
+  val userId: String,
+  val name: String,
+  val userKey: MicroBlogKey,
+  val acct: MicroBlogKey,
+  val screenName: String,
+  val profileImage: String,
+  val profileBackgroundImage: String?,
+  val followersCount: Long,
+  val friendsCount: Long,
+  val listedCount: Long,
+  val htmlDesc: String,
+  val rawDesc: String,
+  val website: String?,
+  val location: String?,
+  val verified: Boolean,
+  val isProtected: Boolean,
+  val platformType: PlatformType,
+  val statusesCount: Long,
+  val extra: Json
 )
 
 @Immutable
 @Serializable
 internal data class DbTwitterUserExtra(
-    val pinned_tweet_id: String?,
-    val url: List<TwitterUrlEntity>,
+  val pinned_tweet_id: String?,
+  val url: List<TwitterUrlEntity>,
 )
 
 @Immutable
 @Serializable
 internal data class TwitterUrlEntity(
-    val url: String,
-    val expandedUrl: String,
-    val displayUrl: String,
+  val url: String,
+  val expandedUrl: String,
+  val displayUrl: String,
 )
 
 @Immutable
 @Serializable
 internal data class DbMastodonUserExtra(
-    val fields: List<com.twidere.services.mastodon.model.Field>,
-    val emoji: List<com.twidere.services.mastodon.model.Emoji>,
-    val bot: Boolean,
-    val locked: Boolean,
+  val fields: List<com.twidere.services.mastodon.model.Field>,
+  val emoji: List<com.twidere.services.mastodon.model.Emoji>,
+  val bot: Boolean,
+  val locked: Boolean,
 )

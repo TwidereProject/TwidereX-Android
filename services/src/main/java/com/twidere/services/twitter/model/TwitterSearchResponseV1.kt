@@ -27,15 +27,15 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TwitterSearchResponseV1(
-    val statuses: List<Status>? = null,
+  val statuses: List<Status>? = null,
 
-    @SerialName("search_metadata")
-    val searchMetadata: SearchMetadataV1? = null
+  @SerialName("search_metadata")
+  val searchMetadata: SearchMetadataV1? = null
 ) : ISearchResponse {
-    override val nextPage: String?
-        get() = searchMetadata?.nextResults?.split("&")?.firstOrNull { it.contains("max_id=") }?.let {
-            it.substring(it.indexOf("max_id=") + "max_id=".length)
-        }
-    override val status: List<IStatus>
-        get() = statuses ?: emptyList()
+  override val nextPage: String?
+    get() = searchMetadata?.nextResults?.split("&")?.firstOrNull { it.contains("max_id=") }?.let {
+      it.substring(it.indexOf("max_id=") + "max_id=".length)
+    }
+  override val status: List<IStatus>
+    get() = statuses ?: emptyList()
 }

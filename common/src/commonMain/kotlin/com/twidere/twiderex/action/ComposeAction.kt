@@ -23,7 +23,7 @@ package com.twidere.twiderex.action
 import com.twidere.twiderex.model.job.ComposeData
 
 expect class ComposeAction {
-    fun commit(
-        data: ComposeData,
-    )
+  fun commit(
+    data: ComposeData,
+  )
 }

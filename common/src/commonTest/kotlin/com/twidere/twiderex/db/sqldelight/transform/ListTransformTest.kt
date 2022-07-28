@@ -26,21 +26,21 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class ListTransformTest {
-    @Test
-    fun transform() {
-        val ui = UiList(
-            accountKey = MicroBlogKey.twitter("account"),
-            id = "id",
-            ownerId = "ownerId",
-            title = "title",
-            descriptions = "desc",
-            mode = "mode",
-            replyPolicy = "private",
-            listKey = MicroBlogKey.twitter("list"),
-            isFollowed = true,
-            allowToSubscribe = false
-        )
-        val db = ui.toDbList()
-        assertEquals(ui, db.toUi())
-    }
+  @Test
+  fun transform() {
+    val ui = UiList(
+      accountKey = MicroBlogKey.twitter("account"),
+      id = "id",
+      ownerId = "ownerId",
+      title = "title",
+      descriptions = "desc",
+      mode = "mode",
+      replyPolicy = "private",
+      listKey = MicroBlogKey.twitter("list"),
+      isFollowed = true,
+      allowToSubscribe = false
+    )
+    val db = ui.toDbList()
+    assertEquals(ui, db.toUi())
+  }
 }

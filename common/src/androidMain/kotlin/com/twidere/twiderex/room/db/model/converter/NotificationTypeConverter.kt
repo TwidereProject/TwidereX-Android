@@ -24,13 +24,13 @@ import androidx.room.TypeConverter
 import com.twidere.twiderex.model.enums.MastodonStatusType
 
 internal class NotificationTypeConverter {
-    @TypeConverter
-    fun fromString(value: String?): MastodonStatusType? {
-        return value?.let { MastodonStatusType.valueOf(it) }
-    }
+  @TypeConverter
+  fun fromString(value: String?): MastodonStatusType? {
+    return value?.let { MastodonStatusType.valueOf(it) }
+  }
 
-    @TypeConverter
-    fun fromNotificationType(type: MastodonStatusType?): String? {
-        return type?.name
-    }
+  @TypeConverter
+  fun fromNotificationType(type: MastodonStatusType?): String? {
+    return type?.name
+  }
 }

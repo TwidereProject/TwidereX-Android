@@ -34,35 +34,35 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 actual class ComposeAction(
-    private val workManager: WorkManager,
-    private val repository: AccountRepository,
+  private val workManager: WorkManager,
+  private val repository: AccountRepository,
 ) {
-    val scope = CoroutineScope(Dispatchers.IO)
-    actual fun commit(
-        data: ComposeData,
-    ) {
-        scope.launch {
-            repository.activeAccount.firstOrNull()?.toUi()?.let { account ->
-                val platformType = account.platformType
-                val accountKey = account.userKey
-                val worker = when (platformType) {
-                    PlatformType.Twitter -> TwitterComposeWorker.create(
-                        accountKey = accountKey,
-                        data = data,
-                    )
-                    PlatformType.StatusNet -> TODO()
-                    PlatformType.Fanfou -> TODO()
-                    PlatformType.Mastodon -> MastodonComposeWorker.create(
-                        accountKey = accountKey,
-                        data = data,
-                    )
-                }
-                workManager
-                    .beginWith(SaveDraftWorker.create(data = data))
-                    .then(worker)
-                    .then(RemoveDraftWorker.create(draftId = data.draftId))
-                    .enqueue()
-            }
+  val scope = CoroutineScope(Dispatchers.IO)
+  actual fun commit(
+    data: ComposeData,
+  ) {
+    scope.launch {
+      repository.activeAccount.firstOrNull()?.toUi()?.let { account ->
+        val platformType = account.platformType
+        val accountKey = account.userKey
+        val worker = when (platformType) {
+          PlatformType.Twitter -> TwitterComposeWorker.create(
+            accountKey = accountKey,
+            data = data,
+          )
+          PlatformType.StatusNet -> TODO()
+          PlatformType.Fanfou -> TODO()
+          PlatformType.Mastodon -> MastodonComposeWorker.create(
+            accountKey = accountKey,
+            data = data,
+          )
         }
+        workManager
+          .beginWith(SaveDraftWorker.create(data = data))
+          .then(worker)
+          .then(RemoveDraftWorker.create(draftId = data.draftId))
+          .enqueue()
+      }
     }
+  }
 }

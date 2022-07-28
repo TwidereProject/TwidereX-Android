@@ -23,7 +23,7 @@ package com.twidere.twiderex
 import android.content.Context
 
 class MissingSplitsCheckerImpl : TwidereApp.MissingSplitsChecker {
-    override fun requiredSplits(context: Context): Boolean {
-        return false
-    }
+  override fun requiredSplits(context: Context): Boolean {
+    return false
+  }
 }

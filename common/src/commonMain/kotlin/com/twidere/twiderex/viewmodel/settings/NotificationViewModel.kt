@@ -28,15 +28,15 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class NotificationViewModel(
-    val notification: DataStore<NotificationPreferences>,
+  val notification: DataStore<NotificationPreferences>,
 ) : ViewModel() {
-    val enabled = notification.data.map {
-        it.enableNotification
-    }
+  val enabled = notification.data.map {
+    it.enableNotification
+  }
 
-    fun setEnabled(value: Boolean) = viewModelScope.launch {
-        notification.updateData {
-            it.copy(enableNotification = value)
-        }
+  fun setEnabled(value: Boolean) = viewModelScope.launch {
+    notification.updateData {
+      it.copy(enableNotification = value)
     }
+  }
 }

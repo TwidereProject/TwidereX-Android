@@ -21,8 +21,8 @@
 package com.twidere.twiderex.model.enums
 
 enum class MediaInsertType {
-    CAMERA,
-    RECORD_VIDEO,
-    LIBRARY,
-    GIF
+  CAMERA,
+  RECORD_VIDEO,
+  LIBRARY,
+  GIF
 }

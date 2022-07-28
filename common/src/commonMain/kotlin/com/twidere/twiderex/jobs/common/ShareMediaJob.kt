@@ -24,18 +24,18 @@ import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.kmp.RemoteNavigator
 
 class ShareMediaJob(
-    private val fileResolver: FileResolver,
-    private val remoteNavigator: RemoteNavigator
+  private val fileResolver: FileResolver,
+  private val remoteNavigator: RemoteNavigator
 ) {
-    fun execute(target: String, extraText: String) {
-        fileResolver.getMimeType(target)?.let { type ->
-            remoteNavigator.shareMedia(
-                filePath = target,
-                mimeType = type,
-                fromBackground = true,
-                extraText = extraText,
-            )
-            true
-        } ?: throw Error("Unresolved file:$target")
-    }
+  fun execute(target: String, extraText: String) {
+    fileResolver.getMimeType(target)?.let { type ->
+      remoteNavigator.shareMedia(
+        filePath = target,
+        mimeType = type,
+        fromBackground = true,
+        extraText = extraText,
+      )
+      true
+    } ?: throw Error("Unresolved file:$target")
+  }
 }

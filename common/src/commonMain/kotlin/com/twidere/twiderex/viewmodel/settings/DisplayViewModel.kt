@@ -27,47 +27,47 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class DisplayViewModel(
-    private val displayPreferences: DataStore<DisplayPreferences>
+  private val displayPreferences: DataStore<DisplayPreferences>
 ) : ViewModel() {
-    fun setUseSystemFontSize(value: Boolean) = viewModelScope.launch {
-        displayPreferences.updateData {
-            it.copy(useSystemFontSize = value)
-        }
+  fun setUseSystemFontSize(value: Boolean) = viewModelScope.launch {
+    displayPreferences.updateData {
+      it.copy(useSystemFontSize = value)
     }
+  }
 
-    fun setAvatarStyle(value: DisplayPreferences.AvatarStyle) = viewModelScope.launch {
-        displayPreferences.updateData {
-            it.copy(avatarStyle = value)
-        }
+  fun setAvatarStyle(value: DisplayPreferences.AvatarStyle) = viewModelScope.launch {
+    displayPreferences.updateData {
+      it.copy(avatarStyle = value)
     }
+  }
 
-    fun setMediaPreview(value: Boolean) = viewModelScope.launch {
-        displayPreferences.updateData {
-            it.copy(mediaPreview = value)
-        }
+  fun setMediaPreview(value: Boolean) = viewModelScope.launch {
+    displayPreferences.updateData {
+      it.copy(mediaPreview = value)
     }
+  }
 
-    fun setUrlPreview(value: Boolean) = viewModelScope.launch {
-        displayPreferences.updateData {
-            it.copy(urlPreview = value)
-        }
+  fun setUrlPreview(value: Boolean) = viewModelScope.launch {
+    displayPreferences.updateData {
+      it.copy(urlPreview = value)
     }
+  }
 
-    fun setAutoPlayback(value: DisplayPreferences.AutoPlayback) = viewModelScope.launch {
-        displayPreferences.updateData {
-            it.copy(autoPlayback = value)
-        }
+  fun setAutoPlayback(value: DisplayPreferences.AutoPlayback) = viewModelScope.launch {
+    displayPreferences.updateData {
+      it.copy(autoPlayback = value)
     }
+  }
 
-    fun commitFontScale(value: Float) = viewModelScope.launch {
-        displayPreferences.updateData {
-            it.copy(fontScale = value)
-        }
+  fun commitFontScale(value: Float) = viewModelScope.launch {
+    displayPreferences.updateData {
+      it.copy(fontScale = value)
     }
+  }
 
-    fun setMuteByDefault(value: Boolean) = viewModelScope.launch {
-        displayPreferences.updateData {
-            it.copy(muteByDefault = value)
-        }
+  fun setMuteByDefault(value: Boolean) = viewModelScope.launch {
+    displayPreferences.updateData {
+      it.copy(muteByDefault = value)
     }
+  }
 }

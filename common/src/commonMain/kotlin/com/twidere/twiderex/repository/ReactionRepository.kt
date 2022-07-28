@@ -24,31 +24,31 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 
 class ReactionRepository(
-    private val database: CacheDatabase,
+  private val database: CacheDatabase,
 ) {
-    suspend fun updateReaction(
-        accountKey: MicroBlogKey,
-        statusKey: MicroBlogKey,
-        liked: Boolean? = null,
-        retweet: Boolean? = null,
-    ) {
-        database.statusDao().updateAction(
-            statusKey = statusKey,
-            accountKey = accountKey,
-            liked = liked,
-            retweet = retweet
-        )
-        // database.reactionDao().findWithStatusKey(statusKey, accountKey).let {
-        //     it ?: DbStatusReaction(
-        //         _id = UUID.randomUUID().toString(),
-        //         statusKey = statusKey,
-        //         accountKey = accountKey,
-        //         liked = false,
-        //         retweeted = false,
-        //     )
-        // }.let {
-        //     action.invoke(it)
-        //     database.reactionDao().insertAll(listOf(it))
-        // }
-    }
+  suspend fun updateReaction(
+    accountKey: MicroBlogKey,
+    statusKey: MicroBlogKey,
+    liked: Boolean? = null,
+    retweet: Boolean? = null,
+  ) {
+    database.statusDao().updateAction(
+      statusKey = statusKey,
+      accountKey = accountKey,
+      liked = liked,
+      retweet = retweet
+    )
+    // database.reactionDao().findWithStatusKey(statusKey, accountKey).let {
+    //     it ?: DbStatusReaction(
+    //         _id = UUID.randomUUID().toString(),
+    //         statusKey = statusKey,
+    //         accountKey = accountKey,
+    //         liked = false,
+    //         retweeted = false,
+    //     )
+    // }.let {
+    //     action.invoke(it)
+    //     database.reactionDao().insertAll(listOf(it))
+    // }
+  }
 }

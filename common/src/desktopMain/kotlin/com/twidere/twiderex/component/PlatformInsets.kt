@@ -37,8 +37,8 @@ import com.twidere.twiderex.utils.OperatingSystem
 import com.twidere.twiderex.utils.currentOperatingSystem
 
 private val titleBarHeight = when (currentOperatingSystem) {
-    OperatingSystem.MacOS -> 24.dp
-    else -> 0.dp
+  OperatingSystem.MacOS -> 24.dp
+  else -> 0.dp
 }
 actual fun Modifier.topInsetsPadding(): Modifier = this.padding(top = titleBarHeight)
 actual fun Modifier.bottomInsetsPadding(): Modifier = this
@@ -52,58 +52,58 @@ actual fun Modifier.endInsetsWidth(): Modifier = this
 
 @Composable
 actual fun PlatformInsets(
-    control: NativeInsetsControl,
-    color: NativeInsetsColor,
-    content: @Composable () -> Unit,
+  control: NativeInsetsControl,
+  color: NativeInsetsColor,
+  content: @Composable () -> Unit,
 ) {
-    val nativeWindowController = LocalNativeWindowController.current
-    val darkTheme = control.darkTheme
-    LaunchedEffect(darkTheme) {
-        nativeWindowController.isAppearanceLightTitleBar = !control.darkTheme
-    }
-    Box {
-        Box(
-            modifier = Modifier
-                .padding(
-                    top = if (control.extendToTop) {
-                        0.dp
-                    } else {
-                        titleBarHeight
-                    }
-                )
-                .align(Alignment.Center)
-        ) {
-            content()
-        }
-        Spacer(
-            modifier = if (!control.extendToTop) {
-                Modifier
-                    .height(titleBarHeight)
-                    .zIndex(999F)
-                    .fillMaxWidth()
-                    .background(color.top)
-            } else {
-                Modifier
-            }.align(Alignment.TopCenter)
+  val nativeWindowController = LocalNativeWindowController.current
+  val darkTheme = control.darkTheme
+  LaunchedEffect(darkTheme) {
+    nativeWindowController.isAppearanceLightTitleBar = !control.darkTheme
+  }
+  Box {
+    Box(
+      modifier = Modifier
+        .padding(
+          top = if (control.extendToTop) {
+            0.dp
+          } else {
+            titleBarHeight
+          }
         )
+        .align(Alignment.Center)
+    ) {
+      content()
     }
+    Spacer(
+      modifier = if (!control.extendToTop) {
+        Modifier
+          .height(titleBarHeight)
+          .zIndex(999F)
+          .fillMaxWidth()
+          .background(color.top)
+      } else {
+        Modifier
+      }.align(Alignment.TopCenter)
+    )
+  }
 }
 
 @Composable
 actual fun ImeVisibleWithInsets(
-    filter: ((Boolean) -> Boolean)?,
-    collectIme: ((Boolean) -> Unit)?
+  filter: ((Boolean) -> Boolean)?,
+  collectIme: ((Boolean) -> Unit)?
 ) {
 }
 
 @Composable
 actual fun ImeHeightWithInsets(
-    filter: ((Int) -> Boolean)?,
-    collectIme: ((Int) -> Unit)?
+  filter: ((Int) -> Boolean)?,
+  collectIme: ((Int) -> Unit)?
 ) {
 }
 
 @Composable
 actual fun imeBottomInsets(): Dp {
-    return 0.dp
+  return 0.dp
 }

@@ -35,23 +35,23 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class SearchTweetsViewModel(
-    val database: CacheDatabase,
-    private val accountRepository: AccountRepository,
-    keyword: String,
+  val database: CacheDatabase,
+  private val accountRepository: AccountRepository,
+  keyword: String,
 ) : ViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val source by lazy {
-        account.flatMapLatest { account ->
-            SearchStatusMediator(
-                keyword,
-                database,
-                account.accountKey,
-                account.service as SearchService
-            ).pager().flow.map { it.map { it.status } }.cachedIn(viewModelScope)
-        }.cachedIn(viewModelScope)
-    }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  val source by lazy {
+    account.flatMapLatest { account ->
+      SearchStatusMediator(
+        keyword,
+        database,
+        account.accountKey,
+        account.service as SearchService
+      ).pager().flow.map { it.map { it.status } }.cachedIn(viewModelScope)
+    }.cachedIn(viewModelScope)
+  }
 }

@@ -52,88 +52,88 @@ import java.util.Locale
 
 @Composable
 fun ListsScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_title))
-                    },
-                )
-            },
-            floatingActionButton = {
-                ListsSceneFab()
-            },
-            floatingActionButtonPosition = FabPosition.Center
-        ) {
-            ListsSceneContent()
-        }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_title))
+          },
+        )
+      },
+      floatingActionButton = {
+        ListsSceneFab()
+      },
+      floatingActionButtonPosition = FabPosition.Center
+    ) {
+      ListsSceneContent()
     }
+  }
 }
 
 @Composable
 fun ListsSceneFab() {
-    val account = LocalActiveAccount.current ?: return
-    val navController = LocalNavController.current
-    FloatingActionButton(
-        onClick = {
-            when (account.type) {
-                PlatformType.Twitter -> navController.navigate(Root.Lists.TwitterCreate)
-                PlatformType.StatusNet -> TODO()
-                PlatformType.Fanfou -> TODO()
-                PlatformType.Mastodon -> navController.navigate(Root.Lists.MastodonCreateDialog)
-            }
-        }
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(ListsSceneDefaults.Fab.ContentPadding)
-        ) {
-            Icon(
-                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_add),
-                contentDescription = stringResource(
-                    res = com.twidere.twiderex.MR.strings.scene_lists_icons_create
-                ),
-                modifier = Modifier.padding(ListsSceneDefaults.Fab.IconPadding)
-            )
-            Text(
-                text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_create_title)
-                    .uppercase(Locale.getDefault()),
-                style = MaterialTheme.typography.button
-            )
-        }
+  val account = LocalActiveAccount.current ?: return
+  val navController = LocalNavController.current
+  FloatingActionButton(
+    onClick = {
+      when (account.type) {
+        PlatformType.Twitter -> navController.navigate(Root.Lists.TwitterCreate)
+        PlatformType.StatusNet -> TODO()
+        PlatformType.Fanfou -> TODO()
+        PlatformType.Mastodon -> navController.navigate(Root.Lists.MastodonCreateDialog)
+      }
     }
+  ) {
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier.padding(ListsSceneDefaults.Fab.ContentPadding)
+    ) {
+      Icon(
+        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_add),
+        contentDescription = stringResource(
+          res = com.twidere.twiderex.MR.strings.scene_lists_icons_create
+        ),
+        modifier = Modifier.padding(ListsSceneDefaults.Fab.IconPadding)
+      )
+      Text(
+        text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_create_title)
+          .uppercase(Locale.getDefault()),
+        style = MaterialTheme.typography.button
+      )
+    }
+  }
 }
 
 @Composable
 fun ListsSceneContent() {
-    val account = LocalActiveAccount.current ?: return
-    val navController = LocalNavController.current
-    // if list type is all , display title of each type
-    val listsViewMode: ListsViewModel = getViewModel()
-    val ownerItems = listsViewMode.ownerSource.collectAsLazyPagingItems()
-    val subscribeItems = listsViewMode.subscribedSource.collectAsLazyPagingItems()
-    val sourceItems = listsViewMode.source.collectAsLazyPagingItems()
-    SwipeToRefreshLayout(
-        refreshingState = ownerItems.loadState.refresh is LoadState.Loading,
-        onRefresh = { ownerItems.refresh() }
-    ) {
-        LazyUiListsList(
-            listType = account.listType,
-            source = sourceItems,
-            ownerItems = ownerItems,
-            subscribedItems = subscribeItems,
-            onItemClicked = { navController.navigate(Root.Lists.Timeline(it.listKey)) }
-        )
-    }
+  val account = LocalActiveAccount.current ?: return
+  val navController = LocalNavController.current
+  // if list type is all , display title of each type
+  val listsViewMode: ListsViewModel = getViewModel()
+  val ownerItems = listsViewMode.ownerSource.collectAsLazyPagingItems()
+  val subscribeItems = listsViewMode.subscribedSource.collectAsLazyPagingItems()
+  val sourceItems = listsViewMode.source.collectAsLazyPagingItems()
+  SwipeToRefreshLayout(
+    refreshingState = ownerItems.loadState.refresh is LoadState.Loading,
+    onRefresh = { ownerItems.refresh() }
+  ) {
+    LazyUiListsList(
+      listType = account.listType,
+      source = sourceItems,
+      ownerItems = ownerItems,
+      subscribedItems = subscribeItems,
+      onItemClicked = { navController.navigate(Root.Lists.Timeline(it.listKey)) }
+    )
+  }
 }
 
 private object ListsSceneDefaults {
-    object Fab {
-        val ContentPadding = PaddingValues(horizontal = 22.dp)
-        val IconPadding = PaddingValues(end = 17.dp)
-    }
+  object Fab {
+    val ContentPadding = PaddingValues(horizontal = 22.dp)
+    val IconPadding = PaddingValues(end = 17.dp)
+  }
 }

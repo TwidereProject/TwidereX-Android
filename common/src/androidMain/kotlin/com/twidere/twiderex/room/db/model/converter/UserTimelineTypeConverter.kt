@@ -24,13 +24,13 @@ import androidx.room.TypeConverter
 import com.twidere.twiderex.room.db.model.UserTimelineType
 
 internal class UserTimelineTypeConverter {
-    @TypeConverter
-    fun fromPlatformType(timelineType: UserTimelineType?): String? {
-        return timelineType?.name
-    }
+  @TypeConverter
+  fun fromPlatformType(timelineType: UserTimelineType?): String? {
+    return timelineType?.name
+  }
 
-    @TypeConverter
-    fun fromString(string: String?): UserTimelineType? {
-        return string?.let { UserTimelineType.valueOf(it) }
-    }
+  @TypeConverter
+  fun fromString(string: String?): UserTimelineType? {
+    return string?.let { UserTimelineType.valueOf(it) }
+  }
 }

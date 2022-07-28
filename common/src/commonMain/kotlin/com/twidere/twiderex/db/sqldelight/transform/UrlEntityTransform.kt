@@ -26,21 +26,21 @@ import com.twidere.twiderex.sqldelight.table.DbUrlEntity
 import java.util.UUID
 
 fun UiUrlEntity.toDbUrlEntity(belongToKey: MicroBlogKey, id: String = UUID.randomUUID().toString()) = DbUrlEntity(
-    id = id,
-    url = url,
-    belongToKey = belongToKey,
-    expandedUrl = expandedUrl,
-    displayUrl = displayUrl,
-    title = title,
-    description = description,
-    image = image
+  id = id,
+  url = url,
+  belongToKey = belongToKey,
+  expandedUrl = expandedUrl,
+  displayUrl = displayUrl,
+  title = title,
+  description = description,
+  image = image
 )
 
 fun DbUrlEntity.toUi() = UiUrlEntity(
-    url = url,
-    expandedUrl = expandedUrl,
-    displayUrl = displayUrl,
-    title = title,
-    description = description,
-    image = image
+  url = url,
+  expandedUrl = expandedUrl,
+  displayUrl = displayUrl,
+  title = title,
+  description = description,
+  image = image
 )

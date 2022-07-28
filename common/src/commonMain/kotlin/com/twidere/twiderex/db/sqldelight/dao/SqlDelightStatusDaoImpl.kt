@@ -34,55 +34,55 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class SqlDelightStatusDaoImpl(private val database: SqlDelightCacheDatabase) : StatusDao {
-    override suspend fun insertAll(listOf: List<UiStatus>, accountKey: MicroBlogKey) {
-        listOf.map { it.toDbStatusWithAttachments(accountKey) }.saveToDb(database)
-    }
+  override suspend fun insertAll(listOf: List<UiStatus>, accountKey: MicroBlogKey) {
+    listOf.map { it.toDbStatusWithAttachments(accountKey) }.saveToDb(database)
+  }
 
-    override suspend fun findWithStatusKey(
-        statusKey: MicroBlogKey,
-        accountKey: MicroBlogKey
-    ): UiStatus? {
-        return database.statusQueries.findWithStatusKey(statusKey = statusKey)
-            .executeAsList().firstOrNull()
-            ?.withAttachments(database, accountKey)
-            ?.toUi()
-    }
+  override suspend fun findWithStatusKey(
+    statusKey: MicroBlogKey,
+    accountKey: MicroBlogKey
+  ): UiStatus? {
+    return database.statusQueries.findWithStatusKey(statusKey = statusKey)
+      .executeAsList().firstOrNull()
+      ?.withAttachments(database, accountKey)
+      ?.toUi()
+  }
 
-    override fun findWithStatusKeyWithFlow(
-        statusKey: MicroBlogKey,
-        accountKey: MicroBlogKey
-    ): Flow<UiStatus?> {
-        return database.statusQueries
-            .findWithStatusKey(statusKey = statusKey)
-            .asFlow()
-            .mapToOneOrNull()
-            .map {
-                it?.withAttachments(database, accountKey)
-                    ?.toUi()
-            }
-    }
+  override fun findWithStatusKeyWithFlow(
+    statusKey: MicroBlogKey,
+    accountKey: MicroBlogKey
+  ): Flow<UiStatus?> {
+    return database.statusQueries
+      .findWithStatusKey(statusKey = statusKey)
+      .asFlow()
+      .mapToOneOrNull()
+      .map {
+        it?.withAttachments(database, accountKey)
+          ?.toUi()
+      }
+  }
 
-    override suspend fun delete(statusKey: MicroBlogKey) {
-        database.statusQueries.delete(statusKey = statusKey)
-    }
+  override suspend fun delete(statusKey: MicroBlogKey) {
+    database.statusQueries.delete(statusKey = statusKey)
+  }
 
-    override suspend fun updateAction(
-        statusKey: MicroBlogKey,
-        accountKey: MicroBlogKey,
-        liked: Boolean?,
-        retweet: Boolean?
-    ) {
-        database.statusReactionsQueries.findWithStatusKey(
-            accountKey = accountKey,
-            statusKey = statusKey
-        ).executeAsOneOrNull()
-            ?.let {
-                database.statusReactionsQueries.insert(
-                    it.copy(
-                        liked = liked ?: it.liked,
-                        retweeted = retweet ?: it.retweeted
-                    )
-                )
-            }
-    }
+  override suspend fun updateAction(
+    statusKey: MicroBlogKey,
+    accountKey: MicroBlogKey,
+    liked: Boolean?,
+    retweet: Boolean?
+  ) {
+    database.statusReactionsQueries.findWithStatusKey(
+      accountKey = accountKey,
+      statusKey = statusKey
+    ).executeAsOneOrNull()
+      ?.let {
+        database.statusReactionsQueries.insert(
+          it.copy(
+            liked = liked ?: it.liked,
+            retweeted = retweet ?: it.retweeted
+          )
+        )
+      }
+  }
 }

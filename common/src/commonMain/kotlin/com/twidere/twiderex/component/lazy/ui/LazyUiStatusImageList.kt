@@ -48,78 +48,78 @@ import com.twidere.twiderex.ui.LocalVideoPlayback
 
 @Composable
 fun LazyUiStatusImageList(
-    items: LazyPagingItems<Pair<UiMedia, UiStatus>>,
+  items: LazyPagingItems<Pair<UiMedia, UiStatus>>,
 ) {
-    LazyUiList(
-        items = items,
-        loading = { LoadingImagePlaceholder() }
-    ) {
-        LazyColumn {
-            item {
-                Box(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
-            }
-            itemsPagingGridIndexed(
-                items,
-                rowSize = 2,
-                spacing = LazyUiStatusImageListDefaults.Spacing,
-                padding = LazyUiStatusImageListDefaults.Spacing
-            ) { index, pair ->
-                pair?.let { item ->
-                    val navigator = LocalNavigator.current
-                    CompositionLocalProvider(
-                        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
-                    ) {
-                        StatusMediaPreviewItem(
-                            item.first,
-                            modifier = Modifier
-                                .aspectRatio(1F)
-                                .clip(
-                                    MaterialTheme.shapes.medium
-                                ),
-                            onClick = {
-                                navigator.media(item.second.statusKey, index)
-                            }
-                        )
-                    }
-                } ?: run {
-                    UiImagePlaceholder()
-                }
-            }
-            item {
-                Box(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
-            }
+  LazyUiList(
+    items = items,
+    loading = { LoadingImagePlaceholder() }
+  ) {
+    LazyColumn {
+      item {
+        Box(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
+      }
+      itemsPagingGridIndexed(
+        items,
+        rowSize = 2,
+        spacing = LazyUiStatusImageListDefaults.Spacing,
+        padding = LazyUiStatusImageListDefaults.Spacing
+      ) { index, pair ->
+        pair?.let { item ->
+          val navigator = LocalNavigator.current
+          CompositionLocalProvider(
+            LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
+          ) {
+            StatusMediaPreviewItem(
+              item.first,
+              modifier = Modifier
+                .aspectRatio(1F)
+                .clip(
+                  MaterialTheme.shapes.medium
+                ),
+              onClick = {
+                navigator.media(item.second.statusKey, index)
+              }
+            )
+          }
+        } ?: run {
+          UiImagePlaceholder()
         }
+      }
+      item {
+        Box(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
+      }
     }
+  }
 }
 
 object LazyUiStatusImageListDefaults {
-    val Spacing = 8.dp
+  val Spacing = 8.dp
 }
 
 @Composable
 private fun LoadingImagePlaceholder() {
-    Column(
-        modifier = Modifier
-            .wrapContentHeight(
-                align = Alignment.Top,
-                unbounded = true,
-            )
-    ) {
-        repeat(10) {
-            Row {
-                Spacer(modifier = Modifier.width(LazyUiStatusImageListDefaults.Spacing))
-                UiImagePlaceholder(
-                    modifier = Modifier.weight(1f),
-                    delayMillis = it * 50L
-                )
-                Spacer(modifier = Modifier.width(LazyUiStatusImageListDefaults.Spacing))
-                UiImagePlaceholder(
-                    modifier = Modifier.weight(1f),
-                    delayMillis = it * 50L
-                )
-                Spacer(modifier = Modifier.width(LazyUiStatusImageListDefaults.Spacing))
-            }
-            Spacer(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
-        }
+  Column(
+    modifier = Modifier
+      .wrapContentHeight(
+        align = Alignment.Top,
+        unbounded = true,
+      )
+  ) {
+    repeat(10) {
+      Row {
+        Spacer(modifier = Modifier.width(LazyUiStatusImageListDefaults.Spacing))
+        UiImagePlaceholder(
+          modifier = Modifier.weight(1f),
+          delayMillis = it * 50L
+        )
+        Spacer(modifier = Modifier.width(LazyUiStatusImageListDefaults.Spacing))
+        UiImagePlaceholder(
+          modifier = Modifier.weight(1f),
+          delayMillis = it * 50L
+        )
+        Spacer(modifier = Modifier.width(LazyUiStatusImageListDefaults.Spacing))
+      }
+      Spacer(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
     }
+  }
 }

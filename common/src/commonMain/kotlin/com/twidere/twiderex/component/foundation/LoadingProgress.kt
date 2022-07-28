@@ -33,28 +33,28 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun LoadingProgress(
-    modifier: Modifier = Modifier,
+  modifier: Modifier = Modifier,
 ) {
-    CircularProgressIndicator(
-        modifier = modifier
-            .defaultMinSize(
-                minHeight = ButtonDefaults.MinHeight,
-            )
-            .padding(ButtonDefaults.ContentPadding),
-    )
+  CircularProgressIndicator(
+    modifier = modifier
+      .defaultMinSize(
+        minHeight = ButtonDefaults.MinHeight,
+      )
+      .padding(ButtonDefaults.ContentPadding),
+  )
 }
 
 fun LazyListScope.loading() {
-    item {
-        Box(
-            modifier = Modifier.fillParentMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .heightIn(min = ButtonDefaults.MinHeight)
-                    .padding(ButtonDefaults.ContentPadding),
-            )
-        }
+  item {
+    Box(
+      modifier = Modifier.fillParentMaxWidth(),
+      contentAlignment = Alignment.Center
+    ) {
+      CircularProgressIndicator(
+        modifier = Modifier
+          .heightIn(min = ButtonDefaults.MinHeight)
+          .padding(ButtonDefaults.ContentPadding),
+      )
     }
+  }
 }

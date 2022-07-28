@@ -24,6 +24,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserEntities(
-    val url: FluffyURL? = null,
-    val description: Description? = null,
+  val url: FluffyURL? = null,
+  val description: Description? = null,
 )

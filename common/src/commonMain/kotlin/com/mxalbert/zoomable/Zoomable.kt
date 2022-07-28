@@ -63,180 +63,180 @@ import kotlin.math.roundToInt
  */
 @Composable
 fun Zoomable(
-    modifier: Modifier = Modifier,
-    state: ZoomableState = rememberZoomableState(),
-    enabled: Boolean = true,
-    dismissGestureEnabled: Boolean = false,
-    onDismiss: () -> Boolean = { false },
-    onClick: () -> Unit = {},
-    content: @Composable () -> Unit
+  modifier: Modifier = Modifier,
+  state: ZoomableState = rememberZoomableState(),
+  enabled: Boolean = true,
+  dismissGestureEnabled: Boolean = false,
+  onDismiss: () -> Boolean = { false },
+  onClick: () -> Unit = {},
+  content: @Composable () -> Unit
 ) {
-    val dismissGestureEnabledState = rememberUpdatedState(dismissGestureEnabled)
-    val scope = rememberCoroutineScope()
-    val gesturesModifier = if (!enabled) Modifier else Modifier
-        .pointerInput(Unit) {
-            detectTapAndDragGestures(
-                state = state,
-                dismissGestureEnabled = dismissGestureEnabledState,
-                onDismiss = onDismiss,
-                onClick = onClick,
-            )
-        }
-        .transformable(
-            state = rememberTransformableState { zoomChange, panChange, _ ->
-                if (state.dismissDragAbsoluteOffsetY == 0f) {
-                    scope.launch {
-                        state.onZoomChange(zoomChange)
-                        state.onDrag(panChange)
-                    }
-                }
-            }
-        )
-
-    Box(
-        modifier = modifier
-            .then(gesturesModifier)
-            .layout { measurable, constraints ->
-                val width = constraints.maxWidth
-                val height = constraints.maxHeight
-                val placeable = measurable.measure(
-                    Constraints(
-                        maxWidth = (width * state.scale).roundToInt(),
-                        maxHeight = (height * state.scale).roundToInt()
-                    )
-                )
-                state.size = IntSize(width, height)
-                state.childSize = Size(
-                    placeable.width / state.scale,
-                    placeable.height / state.scale
-                )
-                layout(width, height) {
-                    placeable.placeWithLayer(0, 0) {
-                        translationX = state.translationX - state.boundOffset.x
-                        translationY =
-                            state.translationY - state.boundOffset.y + state.dismissDragOffsetY
-                    }
-                }
-            }
-    ) {
-        content()
+  val dismissGestureEnabledState = rememberUpdatedState(dismissGestureEnabled)
+  val scope = rememberCoroutineScope()
+  val gesturesModifier = if (!enabled) Modifier else Modifier
+    .pointerInput(Unit) {
+      detectTapAndDragGestures(
+        state = state,
+        dismissGestureEnabled = dismissGestureEnabledState,
+        onDismiss = onDismiss,
+        onClick = onClick,
+      )
     }
+    .transformable(
+      state = rememberTransformableState { zoomChange, panChange, _ ->
+        if (state.dismissDragAbsoluteOffsetY == 0f) {
+          scope.launch {
+            state.onZoomChange(zoomChange)
+            state.onDrag(panChange)
+          }
+        }
+      }
+    )
+
+  Box(
+    modifier = modifier
+      .then(gesturesModifier)
+      .layout { measurable, constraints ->
+        val width = constraints.maxWidth
+        val height = constraints.maxHeight
+        val placeable = measurable.measure(
+          Constraints(
+            maxWidth = (width * state.scale).roundToInt(),
+            maxHeight = (height * state.scale).roundToInt()
+          )
+        )
+        state.size = IntSize(width, height)
+        state.childSize = Size(
+          placeable.width / state.scale,
+          placeable.height / state.scale
+        )
+        layout(width, height) {
+          placeable.placeWithLayer(0, 0) {
+            translationX = state.translationX - state.boundOffset.x
+            translationY =
+              state.translationY - state.boundOffset.y + state.dismissDragOffsetY
+          }
+        }
+      }
+  ) {
+    content()
+  }
 }
 
 internal suspend fun PointerInputScope.detectTapAndDragGestures(
-    state: ZoomableState,
-    dismissGestureEnabled: State<Boolean>,
-    onDismiss: () -> Boolean,
-    onClick: () -> Unit
+  state: ZoomableState,
+  dismissGestureEnabled: State<Boolean>,
+  onDismiss: () -> Boolean,
+  onClick: () -> Unit
 ) = coroutineScope {
-    launch {
-        detectTapGestures(
-            onDoubleTap = { offset ->
-                launch {
-                    val isZooming = state.isZooming
-                    val targetScale =
-                        if (isZooming) state.minScale else state.doubleTapScale
-                    state.animateScaleTo(
-                        targetScale = targetScale,
-                        targetTranslation = if (isZooming) {
-                            Offset.Zero
-                        } else {
-                            state.calculateTargetTranslation(offset) * targetScale
-                        }
-                    )
-                }
-            },
-            onPress = {
-                state.onPress()
-            },
-            onTap = {
-                onClick.invoke()
+  launch {
+    detectTapGestures(
+      onDoubleTap = { offset ->
+        launch {
+          val isZooming = state.isZooming
+          val targetScale =
+            if (isZooming) state.minScale else state.doubleTapScale
+          state.animateScaleTo(
+            targetScale = targetScale,
+            targetTranslation = if (isZooming) {
+              Offset.Zero
+            } else {
+              state.calculateTargetTranslation(offset) * targetScale
             }
-        )
-    }
-    launch {
-        detectDragGestures(
-            state = state,
-            dismissGestureEnabled = dismissGestureEnabled,
-            onDrag = { change, dragAmount ->
-                if (state.isZooming) {
-                    launch {
-                        state.onDrag(dragAmount)
-                        state.addPosition(
-                            change.uptimeMillis,
-                            change.position
-                        )
-                    }
-                } else {
-                    state.onDismissDrag(dragAmount.y)
-                }
-            },
-            onDragCancel = {
-                if (state.isZooming) {
-                    state.resetTracking()
-                } else {
-                    launch {
-                        state.onDismissDragEnd()
-                    }
-                }
-            },
-            onDragEnd = {
-                launch {
-                    if (state.isZooming) {
-                        state.onDragEnd()
-                    } else {
-                        if (!(state.shouldDismiss && onDismiss())) {
-                            state.onDismissDragEnd()
-                        }
-                    }
-                }
+          )
+        }
+      },
+      onPress = {
+        state.onPress()
+      },
+      onTap = {
+        onClick.invoke()
+      }
+    )
+  }
+  launch {
+    detectDragGestures(
+      state = state,
+      dismissGestureEnabled = dismissGestureEnabled,
+      onDrag = { change, dragAmount ->
+        if (state.isZooming) {
+          launch {
+            state.onDrag(dragAmount)
+            state.addPosition(
+              change.uptimeMillis,
+              change.position
+            )
+          }
+        } else {
+          state.onDismissDrag(dragAmount.y)
+        }
+      },
+      onDragCancel = {
+        if (state.isZooming) {
+          state.resetTracking()
+        } else {
+          launch {
+            state.onDismissDragEnd()
+          }
+        }
+      },
+      onDragEnd = {
+        launch {
+          if (state.isZooming) {
+            state.onDragEnd()
+          } else {
+            if (!(state.shouldDismiss && onDismiss())) {
+              state.onDismissDragEnd()
             }
-        )
-    }
+          }
+        }
+      }
+    )
+  }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 private suspend fun PointerInputScope.detectDragGestures(
-    state: ZoomableState,
-    dismissGestureEnabled: State<Boolean>,
-    onDragEnd: () -> Unit = {},
-    onDragCancel: () -> Unit = {},
-    onDrag: (change: PointerInputChange, dragAmount: Offset) -> Unit
+  state: ZoomableState,
+  dismissGestureEnabled: State<Boolean>,
+  onDragEnd: () -> Unit = {},
+  onDragCancel: () -> Unit = {},
+  onDrag: (change: PointerInputChange, dragAmount: Offset) -> Unit
 ) {
-    forEachGesture {
-        awaitPointerEventScope {
-            // We have to always call this or we'll get a crash if we do nothing
-            val down = awaitFirstDown(requireUnconsumed = false)
-            if (state.isZooming || dismissGestureEnabled.value) {
-                var overSlop = Offset.Zero
-                val drag = if (state.isZooming) {
-                    awaitTouchSlopOrCancellation(down.id) { change, over ->
-                        if (change.positionChange() != Offset.Zero) change.consume()
-                        overSlop = over
-                    }
-                } else {
-                    awaitVerticalTouchSlopOrCancellation(down.id) { change, over ->
-                        if (change.positionChange() != Offset.Zero) change.consume()
-                        overSlop = Offset(0f, over)
-                    }
-                }
-                if (drag != null) {
-                    onDrag(drag, overSlop)
-                    if (
-                        !drag(drag.id) { change ->
-                            onDrag(change, change.positionChange())
-                            if (change.positionChange() != Offset.Zero) change.consume()
-                        }
-                    ) {
-                        onDragCancel()
-                    } else {
-                        onDragEnd()
-                    }
-                }
-            }
+  forEachGesture {
+    awaitPointerEventScope {
+      // We have to always call this or we'll get a crash if we do nothing
+      val down = awaitFirstDown(requireUnconsumed = false)
+      if (state.isZooming || dismissGestureEnabled.value) {
+        var overSlop = Offset.Zero
+        val drag = if (state.isZooming) {
+          awaitTouchSlopOrCancellation(down.id) { change, over ->
+            if (change.positionChange() != Offset.Zero) change.consume()
+            overSlop = over
+          }
+        } else {
+          awaitVerticalTouchSlopOrCancellation(down.id) { change, over ->
+            if (change.positionChange() != Offset.Zero) change.consume()
+            overSlop = Offset(0f, over)
+          }
         }
+        if (drag != null) {
+          onDrag(drag, overSlop)
+          if (
+            !drag(drag.id) { change ->
+              onDrag(change, change.positionChange())
+              if (change.positionChange() != Offset.Zero) change.consume()
+            }
+          ) {
+            onDragCancel()
+          } else {
+            onDragEnd()
+          }
+        }
+      }
     }
+  }
 }
 
 private fun ZoomableState.calculateTargetTranslation(doubleTapPoint: Offset): Offset =
-    (size.toSize().center + Offset(translationX, translationY) - doubleTapPoint) / scale
+  (size.toSize().center + Offset(translationX, translationY) - doubleTapPoint) / scale

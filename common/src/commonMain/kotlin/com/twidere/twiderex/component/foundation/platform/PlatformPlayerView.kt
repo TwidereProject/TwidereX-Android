@@ -28,25 +28,25 @@ import com.twidere.twiderex.component.foundation.PlayerCallBack
 import com.twidere.twiderex.component.foundation.PlayerProgressCallBack
 
 expect class PlatformPlayerView(
-    url: String,
-    httpConfig: HttpConfig,
-    zOrderMediaOverlay: Boolean,
-    keepScreenOn: Boolean,
-    backgroundColor: Color?,
-    onClick: (() -> Unit)?
+  url: String,
+  httpConfig: HttpConfig,
+  zOrderMediaOverlay: Boolean,
+  keepScreenOn: Boolean,
+  backgroundColor: Color?,
+  onClick: (() -> Unit)?
 ) {
-    fun registerPlayerCallback(callBack: PlayerCallBack)
-    fun registerProgressCallback(callBack: PlayerProgressCallBack)
-    fun removePlayerCallback(callback: PlayerCallBack)
-    fun removeProgressCallback(callback: PlayerProgressCallBack)
-    fun play()
-    fun pause()
-    fun contentPosition(): Long
-    fun duration(): Long
-    fun seekTo(time: Long)
-    fun setVolume(volume: Float)
-    fun setMute(mute: Boolean)
-    fun release()
-    @Composable
-    fun Content(modifier: Modifier, update: () -> Unit)
+  fun registerPlayerCallback(callBack: PlayerCallBack)
+  fun registerProgressCallback(callBack: PlayerProgressCallBack)
+  fun removePlayerCallback(callback: PlayerCallBack)
+  fun removeProgressCallback(callback: PlayerProgressCallBack)
+  fun play()
+  fun pause()
+  fun contentPosition(): Long
+  fun duration(): Long
+  fun seekTo(time: Long)
+  fun setVolume(volume: Float)
+  fun setMute(mute: Boolean)
+  fun release()
+  @Composable
+  fun Content(modifier: Modifier, update: () -> Unit)
 }

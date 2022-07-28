@@ -31,18 +31,18 @@ import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class FollowingViewModel(
-    private val repository: UserListRepository,
-    private val accountRepository: AccountRepository,
-    private val userKey: MicroBlogKey,
+  private val repository: UserListRepository,
+  private val accountRepository: AccountRepository,
+  private val userKey: MicroBlogKey,
 ) : UserListViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override val source by lazy {
-        account.flatMapLatest { account ->
-            repository.following(userKey, account.service as RelationshipService)
-        }.cachedIn(viewModelScope)
-    }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  override val source by lazy {
+    account.flatMapLatest { account ->
+      repository.following(userKey, account.service as RelationshipService)
+    }.cachedIn(viewModelScope)
+  }
 }

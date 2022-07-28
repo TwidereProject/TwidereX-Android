@@ -46,70 +46,70 @@ import com.twidere.twiderex.viewmodel.settings.StorageViewModel
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun StorageScene() {
-    val viewModel: StorageViewModel = getViewModel()
-    val loading by viewModel.loading.observeAsState(initial = false)
+  val viewModel: StorageViewModel = getViewModel()
+  val loading by viewModel.loading.observeAsState(initial = false)
 
-    if (loading) {
-        Dialog(
-            onDismissRequest = { },
-            properties = DialogProperties(
-                dismissOnBackPress = false,
-                dismissOnClickOutside = false,
-            )
-        ) {
-            CircularProgressIndicator()
-        }
+  if (loading) {
+    Dialog(
+      onDismissRequest = { },
+      properties = DialogProperties(
+        dismissOnBackPress = false,
+        dismissOnClickOutside = false,
+      )
+    ) {
+      CircularProgressIndicator()
     }
+  }
 
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_title))
-                    }
-                )
-            }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_title))
+          }
+        )
+      }
+    ) {
+      Column(
+        modifier = Modifier.verticalScroll(rememberScrollState()),
+      ) {
+        ListItem(
+          modifier = Modifier
+            .clickable {
+              viewModel.clearSearchHistory()
+            },
         ) {
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
-            ) {
-                ListItem(
-                    modifier = Modifier
-                        .clickable {
-                            viewModel.clearSearchHistory()
-                        },
-                ) {
-                    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_search_title))
-                }
-                ListItem(
-                    modifier = Modifier
-                        .clickable {
-                            viewModel.clearImageCache()
-                        },
-                    text = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_media_title))
-                    },
-                    secondaryText = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_media_sub_title))
-                    },
-                )
-                ListItem(
-                    modifier = Modifier
-                        .clickable {
-                            viewModel.clearAllCaches()
-                        },
-                    text = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_all_title), color = Color.Red)
-                    },
-                    secondaryText = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_all_sub_title))
-                    },
-                )
-            }
+          Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_search_title))
         }
+        ListItem(
+          modifier = Modifier
+            .clickable {
+              viewModel.clearImageCache()
+            },
+          text = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_media_title))
+          },
+          secondaryText = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_media_sub_title))
+          },
+        )
+        ListItem(
+          modifier = Modifier
+            .clickable {
+              viewModel.clearAllCaches()
+            },
+          text = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_all_title), color = Color.Red)
+          },
+          secondaryText = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_all_sub_title))
+          },
+        )
+      }
     }
+  }
 }

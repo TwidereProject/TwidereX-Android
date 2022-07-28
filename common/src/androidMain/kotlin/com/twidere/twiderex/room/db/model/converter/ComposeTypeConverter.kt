@@ -24,13 +24,13 @@ import androidx.room.TypeConverter
 import com.twidere.twiderex.model.enums.ComposeType
 
 internal class ComposeTypeConverter {
-    @TypeConverter
-    fun fromString(value: String?): ComposeType? {
-        return value?.let { ComposeType.valueOf(it) }
-    }
+  @TypeConverter
+  fun fromString(value: String?): ComposeType? {
+    return value?.let { ComposeType.valueOf(it) }
+  }
 
-    @TypeConverter
-    fun fromComposeType(composeType: ComposeType?): String? {
-        return composeType?.name
-    }
+  @TypeConverter
+  fun fromComposeType(composeType: ComposeType?): String? {
+    return composeType?.name
+  }
 }

@@ -27,40 +27,40 @@ val StorageProvider.cacheFiles get() = CacheFiles(cacheDir = cacheDir, mediaCach
 val StorageProvider.appFiles get() = AppFiles(appDir)
 
 class CacheFiles(private val cacheDir: String, private val mediaCacheDir: String) {
-    fun mediaFile(name: String) = "${mediaCacheDir.mkdirs()}/$name"
+  fun mediaFile(name: String) = "${mediaCacheDir.mkdirs()}/$name"
 
-    val dataDir get() = "$cacheDir/data".mkdirs()
-    fun dataFile(name: String) = "$dataDir/$name"
+  val dataDir get() = "$cacheDir/data".mkdirs()
+  fun dataFile(name: String) = "$dataDir/$name"
 
-    val databaseDir get() = "$cacheDir/database".mkdirs()
-    fun databaseFile(name: String) = "$databaseDir/$name"
+  val databaseDir get() = "$cacheDir/database".mkdirs()
+  fun databaseFile(name: String) = "$databaseDir/$name"
 }
 
 class AppFiles(private val appDir: String) {
-    val mediaDir get() = "$appDir/medias".mkdirs()
-    fun mediaFile(name: String) = "$mediaDir/$name"
+  val mediaDir get() = "$appDir/medias".mkdirs()
+  fun mediaFile(name: String) = "$mediaDir/$name"
 
-    val dataStoreDir get() = "$appDir/datastore".mkdirs()
-    fun dataStoreFile(name: String) = "$dataStoreDir/$name"
+  val dataStoreDir get() = "$appDir/datastore".mkdirs()
+  fun dataStoreFile(name: String) = "$dataStoreDir/$name"
 
-    val databaseDir get() = "$appDir/database".mkdirs()
-    fun databaseFile(name: String) = "$databaseDir/$name"
+  val databaseDir get() = "$appDir/database".mkdirs()
+  fun databaseFile(name: String) = "$databaseDir/$name"
 }
 
 fun String.mkdirs(): String {
-    File(this).apply {
-        if (!exists()) mkdirs()
-    }
-    return this
+  File(this).apply {
+    if (!exists()) mkdirs()
+  }
+  return this
 }
 
 fun String.file(createIfNotExists: Boolean = true): File {
-    return File(this).apply {
-        if (createIfNotExists && !exists()) createNewFile()
-    }
+  return File(this).apply {
+    if (createIfNotExists && !exists()) createNewFile()
+  }
 }
 
 fun String.mkFile(): String {
-    file()
-    return this
+  file()
+  return this
 }

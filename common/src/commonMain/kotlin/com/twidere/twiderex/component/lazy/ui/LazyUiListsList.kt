@@ -63,196 +63,196 @@ import java.util.Locale
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LazyUiListsList(
-    listType: ListType,
-    modifier: Modifier = Modifier,
-    source: LazyPagingItems<UiList>,
-    ownerItems: LazyPagingItems<UiList>,
-    subscribedItems: LazyPagingItems<UiList>,
-    state: LazyListState = rememberLazyListState(),
-    onItemClicked: (UiList) -> Unit = {},
-    header: LazyListScope.() -> Unit = {},
+  listType: ListType,
+  modifier: Modifier = Modifier,
+  source: LazyPagingItems<UiList>,
+  ownerItems: LazyPagingItems<UiList>,
+  subscribedItems: LazyPagingItems<UiList>,
+  state: LazyListState = rememberLazyListState(),
+  onItemClicked: (UiList) -> Unit = {},
+  header: LazyListScope.() -> Unit = {},
 ) {
-    LazyUiList(
-        items = source,
-        empty = { EmptyList() },
-        loading = { LoadingListsPlaceholder() }
+  LazyUiList(
+    items = source,
+    empty = { EmptyList() },
+    loading = { LoadingListsPlaceholder() }
+  ) {
+    LazyColumn(
+      modifier = modifier,
+      state = state,
     ) {
-        LazyColumn(
-            modifier = modifier,
-            state = state,
-        ) {
-            header.invoke(this)
-            // my lists title
-            if (listType == ListType.All) {
-                item {
-                    LazyUiListTitleItem(
-                        title = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_tabs_created).uppercase(
-                            Locale.getDefault()
-                        )
-                    )
-                }
-            }
-            if (listType == ListType.All || listType == ListType.Owned) {
-                items(
-                    ownerItems,
-                    key = { it.listKey.hashCode() }
-                ) {
-                    if (it != null) {
-                        LazyUiListItem(
-                            uiList = it,
-                            onItemClicked = onItemClicked
-                        )
-                    } else {
-                        LazyUiListItemPlaceHolder()
-                    }
-                }
-                loadState(ownerItems.loadState.append) {
-                    ownerItems.retry()
-                }
-            }
-            if (listType == ListType.All) {
-                item {
-                    LazyUiListTitleItem(
-                        title = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_tabs_subscribed).uppercase(
-                            Locale.getDefault()
-                        ),
-                        divider = true
-                    )
-                }
-            }
-
-            if (listType == ListType.All || listType == ListType.Subscribed) {
-                items(
-                    subscribedItems,
-                    key = { it.listKey.hashCode() }
-                ) {
-                    if (it != null) {
-                        LazyUiListItem(
-                            uiList = it,
-                            onItemClicked = onItemClicked
-                        )
-                    } else {
-                        LazyUiListItemPlaceHolder()
-                    }
-                }
-                loadState(subscribedItems.loadState.append) {
-                    subscribedItems.retry()
-                }
-            }
+      header.invoke(this)
+      // my lists title
+      if (listType == ListType.All) {
+        item {
+          LazyUiListTitleItem(
+            title = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_tabs_created).uppercase(
+              Locale.getDefault()
+            )
+          )
         }
+      }
+      if (listType == ListType.All || listType == ListType.Owned) {
+        items(
+          ownerItems,
+          key = { it.listKey.hashCode() }
+        ) {
+          if (it != null) {
+            LazyUiListItem(
+              uiList = it,
+              onItemClicked = onItemClicked
+            )
+          } else {
+            LazyUiListItemPlaceHolder()
+          }
+        }
+        loadState(ownerItems.loadState.append) {
+          ownerItems.retry()
+        }
+      }
+      if (listType == ListType.All) {
+        item {
+          LazyUiListTitleItem(
+            title = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_tabs_subscribed).uppercase(
+              Locale.getDefault()
+            ),
+            divider = true
+          )
+        }
+      }
+
+      if (listType == ListType.All || listType == ListType.Subscribed) {
+        items(
+          subscribedItems,
+          key = { it.listKey.hashCode() }
+        ) {
+          if (it != null) {
+            LazyUiListItem(
+              uiList = it,
+              onItemClicked = onItemClicked
+            )
+          } else {
+            LazyUiListItemPlaceHolder()
+          }
+        }
+        loadState(subscribedItems.loadState.append) {
+          subscribedItems.retry()
+        }
+      }
     }
+  }
 }
 
 @Composable
 fun LoadingListsPlaceholder() {
-    Column(
-        modifier = Modifier
-            .wrapContentHeight(
-                align = Alignment.Top,
-                unbounded = true
-            )
-    ) {
-        repeat(10) {
-            LazyUiListItemPlaceHolder(
-                delayMillis = it * 50L
-            )
-            StatusDivider()
-        }
+  Column(
+    modifier = Modifier
+      .wrapContentHeight(
+        align = Alignment.Top,
+        unbounded = true
+      )
+  ) {
+    repeat(10) {
+      LazyUiListItemPlaceHolder(
+        delayMillis = it * 50L
+      )
+      StatusDivider()
     }
+  }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun LazyUiListItemPlaceHolder(
-    delayMillis: Long = 0,
+  delayMillis: Long = 0,
 ) {
-    DividerListItem {
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-            TextPlaceHolder(length = 10, delayMillis = delayMillis)
-        }
+  DividerListItem {
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+      TextPlaceHolder(length = 10, delayMillis = delayMillis)
     }
+  }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun LazyUiListItem(uiList: UiList, onItemClicked: (UiList) -> Unit = {}) {
-    DividerListItem(
-        modifier = Modifier.clickable {
-            onItemClicked.invoke(uiList)
-        },
-        trailing = {
-            if (uiList.isPrivate) {
-                Icon(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_lock),
-                    contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_icons_private),
-                    modifier = Modifier
-                        .alpha(ContentAlpha.disabled)
-                        .size(LazyUiListsItemDefaults.LockIconSize)
-                )
-            }
-        }
-    ) {
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-            Text(
-                text = uiList.title,
-                style = MaterialTheme.typography.body1,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
+  DividerListItem(
+    modifier = Modifier.clickable {
+      onItemClicked.invoke(uiList)
+    },
+    trailing = {
+      if (uiList.isPrivate) {
+        Icon(
+          painter = painterResource(res = com.twidere.twiderex.MR.files.ic_lock),
+          contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_icons_private),
+          modifier = Modifier
+            .alpha(ContentAlpha.disabled)
+            .size(LazyUiListsItemDefaults.LockIconSize)
+        )
+      }
     }
+  ) {
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+      Text(
+        text = uiList.title,
+        style = MaterialTheme.typography.body1,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+      )
+    }
+  }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun LazyUiListTitleItem(title: String, divider: Boolean = false) {
-    DividerListItem(divider = divider) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.button,
-        )
-    }
+  DividerListItem(divider = divider) {
+    Text(
+      text = title,
+      style = MaterialTheme.typography.button,
+    )
+  }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun DividerListItem(
-    modifier: Modifier = Modifier,
-    divider: Boolean = false,
-    trailing: @Composable (() -> Unit)? = null,
-    text: @Composable () -> Unit
+  modifier: Modifier = Modifier,
+  divider: Boolean = false,
+  trailing: @Composable (() -> Unit)? = null,
+  text: @Composable () -> Unit
 ) {
-    Column {
-        if (divider) {
-            Divider(
-                Modifier.padding(start = LazyUiListsItemDefaults.HorizontalPadding),
-                thickness = LazyUiListsItemDefaults.DividerThickness
-            )
-        }
-        ListItem(
-            modifier = modifier,
-            text = text,
-            trailing = trailing
-        )
+  Column {
+    if (divider) {
+      Divider(
+        Modifier.padding(start = LazyUiListsItemDefaults.HorizontalPadding),
+        thickness = LazyUiListsItemDefaults.DividerThickness
+      )
     }
+    ListItem(
+      modifier = modifier,
+      text = text,
+      trailing = trailing
+    )
+  }
 }
 
 @Composable
 private fun EmptyList() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_empty_list),
-            contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_no_tweets_found_title)
-        )
-    }
+  Column(
+    modifier = Modifier.fillMaxSize(),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center
+  ) {
+    Icon(
+      painter = painterResource(res = com.twidere.twiderex.MR.files.ic_empty_list),
+      contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_no_tweets_found_title)
+    )
+  }
 }
 
 private object LazyUiListsItemDefaults {
-    val HorizontalPadding = 16.dp
-    val LockIconSize = 16.dp
-    val DividerThickness = 1.dp
+  val HorizontalPadding = 16.dp
+  val LockIconSize = 16.dp
+  val DividerThickness = 1.dp
 }

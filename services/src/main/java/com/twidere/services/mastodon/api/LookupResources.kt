@@ -26,13 +26,13 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface LookupResources {
-    @GET("/api/v1/accounts/{id}")
-    suspend fun lookupUser(
-        @Path(value = "id") id: String,
-    ): Account
+  @GET("/api/v1/accounts/{id}")
+  suspend fun lookupUser(
+    @Path(value = "id") id: String,
+  ): Account
 
-    @GET("/api/v1/statuses/{id}")
-    suspend fun lookupStatus(
-        @Path("id") id: String,
-    ): Status
+  @GET("/api/v1/statuses/{id}")
+  suspend fun lookupStatus(
+    @Path("id") id: String,
+  ): Status
 }
