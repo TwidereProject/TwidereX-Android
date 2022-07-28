@@ -33,21 +33,21 @@ import androidx.compose.ui.Modifier
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
 fun ColoredSwitch(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    colors: SwitchColors = SwitchDefaults.colors(
-        checkedThumbColor = MaterialTheme.colors.primaryVariant,
-    )
+  checked: Boolean,
+  onCheckedChange: (Boolean) -> Unit,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+  colors: SwitchColors = SwitchDefaults.colors(
+    checkedThumbColor = MaterialTheme.colors.primaryVariant,
+  )
 ) {
-    Switch(
-        checked = checked,
-        onCheckedChange = onCheckedChange,
-        modifier = modifier,
-        enabled = enabled,
-        interactionSource = interactionSource,
-        colors = colors,
-    )
+  Switch(
+    checked = checked,
+    onCheckedChange = onCheckedChange,
+    modifier = modifier,
+    enabled = enabled,
+    interactionSource = interactionSource,
+    colors = colors,
+  )
 }

@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.Flow
 val LocalPlatformWindow = staticCompositionLocalOf<PlatformWindow> { error("No Platform Window") }
 
 expect class PlatformWindow {
-    val windowBarVisibility: Flow<Boolean>
-    fun hideControls()
-    fun showControls()
+  val windowBarVisibility: Flow<Boolean>
+  fun hideControls()
+  fun showControls()
 }

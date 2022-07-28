@@ -25,30 +25,30 @@ import androidx.compose.runtime.compositionLocalOf
 val LocalBackDispatcherOwner = compositionLocalOf<BackDispatcherOwner?> { null }
 
 interface BackDispatcherOwner {
-    val backDispatcher: BackDispatcher
+  val backDispatcher: BackDispatcher
 }
 
 class BackDispatcher {
-    private val handlers = arrayListOf<BackHandler>()
+  private val handlers = arrayListOf<BackHandler>()
 
-    fun onBackPress(): Boolean {
-        for (it in handlers) {
-            if (it.handleBackPress()) {
-                return true
-            }
-        }
-        return false
+  fun onBackPress(): Boolean {
+    for (it in handlers) {
+      if (it.handleBackPress()) {
+        return true
+      }
     }
+    return false
+  }
 
-    internal fun register(handler: BackHandler) {
-        handlers.add(0, handler)
-    }
+  internal fun register(handler: BackHandler) {
+    handlers.add(0, handler)
+  }
 
-    internal fun unregister(handler: BackHandler) {
-        handlers.remove(handler)
-    }
+  internal fun unregister(handler: BackHandler) {
+    handlers.remove(handler)
+  }
 }
 
 interface BackHandler {
-    fun handleBackPress(): Boolean
+  fun handleBackPress(): Boolean
 }

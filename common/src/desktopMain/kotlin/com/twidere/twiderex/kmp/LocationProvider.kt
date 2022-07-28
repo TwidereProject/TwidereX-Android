@@ -27,23 +27,23 @@ import kotlinx.coroutines.flow.flowOf
 
 @Composable
 actual fun RequestLocationPermission(
-    onPermissionGrantt: () -> Unit,
-    content: @Composable (launchRequest: () -> Unit) -> Unit,
+  onPermissionGrantt: () -> Unit,
+  content: @Composable (launchRequest: () -> Unit) -> Unit,
 ) {
-    content.invoke {}
+  content.invoke {}
 }
 
 // TODO: implementation
 actual class LocationProvider {
-    actual val location: Flow<Location?>
-        get() = flowOf(null)
+  actual val location: Flow<Location?>
+    get() = flowOf(null)
 
-    actual fun enable() {
-    }
+  actual fun enable() {
+  }
 
-    actual fun disable() {
-    }
+  actual fun disable() {
+  }
 
-    actual val locationEnabled: Flow<Boolean>
-        get() = flowOf(false)
+  actual val locationEnabled: Flow<Boolean>
+    get() = flowOf(false)
 }

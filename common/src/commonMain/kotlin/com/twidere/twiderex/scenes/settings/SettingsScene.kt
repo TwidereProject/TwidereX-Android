@@ -42,103 +42,103 @@ import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 
 data class SettingItem(
-    val name: String,
-    val icon: Painter,
-    val route: String,
+  val name: String,
+  val icon: Painter,
+  val route: String,
 )
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SettingsScene() {
-    val settings =
-        mapOf(
-            stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_section_header_general) to listOf(
-                SettingItem(
-                    stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_title),
-                    painterResource(res = com.twidere.twiderex.MR.files.ic_shirt),
-                    route = Root.Settings.Appearance,
-                ),
-                SettingItem(
-                    stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_title),
-                    painterResource(res = com.twidere.twiderex.MR.files.ic_template),
-                    route = Root.Settings.Display,
-                ),
-                SettingItem(
-                    stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_layout_title),
-                    painterResource(res = com.twidere.twiderex.MR.files.ic_layout_sidebar),
-                    route = Root.Settings.Layout,
-                ),
-                SettingItem(
-                    stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_notification_title),
-                    painterResource(res = com.twidere.twiderex.MR.files.ic_settings_notification),
-                    route = Root.Settings.Notification,
-                ),
-                SettingItem(
-                    stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_title),
-                    painterResource(res = com.twidere.twiderex.MR.files.ic_database),
-                    route = Root.Settings.Storage,
-                ),
-                SettingItem(
-                    stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_title),
-                    painterResource(res = com.twidere.twiderex.MR.files.ic_triangle_square_circle),
-                    route = Root.Settings.Misc,
-                ),
-            ),
-            stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_section_header_about) to listOf(
-                SettingItem(
-                    stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_title),
-                    painterResource(res = com.twidere.twiderex.MR.files.ic_info_circle),
-                    route = Root.Settings.About,
-                ),
-            )
-        )
+  val settings =
+    mapOf(
+      stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_section_header_general) to listOf(
+        SettingItem(
+          stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_title),
+          painterResource(res = com.twidere.twiderex.MR.files.ic_shirt),
+          route = Root.Settings.Appearance,
+        ),
+        SettingItem(
+          stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_title),
+          painterResource(res = com.twidere.twiderex.MR.files.ic_template),
+          route = Root.Settings.Display,
+        ),
+        SettingItem(
+          stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_layout_title),
+          painterResource(res = com.twidere.twiderex.MR.files.ic_layout_sidebar),
+          route = Root.Settings.Layout,
+        ),
+        SettingItem(
+          stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_notification_title),
+          painterResource(res = com.twidere.twiderex.MR.files.ic_settings_notification),
+          route = Root.Settings.Notification,
+        ),
+        SettingItem(
+          stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_title),
+          painterResource(res = com.twidere.twiderex.MR.files.ic_database),
+          route = Root.Settings.Storage,
+        ),
+        SettingItem(
+          stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_title),
+          painterResource(res = com.twidere.twiderex.MR.files.ic_triangle_square_circle),
+          route = Root.Settings.Misc,
+        ),
+      ),
+      stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_section_header_about) to listOf(
+        SettingItem(
+          stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_title),
+          painterResource(res = com.twidere.twiderex.MR.files.ic_info_circle),
+          route = Root.Settings.About,
+        ),
+      )
+    )
 
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_title))
-                    }
-                )
-            }
-        ) {
-            LazyColumn(
-                contentPadding = it
-            ) {
-                settings.forEach {
-                    item {
-                        ListItem(
-                            text = {
-                                ProvideTextStyle(value = MaterialTheme.typography.button) {
-                                    Text(text = it.key)
-                                }
-                            },
-                        )
-                    }
-                    items(it.value) {
-                        val navController = LocalNavController.current
-                        ListItem(
-                            modifier = Modifier.clickable(
-                                onClick = {
-                                    if (it.route.isNotEmpty()) {
-                                        navController.navigate(it.route)
-                                    }
-                                }
-                            ),
-                            icon = {
-                                Icon(painter = it.icon, contentDescription = it.name)
-                            },
-                            text = {
-                                Text(text = it.name)
-                            },
-                        )
-                    }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_title))
+          }
+        )
+      }
+    ) {
+      LazyColumn(
+        contentPadding = it
+      ) {
+        settings.forEach {
+          item {
+            ListItem(
+              text = {
+                ProvideTextStyle(value = MaterialTheme.typography.button) {
+                  Text(text = it.key)
                 }
-            }
+              },
+            )
+          }
+          items(it.value) {
+            val navController = LocalNavController.current
+            ListItem(
+              modifier = Modifier.clickable(
+                onClick = {
+                  if (it.route.isNotEmpty()) {
+                    navController.navigate(it.route)
+                  }
+                }
+              ),
+              icon = {
+                Icon(painter = it.icon, contentDescription = it.name)
+              },
+              text = {
+                Text(text = it.name)
+              },
+            )
+          }
         }
+      }
     }
+  }
 }

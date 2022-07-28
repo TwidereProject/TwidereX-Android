@@ -29,23 +29,23 @@ import com.twidere.twiderex.jobs.dm.TwitterDirectMessageSendJob
 import com.twidere.twiderex.model.job.DirectMessageSendData
 
 class TwitterDirectMessageSendWorker(
-    context: Context,
-    workerParams: WorkerParameters,
-    twitterDirectMessageSendJob: TwitterDirectMessageSendJob
+  context: Context,
+  workerParams: WorkerParameters,
+  twitterDirectMessageSendJob: TwitterDirectMessageSendJob
 ) : DirectMessageSendWorker(
-    context,
-    workerParams,
-    twitterDirectMessageSendJob
+  context,
+  workerParams,
+  twitterDirectMessageSendJob
 ) {
-    companion object {
-        fun create(
-            data: DirectMessageSendData,
-        ) = OneTimeWorkRequestBuilder<TwitterDirectMessageSendWorker>()
-            .setInputData(
-                Data.Builder()
-                    .putAll(data.toWorkData())
-                    .build()
-            )
-            .build()
-    }
+  companion object {
+    fun create(
+      data: DirectMessageSendData,
+    ) = OneTimeWorkRequestBuilder<TwitterDirectMessageSendWorker>()
+      .setInputData(
+        Data.Builder()
+          .putAll(data.toWorkData())
+          .build()
+      )
+      .build()
+  }
 }

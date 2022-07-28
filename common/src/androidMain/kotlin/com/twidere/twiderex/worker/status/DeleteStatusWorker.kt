@@ -30,40 +30,40 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 
 class DeleteStatusWorker(
-    appContext: Context,
-    params: WorkerParameters,
-    private val deleteStatusJob: DeleteStatusJob
+  appContext: Context,
+  params: WorkerParameters,
+  private val deleteStatusJob: DeleteStatusJob
 ) : CoroutineWorker(appContext, params) {
-    companion object {
-        fun create(
-            accountKey: MicroBlogKey,
-            status: UiStatus,
-        ) = OneTimeWorkRequestBuilder<DeleteStatusWorker>()
-            .setInputData(
-                workDataOf(
-                    "accountKey" to accountKey.toString(),
-                    "statusKey" to status.statusKey.toString(),
-                )
-            )
-            .build()
-    }
+  companion object {
+    fun create(
+      accountKey: MicroBlogKey,
+      status: UiStatus,
+    ) = OneTimeWorkRequestBuilder<DeleteStatusWorker>()
+      .setInputData(
+        workDataOf(
+          "accountKey" to accountKey.toString(),
+          "statusKey" to status.statusKey.toString(),
+        )
+      )
+      .build()
+  }
 
-    override suspend fun doWork(): Result {
-        val accountKey = inputData.getString("accountKey")?.let {
-            MicroBlogKey.valueOf(it)
-        } ?: return Result.failure()
-        val statusKey = inputData.getString("statusKey")?.let {
-            MicroBlogKey.valueOf(it)
-        } ?: return Result.failure()
-        return try {
-            deleteStatusJob.execute(
-                accountKey = accountKey,
-                statusKey = statusKey
-            )
-            Result.success()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            Result.failure()
-        }
+  override suspend fun doWork(): Result {
+    val accountKey = inputData.getString("accountKey")?.let {
+      MicroBlogKey.valueOf(it)
+    } ?: return Result.failure()
+    val statusKey = inputData.getString("statusKey")?.let {
+      MicroBlogKey.valueOf(it)
+    } ?: return Result.failure()
+    return try {
+      deleteStatusJob.execute(
+        accountKey = accountKey,
+        statusKey = statusKey
+      )
+      Result.success()
+    } catch (e: Throwable) {
+      e.printStackTrace()
+      Result.failure()
     }
+  }
 }

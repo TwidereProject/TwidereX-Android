@@ -26,15 +26,15 @@ import kotlin.test.assertNotNull
 
 class DateSerializerTest {
 
-    @Test
-    fun test() {
-        assertNotNull(DateFormatUtils.parse("2019-04-12T16:38:15"))
-        assertNotNull(DateFormatUtils.parse("2019-04-12T16:38:15Z"))
-        assertNotNull(DateFormatUtils.parse("2019-04-12T16:38:15.123"))
-        assertNotNull(DateFormatUtils.parse("2022-05-05T06:05:28.000Z"))
-        assertNotNull(DateFormatUtils.parse("Thu May 05 06:29:56 +0000 2022"))
-        assertNotNull(DateFormatUtils.parse("Dec 2, 2017 8:45 AM UTC"))
-        assertNotNull(DateFormatUtils.parse("Dec 2, 2017·8:45 AM UTC"))
-        assertNotNull(DateFormatUtils.parse("Dec 2, 2017 · 8:45 AM UTC"))
-    }
+  @Test
+  fun test() {
+    assertNotNull(DateFormatUtils.parse("2019-04-12T16:38:15"))
+    assertNotNull(DateFormatUtils.parse("2019-04-12T16:38:15Z"))
+    assertNotNull(DateFormatUtils.parse("2019-04-12T16:38:15.123"))
+    assertNotNull(DateFormatUtils.parse("2022-05-05T06:05:28.000Z"))
+    assertNotNull(DateFormatUtils.parse("Thu May 05 06:29:56 +0000 2022"))
+    assertNotNull(DateFormatUtils.parse("Dec 2, 2017 8:45 AM UTC"))
+    assertNotNull(DateFormatUtils.parse("Dec 2, 2017·8:45 AM UTC"))
+    assertNotNull(DateFormatUtils.parse("Dec 2, 2017 · 8:45 AM UTC"))
+  }
 }

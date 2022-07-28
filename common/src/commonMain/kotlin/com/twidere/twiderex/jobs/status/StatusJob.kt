@@ -32,63 +32,63 @@ import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.utils.notifyError
 
 abstract class StatusJob(
-    private val accountRepository: AccountRepository,
-    private val statusRepository: StatusRepository,
-    private val inAppNotification: InAppNotification,
+  private val accountRepository: AccountRepository,
+  private val statusRepository: StatusRepository,
+  private val inAppNotification: InAppNotification,
 ) {
-    suspend fun execute(accountKey: MicroBlogKey, statusKey: MicroBlogKey): StatusResult {
-        val status = statusKey.let {
-            statusRepository.loadFromCache(it, accountKey = accountKey)
-        } ?: throw Error("can't find any status matches:$statusKey")
-        val service = accountRepository.findByAccountKey(accountKey)?.let {
-            it.service as? StatusService
-        } ?: throw Error("account service is not StatusService")
-        return try {
-            return doWork(accountKey, service, status)
-        } catch (e: TwitterApiException) {
-            e.errors?.firstOrNull()?.let {
-                when (it.code) {
-                    TwitterErrorCodes.AlreadyRetweeted -> {
-                        StatusResult(
-                            accountKey = accountKey,
-                            statusKey = status.statusKey,
-                            retweeted = true,
-                        )
-                    }
-                    TwitterErrorCodes.AlreadyFavorited -> {
-                        StatusResult(
-                            accountKey = accountKey,
-                            statusKey = status.statusKey,
-                            liked = true,
-                        )
-                    }
-                    else -> {
-                        inAppNotification.notifyError(e)
-                        fallback(accountKey, status)
-                    }
-                }
-            } ?: run {
-                inAppNotification.notifyError(e)
-                fallback(accountKey, status)
-            }
-        } catch (e: Throwable) {
+  suspend fun execute(accountKey: MicroBlogKey, statusKey: MicroBlogKey): StatusResult {
+    val status = statusKey.let {
+      statusRepository.loadFromCache(it, accountKey = accountKey)
+    } ?: throw Error("can't find any status matches:$statusKey")
+    val service = accountRepository.findByAccountKey(accountKey)?.let {
+      it.service as? StatusService
+    } ?: throw Error("account service is not StatusService")
+    return try {
+      return doWork(accountKey, service, status)
+    } catch (e: TwitterApiException) {
+      e.errors?.firstOrNull()?.let {
+        when (it.code) {
+          TwitterErrorCodes.AlreadyRetweeted -> {
+            StatusResult(
+              accountKey = accountKey,
+              statusKey = status.statusKey,
+              retweeted = true,
+            )
+          }
+          TwitterErrorCodes.AlreadyFavorited -> {
+            StatusResult(
+              accountKey = accountKey,
+              statusKey = status.statusKey,
+              liked = true,
+            )
+          }
+          else -> {
             inAppNotification.notifyError(e)
             fallback(accountKey, status)
+          }
         }
+      } ?: run {
+        inAppNotification.notifyError(e)
+        fallback(accountKey, status)
+      }
+    } catch (e: Throwable) {
+      inAppNotification.notifyError(e)
+      fallback(accountKey, status)
     }
-    protected abstract suspend fun doWork(
-        accountKey: MicroBlogKey,
-        service: StatusService,
-        status: UiStatus,
-    ): StatusResult
+  }
+  protected abstract suspend fun doWork(
+    accountKey: MicroBlogKey,
+    service: StatusService,
+    status: UiStatus,
+  ): StatusResult
 
-    protected open fun fallback(
-        accountKey: MicroBlogKey,
-        status: UiStatus,
-    ) = StatusResult(
-        accountKey = accountKey,
-        statusKey = status.statusKey,
-        liked = status.liked,
-        retweeted = status.retweeted,
-    )
+  protected open fun fallback(
+    accountKey: MicroBlogKey,
+    status: UiStatus,
+  ) = StatusResult(
+    accountKey = accountKey,
+    statusKey = status.statusKey,
+    liked = status.liked,
+    retweeted = status.retweeted,
+  )
 }

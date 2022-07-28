@@ -21,21 +21,21 @@
 package com.twidere.twiderex.kmp
 
 expect class StorageProvider {
-    companion object {
-        fun create(): StorageProvider
-    }
-    // for persistence data
-    val appDir: String
+  companion object {
+    fun create(): StorageProvider
+  }
+  // for persistence data
+  val appDir: String
 
-    // for cache data
-    val cacheDir: String
+  // for cache data
+  val cacheDir: String
 
-    // for media caches e.g image, video
-    val mediaCacheDir: String
+  // for media caches e.g image, video
+  val mediaCacheDir: String
 
-    /**
-     * @param dir, cache dir needs to be clear
-     * @param deleteDirAlso, delete all files in dir include dir itself
-     */
-    fun clearCaches(dir: String, deleteDirAlso: Boolean = false)
+  /**
+   * @param dir, cache dir needs to be clear
+   * @param deleteDirAlso, delete all files in dir include dir itself
+   */
+  fun clearCaches(dir: String, deleteDirAlso: Boolean = false)
 }

@@ -30,25 +30,25 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class TestMemoryCachePagingMediator(pagingMemoryCache: PagingMemoryCache<String>) : MemoryCachePagingMediator<Int, String>(pagingMemoryCache) {
-    override suspend fun load(
-        key: Int?,
-        loadType: LoadType,
-        state: PagingState<Int, String>
-    ): PagingSource.LoadResult<Int, String> {
-        return PagingSource.LoadResult.Page(listOf("1", "2"), null, null)
-    }
+  override suspend fun load(
+    key: Int?,
+    loadType: LoadType,
+    state: PagingState<Int, String>
+  ): PagingSource.LoadResult<Int, String> {
+    return PagingSource.LoadResult.Page(listOf("1", "2"), null, null)
+  }
 }
 
 class MemoryCachePagingMediatorTest {
-    private val pagingMemoryCache = PagingMemoryCache<String>()
+  private val pagingMemoryCache = PagingMemoryCache<String>()
 
-    @OptIn(ExperimentalPagingApi::class)
-    @Test
-    fun load_saveToPagingMemoryCacheAfterSuccess() = runBlocking {
-        val mediator = TestMemoryCachePagingMediator(pagingMemoryCache)
-        assertEquals(0, pagingMemoryCache.size())
-        val pagingState = PagingState<Int, String>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
-        mediator.load(LoadType.REFRESH, pagingState)
-        assertEquals(2, pagingMemoryCache.size())
-    }
+  @OptIn(ExperimentalPagingApi::class)
+  @Test
+  fun load_saveToPagingMemoryCacheAfterSuccess() = runBlocking {
+    val mediator = TestMemoryCachePagingMediator(pagingMemoryCache)
+    assertEquals(0, pagingMemoryCache.size())
+    val pagingState = PagingState<Int, String>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
+    mediator.load(LoadType.REFRESH, pagingState)
+    assertEquals(2, pagingMemoryCache.size())
+  }
 }

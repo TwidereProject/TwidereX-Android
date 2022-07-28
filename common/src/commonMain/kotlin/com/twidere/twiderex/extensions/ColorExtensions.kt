@@ -28,8 +28,8 @@ import com.twidere.twiderex.component.foundation.AppBarDefaults
 
 @Composable
 fun Color.withElevation(elevation: Dp = AppBarDefaults.TopAppBarElevation): Color {
-    return LocalElevationOverlay.current?.apply(
-        color = this,
-        elevation = elevation
-    ) ?: this
+  return LocalElevationOverlay.current?.apply(
+    color = this,
+    elevation = elevation
+  ) ?: this
 }

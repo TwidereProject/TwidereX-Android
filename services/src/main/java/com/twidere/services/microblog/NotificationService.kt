@@ -23,9 +23,9 @@ package com.twidere.services.microblog
 import com.twidere.services.microblog.model.INotification
 
 interface NotificationService {
-    suspend fun notificationTimeline(
-        count: Int = 20,
-        since_id: String? = null,
-        max_id: String? = null,
-    ): List<INotification>
+  suspend fun notificationTimeline(
+    count: Int = 20,
+    since_id: String? = null,
+    max_id: String? = null,
+  ): List<INotification>
 }

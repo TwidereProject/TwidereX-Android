@@ -26,15 +26,15 @@ import org.junit.After
 import org.junit.Before
 
 internal open class BaseAppDatabaseTest {
-    private val driver = SqlDriverFactory.create(SqlDelightAppDatabase.Schema)
-    protected val database: SqlDelightAppDatabase = createAppDataBase(driver)
-    @Before
-    fun setUp() {
-    }
+  private val driver = SqlDriverFactory.create(SqlDelightAppDatabase.Schema)
+  protected val database: SqlDelightAppDatabase = createAppDataBase(driver)
+  @Before
+  fun setUp() {
+  }
 
-    @After
-    fun tearDown() {
-        database.dropQueries.clearAllTables()
-        driver.close()
-    }
+  @After
+  fun tearDown() {
+    database.dropQueries.clearAllTables()
+    driver.close()
+  }
 }

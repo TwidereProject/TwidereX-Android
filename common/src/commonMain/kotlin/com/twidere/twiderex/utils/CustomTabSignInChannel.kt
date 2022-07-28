@@ -25,32 +25,32 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 
 object CustomTabSignInChannel {
-    private var waiting = false
-    private val channel: Channel<String> = Channel()
+  private var waiting = false
+  private val channel: Channel<String> = Channel()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun send(uri: String) {
-        if (waiting && !channel.isClosedForSend) {
-            channel.send(uri)
-        }
-        waiting = false
+  @OptIn(ExperimentalCoroutinesApi::class)
+  suspend fun send(uri: String) {
+    if (waiting && !channel.isClosedForSend) {
+      channel.send(uri)
     }
+    waiting = false
+  }
 
-    fun canHandle(uri: String): Boolean {
-        return uri.startsWith(RootDeepLinks.Callback.SignIn.Mastodon) ||
-            uri.startsWith(RootDeepLinks.Callback.SignIn.Twitter)
-    }
+  fun canHandle(uri: String): Boolean {
+    return uri.startsWith(RootDeepLinks.Callback.SignIn.Mastodon) ||
+      uri.startsWith(RootDeepLinks.Callback.SignIn.Twitter)
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun waitOne(): String {
-        waiting = true
-        return channel.receive()
-    }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  suspend fun waitOne(): String {
+    waiting = true
+    return channel.receive()
+  }
 
-    fun onClose() {
-        if (waiting) {
-            channel.close()
-            waiting = false
-        }
+  fun onClose() {
+    if (waiting) {
+      channel.close()
+      waiting = false
     }
+  }
 }

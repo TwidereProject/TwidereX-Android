@@ -29,80 +29,80 @@ import kotlin.test.assertNotNull
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class ListServiceTest {
-    private lateinit var listService: ListsService
+  private lateinit var listService: ListsService
 
-    @BeforeAll
-    fun setUp() {
-        listService = createService()
+  @BeforeAll
+  fun setUp() {
+    listService = createService()
+  }
+
+  abstract fun createService(): ListsService
+
+  abstract fun testListId(): String
+
+  abstract fun testUserId(): String
+
+  @Test
+  fun fetchList() {
+    runBlocking {
+      val result = listService.lists()
+      assertNotNull(result[0])
     }
+  }
 
-    abstract fun createService(): ListsService
-
-    abstract fun testListId(): String
-
-    abstract fun testUserId(): String
-
-    @Test
-    fun fetchList() {
-        runBlocking {
-            val result = listService.lists()
-            assertNotNull(result[0])
-        }
+  @Test
+  fun createList() {
+    runBlocking {
+      val result = listService.createList("test")
+      assertNotNull(result)
     }
+  }
 
-    @Test
-    fun createList() {
-        runBlocking {
-            val result = listService.createList("test")
-            assertNotNull(result)
-        }
+  @Test
+  fun updateList() {
+    runBlocking {
+      val result = listService.updateList(testListId())
+      assertNotNull(result)
     }
+  }
 
-    @Test
-    fun updateList() {
-        runBlocking {
-            val result = listService.updateList(testListId())
-            assertNotNull(result)
-        }
+  @Test
+  fun destroyList() {
+    runBlocking {
+      listService.destroyList(testListId())
+      assert(true)
     }
+  }
 
-    @Test
-    fun destroyList() {
-        runBlocking {
-            listService.destroyList(testListId())
-            assert(true)
-        }
+  @Test
+  fun listMembers() {
+    runBlocking {
+      val result = listService.listMembers(testListId())
+      assertNotNull(result[0])
     }
+  }
 
-    @Test
-    fun listMembers() {
-        runBlocking {
-            val result = listService.listMembers(testListId())
-            assertNotNull(result[0])
-        }
+  @Test
+  fun addMember() {
+    runBlocking {
+      listService.addMember(testListId(), testUserId(), "test")
+      assert(true)
     }
+  }
 
-    @Test
-    fun addMember() {
-        runBlocking {
-            listService.addMember(testListId(), testUserId(), "test")
-            assert(true)
-        }
+  @Test
+  fun removeMember() {
+    runBlocking {
+      listService.removeMember(testListId(), testUserId(), "test")
+      assert(true)
     }
+  }
 
-    @Test
-    fun removeMember() {
-        runBlocking {
-            listService.removeMember(testListId(), testUserId(), "test")
-            assert(true)
-        }
+  @Test
+  fun listSubscribers() {
+    runBlocking {
+      val result = listService.listMembers(testListId())
+      assertNotNull(result[0])
     }
-
-    @Test
-    fun listSubscribers() {
-        runBlocking {
-            val result = listService.listMembers(testListId())
-            assertNotNull(result[0])
-        }
-    }
+  }
 }

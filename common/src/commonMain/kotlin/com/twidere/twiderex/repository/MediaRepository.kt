@@ -23,7 +23,7 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 
 class MediaRepository(private val cacheDatabase: CacheDatabase) {
-    suspend fun findMediaByBelongToKey(
-        belongToKey: MicroBlogKey
-    ) = cacheDatabase.mediaDao().findMediaByBelongToKey(belongToKey)
+  suspend fun findMediaByBelongToKey(
+    belongToKey: MicroBlogKey
+  ) = cacheDatabase.mediaDao().findMediaByBelongToKey(belongToKey)
 }

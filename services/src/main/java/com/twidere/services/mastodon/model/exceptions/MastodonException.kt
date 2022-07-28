@@ -26,9 +26,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MastodonException(
-    @SerialName("error")
-    val error: String? = null,
+  @SerialName("error")
+  val error: String? = null,
 ) : MicroBlogException() {
-    override val microBlogErrorMessage: String?
-        get() = error
+  override val microBlogErrorMessage: String?
+    get() = error
 }

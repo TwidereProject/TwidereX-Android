@@ -31,13 +31,13 @@ import java.io.OutputStream
 
 @OptIn(ExperimentalSerializationApi::class)
 object NotificationPreferencesSerializer : Serializer<NotificationPreferences> {
-    override val defaultValue: NotificationPreferences
-        get() = NotificationPreferences()
+  override val defaultValue: NotificationPreferences
+    get() = NotificationPreferences()
 
-    override suspend fun readFrom(input: InputStream): NotificationPreferences {
-        return ProtoBuf.decodeFromByteArray(input.readBytes())
-    }
+  override suspend fun readFrom(input: InputStream): NotificationPreferences {
+    return ProtoBuf.decodeFromByteArray(input.readBytes())
+  }
 
-    override suspend fun writeTo(t: NotificationPreferences, output: OutputStream) =
-        output.write(ProtoBuf.encodeToByteArray(t))
+  override suspend fun writeTo(t: NotificationPreferences, output: OutputStream) =
+    output.write(ProtoBuf.encodeToByteArray(t))
 }

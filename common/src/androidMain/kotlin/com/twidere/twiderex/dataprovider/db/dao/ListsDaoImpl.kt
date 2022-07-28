@@ -32,49 +32,49 @@ import com.twidere.twiderex.room.db.transform.toUi
 import kotlinx.coroutines.flow.map
 
 internal class ListsDaoImpl(private val database: RoomCacheDatabase) : ListsDao {
-    override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiList> {
-        return database.listsDao().getPagingSource(cacheDatabase = database, accountKey = accountKey)
-    }
+  override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiList> {
+    return database.listsDao().getPagingSource(cacheDatabase = database, accountKey = accountKey)
+  }
 
-    override fun findWithListKeyWithFlow(
-        listKey: MicroBlogKey,
-        accountKey: MicroBlogKey
-    ) = database.listsDao().findWithListKeyWithFlow(listKey, accountKey).map { it?.toUi() }
+  override fun findWithListKeyWithFlow(
+    listKey: MicroBlogKey,
+    accountKey: MicroBlogKey
+  ) = database.listsDao().findWithListKeyWithFlow(listKey, accountKey).map { it?.toUi() }
 
-    override suspend fun insertAll(listOf: List<UiList>) {
-        database.listsDao().insertAll(listOf.map { it.toDbList() })
-    }
+  override suspend fun insertAll(listOf: List<UiList>) {
+    database.listsDao().insertAll(listOf.map { it.toDbList() })
+  }
 
-    override suspend fun findWithListKey(
-        listKey: MicroBlogKey,
-        accountKey: MicroBlogKey
-    ) = database.listsDao().findWithListKey(listKey, accountKey)?.toUi()
+  override suspend fun findWithListKey(
+    listKey: MicroBlogKey,
+    accountKey: MicroBlogKey
+  ) = database.listsDao().findWithListKey(listKey, accountKey)?.toUi()
 
-    override suspend fun update(listOf: List<UiList>) {
-        database.withTransaction {
-            listOf.mapNotNull {
-                database.listsDao().findWithListKey(it.listKey, it.accountKey)?.let { dbList ->
-                    it.toDbList(dbId = dbList._id)
-                }
-            }.let {
-                database.listsDao().update(it)
-            }
+  override suspend fun update(listOf: List<UiList>) {
+    database.withTransaction {
+      listOf.mapNotNull {
+        database.listsDao().findWithListKey(it.listKey, it.accountKey)?.let { dbList ->
+          it.toDbList(dbId = dbList._id)
         }
+      }.let {
+        database.listsDao().update(it)
+      }
     }
+  }
 
-    override suspend fun delete(listOf: List<UiList>) {
-        database.withTransaction {
-            listOf.mapNotNull {
-                database.listsDao().findWithListKey(it.listKey, it.accountKey)?.let { dbList ->
-                    it.toDbList(dbId = dbList._id)
-                }
-            }.let {
-                database.listsDao().delete(it)
-            }
+  override suspend fun delete(listOf: List<UiList>) {
+    database.withTransaction {
+      listOf.mapNotNull {
+        database.listsDao().findWithListKey(it.listKey, it.accountKey)?.let { dbList ->
+          it.toDbList(dbId = dbList._id)
         }
+      }.let {
+        database.listsDao().delete(it)
+      }
     }
+  }
 
-    override suspend fun clearAll(accountKey: MicroBlogKey) {
-        database.listsDao().clearAll(accountKey)
-    }
+  override suspend fun clearAll(accountKey: MicroBlogKey) {
+    database.listsDao().clearAll(accountKey)
+  }
 }

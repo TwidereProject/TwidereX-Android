@@ -28,52 +28,52 @@ import com.twidere.twiderex.model.ui.UiDMEvent
 import org.jetbrains.annotations.TestOnly
 
 internal class MockDirectMessageEventDao @TestOnly constructor() : DirectMessageEventDao {
-    private val fakeDb = mutableMapOf<MicroBlogKey, MutableList<UiDMEvent>>()
+  private val fakeDb = mutableMapOf<MicroBlogKey, MutableList<UiDMEvent>>()
 
-    fun getLatestMessage(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey
-    ): UiDMEvent? {
-        return fakeDb[accountKey]?.filter { it.conversationKey == conversationKey }?.maxByOrNull { it.sortId }
-    }
+  fun getLatestMessage(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey
+  ): UiDMEvent? {
+    return fakeDb[accountKey]?.filter { it.conversationKey == conversationKey }?.maxByOrNull { it.sortId }
+  }
 
-    override fun getPagingSource(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey
-    ): PagingSource<Int, UiDMEvent> {
-        return MockPagingSource(
-            data = fakeDb[accountKey]?.filter { it.conversationKey == conversationKey } ?: emptyList()
-        )
-    }
+  override fun getPagingSource(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey
+  ): PagingSource<Int, UiDMEvent> {
+    return MockPagingSource(
+      data = fakeDb[accountKey]?.filter { it.conversationKey == conversationKey } ?: emptyList()
+    )
+  }
 
-    override suspend fun findWithMessageKey(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey,
-        messageKey: MicroBlogKey
-    ): UiDMEvent? {
-        return fakeDb[accountKey]?.find { it.conversationKey == conversationKey && it.messageKey == messageKey }
-    }
+  override suspend fun findWithMessageKey(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey,
+    messageKey: MicroBlogKey
+  ): UiDMEvent? {
+    return fakeDb[accountKey]?.find { it.conversationKey == conversationKey && it.messageKey == messageKey }
+  }
 
-    override suspend fun delete(message: UiDMEvent) {
-        fakeDb[message.accountKey]?.removeAll { it.messageKey == message.messageKey }
-    }
+  override suspend fun delete(message: UiDMEvent) {
+    fakeDb[message.accountKey]?.removeAll { it.messageKey == message.messageKey }
+  }
 
-    override suspend fun getMessageCount(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey
-    ): Long {
-        return fakeDb[accountKey]?.sumOf { if (it.conversationKey == conversationKey) 1L else 0L } ?: 0
-    }
+  override suspend fun getMessageCount(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey
+  ): Long {
+    return fakeDb[accountKey]?.sumOf { if (it.conversationKey == conversationKey) 1L else 0L } ?: 0
+  }
 
-    override suspend fun insertAll(events: List<UiDMEvent>) {
-        events.forEach { event ->
-            fakeDb[event.accountKey].let {
-                if (it.isNullOrEmpty()) {
-                    fakeDb[event.accountKey] = mutableListOf(event)
-                } else {
-                    it.add(event)
-                }
-            }
+  override suspend fun insertAll(events: List<UiDMEvent>) {
+    events.forEach { event ->
+      fakeDb[event.accountKey].let {
+        if (it.isNullOrEmpty()) {
+          fakeDb[event.accountKey] = mutableListOf(event)
+        } else {
+          it.add(event)
         }
+      }
     }
+  }
 }

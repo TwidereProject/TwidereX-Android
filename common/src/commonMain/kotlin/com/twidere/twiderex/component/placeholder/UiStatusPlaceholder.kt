@@ -42,36 +42,36 @@ import moe.tlaster.placeholder.TextPlaceHolder
 
 @Composable
 fun UiStatusPlaceholder(
-    delayMillis: Long = 0,
+  delayMillis: Long = 0,
 ) {
-    Box(
-        modifier = Modifier.padding(vertical = NormalStatusDefaults.ContentSpacing)
+  Box(
+    modifier = Modifier.padding(vertical = NormalStatusDefaults.ContentSpacing)
+  ) {
+    Row(
+      modifier = Modifier.padding(NormalStatusDefaults.ContentPadding)
     ) {
-        Row(
-            modifier = Modifier.padding(NormalStatusDefaults.ContentPadding)
-        ) {
-            AvatarPlaceHolder(
-                delayMillis = delayMillis,
-            )
-            Spacer(modifier = Modifier.width(StatusContentDefaults.AvatarSpacing))
-            Column {
-                TextPlaceHolder(
-                    length = 5,
-                    delayMillis = delayMillis,
-                )
-                Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
-                TextPlaceHolder(
-                    length = 24,
-                    delayMillis = delayMillis,
-                )
-                Spacer(modifier = Modifier.height(StatusBodyMediaDefaults.Spacing))
-                Placeholder(
-                    modifier = Modifier
-                        .clip(MaterialTheme.shapes.medium)
-                        .aspectRatio(StatusMediaDefaults.DefaultAspectRatio)
-                        .heightIn(max = StatusMediaDefaults.DefaultMaxHeight)
-                )
-            }
-        }
+      AvatarPlaceHolder(
+        delayMillis = delayMillis,
+      )
+      Spacer(modifier = Modifier.width(StatusContentDefaults.AvatarSpacing))
+      Column {
+        TextPlaceHolder(
+          length = 5,
+          delayMillis = delayMillis,
+        )
+        Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
+        TextPlaceHolder(
+          length = 24,
+          delayMillis = delayMillis,
+        )
+        Spacer(modifier = Modifier.height(StatusBodyMediaDefaults.Spacing))
+        Placeholder(
+          modifier = Modifier
+            .clip(MaterialTheme.shapes.medium)
+            .aspectRatio(StatusMediaDefaults.DefaultAspectRatio)
+            .heightIn(max = StatusMediaDefaults.DefaultMaxHeight)
+        )
+      }
     }
+  }
 }

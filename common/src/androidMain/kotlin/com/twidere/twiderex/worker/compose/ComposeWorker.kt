@@ -29,25 +29,25 @@ import com.twidere.twiderex.jobs.compose.ComposeJob
 import com.twidere.twiderex.model.MicroBlogKey
 
 abstract class ComposeWorker<T : MicroBlogService>(
-    protected val context: Context,
-    workerParams: WorkerParameters,
-    private val composeJob: ComposeJob<*>
+  protected val context: Context,
+  workerParams: WorkerParameters,
+  private val composeJob: ComposeJob<*>
 ) : CoroutineWorker(context, workerParams) {
 
-    override suspend fun doWork(): Result {
-        val composeData = inputData.toComposeData()
-        val accountKey = inputData.getString("accountKey")?.let {
-            MicroBlogKey.valueOf(it)
-        } ?: return Result.failure()
-        return try {
-            composeJob.execute(
-                composeData = composeData,
-                accountKey = accountKey
-            )
-            Result.success()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            Result.failure()
-        }
+  override suspend fun doWork(): Result {
+    val composeData = inputData.toComposeData()
+    val accountKey = inputData.getString("accountKey")?.let {
+      MicroBlogKey.valueOf(it)
+    } ?: return Result.failure()
+    return try {
+      composeJob.execute(
+        composeData = composeData,
+        accountKey = accountKey
+      )
+      Result.success()
+    } catch (e: Throwable) {
+      e.printStackTrace()
+      Result.failure()
     }
+  }
 }

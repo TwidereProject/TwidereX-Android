@@ -35,36 +35,36 @@ import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class NotificationTimelineViewModel(
-    dataStore: DataStore<Preferences>,
-    database: CacheDatabase,
-    notificationRepository: NotificationRepository,
-    private val accountRepository: AccountRepository,
+  dataStore: DataStore<Preferences>,
+  database: CacheDatabase,
+  notificationRepository: NotificationRepository,
+  private val accountRepository: AccountRepository,
 ) : TimelineViewModel(dataStore) {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-            .filter { it.service is NotificationService }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+      .filter { it.service is NotificationService }
+  }
 
-    override val pagingMediator by lazy {
-        account.map {
-            NotificationTimelineMediator(
-                service = it.service as NotificationService,
-                accountKey = it.accountKey,
-                database = database,
-                addCursorIfNeed = { data, accountKey ->
-                    notificationRepository.addCursorIfNeeded(
-                        accountKey,
-                        NotificationCursorType.General,
-                        data.status.statusId,
-                        data.status.timestamp
-                    )
-                }
-            )
-        }.asStateIn(viewModelScope, null)
-    }
-    override val savedStateKey by lazy {
-        account.map {
-            "${it.accountKey}_notification"
-        }.asStateIn(viewModelScope, null)
-    }
+  override val pagingMediator by lazy {
+    account.map {
+      NotificationTimelineMediator(
+        service = it.service as NotificationService,
+        accountKey = it.accountKey,
+        database = database,
+        addCursorIfNeed = { data, accountKey ->
+          notificationRepository.addCursorIfNeeded(
+            accountKey,
+            NotificationCursorType.General,
+            data.status.statusId,
+            data.status.timestamp
+          )
+        }
+      )
+    }.asStateIn(viewModelScope, null)
+  }
+  override val savedStateKey by lazy {
+    account.map {
+      "${it.accountKey}_notification"
+    }.asStateIn(viewModelScope, null)
+  }
 }

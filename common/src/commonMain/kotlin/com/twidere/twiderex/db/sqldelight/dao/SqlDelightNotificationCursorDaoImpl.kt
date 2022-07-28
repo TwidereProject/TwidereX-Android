@@ -29,10 +29,10 @@ import com.twidere.twiderex.model.paging.NotificationCursor
 import com.twidere.twiderex.sqldelight.table.NotificationCursorQueries
 
 internal class SqlDelightNotificationCursorDaoImpl(private val notificationCursorQueries: NotificationCursorQueries) : NotificationCursorDao {
-    override suspend fun find(
-        accountKey: MicroBlogKey,
-        type: NotificationCursorType
-    ) = notificationCursorQueries.find(accountKey = accountKey, type = type).executeAsOneOrNull()?.toUi()
+  override suspend fun find(
+    accountKey: MicroBlogKey,
+    type: NotificationCursorType
+  ) = notificationCursorQueries.find(accountKey = accountKey, type = type).executeAsOneOrNull()?.toUi()
 
-    override suspend fun add(notificationCursor: NotificationCursor) = notificationCursorQueries.insert(notificationCursor.toDb())
+  override suspend fun add(notificationCursor: NotificationCursor) = notificationCursorQueries.insert(notificationCursor.toDb())
 }

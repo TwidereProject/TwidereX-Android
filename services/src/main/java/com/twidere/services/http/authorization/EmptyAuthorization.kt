@@ -21,6 +21,6 @@
 package com.twidere.services.http.authorization
 
 class EmptyAuthorization : Authorization {
-    override val hasAuthorization: Boolean
-        get() = false
+  override val hasAuthorization: Boolean
+    get() = false
 }

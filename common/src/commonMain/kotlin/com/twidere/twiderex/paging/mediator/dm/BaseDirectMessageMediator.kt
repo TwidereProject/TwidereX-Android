@@ -31,29 +31,29 @@ import com.twidere.twiderex.model.MicroBlogKey
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class BaseDirectMessageMediator<Key : Any, Value : Any>(
-    protected val database: CacheDatabase,
-    protected val accountKey: MicroBlogKey,
-    protected val realFetch: suspend (key: String?) -> List<IDirectMessage>
+  protected val database: CacheDatabase,
+  protected val accountKey: MicroBlogKey,
+  protected val realFetch: suspend (key: String?) -> List<IDirectMessage>
 ) : RemoteMediator<Key, Value>() {
-    private var paging: String? = null
-    override suspend fun load(
-        loadType: LoadType,
-        state: PagingState<Key, Value>
-    ): MediatorResult {
-        return try {
-            val key = when (loadType) {
-                LoadType.REFRESH -> null
-                LoadType.APPEND -> if (reverse()) return MediatorResult.Success(endOfPaginationReached = true) else paging
-                LoadType.PREPEND -> if (reverse()) paging else return MediatorResult.Success(endOfPaginationReached = true)
-            }
-            paging = realFetch(key).let {
-                if (it is IPaging) it.nextPage else null
-            }
-            MediatorResult.Success(endOfPaginationReached = paging == null)
-        } catch (e: Throwable) {
-            MediatorResult.Error(e)
-        }
+  private var paging: String? = null
+  override suspend fun load(
+    loadType: LoadType,
+    state: PagingState<Key, Value>
+  ): MediatorResult {
+    return try {
+      val key = when (loadType) {
+        LoadType.REFRESH -> null
+        LoadType.APPEND -> if (reverse()) return MediatorResult.Success(endOfPaginationReached = true) else paging
+        LoadType.PREPEND -> if (reverse()) paging else return MediatorResult.Success(endOfPaginationReached = true)
+      }
+      paging = realFetch(key).let {
+        if (it is IPaging) it.nextPage else null
+      }
+      MediatorResult.Success(endOfPaginationReached = paging == null)
+    } catch (e: Throwable) {
+      MediatorResult.Error(e)
     }
+  }
 
-    abstract fun reverse(): Boolean
+  abstract fun reverse(): Boolean
 }

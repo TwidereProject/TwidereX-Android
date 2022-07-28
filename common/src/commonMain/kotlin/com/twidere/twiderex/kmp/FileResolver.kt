@@ -24,18 +24,18 @@ import java.io.InputStream
 import java.io.OutputStream
 
 expect class FileResolver {
-    fun getMimeType(file: String): String?
+  fun getMimeType(file: String): String?
 
-    fun getFileSize(file: String): Long?
+  fun getFileSize(file: String): Long?
 
-    fun openInputStream(file: String): InputStream?
+  fun openInputStream(file: String): InputStream?
 
-    fun openOutputStream(file: String): OutputStream?
+  fun openOutputStream(file: String): OutputStream?
 
-    fun getMediaSize(file: String): MediaSize
+  fun getMediaSize(file: String): MediaSize
 }
 
 data class MediaSize(
-    val width: Long,
-    val height: Long,
+  val width: Long,
+  val height: Long,
 )

@@ -25,16 +25,16 @@ import com.twidere.twiderex.room.db.model.DbSearch
 import java.util.UUID
 
 internal fun DbSearch.toUiSearch() = UiSearch(
-    content = content,
-    lastActive = lastActive,
-    saved = saved,
-    accountKey = accountKey
+  content = content,
+  lastActive = lastActive,
+  saved = saved,
+  accountKey = accountKey
 )
 
 internal fun UiSearch.toDbSearch(id: String = UUID.randomUUID().toString()) = DbSearch(
-    _id = id,
-    content = content,
-    lastActive = lastActive,
-    saved = saved,
-    accountKey = accountKey
+  _id = id,
+  content = content,
+  lastActive = lastActive,
+  saved = saved,
+  accountKey = accountKey
 )

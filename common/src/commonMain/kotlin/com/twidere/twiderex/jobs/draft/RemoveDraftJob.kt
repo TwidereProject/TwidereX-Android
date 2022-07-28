@@ -23,9 +23,9 @@ package com.twidere.twiderex.jobs.draft
 import com.twidere.twiderex.repository.DraftRepository
 
 class RemoveDraftJob(
-    private val repository: DraftRepository,
+  private val repository: DraftRepository,
 ) {
-    suspend fun execute(draftId: String) {
-        repository.remove(draftId = draftId)
-    }
+  suspend fun execute(draftId: String) {
+    repository.remove(draftId = draftId)
+  }
 }

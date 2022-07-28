@@ -24,5 +24,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class EntitiesURLV2(
-    val urls: List<URLElementV2>? = null
+  val urls: List<URLElementV2>? = null
 )

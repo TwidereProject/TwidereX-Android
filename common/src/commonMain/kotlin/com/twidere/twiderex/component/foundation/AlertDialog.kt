@@ -28,25 +28,25 @@ import com.twidere.twiderex.component.foundation.platform.PlatformAlertDialog
 
 @Composable
 fun AlertDialog(
-    onDismissRequest: () -> Unit,
-    confirmButton: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    dismissButton: @Composable (() -> Unit)? = null,
-    title: @Composable (() -> Unit)? = null,
-    text: @Composable (() -> Unit)? = null,
-    shape: Shape? = null,
-    backgroundColor: Color? = null,
-    contentColor: Color? = null,
+  onDismissRequest: () -> Unit,
+  confirmButton: @Composable () -> Unit,
+  modifier: Modifier = Modifier,
+  dismissButton: @Composable (() -> Unit)? = null,
+  title: @Composable (() -> Unit)? = null,
+  text: @Composable (() -> Unit)? = null,
+  shape: Shape? = null,
+  backgroundColor: Color? = null,
+  contentColor: Color? = null,
 ) {
-    PlatformAlertDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = confirmButton,
-        modifier = modifier,
-        dismissButton = dismissButton,
-        title = title,
-        text = text,
-        shape = shape,
-        backgroundColor = backgroundColor,
-        contentColor = contentColor
-    )
+  PlatformAlertDialog(
+    onDismissRequest = onDismissRequest,
+    confirmButton = confirmButton,
+    modifier = modifier,
+    dismissButton = dismissButton,
+    title = title,
+    text = text,
+    shape = shape,
+    backgroundColor = backgroundColor,
+    contentColor = contentColor
+  )
 }

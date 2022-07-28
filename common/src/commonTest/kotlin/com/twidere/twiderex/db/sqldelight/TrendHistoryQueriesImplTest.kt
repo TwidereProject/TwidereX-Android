@@ -30,15 +30,15 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class TrendHistoryQueriesImplTest : BaseCacheDatabaseTest() {
-    private val accountKey = MicroBlogKey.twitter("account")
-    @Test
-    fun insert_ReplaceWhenUniqueKeyEquals() = runBlocking {
-        val insert = mockITrend().toUi(accountKey).toDbTrendWithHistory()
-        database.trendHistoryQueries.insert(insert.history.first().copy(uses = 10))
-        assertEquals(10, database.trendHistoryQueries.findWithTrendKey(accountKey = accountKey, trendKey = insert.trend.trendKey).executeAsOne().uses)
-        database.trendHistoryQueries.insert(insert.history.first().copy(uses = 20))
-        assertEquals(20, database.trendHistoryQueries.findWithTrendKey(accountKey = accountKey, trendKey = insert.trend.trendKey).executeAsOne().uses)
-        database.trendHistoryQueries.insert(insert.history.first().copy(day = 20))
-        assertEquals(2, database.trendHistoryQueries.findWithTrendKey(accountKey = accountKey, trendKey = insert.trend.trendKey).executeAsList().size)
-    }
+  private val accountKey = MicroBlogKey.twitter("account")
+  @Test
+  fun insert_ReplaceWhenUniqueKeyEquals() = runBlocking {
+    val insert = mockITrend().toUi(accountKey).toDbTrendWithHistory()
+    database.trendHistoryQueries.insert(insert.history.first().copy(uses = 10))
+    assertEquals(10, database.trendHistoryQueries.findWithTrendKey(accountKey = accountKey, trendKey = insert.trend.trendKey).executeAsOne().uses)
+    database.trendHistoryQueries.insert(insert.history.first().copy(uses = 20))
+    assertEquals(20, database.trendHistoryQueries.findWithTrendKey(accountKey = accountKey, trendKey = insert.trend.trendKey).executeAsOne().uses)
+    database.trendHistoryQueries.insert(insert.history.first().copy(day = 20))
+    assertEquals(2, database.trendHistoryQueries.findWithTrendKey(accountKey = accountKey, trendKey = insert.trend.trendKey).executeAsList().size)
+  }
 }

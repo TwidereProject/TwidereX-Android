@@ -26,20 +26,20 @@ import androidx.room.PrimaryKey
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
-    tableName = "status_reactions",
-    indices = [Index(value = ["statusKey", "accountKey"], unique = true)],
+  tableName = "status_reactions",
+  indices = [Index(value = ["statusKey", "accountKey"], unique = true)],
 )
 internal data class DbStatusReaction(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    val _id: String,
-    /**
-     * Actual tweet/toots id
-     */
-    val statusKey: MicroBlogKey,
-    val accountKey: MicroBlogKey,
-    var liked: Boolean,
-    var retweeted: Boolean,
+  /**
+   * Id that being used in the database
+   */
+  @PrimaryKey
+  val _id: String,
+  /**
+   * Actual tweet/toots id
+   */
+  val statusKey: MicroBlogKey,
+  val accountKey: MicroBlogKey,
+  var liked: Boolean,
+  var retweeted: Boolean,
 )

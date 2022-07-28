@@ -34,29 +34,29 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun TwitterSignInScene(
-    consumerKey: String,
-    consumerSecret: String,
+  consumerKey: String,
+  consumerSecret: String,
 ) {
-    val navController = LocalNavController.current
-    val navigator = LocalNavigator.current
-    val pinCodeProvider: PinCodeProvider = { target ->
-        navigator.twitterSignInWeb(target)
-    }
-    val viewModel: TwitterSignInViewModel = getViewModel {
-        parametersOf(
-            consumerKey,
-            consumerSecret,
-            pinCodeProvider,
-            { success: Boolean ->
-                navController.goBackWith(success)
-            }
-        )
-    }
-    val loading by viewModel.loading.observeAsState(initial = false)
+  val navController = LocalNavController.current
+  val navigator = LocalNavigator.current
+  val pinCodeProvider: PinCodeProvider = { target ->
+    navigator.twitterSignInWeb(target)
+  }
+  val viewModel: TwitterSignInViewModel = getViewModel {
+    parametersOf(
+      consumerKey,
+      consumerSecret,
+      pinCodeProvider,
+      { success: Boolean ->
+        navController.goBackWith(success)
+      }
+    )
+  }
+  val loading by viewModel.loading.observeAsState(initial = false)
 
-    SignInScaffold {
-        if (loading) {
-            CircularProgressIndicator()
-        }
+  SignInScaffold {
+    if (loading) {
+      CircularProgressIndicator()
     }
+  }
 }

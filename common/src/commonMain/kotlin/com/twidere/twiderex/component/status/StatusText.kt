@@ -52,96 +52,96 @@ import com.twidere.twiderex.model.ui.UiStatus
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ColumnScope.StatusText(
-    status: UiStatus,
-    maxLines: Int = Int.MAX_VALUE,
-    showMastodonPoll: Boolean = true,
-    isSelectionAble: Boolean = true,
+  status: UiStatus,
+  maxLines: Int = Int.MAX_VALUE,
+  showMastodonPoll: Boolean = true,
+  isSelectionAble: Boolean = true,
 ) {
-    val expandable = status.platformType == PlatformType.Mastodon &&
-        status.spoilerText != null
+  val expandable = status.platformType == PlatformType.Mastodon &&
+    status.spoilerText != null
 
-    var expanded by rememberSaveable { mutableStateOf(!expandable) }
+  var expanded by rememberSaveable { mutableStateOf(!expandable) }
 
-    if (expandable && status.spoilerText != null) {
-        Text(text = status.spoilerText)
-        Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.SpoilerSpacing))
-        Row(
-            modifier = Modifier
-                .background(
-                    LocalContentColor.current.copy(alpha = 0.04f),
-                    shape = MaterialTheme.shapes.medium,
-                )
-                .clip(MaterialTheme.shapes.medium)
-                .clickable {
-                    expanded = !expanded
-                },
-        ) {
-            Icon(
-                modifier = Modifier.size(width = StatusTextDefaults.Mastodon.MoreButton.Width, height = StatusTextDefaults.Mastodon.MoreButton.Height).padding(StatusTextDefaults.Mastodon.SpoilerButtonPadding),
-                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_expand_more),
-                contentDescription = null,
-                tint = MaterialTheme.colors.primary,
-            )
-        }
+  if (expandable && status.spoilerText != null) {
+    Text(text = status.spoilerText)
+    Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.SpoilerSpacing))
+    Row(
+      modifier = Modifier
+        .background(
+          LocalContentColor.current.copy(alpha = 0.04f),
+          shape = MaterialTheme.shapes.medium,
+        )
+        .clip(MaterialTheme.shapes.medium)
+        .clickable {
+          expanded = !expanded
+        },
+    ) {
+      Icon(
+        modifier = Modifier.size(width = StatusTextDefaults.Mastodon.MoreButton.Width, height = StatusTextDefaults.Mastodon.MoreButton.Height).padding(StatusTextDefaults.Mastodon.SpoilerButtonPadding),
+        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_expand_more),
+        contentDescription = null,
+        tint = MaterialTheme.colors.primary,
+      )
     }
-    AnimatedVisibility(visible = expanded) {
-        Column {
-            SelectionContainer(enable = isSelectionAble) {
-                HtmlText(
-                    modifier = Modifier.fillMaxWidth(),
-                    htmlText = status.htmlText,
-                    maxLines = maxLines,
-                    linkResolver = { href ->
-                        status.resolveLink(href)
-                    },
-                    positionWrapper = it
-                )
-            }
-            if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.poll != null) {
-                Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.PollSpacing))
-                MastodonPoll(status)
-            }
-        }
+  }
+  AnimatedVisibility(visible = expanded) {
+    Column {
+      SelectionContainer(enable = isSelectionAble) {
+        HtmlText(
+          modifier = Modifier.fillMaxWidth(),
+          htmlText = status.htmlText,
+          maxLines = maxLines,
+          linkResolver = { href ->
+            status.resolveLink(href)
+          },
+          positionWrapper = it
+        )
+      }
+      if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.poll != null) {
+        Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.PollSpacing))
+        MastodonPoll(status)
+      }
     }
+  }
 }
 
 object StatusTextDefaults {
-    object Mastodon {
-        object MoreButton {
-            val Width = 46.dp
-            val Height = 20.dp
-        }
-        val SpoilerSpacing = 2.dp
-        val SpoilerButtonPadding = PaddingValues(
-            2.dp
-        )
-        val PollSpacing = 10.dp
+  object Mastodon {
+    object MoreButton {
+      val Width = 46.dp
+      val Height = 20.dp
     }
+    val SpoilerSpacing = 2.dp
+    val SpoilerButtonPadding = PaddingValues(
+      2.dp
+    )
+    val PollSpacing = 10.dp
+  }
 }
 
 fun UiStatus.resolveLink(
-    href: String,
+  href: String,
 ): ResolvedLink {
-    val entity = url.firstOrNull { it.url == href }
-    val media = media.firstOrNull { it.url == href }
-    return when {
-        entity != null -> {
-            if (!entity.displayUrl.contains("pic.twitter.com") &&
-                quote?.let { entity.expandedUrl.endsWith(it.statusId) } != true
-            ) {
-                ResolvedLink(
-                    expanded = entity.expandedUrl,
-                    display = entity.displayUrl,
-                )
-            } else {
-                ResolvedLink(expanded = null, skip = true)
-            }
-        }
-        media != null -> {
-            ResolvedLink(expanded = null, skip = true)
-        }
-        else -> {
-            ResolvedLink(expanded = null)
-        }
+  val entity = url.firstOrNull { it.url == href }
+  val media = media.firstOrNull { it.url == href }
+  return when {
+    entity != null -> {
+      if (!entity.displayUrl.contains("pic.twitter.com") &&
+        quote?.let { entity.expandedUrl.endsWith(it.statusId) } != true
+      ) {
+        ResolvedLink(
+          expanded = entity.expandedUrl,
+          display = entity.displayUrl,
+        )
+      } else {
+        ResolvedLink(expanded = null, skip = true)
+      }
     }
+    media != null -> {
+      ResolvedLink(expanded = null, skip = true)
+    }
+    else -> {
+      ResolvedLink(expanded = null)
+    }
+  }
 }

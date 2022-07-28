@@ -25,16 +25,16 @@ import com.twidere.twiderex.model.ui.UiEmoji
 import com.twidere.twiderex.model.ui.UiEmojiCategory
 
 internal fun List<Emoji>.toUi(): List<UiEmojiCategory> = groupBy({ it.category }, { it }).map {
-    UiEmojiCategory(
-        if (it.key.isNullOrEmpty()) null else it.key,
-        it.value.map { emoji ->
-            UiEmoji(
-                shortcode = emoji.shortcode,
-                url = emoji.url,
-                staticURL = emoji.staticURL,
-                visibleInPicker = emoji.visibleInPicker,
-                category = emoji.category
-            )
-        }
-    )
+  UiEmojiCategory(
+    if (it.key.isNullOrEmpty()) null else it.key,
+    it.value.map { emoji ->
+      UiEmoji(
+        shortcode = emoji.shortcode,
+        url = emoji.url,
+        staticURL = emoji.staticURL,
+        visibleInPicker = emoji.visibleInPicker,
+        category = emoji.category
+      )
+    }
+  )
 }

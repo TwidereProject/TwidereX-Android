@@ -24,6 +24,6 @@ import com.twidere.twiderex.db.dao.DraftDao
 import com.twidere.twiderex.db.dao.SearchDao
 
 interface AppDatabase : Database {
-    fun draftDao(): DraftDao
-    fun searchDao(): SearchDao
+  fun draftDao(): DraftDao
+  fun searchDao(): SearchDao
 }

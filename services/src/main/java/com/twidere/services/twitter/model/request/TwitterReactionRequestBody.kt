@@ -24,5 +24,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TwitterReactionRequestBody(
-    val tweet_id: String
+  val tweet_id: String
 )

@@ -36,44 +36,44 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class SearchInputViewModel(
-    private val repository: SearchRepository,
-    private val accountRepository: AccountRepository,
-    keyword: String
+  private val repository: SearchRepository,
+  private val accountRepository: AccountRepository,
+  keyword: String
 ) : ViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
+
+  @OptIn(ExperimentalCoroutinesApi::class)
+  val source by lazy {
+    account.flatMapLatest {
+      repository.searchHistory(it.accountKey)
     }
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val source by lazy {
-        account.flatMapLatest {
-            repository.searchHistory(it.accountKey)
-        }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  val savedSource by lazy {
+    account.flatMapLatest {
+      repository.savedSearch(it.accountKey)
     }
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val savedSource by lazy {
-        account.flatMapLatest {
-            repository.savedSearch(it.accountKey)
-        }
+  private val _searchInput = MutableStateFlow(TextFieldValue(keyword, TextRange(keyword.length)))
+  val searchInput = _searchInput.asStateFlow()
+
+  fun updateSearchInput(searchInput: TextFieldValue) {
+    _searchInput.value = searchInput
+  }
+
+  val expandSearch = MutableStateFlow(false)
+
+  fun remove(item: UiSearch) = viewModelScope.launch {
+    repository.remove(item)
+  }
+
+  fun addOrUpgrade(content: String) = viewModelScope.launch {
+    account.firstOrNull()?.let {
+      repository.addOrUpgrade(content, it.accountKey)
     }
-
-    private val _searchInput = MutableStateFlow(TextFieldValue(keyword, TextRange(keyword.length)))
-    val searchInput = _searchInput.asStateFlow()
-
-    fun updateSearchInput(searchInput: TextFieldValue) {
-        _searchInput.value = searchInput
-    }
-
-    val expandSearch = MutableStateFlow(false)
-
-    fun remove(item: UiSearch) = viewModelScope.launch {
-        repository.remove(item)
-    }
-
-    fun addOrUpgrade(content: String) = viewModelScope.launch {
-        account.firstOrNull()?.let {
-            repository.addOrUpgrade(content, it.accountKey)
-        }
-    }
+  }
 }

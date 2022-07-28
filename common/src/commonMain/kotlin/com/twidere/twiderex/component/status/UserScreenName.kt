@@ -41,92 +41,92 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 
 @Composable
 fun UserScreenName(user: UiUser) {
-    UserScreenName(name = user.getDisplayScreenName(LocalActiveAccount.current?.accountKey?.host))
+  UserScreenName(name = user.getDisplayScreenName(LocalActiveAccount.current?.accountKey?.host))
 }
 
 @Composable
 fun UserScreenName(name: String) {
-    CompositionLocalProvider(
-        LocalContentAlpha provides ContentAlpha.medium
-    ) {
-        Text(
-            text = name,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-    }
+  CompositionLocalProvider(
+    LocalContentAlpha provides ContentAlpha.medium
+  ) {
+    Text(
+      text = name,
+      maxLines = 1,
+      overflow = TextOverflow.Ellipsis,
+    )
+  }
 }
 
 @Composable
 fun UserName(
-    user: UiUser,
-    modifier: Modifier = Modifier,
-    color: Color = Color.Unspecified,
-    fontSize: TextUnit = TextUnit.Unspecified,
-    fontStyle: FontStyle? = null,
-    fontWeight: FontWeight? = null,
-    fontFamily: FontFamily? = null,
-    letterSpacing: TextUnit = TextUnit.Unspecified,
-    textDecoration: TextDecoration? = null,
-    textAlign: TextAlign? = null,
-    lineHeight: TextUnit = TextUnit.Unspecified,
-    overflow: TextOverflow = TextOverflow.Ellipsis,
-    softWrap: Boolean = true,
-    maxLines: Int = 1,
-    style: TextStyle = LocalTextStyle.current
+  user: UiUser,
+  modifier: Modifier = Modifier,
+  color: Color = Color.Unspecified,
+  fontSize: TextUnit = TextUnit.Unspecified,
+  fontStyle: FontStyle? = null,
+  fontWeight: FontWeight? = null,
+  fontFamily: FontFamily? = null,
+  letterSpacing: TextUnit = TextUnit.Unspecified,
+  textDecoration: TextDecoration? = null,
+  textAlign: TextAlign? = null,
+  lineHeight: TextUnit = TextUnit.Unspecified,
+  overflow: TextOverflow = TextOverflow.Ellipsis,
+  softWrap: Boolean = true,
+  maxLines: Int = 1,
+  style: TextStyle = LocalTextStyle.current
 ) {
-    UserName(
-        userName = user.name.takeIf { it.isNotEmpty() } ?: user.screenName,
-        modifier = modifier,
-        color = color,
-        fontSize = fontSize,
-        fontStyle = fontStyle,
-        fontWeight = fontWeight,
-        fontFamily = fontFamily,
-        letterSpacing = letterSpacing,
-        textDecoration = textDecoration,
-        textAlign = textAlign,
-        lineHeight = lineHeight,
-        overflow = overflow,
-        softWrap = softWrap,
-        maxLines = maxLines,
-        style = style,
-    )
+  UserName(
+    userName = user.name.takeIf { it.isNotEmpty() } ?: user.screenName,
+    modifier = modifier,
+    color = color,
+    fontSize = fontSize,
+    fontStyle = fontStyle,
+    fontWeight = fontWeight,
+    fontFamily = fontFamily,
+    letterSpacing = letterSpacing,
+    textDecoration = textDecoration,
+    textAlign = textAlign,
+    lineHeight = lineHeight,
+    overflow = overflow,
+    softWrap = softWrap,
+    maxLines = maxLines,
+    style = style,
+  )
 }
 
 @Composable
 fun UserName(
-    userName: String,
-    modifier: Modifier = Modifier,
-    color: Color = Color.Unspecified,
-    fontSize: TextUnit = TextUnit.Unspecified,
-    fontStyle: FontStyle? = null,
-    fontWeight: FontWeight? = null,
-    fontFamily: FontFamily? = null,
-    letterSpacing: TextUnit = TextUnit.Unspecified,
-    textDecoration: TextDecoration? = null,
-    textAlign: TextAlign? = null,
-    lineHeight: TextUnit = TextUnit.Unspecified,
-    overflow: TextOverflow = TextOverflow.Ellipsis,
-    softWrap: Boolean = true,
-    maxLines: Int = 1,
-    style: TextStyle = LocalTextStyle.current
+  userName: String,
+  modifier: Modifier = Modifier,
+  color: Color = Color.Unspecified,
+  fontSize: TextUnit = TextUnit.Unspecified,
+  fontStyle: FontStyle? = null,
+  fontWeight: FontWeight? = null,
+  fontFamily: FontFamily? = null,
+  letterSpacing: TextUnit = TextUnit.Unspecified,
+  textDecoration: TextDecoration? = null,
+  textAlign: TextAlign? = null,
+  lineHeight: TextUnit = TextUnit.Unspecified,
+  overflow: TextOverflow = TextOverflow.Ellipsis,
+  softWrap: Boolean = true,
+  maxLines: Int = 1,
+  style: TextStyle = LocalTextStyle.current
 ) {
-    HtmlText(
-        htmlText = userName,
-        modifier = modifier,
-        color = color,
-        fontSize = fontSize,
-        fontStyle = fontStyle,
-        fontWeight = fontWeight,
-        fontFamily = fontFamily,
-        letterSpacing = letterSpacing,
-        textDecoration = textDecoration,
-        textAlign = textAlign,
-        lineHeight = lineHeight,
-        overflow = overflow,
-        softWrap = softWrap,
-        maxLines = maxLines,
-        textStyle = style,
-    )
+  HtmlText(
+    htmlText = userName,
+    modifier = modifier,
+    color = color,
+    fontSize = fontSize,
+    fontStyle = fontStyle,
+    fontWeight = fontWeight,
+    fontFamily = fontFamily,
+    letterSpacing = letterSpacing,
+    textDecoration = textDecoration,
+    textAlign = textAlign,
+    lineHeight = lineHeight,
+    overflow = overflow,
+    softWrap = softWrap,
+    maxLines = maxLines,
+    textStyle = style,
+  )
 }

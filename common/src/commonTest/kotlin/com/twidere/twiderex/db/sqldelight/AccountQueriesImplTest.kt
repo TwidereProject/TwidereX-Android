@@ -36,47 +36,47 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 internal class AccountQueriesImplTest : BaseAppDatabaseTest() {
-    private val accountKey = MicroBlogKey.twitter("123")
+  private val accountKey = MicroBlogKey.twitter("123")
 
-    @Test
-    fun insertAccount_InsertOrReplaceWhenContentAndAccountKeyEquals() = runBlocking {
-        val query = database.accountQueries
-        val insert = DbAccount(
-            accountKey = accountKey,
-            account = TwidereAccount("name", "type"),
-            type = PlatformType.Twitter,
-            credentials_json = "insert",
-            credentials_type = CredentialsType.Basic,
-            extras_json = "",
-            user = mockIUser().toUi(accountKey).toAmUser(),
-            lastActive = System.currentTimeMillis()
-        )
-        query.insert(insert)
-        var result = query.findWithAccountKey(accountKey).executeAsOneOrNull()
-        assertEquals("insert", result?.credentials_json)
-        query.insert(insert.copy(credentials_json = "update"))
-        result = query.findWithAccountKey(accountKey).executeAsOneOrNull()
-        assertEquals("update", result?.credentials_json)
-    }
+  @Test
+  fun insertAccount_InsertOrReplaceWhenContentAndAccountKeyEquals() = runBlocking {
+    val query = database.accountQueries
+    val insert = DbAccount(
+      accountKey = accountKey,
+      account = TwidereAccount("name", "type"),
+      type = PlatformType.Twitter,
+      credentials_json = "insert",
+      credentials_type = CredentialsType.Basic,
+      extras_json = "",
+      user = mockIUser().toUi(accountKey).toAmUser(),
+      lastActive = System.currentTimeMillis()
+    )
+    query.insert(insert)
+    var result = query.findWithAccountKey(accountKey).executeAsOneOrNull()
+    assertEquals("insert", result?.credentials_json)
+    query.insert(insert.copy(credentials_json = "update"))
+    result = query.findWithAccountKey(accountKey).executeAsOneOrNull()
+    assertEquals("update", result?.credentials_json)
+  }
 
-    @Test
-    fun deleteAccount_DeleteAccountWithGivenKeys(): Unit = runBlocking {
-        val query = database.accountQueries
-        val insert = DbAccount(
-            accountKey = accountKey,
-            account = TwidereAccount("name", "type"),
-            type = PlatformType.Twitter,
-            credentials_json = "insert",
-            credentials_type = CredentialsType.Basic,
-            extras_json = "",
-            user = mockIUser().toUi(accountKey).toAmUser(),
-            lastActive = System.currentTimeMillis()
-        )
-        query.insert(insert)
-        var result = query.findWithAccountKey(accountKey).executeAsOneOrNull()
-        assertNotNull(result)
-        query.delete(insert.accountKey)
-        result = query.findWithAccountKey(accountKey).executeAsOneOrNull()
-        assertNull(result)
-    }
+  @Test
+  fun deleteAccount_DeleteAccountWithGivenKeys(): Unit = runBlocking {
+    val query = database.accountQueries
+    val insert = DbAccount(
+      accountKey = accountKey,
+      account = TwidereAccount("name", "type"),
+      type = PlatformType.Twitter,
+      credentials_json = "insert",
+      credentials_type = CredentialsType.Basic,
+      extras_json = "",
+      user = mockIUser().toUi(accountKey).toAmUser(),
+      lastActive = System.currentTimeMillis()
+    )
+    query.insert(insert)
+    var result = query.findWithAccountKey(accountKey).executeAsOneOrNull()
+    assertNotNull(result)
+    query.delete(insert.accountKey)
+    result = query.findWithAccountKey(accountKey).executeAsOneOrNull()
+    assertNull(result)
+  }
 }

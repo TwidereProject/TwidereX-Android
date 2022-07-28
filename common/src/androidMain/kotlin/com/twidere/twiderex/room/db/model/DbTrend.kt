@@ -29,41 +29,41 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.room.db.RoomCacheDatabase
 
 @Entity(
-    tableName = "trends",
-    indices = [Index(value = ["trendKey", "url"], unique = true)],
+  tableName = "trends",
+  indices = [Index(value = ["trendKey", "url"], unique = true)],
 )
 internal data class DbTrend(
-    @PrimaryKey
-    val _id: String,
-    val trendKey: MicroBlogKey,
-    val accountKey: MicroBlogKey,
-    val displayName: String,
-    val url: String,
-    val query: String,
-    val volume: Long,
+  @PrimaryKey
+  val _id: String,
+  val trendKey: MicroBlogKey,
+  val accountKey: MicroBlogKey,
+  val displayName: String,
+  val url: String,
+  val query: String,
+  val volume: Long,
 )
 
 internal data class DbTrendWithHistory(
-    @Embedded
-    val trend: DbTrend,
+  @Embedded
+  val trend: DbTrend,
 
-    @Relation(
-        parentColumn = "trendKey",
-        entityColumn = "trendKey",
-        entity = DbTrendHistory::class
-    )
-    val history: List<DbTrendHistory>,
+  @Relation(
+    parentColumn = "trendKey",
+    entityColumn = "trendKey",
+    entity = DbTrendHistory::class
+  )
+  val history: List<DbTrendHistory>,
 ) {
-    companion object {
-        suspend fun List<DbTrendWithHistory>.saveToDb(database: RoomCacheDatabase) {
-            map { it.trend }.let {
-                database.trendDao().insertAll(it)
-            }
-            map { it.history }
-                .flatten()
-                .let {
-                    database.trendHistoryDao().insertAll(it)
-                }
+  companion object {
+    suspend fun List<DbTrendWithHistory>.saveToDb(database: RoomCacheDatabase) {
+      map { it.trend }.let {
+        database.trendDao().insertAll(it)
+      }
+      map { it.history }
+        .flatten()
+        .let {
+          database.trendHistoryDao().insertAll(it)
         }
     }
+  }
 }

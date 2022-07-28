@@ -79,160 +79,160 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 val viewModelModule = module {
-    viewModel { (statusKey: MicroBlogKey) -> StatusViewModel(get(), get(), statusKey) }
-    viewModel { (belongKey: MicroBlogKey) -> PureMediaViewModel(get(), belongKey) }
-    viewModel { (statusKey: MicroBlogKey) -> MediaViewModel(get(), get(), get(), statusKey) }
-    viewModel { DraftViewModel(get(), get()) }
-    viewModel { ActiveAccountViewModel(get()) }
+  viewModel { (statusKey: MicroBlogKey) -> StatusViewModel(get(), get(), statusKey) }
+  viewModel { (belongKey: MicroBlogKey) -> PureMediaViewModel(get(), belongKey) }
+  viewModel { (statusKey: MicroBlogKey) -> MediaViewModel(get(), get(), get(), statusKey) }
+  viewModel { DraftViewModel(get(), get()) }
+  viewModel { ActiveAccountViewModel(get()) }
 
-    user()
-    twitter()
-    trend()
-    timeline()
-    settings()
-    search()
-    mastodon()
-    lists()
-    dm()
-    compose()
-    gif()
+  user()
+  twitter()
+  trend()
+  timeline()
+  settings()
+  search()
+  mastodon()
+  lists()
+  dm()
+  compose()
+  gif()
 }
 
 private fun Module.compose() {
-    viewModel { MastodonComposeSearchHashtagViewModel(get()) }
-    viewModel { (draftId: String) -> DraftItemViewModel(get(), draftId) }
-    viewModel { (draft: UiDraft) ->
-        DraftComposeViewModel(
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            draft
-        )
-    }
-    viewModel { (statusKey: MicroBlogKey?, composeType: ComposeType) ->
-        ComposeViewModel(
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            statusKey,
-            composeType,
-        )
-    }
-    viewModel { ComposeSearchUserViewModel(get()) }
+  viewModel { MastodonComposeSearchHashtagViewModel(get()) }
+  viewModel { (draftId: String) -> DraftItemViewModel(get(), draftId) }
+  viewModel { (draft: UiDraft) ->
+    DraftComposeViewModel(
+      get(),
+      get(),
+      get(),
+      get(),
+      get(),
+      get(),
+      get(),
+      get(),
+      get(),
+      draft
+    )
+  }
+  viewModel { (statusKey: MicroBlogKey?, composeType: ComposeType) ->
+    ComposeViewModel(
+      get(),
+      get(),
+      get(),
+      get(),
+      get(),
+      get(),
+      get(),
+      get(),
+      statusKey,
+      composeType,
+    )
+  }
+  viewModel { ComposeSearchUserViewModel(get()) }
 }
 
 private fun Module.dm() {
-    viewModel { DMConversationViewModel(get(), get()) }
-    viewModel { (conversationKey: MicroBlogKey) ->
-        DMEventViewModel(
-            get(),
-            get(),
-            get(),
-            conversationKey
-        )
-    }
-    viewModel { DMNewConversationViewModel(get(), get()) }
+  viewModel { DMConversationViewModel(get(), get()) }
+  viewModel { (conversationKey: MicroBlogKey) ->
+    DMEventViewModel(
+      get(),
+      get(),
+      get(),
+      conversationKey
+    )
+  }
+  viewModel { DMNewConversationViewModel(get(), get()) }
 }
 
 private fun Module.lists() {
-    viewModel { (following: Boolean) -> ListsSearchUserViewModel(get(), following) }
-    viewModel { (listKey: MicroBlogKey) -> ListsTimelineViewModel(get(), get(), listKey) }
-    viewModel { (listId: String) -> ListsAddMemberViewModel(get(), get(), get(), listId) }
-    viewModel { (listId: String, viewMembers: Boolean) ->
-        ListsUserViewModel(
-            get(),
-            get(),
-            listId,
-            viewMembers
-        )
-    }
-    viewModel { ListsViewModel(get(), get()) }
-    viewModel {
-        ListsCreateViewModel(
-            get(),
-            get(),
-            get(),
-        )
-    }
-    viewModel { (listKey: MicroBlogKey) -> ListsModifyViewModel(get(), get(), get(), listKey) }
+  viewModel { (following: Boolean) -> ListsSearchUserViewModel(get(), following) }
+  viewModel { (listKey: MicroBlogKey) -> ListsTimelineViewModel(get(), get(), listKey) }
+  viewModel { (listId: String) -> ListsAddMemberViewModel(get(), get(), get(), listId) }
+  viewModel { (listId: String, viewMembers: Boolean) ->
+    ListsUserViewModel(
+      get(),
+      get(),
+      listId,
+      viewMembers
+    )
+  }
+  viewModel { ListsViewModel(get(), get()) }
+  viewModel {
+    ListsCreateViewModel(
+      get(),
+      get(),
+      get(),
+    )
+  }
+  viewModel { (listKey: MicroBlogKey) -> ListsModifyViewModel(get(), get(), get(), listKey) }
 }
 
 private fun Module.mastodon() {
-    viewModel { (keyword: String) -> MastodonHashtagViewModel(get(), get(), keyword) }
-    viewModel { (keyword: String) -> MastodonSearchHashtagViewModel(get(), keyword) }
-    viewModel { MastodonSignInViewModel(get(), get(), get()) }
+  viewModel { (keyword: String) -> MastodonHashtagViewModel(get(), get(), keyword) }
+  viewModel { (keyword: String) -> MastodonSearchHashtagViewModel(get(), keyword) }
+  viewModel { MastodonSignInViewModel(get(), get(), get()) }
 }
 
 private fun Module.search() {
-    viewModel { (keyword: String) -> SearchInputViewModel(get(), get(), keyword) }
-    viewModel { (content: String) -> SearchSaveViewModel(get(), get(), content) }
-    viewModel { (keyword: String) -> SearchTweetsViewModel(get(), get(), keyword) }
-    viewModel { (keyword: String) -> SearchUserViewModel(get(), keyword) }
+  viewModel { (keyword: String) -> SearchInputViewModel(get(), get(), keyword) }
+  viewModel { (content: String) -> SearchSaveViewModel(get(), get(), content) }
+  viewModel { (keyword: String) -> SearchTweetsViewModel(get(), get(), keyword) }
+  viewModel { (keyword: String) -> SearchUserViewModel(get(), keyword) }
 }
 
 private fun Module.settings() {
-    viewModel { AccountNotificationViewModel(get()) }
-    viewModel { AppearanceViewModel(get<PreferencesHolder>().appearancePreferences) }
-    viewModel { DisplayViewModel(get<PreferencesHolder>().displayPreferences) }
-    viewModel { LayoutViewModel(get()) }
-    viewModel { MiscViewModel(get<PreferencesHolder>().miscPreferences, get(), get()) }
-    viewModel { NotificationViewModel(get<PreferencesHolder>().notificationPreferences) }
-    viewModel { StorageViewModel(get()) }
+  viewModel { AccountNotificationViewModel(get()) }
+  viewModel { AppearanceViewModel(get<PreferencesHolder>().appearancePreferences) }
+  viewModel { DisplayViewModel(get<PreferencesHolder>().displayPreferences) }
+  viewModel { LayoutViewModel(get()) }
+  viewModel { MiscViewModel(get<PreferencesHolder>().miscPreferences, get(), get()) }
+  viewModel { NotificationViewModel(get<PreferencesHolder>().notificationPreferences) }
+  viewModel { StorageViewModel(get()) }
 }
 
 private fun Module.timeline() {
-    viewModel { NotificationTimelineViewModel(get(), get(), get(), get()) }
-    viewModel { MentionsTimelineViewModel(get(), get(), get(), get()) }
-    viewModel { HomeTimelineViewModel(get(), get(), get()) }
-    viewModel { LocalTimelineViewModel(get(), get(), get()) }
-    viewModel { FederatedTimelineViewModel(get(), get(), get()) }
+  viewModel { NotificationTimelineViewModel(get(), get(), get(), get()) }
+  viewModel { MentionsTimelineViewModel(get(), get(), get(), get()) }
+  viewModel { HomeTimelineViewModel(get(), get(), get()) }
+  viewModel { LocalTimelineViewModel(get(), get(), get()) }
+  viewModel { FederatedTimelineViewModel(get(), get(), get()) }
 }
 
 private fun Module.trend() {
-    viewModel { TrendViewModel(get(), get()) }
+  viewModel { TrendViewModel(get(), get()) }
 }
 
 private fun Module.twitter() {
-    viewModel { (
-        consumerKey: String,
-        consumerSecret: String,
-        pinCodeProvider: suspend (url: String) -> String?,
-        onResult: (success: Boolean) -> Unit,
-    ) ->
-        TwitterSignInViewModel(
-            get(),
-            get(),
-            consumerKey,
-            consumerSecret,
-            get(),
-            pinCodeProvider,
-            onResult,
-        )
-    }
-    viewModel { (screenName: String) -> TwitterUserViewModel(get(), get(), get(), screenName) }
-    viewModel { (keyword: String) -> TwitterSearchMediaViewModel(get(), get(), keyword) }
+  viewModel { (
+    consumerKey: String,
+    consumerSecret: String,
+    pinCodeProvider: suspend (url: String) -> String?,
+    onResult: (success: Boolean) -> Unit,
+  ) ->
+    TwitterSignInViewModel(
+      get(),
+      get(),
+      consumerKey,
+      consumerSecret,
+      get(),
+      pinCodeProvider,
+      onResult,
+    )
+  }
+  viewModel { (screenName: String) -> TwitterUserViewModel(get(), get(), get(), screenName) }
+  viewModel { (keyword: String) -> TwitterSearchMediaViewModel(get(), get(), keyword) }
 }
 
 private fun Module.user() {
-    viewModel { (userKey: MicroBlogKey) -> UserViewModel(get(), get(), get(), userKey) }
-    viewModel { (userKey: MicroBlogKey) -> UserTimelineViewModel(get(), get(), userKey) }
-    viewModel { (userKey: MicroBlogKey) -> UserMediaTimelineViewModel(get(), get(), userKey) }
-    viewModel { (userKey: MicroBlogKey) -> UserFavouriteTimelineViewModel(get(), get(), userKey) }
-    viewModel { (userKey: MicroBlogKey) -> FollowingViewModel(get(), get(), userKey) }
-    viewModel { (userKey: MicroBlogKey) -> FollowersViewModel(get(), get(), userKey) }
+  viewModel { (userKey: MicroBlogKey) -> UserViewModel(get(), get(), get(), userKey) }
+  viewModel { (userKey: MicroBlogKey) -> UserTimelineViewModel(get(), get(), userKey) }
+  viewModel { (userKey: MicroBlogKey) -> UserMediaTimelineViewModel(get(), get(), userKey) }
+  viewModel { (userKey: MicroBlogKey) -> UserFavouriteTimelineViewModel(get(), get(), userKey) }
+  viewModel { (userKey: MicroBlogKey) -> FollowingViewModel(get(), get(), userKey) }
+  viewModel { (userKey: MicroBlogKey) -> FollowersViewModel(get(), get(), userKey) }
 }
 
 private fun Module.gif() {
-    viewModel { GifViewModel(get(), get(), get()) }
+  viewModel { GifViewModel(get(), get(), get()) }
 }

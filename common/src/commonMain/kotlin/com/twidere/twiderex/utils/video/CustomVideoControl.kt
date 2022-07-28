@@ -35,54 +35,54 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 @Composable
 fun CustomVideoControl(
-    state: VideoPlayerState,
-    modifier: Modifier = Modifier,
+  state: VideoPlayerState,
+  modifier: Modifier = Modifier,
 ) {
-    if (!state.isReady) {
-        return
-    }
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+  if (!state.isReady) {
+    return
+  }
+  Row(
+    modifier = modifier,
+    horizontalArrangement = Arrangement.Center,
+    verticalAlignment = Alignment.CenterVertically
+  ) {
+
+    IconButton(
+      onClick = {
+        state.playSwitch()
+      },
     ) {
-
-        IconButton(
-            onClick = {
-                state.playSwitch()
-            },
-        ) {
-            Icon(
-                painter = painterResource(res = if (state.isPlaying) com.twidere.twiderex.MR.files.ic_player_pause else com.twidere.twiderex.MR.files.ic_player_play),
-                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_video_play),
-                tint = MaterialTheme.colors.onSurface
-            )
-        }
-
-        Box(modifier.weight(1f)) {
-            Slider(
-                valueRange = 0f..state.duration.toFloat(),
-                value = state.currentPosition.toFloat(),
-                onValueChange = {
-                    state.seeking()
-                    state.currentPosition = it.toLong()
-                },
-                onValueChangeFinished = {
-                    state.seekTo(state.currentPosition)
-                }
-            )
-        }
-
-        IconButton(
-            onClick = {
-                state.mute()
-            },
-        ) {
-            Icon(
-                painter = painterResource(res = if (state.isMute) com.twidere.twiderex.MR.files.ic_volume_mute else com.twidere.twiderex.MR.files.ic_volume),
-                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_video_play),
-                tint = MaterialTheme.colors.onSurface
-            )
-        }
+      Icon(
+        painter = painterResource(res = if (state.isPlaying) com.twidere.twiderex.MR.files.ic_player_pause else com.twidere.twiderex.MR.files.ic_player_play),
+        contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_video_play),
+        tint = MaterialTheme.colors.onSurface
+      )
     }
+
+    Box(modifier.weight(1f)) {
+      Slider(
+        valueRange = 0f..state.duration.toFloat(),
+        value = state.currentPosition.toFloat(),
+        onValueChange = {
+          state.seeking()
+          state.currentPosition = it.toLong()
+        },
+        onValueChangeFinished = {
+          state.seekTo(state.currentPosition)
+        }
+      )
+    }
+
+    IconButton(
+      onClick = {
+        state.mute()
+      },
+    ) {
+      Icon(
+        painter = painterResource(res = if (state.isMute) com.twidere.twiderex.MR.files.ic_volume_mute else com.twidere.twiderex.MR.files.ic_volume),
+        contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_video_play),
+        tint = MaterialTheme.colors.onSurface
+      )
+    }
+  }
 }

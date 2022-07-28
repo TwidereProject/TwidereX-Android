@@ -32,48 +32,48 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 internal class SqlDelightStatusDaoImplTest : BaseCacheDatabaseTest() {
-    private val accountKey = MicroBlogKey.twitter("account")
-    @Test
-    fun findWithStatusKey_ReturnStatusWithAttachments() = runBlocking {
-        val dao = SqlDelightStatusDaoImpl(database)
-        val status = mockIStatus().toUi(accountKey = accountKey)
-        dao.insertAll(listOf = listOf(status), accountKey = accountKey)
-        assertEquals(status, dao.findWithStatusKey(statusKey = status.statusKey, accountKey = accountKey))
-    }
+  private val accountKey = MicroBlogKey.twitter("account")
+  @Test
+  fun findWithStatusKey_ReturnStatusWithAttachments() = runBlocking {
+    val dao = SqlDelightStatusDaoImpl(database)
+    val status = mockIStatus().toUi(accountKey = accountKey)
+    dao.insertAll(listOf = listOf(status), accountKey = accountKey)
+    assertEquals(status, dao.findWithStatusKey(statusKey = status.statusKey, accountKey = accountKey))
+  }
 
-    @Test
-    fun findWithStatusKeyFlow_FlowUpdatesWhenDbChanged() = runBlocking {
-        val dao = SqlDelightStatusDaoImpl(database)
-        val status = mockIStatus().toUi(accountKey = accountKey)
-        val flow = dao.findWithStatusKeyWithFlow(statusKey = status.statusKey, accountKey = accountKey)
-        assertNull(flow.firstOrNull())
-        dao.insertAll(listOf = listOf(status), accountKey = accountKey)
-        assertEquals(status, flow.firstOrNull())
-    }
+  @Test
+  fun findWithStatusKeyFlow_FlowUpdatesWhenDbChanged() = runBlocking {
+    val dao = SqlDelightStatusDaoImpl(database)
+    val status = mockIStatus().toUi(accountKey = accountKey)
+    val flow = dao.findWithStatusKeyWithFlow(statusKey = status.statusKey, accountKey = accountKey)
+    assertNull(flow.firstOrNull())
+    dao.insertAll(listOf = listOf(status), accountKey = accountKey)
+    assertEquals(status, flow.firstOrNull())
+  }
 
-    @Test
-    fun updateReaction() = runBlocking {
-        val dao = SqlDelightStatusDaoImpl(database)
-        val status = mockIStatus().toUi(accountKey = accountKey)
-        dao.insertAll(listOf = listOf(status), accountKey = accountKey)
-        val flow = dao.findWithStatusKeyWithFlow(statusKey = status.statusKey, accountKey = accountKey)
-        assertEquals(false, status.liked)
-        assertEquals(false, status.retweeted)
-        dao.updateAction(
-            statusKey = status.statusKey,
-            accountKey = accountKey,
-            liked = true,
-            retweet = null
-        )
-        assertEquals(true, flow.firstOrNull()?.liked)
-        assertEquals(false, flow.firstOrNull()?.retweeted)
-        dao.updateAction(
-            statusKey = status.statusKey,
-            accountKey = accountKey,
-            liked = null,
-            retweet = true
-        )
-        assertEquals(true, flow.firstOrNull()?.liked)
-        assertEquals(true, flow.firstOrNull()?.retweeted)
-    }
+  @Test
+  fun updateReaction() = runBlocking {
+    val dao = SqlDelightStatusDaoImpl(database)
+    val status = mockIStatus().toUi(accountKey = accountKey)
+    dao.insertAll(listOf = listOf(status), accountKey = accountKey)
+    val flow = dao.findWithStatusKeyWithFlow(statusKey = status.statusKey, accountKey = accountKey)
+    assertEquals(false, status.liked)
+    assertEquals(false, status.retweeted)
+    dao.updateAction(
+      statusKey = status.statusKey,
+      accountKey = accountKey,
+      liked = true,
+      retweet = null
+    )
+    assertEquals(true, flow.firstOrNull()?.liked)
+    assertEquals(false, flow.firstOrNull()?.retweeted)
+    dao.updateAction(
+      statusKey = status.statusKey,
+      accountKey = accountKey,
+      liked = null,
+      retweet = true
+    )
+    assertEquals(true, flow.firstOrNull()?.liked)
+    assertEquals(true, flow.firstOrNull()?.retweeted)
+  }
 }

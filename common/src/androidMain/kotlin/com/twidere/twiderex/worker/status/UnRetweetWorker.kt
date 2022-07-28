@@ -25,7 +25,7 @@ import androidx.work.WorkerParameters
 import com.twidere.twiderex.jobs.status.UnRetweetStatusJob
 
 class UnRetweetWorker(
-    appContext: Context,
-    params: WorkerParameters,
-    unRetweetStatusJob: UnRetweetStatusJob
+  appContext: Context,
+  params: WorkerParameters,
+  unRetweetStatusJob: UnRetweetStatusJob
 ) : StatusWorker(appContext, params, unRetweetStatusJob)

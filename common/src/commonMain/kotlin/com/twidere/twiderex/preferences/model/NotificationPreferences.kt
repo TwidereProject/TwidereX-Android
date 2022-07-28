@@ -24,5 +24,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class NotificationPreferences(
-    val enableNotification: Boolean = true,
+  val enableNotification: Boolean = true,
 )

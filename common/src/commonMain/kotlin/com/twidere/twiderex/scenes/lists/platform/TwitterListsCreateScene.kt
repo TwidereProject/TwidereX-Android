@@ -55,76 +55,76 @@ import moe.tlaster.precompose.navigation.PopUpTo
 
 @Composable
 fun TwitterListsCreateScene() {
-    val navController = LocalNavController.current
-    val scope = rememberCoroutineScope()
-    val listsCreateViewModel: ListsCreateViewModel = getViewModel()
-    val loading by listsCreateViewModel.loading.observeAsState(initial = false)
+  val navController = LocalNavController.current
+  val scope = rememberCoroutineScope()
+  val listsCreateViewModel: ListsCreateViewModel = getViewModel()
+  val loading by listsCreateViewModel.loading.observeAsState(initial = false)
 
-    TwidereScene {
-        var name by remember {
-            mutableStateOf("")
-        }
-        var desc by remember {
-            mutableStateOf("")
-        }
-        var isPrivate by remember {
-            mutableStateOf(false)
-        }
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = { AppBarNavigationButton(Icons.Default.Close) },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_create_title))
-                    },
-                    actions = {
-                        IconButton(
-                            enabled = name.isNotEmpty(),
-                            onClick = {
-                                scope.launch {
-                                    listsCreateViewModel.createList(
-                                        title = name,
-                                        description = desc,
-                                        private = isPrivate
-                                    )?.let {
-                                        navController.navigate(
-                                            Root.Lists.Timeline(it.listKey),
-                                            options = NavOptions(
-                                                popUpTo = PopUpTo(Root.Lists.Home)
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Done,
-                                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_confirm),
-                                tint = if (name.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(
-                                    alpha = LocalContentAlpha.current
-                                )
-                            )
-                        }
-                    }
-                )
-            }
-        ) {
-            Box {
-                TwitterListsModifyComponent(
-                    name = name,
-                    desc = desc,
-                    isPrivate = isPrivate,
-                    onNameChanged = { name = it },
-                    onDescChanged = { desc = it },
-                ) {
-                    isPrivate = it
-                }
-                if (loading) {
-                    Dialog(onDismissRequest = { }) {
-                        LoadingProgress()
-                    }
-                }
-            }
-        }
+  TwidereScene {
+    var name by remember {
+      mutableStateOf("")
     }
+    var desc by remember {
+      mutableStateOf("")
+    }
+    var isPrivate by remember {
+      mutableStateOf(false)
+    }
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = { AppBarNavigationButton(Icons.Default.Close) },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_create_title))
+          },
+          actions = {
+            IconButton(
+              enabled = name.isNotEmpty(),
+              onClick = {
+                scope.launch {
+                  listsCreateViewModel.createList(
+                    title = name,
+                    description = desc,
+                    private = isPrivate
+                  )?.let {
+                    navController.navigate(
+                      Root.Lists.Timeline(it.listKey),
+                      options = NavOptions(
+                        popUpTo = PopUpTo(Root.Lists.Home)
+                      )
+                    )
+                  }
+                }
+              }
+            ) {
+              Icon(
+                imageVector = Icons.Default.Done,
+                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_confirm),
+                tint = if (name.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                  alpha = LocalContentAlpha.current
+                )
+              )
+            }
+          }
+        )
+      }
+    ) {
+      Box {
+        TwitterListsModifyComponent(
+          name = name,
+          desc = desc,
+          isPrivate = isPrivate,
+          onNameChanged = { name = it },
+          onDescChanged = { desc = it },
+        ) {
+          isPrivate = it
+        }
+        if (loading) {
+          Dialog(onDismissRequest = { }) {
+            LoadingProgress()
+          }
+        }
+      }
+    }
+  }
 }

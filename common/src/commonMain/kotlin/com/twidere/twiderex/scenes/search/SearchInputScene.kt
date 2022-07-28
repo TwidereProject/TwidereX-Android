@@ -57,120 +57,120 @@ import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 import org.koin.core.parameter.parametersOf
 
 val fadeCreateTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
-    alpha = factor
+  alpha = factor
 }
 val fadeDestroyTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
-    alpha = factor
+  alpha = factor
 }
 val fadePauseTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
-    alpha = factor
+  alpha = factor
 }
 val fadeResumeTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
-    alpha = factor
+  alpha = factor
 }
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun SearchInputScene(initial: String? = null) {
 
-    val viewModel: SearchInputViewModel = getViewModel {
-        parametersOf(initial ?: "")
-    }
-    val source by viewModel.source.observeAsState(initial = emptyList())
-    val textFieldValue by viewModel.searchInput.observeAsState(TextFieldValue())
-    val navigator = LocalNavigator.current
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        ProvideTextStyle(value = MaterialTheme.typography.body1) {
-                            TextInput(
-                                value = textFieldValue,
-                                onValueChange = {
-                                    viewModel.updateSearchInput(it)
-                                },
-                                maxLines = 1,
-                                placeholder = {
-                                    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_search_bar_placeholder))
-                                },
-                                autoFocus = true,
-                                alignment = Alignment.CenterStart,
-                                keyboardOptions = KeyboardOptions(
-                                    imeAction = ImeAction.Search,
-                                ),
-                                keyboardActions = KeyboardActions(
-                                    onSearch = {
-                                        if (textFieldValue.text.isNotEmpty()) {
-                                            viewModel.addOrUpgrade(textFieldValue.text)
-                                            navigator.search(textFieldValue.text)
-                                        }
-                                    }
-                                )
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                if (textFieldValue.text.isNotEmpty()) {
-                                    viewModel.addOrUpgrade(textFieldValue.text)
-                                    navigator.search(textFieldValue.text)
-                                }
-                            }
-                        ) {
-                            Icon(
-                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
-                                contentDescription = stringResource(
-                                    res = com.twidere.twiderex.MR.strings.scene_search_title
-                                )
-                            )
-                        }
+  val viewModel: SearchInputViewModel = getViewModel {
+    parametersOf(initial ?: "")
+  }
+  val source by viewModel.source.observeAsState(initial = emptyList())
+  val textFieldValue by viewModel.searchInput.observeAsState(TextFieldValue())
+  val navigator = LocalNavigator.current
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            ProvideTextStyle(value = MaterialTheme.typography.body1) {
+              TextInput(
+                value = textFieldValue,
+                onValueChange = {
+                  viewModel.updateSearchInput(it)
+                },
+                maxLines = 1,
+                placeholder = {
+                  Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_search_bar_placeholder))
+                },
+                autoFocus = true,
+                alignment = Alignment.CenterStart,
+                keyboardOptions = KeyboardOptions(
+                  imeAction = ImeAction.Search,
+                ),
+                keyboardActions = KeyboardActions(
+                  onSearch = {
+                    if (textFieldValue.text.isNotEmpty()) {
+                      viewModel.addOrUpgrade(textFieldValue.text)
+                      navigator.search(textFieldValue.text)
                     }
+                  }
                 )
+              )
             }
-        ) {
-            LazyColumn {
-                items(items = source) {
-                    ListItem(
-                        modifier = Modifier.clickable(
-                            onClick = {
-                                viewModel.addOrUpgrade(it.content)
-                                viewModel.updateSearchInput(TextFieldValue(it.content, TextRange(it.content.length)))
-                                navigator.search(it.content)
-                            }
-                        ),
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.History,
-                                contentDescription = stringResource(
-                                    res = com.twidere.twiderex.MR.strings.accessibility_scene_search_history
-                                )
-                            )
-                        },
-                        trailing = {
-                            IconButton(
-                                onClick = {
-                                    viewModel.remove(it)
-                                }
-                            ) {
-                                Icon(
-                                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
-                                    contentDescription = stringResource(
-                                        res = com.twidere.twiderex.MR.strings.common_controls_actions_remove
-                                    )
-                                )
-                            }
-                        },
-                        text = {
-                            Text(text = it.content)
-                        },
-                    )
+          },
+          actions = {
+            IconButton(
+              onClick = {
+                if (textFieldValue.text.isNotEmpty()) {
+                  viewModel.addOrUpgrade(textFieldValue.text)
+                  navigator.search(textFieldValue.text)
                 }
+              }
+            ) {
+              Icon(
+                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
+                contentDescription = stringResource(
+                  res = com.twidere.twiderex.MR.strings.scene_search_title
+                )
+              )
             }
+          }
+        )
+      }
+    ) {
+      LazyColumn {
+        items(items = source) {
+          ListItem(
+            modifier = Modifier.clickable(
+              onClick = {
+                viewModel.addOrUpgrade(it.content)
+                viewModel.updateSearchInput(TextFieldValue(it.content, TextRange(it.content.length)))
+                navigator.search(it.content)
+              }
+            ),
+            icon = {
+              Icon(
+                imageVector = Icons.Default.History,
+                contentDescription = stringResource(
+                  res = com.twidere.twiderex.MR.strings.accessibility_scene_search_history
+                )
+              )
+            },
+            trailing = {
+              IconButton(
+                onClick = {
+                  viewModel.remove(it)
+                }
+              ) {
+                Icon(
+                  painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
+                  contentDescription = stringResource(
+                    res = com.twidere.twiderex.MR.strings.common_controls_actions_remove
+                  )
+                )
+              }
+            },
+            text = {
+              Text(text = it.content)
+            },
+          )
         }
+      }
     }
+  }
 }

@@ -25,34 +25,34 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 
 data class PagingTimeLine(
-    val accountKey: MicroBlogKey,
-    val pagingKey: String,
-    val statusKey: MicroBlogKey,
-    val timestamp: Long,
-    val sortId: Long,
-    var isGap: Boolean,
+  val accountKey: MicroBlogKey,
+  val pagingKey: String,
+  val statusKey: MicroBlogKey,
+  val timestamp: Long,
+  val sortId: Long,
+  var isGap: Boolean,
 )
 
 data class PagingTimeLineWithStatus(
-    val timeline: PagingTimeLine,
-    val status: UiStatus,
+  val timeline: PagingTimeLine,
+  val status: UiStatus,
 )
 
 enum class UserTimelineType {
-    Status,
-    Media,
-    Favourite
+  Status,
+  Media,
+  Favourite
 }
 
 fun UserTimelineType.pagingKey(accountKey: MicroBlogKey) = "user:$accountKey:$this"
 
 suspend fun List<PagingTimeLineWithStatus>.saveToDb(
-    database: CacheDatabase,
+  database: CacheDatabase,
 ) {
-    this.groupBy { it.timeline.accountKey }.forEach {
-        database.statusDao().insertAll(it.value.map { it.status }, it.key)
-    }
-    this.map { it.timeline }.let {
-        database.pagingTimelineDao().insertAll(it)
-    }
+  this.groupBy { it.timeline.accountKey }.forEach {
+    database.statusDao().insertAll(it.value.map { it.status }, it.key)
+  }
+  this.map { it.timeline }.let {
+    database.pagingTimelineDao().insertAll(it)
+  }
 }

@@ -25,7 +25,7 @@ import androidx.work.WorkerParameters
 import com.twidere.twiderex.jobs.status.RetweetStatusJob
 
 class RetweetWorker(
-    appContext: Context,
-    params: WorkerParameters,
-    retweetStatusJob: RetweetStatusJob,
+  appContext: Context,
+  params: WorkerParameters,
+  retweetStatusJob: RetweetStatusJob,
 ) : StatusWorker(appContext, params, retweetStatusJob)

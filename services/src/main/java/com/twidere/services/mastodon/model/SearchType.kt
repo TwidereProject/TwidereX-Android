@@ -21,7 +21,7 @@
 package com.twidere.services.mastodon.model
 
 enum class SearchType {
-    accounts,
-    hashtags,
-    statuses
+  accounts,
+  hashtags,
+  statuses
 }

@@ -45,67 +45,67 @@ import com.twidere.twiderex.viewmodel.dm.DMConversationViewModel
 
 @Composable
 fun DMConversationListScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_title))
-                    },
-                )
-            },
-            floatingActionButton = {
-                DMConversationListSceneFab()
-            },
-        ) {
-            DMConversationListSceneContent()
-        }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_title))
+          },
+        )
+      },
+      floatingActionButton = {
+        DMConversationListSceneFab()
+      },
+    ) {
+      DMConversationListSceneContent()
     }
+  }
 }
 
 @Composable
 fun DMConversationListSceneFab() {
-    val navController = LocalNavController.current
-    FloatingActionButton(
-        onClick = {
-            navController.navigate(Root.Messages.NewConversation)
-        }
-    ) {
-        Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_add),
-            contentDescription = stringResource(
-                res = com.twidere.twiderex.MR.strings.scene_lists_icons_create
-            ),
-        )
+  val navController = LocalNavController.current
+  FloatingActionButton(
+    onClick = {
+      navController.navigate(Root.Messages.NewConversation)
     }
+  ) {
+    Icon(
+      painter = painterResource(res = com.twidere.twiderex.MR.files.ic_add),
+      contentDescription = stringResource(
+        res = com.twidere.twiderex.MR.strings.scene_lists_icons_create
+      ),
+    )
+  }
 }
 
 @Composable
 fun DMConversationListSceneContent(
-    lazyListController: LazyListController? = null
+  lazyListController: LazyListController? = null
 ) {
-    val account = LocalActiveAccount.current ?: return
-    val navController = LocalNavController.current
-    if (!account.supportDirectMessage) return
-    val viewModel: DMConversationViewModel = getViewModel()
-    val source = viewModel.source.collectAsLazyPagingItems()
-    val listState = rememberLazyListState()
-    LaunchedEffect(lazyListController) {
-        lazyListController?.listState = listState
-    }
-    SwipeToRefreshLayout(
-        refreshingState = source.loadState.refresh is LoadState.Loading,
-        onRefresh = { source.refresh() }
-    ) {
-        LazyUiDMConversationList(
-            items = source,
-            state = listState,
-            onItemClicked = {
-                navController.navigate(Root.Messages.Conversation(it.conversation.conversationKey))
-            }
-        )
-    }
+  val account = LocalActiveAccount.current ?: return
+  val navController = LocalNavController.current
+  if (!account.supportDirectMessage) return
+  val viewModel: DMConversationViewModel = getViewModel()
+  val source = viewModel.source.collectAsLazyPagingItems()
+  val listState = rememberLazyListState()
+  LaunchedEffect(lazyListController) {
+    lazyListController?.listState = listState
+  }
+  SwipeToRefreshLayout(
+    refreshingState = source.loadState.refresh is LoadState.Loading,
+    onRefresh = { source.refresh() }
+  ) {
+    LazyUiDMConversationList(
+      items = source,
+      state = listState,
+      onItemClicked = {
+        navController.navigate(Root.Messages.Conversation(it.conversation.conversationKey))
+      }
+    )
+  }
 }

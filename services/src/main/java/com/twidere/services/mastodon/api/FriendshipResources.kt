@@ -28,26 +28,26 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface FriendshipResources {
-    @POST("/api/v1/accounts/{id}/follow")
-    suspend fun follow(
-        @Path(value = "id") id: String,
-    ): Account
+  @POST("/api/v1/accounts/{id}/follow")
+  suspend fun follow(
+    @Path(value = "id") id: String,
+  ): Account
 
-    @POST("/api/v1/accounts/{id}/unfollow")
-    suspend fun unfollow(
-        @Path(value = "id") id: String,
-    ): Account
+  @POST("/api/v1/accounts/{id}/unfollow")
+  suspend fun unfollow(
+    @Path(value = "id") id: String,
+  ): Account
 
-    @GET("/api/v1/accounts/relationships")
-    suspend fun showFriendships(@Query("id[]") id: List<String>): List<RelationshipResponse>
+  @GET("/api/v1/accounts/relationships")
+  suspend fun showFriendships(@Query("id[]") id: List<String>): List<RelationshipResponse>
 
-    @POST("/api/v1/accounts/{id}/block")
-    suspend fun block(
-        @Path(value = "id") id: String,
-    ): RelationshipResponse
+  @POST("/api/v1/accounts/{id}/block")
+  suspend fun block(
+    @Path(value = "id") id: String,
+  ): RelationshipResponse
 
-    @POST("/api/v1/accounts/{id}/unblock")
-    suspend fun unblock(
-        @Path(value = "id") id: String,
-    ): RelationshipResponse
+  @POST("/api/v1/accounts/{id}/unblock")
+  suspend fun unblock(
+    @Path(value = "id") id: String,
+  ): RelationshipResponse
 }

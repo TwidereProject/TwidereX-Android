@@ -28,27 +28,27 @@ import java.util.Date
 import java.util.Locale
 
 class DateQueryConverterFactory : Converter.Factory() {
-    override fun stringConverter(
-        type: Type,
-        annotations: Array<out Annotation>,
-        retrofit: Retrofit
-    ): Converter<*, String>? {
-        return if (type == Date::class.java) {
-            DateQueryConverter.INSTANCE
-        } else {
-            null
-        }
+  override fun stringConverter(
+    type: Type,
+    annotations: Array<out Annotation>,
+    retrofit: Retrofit
+  ): Converter<*, String>? {
+    return if (type == Date::class.java) {
+      DateQueryConverter.INSTANCE
+    } else {
+      null
     }
+  }
 
-    private class DateQueryConverter : Converter<Date, String> {
-        val simpleDateFormat by lazy {
-            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH)
-        }
-        override fun convert(date: Date): String? {
-            return simpleDateFormat.format(date)
-        }
-        companion object {
-            val INSTANCE = DateQueryConverter()
-        }
+  private class DateQueryConverter : Converter<Date, String> {
+    val simpleDateFormat by lazy {
+      SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH)
     }
+    override fun convert(date: Date): String? {
+      return simpleDateFormat.format(date)
+    }
+    companion object {
+      val INSTANCE = DateQueryConverter()
+    }
+  }
 }

@@ -28,41 +28,41 @@ import androidx.room.Relation
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
-    tableName = "paging_timeline",
-    indices = [
-        Index(
-            value = ["accountKey", "statusKey", "pagingKey"],
-            unique = true
-        )
-    ],
+  tableName = "paging_timeline",
+  indices = [
+    Index(
+      value = ["accountKey", "statusKey", "pagingKey"],
+      unique = true
+    )
+  ],
 )
 internal data class DbPagingTimeline(
-    @PrimaryKey
-    val _id: String,
-    val accountKey: MicroBlogKey,
-    val pagingKey: String,
-    val statusKey: MicroBlogKey,
-    val timestamp: Long,
-    val sortId: Long,
-    var isGap: Boolean,
+  @PrimaryKey
+  val _id: String,
+  val accountKey: MicroBlogKey,
+  val pagingKey: String,
+  val statusKey: MicroBlogKey,
+  val timestamp: Long,
+  val sortId: Long,
+  var isGap: Boolean,
 )
 
 internal data class DbPagingTimelineWithStatus(
-    @Embedded
-    val timeline: DbPagingTimeline,
+  @Embedded
+  val timeline: DbPagingTimeline,
 
-    @Relation(
-        parentColumn = "statusKey",
-        entityColumn = "statusKey",
-        entity = DbStatusV2::class,
-    )
-    val status: DbStatusWithReference,
+  @Relation(
+    parentColumn = "statusKey",
+    entityColumn = "statusKey",
+    entity = DbStatusV2::class,
+  )
+  val status: DbStatusWithReference,
 )
 
 internal enum class UserTimelineType {
-    Status,
-    Media,
-    Favourite
+  Status,
+  Media,
+  Favourite
 }
 
 internal fun UserTimelineType.pagingKey(accountKey: MicroBlogKey) = "user:$accountKey:$this"

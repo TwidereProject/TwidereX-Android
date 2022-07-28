@@ -33,65 +33,65 @@ import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
 
 class MediaViewModel(
-    private val repository: StatusRepository,
-    private val accountRepository: AccountRepository,
-    private val mediaAction: MediaAction,
-    private val statusKey: MicroBlogKey,
+  private val repository: StatusRepository,
+  private val accountRepository: AccountRepository,
+  private val mediaAction: MediaAction,
+  private val statusKey: MicroBlogKey,
 ) : ViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
+
+  suspend fun saveFile(currentMedia: UiMedia, target: suspend (fileName: String) -> String?) {
+    val account = account.firstOrNull() ?: return
+    val fileName = currentMedia.fileName ?: return
+    val path = target.invoke(fileName) ?: return
+    currentMedia.mediaUrl?.let {
+      mediaAction.download(
+        accountKey = account.accountKey,
+        source = it,
+        target = path
+      )
     }
+  }
 
-    suspend fun saveFile(currentMedia: UiMedia, target: suspend (fileName: String) -> String?) {
-        val account = account.firstOrNull() ?: return
-        val fileName = currentMedia.fileName ?: return
-        val path = target.invoke(fileName) ?: return
-        currentMedia.mediaUrl?.let {
-            mediaAction.download(
-                accountKey = account.accountKey,
-                source = it,
-                target = path
-            )
-        }
+  suspend fun shareMedia(currentMedia: UiMedia, extraText: String = "") {
+    val account = account.firstOrNull() ?: return
+    currentMedia.mediaUrl?.let { mediaUrl ->
+      currentMedia.fileName?.let { fileName ->
+        mediaAction.share(
+          source = mediaUrl,
+          fileName = fileName,
+          accountKey = account.accountKey,
+          extraText = extraText
+        )
+      }
     }
+  }
 
-    suspend fun shareMedia(currentMedia: UiMedia, extraText: String = "") {
-        val account = account.firstOrNull() ?: return
-        currentMedia.mediaUrl?.let { mediaUrl ->
-            currentMedia.fileName?.let { fileName ->
-                mediaAction.share(
-                    source = mediaUrl,
-                    fileName = fileName,
-                    accountKey = account.accountKey,
-                    extraText = extraText
-                )
-            }
-        }
+  val loading = MutableStateFlow(false)
+
+  @OptIn(ExperimentalCoroutinesApi::class)
+  val status by lazy {
+    account.flatMapLatest {
+      repository.loadStatus(
+        statusKey = statusKey,
+        accountKey = it.accountKey,
+      )
     }
+  }
 
-    val loading = MutableStateFlow(false)
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val status by lazy {
-        account.flatMapLatest {
-            repository.loadStatus(
-                statusKey = statusKey,
-                accountKey = it.accountKey,
-            )
-        }
-    }
-
-    // init {
-    //     viewModelScope.launch {
-    //         try {
-    //             repository.loadTweetFromNetwork(
-    //                 statusKey.id,
-    //                 account.accountKey,
-    //                 account.service as LookupService
-    //             )
-    //         } catch (e: Throwable) {
-    //             e.notify(inAppNotification)
-    //         }
-    //     }
-    // }
+  // init {
+  //     viewModelScope.launch {
+  //         try {
+  //             repository.loadTweetFromNetwork(
+  //                 statusKey.id,
+  //                 account.accountKey,
+  //                 account.service as LookupService
+  //             )
+  //         } catch (e: Throwable) {
+  //             e.notify(inAppNotification)
+  //         }
+  //     }
+  // }
 }

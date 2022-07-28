@@ -25,12 +25,12 @@ import android.net.Uri
 import com.twidere.twiderex.model.enums.MediaType
 
 fun Uri.mediaType(context: Context): MediaType {
-    val mimeType = context.contentResolver.getType(this) ?: ""
-    return when {
-        mimeType.startsWith("video") -> MediaType.video
-        mimeType == "image/gif" -> MediaType.animated_gif
-        mimeType.startsWith("image") -> MediaType.photo
-        mimeType.startsWith("audio") -> MediaType.audio
-        else -> MediaType.other
-    }
+  val mimeType = context.contentResolver.getType(this) ?: ""
+  return when {
+    mimeType.startsWith("video") -> MediaType.video
+    mimeType == "image/gif" -> MediaType.animated_gif
+    mimeType.startsWith("image") -> MediaType.photo
+    mimeType.startsWith("audio") -> MediaType.audio
+    else -> MediaType.other
+  }
 }

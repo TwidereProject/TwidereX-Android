@@ -26,18 +26,18 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TwitterApiExceptionV2(
-    @SerialName("account_id")
-    val accountID: Long? = null,
+  @SerialName("account_id")
+  val accountID: Long? = null,
 
-    @SerialName("product_name")
-    val productName: String? = null,
+  @SerialName("product_name")
+  val productName: String? = null,
 
-    val title: String? = null,
-    val period: String? = null,
-    val scope: String? = null,
-    val detail: String? = null,
-    val type: String? = null,
+  val title: String? = null,
+  val period: String? = null,
+  val scope: String? = null,
+  val detail: String? = null,
+  val type: String? = null,
 ) : MicroBlogException() {
-    override val microBlogErrorMessage: String?
-        get() = detail
+  override val microBlogErrorMessage: String?
+    get() = detail
 }

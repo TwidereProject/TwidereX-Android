@@ -24,5 +24,5 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import com.twidere.twiderex.kmp.ResLoader
 
 val LocalResLoader = staticCompositionLocalOf<ResLoader> {
-    error("No ResLoader")
+  error("No ResLoader")
 }

@@ -27,28 +27,28 @@ import kotlinx.coroutines.flow.flow
 import org.jetbrains.annotations.TestOnly
 
 internal class MockDraftDao @TestOnly constructor() : DraftDao {
-    private val fakeDb = mutableMapOf<String, UiDraft>()
-    override fun getAll(): Flow<List<UiDraft>> {
-        return flow {
-            emit(fakeDb.values.toList())
-        }
+  private val fakeDb = mutableMapOf<String, UiDraft>()
+  override fun getAll(): Flow<List<UiDraft>> {
+    return flow {
+      emit(fakeDb.values.toList())
     }
+  }
 
-    override fun getDraftCount(): Flow<Long> {
-        return flow {
-            emit(fakeDb.keys.size.toLong())
-        }
+  override fun getDraftCount(): Flow<Long> {
+    return flow {
+      emit(fakeDb.keys.size.toLong())
     }
+  }
 
-    override suspend fun insert(it: UiDraft) {
-        fakeDb[it.draftId] = it
-    }
+  override suspend fun insert(it: UiDraft) {
+    fakeDb[it.draftId] = it
+  }
 
-    override suspend fun get(draftId: String): UiDraft? {
-        return fakeDb[draftId]
-    }
+  override suspend fun get(draftId: String): UiDraft? {
+    return fakeDb[draftId]
+  }
 
-    override suspend fun remove(draft: UiDraft) {
-        fakeDb.remove(draft.draftId)
-    }
+  override suspend fun remove(draft: UiDraft) {
+    fakeDb.remove(draft.draftId)
+  }
 }

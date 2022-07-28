@@ -27,21 +27,21 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class MediaTransformTest {
-    @Test
-    fun transform() {
-        val ui = UiMedia(
-            belongToKey = MicroBlogKey.valueOf("test"),
-            url = "url",
-            mediaUrl = "mediaUrl",
-            previewUrl = "previewUrl",
-            type = MediaType.video,
-            width = 100,
-            height = 100,
-            pageUrl = "pageUrl",
-            altText = "altText",
-            order = 5
-        )
-        val db = ui.toDbMedia()
-        assertEquals(ui, db.toUi())
-    }
+  @Test
+  fun transform() {
+    val ui = UiMedia(
+      belongToKey = MicroBlogKey.valueOf("test"),
+      url = "url",
+      mediaUrl = "mediaUrl",
+      previewUrl = "previewUrl",
+      type = MediaType.video,
+      width = 100,
+      height = 100,
+      pageUrl = "pageUrl",
+      altText = "altText",
+      order = 5
+    )
+    val db = ui.toDbMedia()
+    assertEquals(ui, db.toUi())
+  }
 }

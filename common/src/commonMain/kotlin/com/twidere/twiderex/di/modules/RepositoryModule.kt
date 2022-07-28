@@ -40,20 +40,20 @@ import com.twidere.twiderex.repository.UserRepository
 import org.koin.dsl.module
 
 val repositoryModule = module {
-    single { CacheRepository(get(), get(), get()) }
-    single { DirectMessageRepository(get()) }
-    single { DraftRepository(get()) }
-    single { ListsRepository(get()) }
-    single { ListsUsersRepository() }
-    single { MediaRepository(get()) }
-    single { NotificationRepository(get()) }
-    single { ReactionRepository(get()) }
-    single { SearchRepository(get(), get()) }
-    single { StatusRepository(get(), get<PreferencesHolder>().miscPreferences) }
-    single { TimelineRepository(get()) }
-    single { TrendRepository(get()) }
-    single { UserListRepository() }
-    single { UserRepository(get(), get()) }
-    single { GifRepository(get()) }
-    single { NitterRepository() }
+  single { CacheRepository(get(), get(), get()) }
+  single { DirectMessageRepository(get()) }
+  single { DraftRepository(get()) }
+  single { ListsRepository(get()) }
+  single { ListsUsersRepository() }
+  single { MediaRepository(get()) }
+  single { NotificationRepository(get()) }
+  single { ReactionRepository(get()) }
+  single { SearchRepository(get(), get()) }
+  single { StatusRepository(get(), get<PreferencesHolder>().miscPreferences) }
+  single { TimelineRepository(get()) }
+  single { TrendRepository(get()) }
+  single { UserListRepository() }
+  single { UserRepository(get(), get()) }
+  single { GifRepository(get()) }
+  single { NitterRepository() }
 }

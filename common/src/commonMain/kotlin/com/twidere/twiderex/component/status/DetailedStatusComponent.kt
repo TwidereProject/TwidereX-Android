@@ -53,162 +53,162 @@ import com.twidere.twiderex.model.ui.UiStatus
 
 @Composable
 fun DetailedStatusComponent(
-    data: UiStatus,
-    showInfo: Boolean = true,
-    showActions: Boolean = true,
-    lineUp: Boolean = false,
+  data: UiStatus,
+  showInfo: Boolean = true,
+  showActions: Boolean = true,
+  lineUp: Boolean = false,
 ) {
+  Column(
+    modifier = Modifier
+      .fillMaxWidth()
+      .clickable(onClick = {}),
+  ) {
+    val status = (data.retweet ?: data)
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = {}),
+      modifier = Modifier.padding(
+        start = DetailedStatusDefaults.ContentPadding,
+        end = DetailedStatusDefaults.ContentPadding,
+      ),
     ) {
-        val status = (data.retweet ?: data)
-        Column(
-            modifier = Modifier.padding(
-                start = DetailedStatusDefaults.ContentPadding,
-                end = DetailedStatusDefaults.ContentPadding,
-            ),
-        ) {
-            StatusContent(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(top = DetailedStatusDefaults.ContentPadding),
-                lineUp = lineUp,
-                data = data,
-                type = StatusContentType.Extend,
-            )
-            if (showInfo) {
-                Spacer(modifier = Modifier.height(DetailedStatusDefaults.InfoContentSpacing))
-                ProvideTextStyle(value = MaterialTheme.typography.caption) {
-                    CompositionLocalProvider(
-                        LocalContentAlpha provides ContentAlpha.disabled
-                    ) {
-                        if (status.geo.name.isNotEmpty()) {
-                            Row(
-                                modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
-                            ) {
-                                Icon(
-                                    modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp),
-                                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
-                                    contentDescription = stringResource(
-                                        res = com.twidere.twiderex.MR.strings.accessibility_common_status_location
-                                    )
-                                )
-                                Text(text = status.geo.name)
-                            }
-                            Spacer(modifier = Modifier.height(DetailedStatusDefaults.ContentSpacing))
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                        ) {
-                            FormattedTime(time = status.timestamp)
-                            Spacer(modifier = Modifier.width(DetailedStatusDefaults.TimestampSpacing))
-                            HtmlText(
-                                htmlText = status.source,
-                                maxLines = 1,
-                                linkResolver = {
-                                    ResolvedLink(null)
-                                }
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(DetailedStatusDefaults.ContentSpacing))
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                        ) {
-                            StatusStatistics(
-                                count = status.metrics.reply,
-                                icon = painterResource(res = com.twidere.twiderex.MR.files.ic_corner_up_left),
-                                contentDescription = stringResource(
-                                    res = com.twidere.twiderex.MR.strings.scene_status_reply_mutiple,
-                                    status.metrics.reply,
-                                ),
-                            )
-                            Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
-                            StatusStatistics(
-                                count = status.metrics.retweet,
-                                icon = painterResource(res = com.twidere.twiderex.MR.files.ic_repeat),
-                                contentDescription = stringResource(
-                                    res = com.twidere.twiderex.MR.strings.scene_status_retweet_mutiple,
-                                    status.metrics.retweet,
-                                ),
-                            )
-                            if (status.platformType == PlatformType.Twitter) {
-                                Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
-                                StatusStatistics(
-                                    count = status.twitterExtra?.quoteCount ?: 0,
-                                    icon = painterResource(res = com.twidere.twiderex.MR.files.ic_blockquote),
-                                    contentDescription = null,
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
-                            StatusStatistics(
-                                count = status.metrics.like,
-                                icon = painterResource(res = com.twidere.twiderex.MR.files.ic_heart),
-                                contentDescription = stringResource(
-                                    res = com.twidere.twiderex.MR.strings.scene_status_like_multiple,
-                                    status.metrics.like,
-                                ),
-                            )
-                        }
-                    }
-                }
+      StatusContent(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(top = DetailedStatusDefaults.ContentPadding),
+        lineUp = lineUp,
+        data = data,
+        type = StatusContentType.Extend,
+      )
+      if (showInfo) {
+        Spacer(modifier = Modifier.height(DetailedStatusDefaults.InfoContentSpacing))
+        ProvideTextStyle(value = MaterialTheme.typography.caption) {
+          CompositionLocalProvider(
+            LocalContentAlpha provides ContentAlpha.disabled
+          ) {
+            if (status.geo.name.isNotEmpty()) {
+              Row(
+                modifier = Modifier
+                  .align(Alignment.CenterHorizontally)
+              ) {
+                Icon(
+                  modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp),
+                  painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
+                  contentDescription = stringResource(
+                    res = com.twidere.twiderex.MR.strings.accessibility_common_status_location
+                  )
+                )
+                Text(text = status.geo.name)
+              }
+              Spacer(modifier = Modifier.height(DetailedStatusDefaults.ContentSpacing))
             }
-        }
 
-        if (showActions) {
-            Spacer(modifier = Modifier.height(DetailedStatusDefaults.InfoContentSpacing))
-            Divider(
-                color = MaterialTheme.colors.onSurface.copy(alpha = 0.06f),
-                thickness = 0.5.dp
-            )
-            CompositionLocalProvider(
-                LocalContentAlpha provides ContentAlpha.medium
+            Row(
+              modifier = Modifier
+                .align(Alignment.CenterHorizontally)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                ) {
-                    ReplyButton(status = data, withNumber = false)
-                    RetweetButton(status = data, withNumber = false)
-                    LikeButton(status = data, withNumber = false)
-                    ShareButton(status = data)
+              FormattedTime(time = status.timestamp)
+              Spacer(modifier = Modifier.width(DetailedStatusDefaults.TimestampSpacing))
+              HtmlText(
+                htmlText = status.source,
+                maxLines = 1,
+                linkResolver = {
+                  ResolvedLink(null)
                 }
+              )
             }
+
+            Spacer(modifier = Modifier.height(DetailedStatusDefaults.ContentSpacing))
+            Row(
+              modifier = Modifier
+                .fillMaxWidth(),
+              horizontalArrangement = Arrangement.Center,
+            ) {
+              StatusStatistics(
+                count = status.metrics.reply,
+                icon = painterResource(res = com.twidere.twiderex.MR.files.ic_corner_up_left),
+                contentDescription = stringResource(
+                  res = com.twidere.twiderex.MR.strings.scene_status_reply_mutiple,
+                  status.metrics.reply,
+                ),
+              )
+              Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
+              StatusStatistics(
+                count = status.metrics.retweet,
+                icon = painterResource(res = com.twidere.twiderex.MR.files.ic_repeat),
+                contentDescription = stringResource(
+                  res = com.twidere.twiderex.MR.strings.scene_status_retweet_mutiple,
+                  status.metrics.retweet,
+                ),
+              )
+              if (status.platformType == PlatformType.Twitter) {
+                Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
+                StatusStatistics(
+                  count = status.twitterExtra?.quoteCount ?: 0,
+                  icon = painterResource(res = com.twidere.twiderex.MR.files.ic_blockquote),
+                  contentDescription = null,
+                )
+              }
+              Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
+              StatusStatistics(
+                count = status.metrics.like,
+                icon = painterResource(res = com.twidere.twiderex.MR.files.ic_heart),
+                contentDescription = stringResource(
+                  res = com.twidere.twiderex.MR.strings.scene_status_like_multiple,
+                  status.metrics.like,
+                ),
+              )
+            }
+          }
         }
+      }
     }
+
+    if (showActions) {
+      Spacer(modifier = Modifier.height(DetailedStatusDefaults.InfoContentSpacing))
+      Divider(
+        color = MaterialTheme.colors.onSurface.copy(alpha = 0.06f),
+        thickness = 0.5.dp
+      )
+      CompositionLocalProvider(
+        LocalContentAlpha provides ContentAlpha.medium
+      ) {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+          ReplyButton(status = data, withNumber = false)
+          RetweetButton(status = data, withNumber = false)
+          LikeButton(status = data, withNumber = false)
+          ShareButton(status = data)
+        }
+      }
+    }
+  }
 }
 
 object DetailedStatusDefaults {
-    val ContentPadding = 16.dp
-    val StatusStatisticsSpacing = 32.dp
-    val ContentSpacing = 8.dp
-    val InfoContentSpacing = 12.dp
-    val TimestampSpacing = 8.dp
+  val ContentPadding = 16.dp
+  val StatusStatisticsSpacing = 32.dp
+  val ContentSpacing = 8.dp
+  val InfoContentSpacing = 12.dp
+  val TimestampSpacing = 8.dp
 }
 
 @Composable
 private fun StatusStatistics(
-    count: Long,
-    icon: Painter,
-    contentDescription: String?,
+  count: Long,
+  icon: Painter,
+  contentDescription: String?,
 ) {
-    Row {
-        Icon(
-            modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp),
-            painter = icon,
-            contentDescription = contentDescription,
-        )
-        Spacer(modifier = Modifier.width(StatusStatisticsDefaults.IconSpacing))
-        Text(text = count.humanizedCount())
-    }
+  Row {
+    Icon(
+      modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp),
+      painter = icon,
+      contentDescription = contentDescription,
+    )
+    Spacer(modifier = Modifier.width(StatusStatisticsDefaults.IconSpacing))
+    Text(text = count.humanizedCount())
+  }
 }
 
 private object StatusStatisticsDefaults {
-    val IconSpacing = 4.dp
+  val IconSpacing = 4.dp
 }

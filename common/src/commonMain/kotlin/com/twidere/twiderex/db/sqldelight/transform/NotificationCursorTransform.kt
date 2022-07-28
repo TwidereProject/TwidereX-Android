@@ -24,17 +24,17 @@ import com.twidere.twiderex.model.paging.NotificationCursor
 import com.twidere.twiderex.sqldelight.table.DbNotificationCursor
 
 internal fun NotificationCursor.toDb() = DbNotificationCursor(
-    id = _id,
-    accountKey = accountKey,
-    type = type,
-    value_ = value,
-    timestamp = timestamp
+  id = _id,
+  accountKey = accountKey,
+  type = type,
+  value_ = value,
+  timestamp = timestamp
 )
 
 internal fun DbNotificationCursor.toUi() = NotificationCursor(
-    _id = id,
-    accountKey = accountKey,
-    type = type,
-    value = value_,
-    timestamp = timestamp
+  _id = id,
+  accountKey = accountKey,
+  type = type,
+  value = value_,
+  timestamp = timestamp
 )

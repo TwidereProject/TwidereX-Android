@@ -26,22 +26,22 @@ import kotlinx.serialization.Transient
 
 @Serializable
 data class AttachmentsV2(
-    @SerialName("media_keys")
-    val mediaKeys: List<String>? = null,
-    @SerialName("poll_ids")
-    val pollIds: List<String>? = null,
+  @SerialName("media_keys")
+  val mediaKeys: List<String>? = null,
+  @SerialName("poll_ids")
+  val pollIds: List<String>? = null,
 ) {
-    internal fun setExtra(includesV2: IncludesV2) {
-        mediaKeys?.let {
-            media = includesV2.media?.filter { mediaKeys.contains(it.mediaKey) }
-        }
-        pollIds?.let {
-            poll = includesV2.polls?.filter { pollIds.contains(it.id) }
-        }
+  internal fun setExtra(includesV2: IncludesV2) {
+    mediaKeys?.let {
+      media = includesV2.media?.filter { mediaKeys.contains(it.mediaKey) }
     }
+    pollIds?.let {
+      poll = includesV2.polls?.filter { pollIds.contains(it.id) }
+    }
+  }
 
-    @Transient
-    var media: List<MediaV2>? = null
-    @Transient
-    var poll: List<PollV2>? = null
+  @Transient
+  var media: List<MediaV2>? = null
+  @Transient
+  var poll: List<PollV2>? = null
 }

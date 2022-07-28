@@ -27,24 +27,24 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
 interface UploadResources {
-    @POST("/1.1/media/upload.json?command=INIT")
-    @FormUrlEncoded
-    suspend fun initUpload(
-        @Field("media_type") media_type: String,
-        @Field("total_bytes") total_bytes: Long,
-    ): TwitterUploadResponse
+  @POST("/1.1/media/upload.json?command=INIT")
+  @FormUrlEncoded
+  suspend fun initUpload(
+    @Field("media_type") media_type: String,
+    @Field("total_bytes") total_bytes: Long,
+  ): TwitterUploadResponse
 
-    @POST("/1.1/media/upload.json?command=APPEND")
-    @FormUrlEncoded
-    suspend fun appendUpload(
-        @Field("media_id") media_id: String,
-        @Field("segment_index") segment_index: Long,
-        @Field("media_data") media_data: String,
-    ): Response<Unit>
+  @POST("/1.1/media/upload.json?command=APPEND")
+  @FormUrlEncoded
+  suspend fun appendUpload(
+    @Field("media_id") media_id: String,
+    @Field("segment_index") segment_index: Long,
+    @Field("media_data") media_data: String,
+  ): Response<Unit>
 
-    @POST("/1.1/media/upload.json?command=FINALIZE")
-    @FormUrlEncoded
-    suspend fun finalizeUpload(
-        @Field("media_id") media_id: String,
-    ): TwitterUploadResponse
+  @POST("/1.1/media/upload.json?command=FINALIZE")
+  @FormUrlEncoded
+  suspend fun finalizeUpload(
+    @Field("media_id") media_id: String,
+  ): TwitterUploadResponse
 }

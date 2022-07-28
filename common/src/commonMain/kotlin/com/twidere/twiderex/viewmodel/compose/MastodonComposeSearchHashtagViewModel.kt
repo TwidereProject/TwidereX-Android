@@ -38,28 +38,28 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class MastodonComposeSearchHashtagViewModel(
-    private val accountRepository: AccountRepository,
+  private val accountRepository: AccountRepository,
 ) : ViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
+
+  val text = MutableStateFlow("")
+
+  @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+  val source = text.debounce(666L).filterNot { it.isEmpty() }.flatMapLatest { str ->
+    account.mapNotNull { it }.flatMapLatest { account ->
+      Pager(
+        config = PagingConfig(
+          pageSize = defaultLoadCount,
+          enablePlaceholders = false,
+        )
+      ) {
+        MastodonSearchHashtagPagingSource(
+          str,
+          account.service as MastodonService
+        )
+      }.flow
     }
-
-    val text = MutableStateFlow("")
-
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val source = text.debounce(666L).filterNot { it.isEmpty() }.flatMapLatest { str ->
-        account.mapNotNull { it }.flatMapLatest { account ->
-            Pager(
-                config = PagingConfig(
-                    pageSize = defaultLoadCount,
-                    enablePlaceholders = false,
-                )
-            ) {
-                MastodonSearchHashtagPagingSource(
-                    str,
-                    account.service as MastodonService
-                )
-            }.flow
-        }
-    }.cachedIn(viewModelScope)
+  }.cachedIn(viewModelScope)
 }

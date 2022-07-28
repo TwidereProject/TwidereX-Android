@@ -24,13 +24,13 @@ import androidx.room.TypeConverter
 import com.twidere.twiderex.model.enums.MastodonVisibility
 
 internal class MastodonVisibilityConverter {
-    @TypeConverter
-    fun fromString(target: MastodonVisibility?): String? {
-        return target?.name
-    }
+  @TypeConverter
+  fun fromString(target: MastodonVisibility?): String? {
+    return target?.name
+  }
 
-    @TypeConverter
-    fun fromMastodonVisibility(string: String?): MastodonVisibility? {
-        return string?.let { MastodonVisibility.valueOf(it) }
-    }
+  @TypeConverter
+  fun fromMastodonVisibility(string: String?): MastodonVisibility? {
+    return string?.let { MastodonVisibility.valueOf(it) }
+  }
 }

@@ -28,13 +28,13 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 fun CoroutineScope.launchCatching(
-    context: CoroutineContext = EmptyCoroutineContext,
-    start: CoroutineStart = CoroutineStart.DEFAULT,
-    block: suspend CoroutineScope.() -> Unit
+  context: CoroutineContext = EmptyCoroutineContext,
+  start: CoroutineStart = CoroutineStart.DEFAULT,
+  block: suspend CoroutineScope.() -> Unit
 ): Job = launch(
-    context, start
+  context, start
 ) {
-    runCatching {
-        block()
-    }
+  runCatching {
+    block()
+  }
 }

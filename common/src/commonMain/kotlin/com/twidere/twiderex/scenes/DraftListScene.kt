@@ -54,80 +54,80 @@ import com.twidere.twiderex.viewmodel.DraftViewModel
 
 @Composable
 fun DraftListScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_drafts_title))
-                    }
-                )
-            }
-        ) {
-            DraftListSceneContent()
-        }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_drafts_title))
+          }
+        )
+      }
+    ) {
+      DraftListSceneContent()
     }
+  }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DraftListSceneContent(
-    lazyListController: LazyListController? = null,
+  lazyListController: LazyListController? = null,
 ) {
-    val viewModel: DraftViewModel = getViewModel()
-    val source by viewModel.source.observeAsState(initial = emptyList())
-    val navController = LocalNavController.current
-    val listState = rememberLazyListState()
-    LaunchedEffect(lazyListController) {
-        lazyListController?.listState = listState
-    }
-    LazyColumn(
-        state = listState
-    ) {
-        items(items = source, key = { it.draftId.hashCode() }) {
-            ListItem(
-                text = {
-                    Text(text = it.content)
-                },
-                trailing = {
-                    var expanded by remember { mutableStateOf(false) }
-                    Box {
-                        IconButton(onClick = { expanded = true }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = stringResource(
-                                    res = com.twidere.twiderex.MR.strings.accessibility_common_more
-                                )
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                        ) {
-                            DropdownMenuItem(
-                                onClick = {
-                                    navController.navigate(Root.Draft.Compose(it.draftId))
-                                }
-                            ) {
-                                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_drafts_actions_edit_draft))
-                            }
-                            DropdownMenuItem(
-                                onClick = {
-                                    viewModel.delete(it)
-                                }
-                            ) {
-                                Text(
-                                    text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_remove),
-                                    color = Color.Red,
-                                )
-                            }
-                        }
-                    }
+  val viewModel: DraftViewModel = getViewModel()
+  val source by viewModel.source.observeAsState(initial = emptyList())
+  val navController = LocalNavController.current
+  val listState = rememberLazyListState()
+  LaunchedEffect(lazyListController) {
+    lazyListController?.listState = listState
+  }
+  LazyColumn(
+    state = listState
+  ) {
+    items(items = source, key = { it.draftId.hashCode() }) {
+      ListItem(
+        text = {
+          Text(text = it.content)
+        },
+        trailing = {
+          var expanded by remember { mutableStateOf(false) }
+          Box {
+            IconButton(onClick = { expanded = true }) {
+              Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(
+                  res = com.twidere.twiderex.MR.strings.accessibility_common_more
+                )
+              )
+            }
+            DropdownMenu(
+              expanded = expanded,
+              onDismissRequest = { expanded = false },
+            ) {
+              DropdownMenuItem(
+                onClick = {
+                  navController.navigate(Root.Draft.Compose(it.draftId))
                 }
-            )
+              ) {
+                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_drafts_actions_edit_draft))
+              }
+              DropdownMenuItem(
+                onClick = {
+                  viewModel.delete(it)
+                }
+              ) {
+                Text(
+                  text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_remove),
+                  color = Color.Red,
+                )
+              }
+            }
+          }
         }
+      )
     }
+  }
 }

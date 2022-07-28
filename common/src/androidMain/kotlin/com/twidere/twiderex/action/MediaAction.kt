@@ -30,38 +30,38 @@ import com.twidere.twiderex.worker.DownloadMediaWorker
 import com.twidere.twiderex.worker.ShareMediaWorker
 
 actual class MediaAction(
-    private val workManager: WorkManager,
-    private val context: Context,
-    private val storageProvider: StorageProvider
+  private val workManager: WorkManager,
+  private val context: Context,
+  private val storageProvider: StorageProvider
 ) {
-    actual fun download(
-        source: String,
-        target: String,
-        accountKey: MicroBlogKey
-    ) {
-        workManager.enqueue(
-            DownloadMediaWorker.create(
-                accountKey = accountKey,
-                source = source,
-                target = target
-            )
-        )
-    }
+  actual fun download(
+    source: String,
+    target: String,
+    accountKey: MicroBlogKey
+  ) {
+    workManager.enqueue(
+      DownloadMediaWorker.create(
+        accountKey = accountKey,
+        source = source,
+        target = target
+      )
+    )
+  }
 
-    actual fun share(source: String, fileName: String, accountKey: MicroBlogKey, extraText: String) {
-        val uri = storageProvider.cacheFiles.mediaFile(fileName).toUri(context)
-        DownloadMediaWorker.create(
-            accountKey = accountKey,
-            source = source,
-            target = uri.toString()
-        ).let {
-            workManager.beginWith(it)
-                .then(
-                    ShareMediaWorker.create(
-                        target = uri,
-                        extraText = extraText,
-                    )
-                ).enqueue()
-        }
+  actual fun share(source: String, fileName: String, accountKey: MicroBlogKey, extraText: String) {
+    val uri = storageProvider.cacheFiles.mediaFile(fileName).toUri(context)
+    DownloadMediaWorker.create(
+      accountKey = accountKey,
+      source = source,
+      target = uri.toString()
+    ).let {
+      workManager.beginWith(it)
+        .then(
+          ShareMediaWorker.create(
+            target = uri,
+            extraText = extraText,
+          )
+        ).enqueue()
     }
+  }
 }

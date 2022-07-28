@@ -33,53 +33,53 @@ import kotlin.math.min
 private const val MaxMenuCount = 5
 
 class LayoutViewModel(
-    private val accountRepository: AccountRepository,
+  private val accountRepository: AccountRepository,
 ) : ViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    fun updateHomeMenu(oldIndex: Int, newIndex: Int, menus: List<Any>) = viewModelScope.launch {
-        menus.toMutableList().let { list ->
-            list.add(newIndex, list.removeAt(oldIndex))
-            list.remove(true)
-            list.indexOf(false).let { min(it, MaxMenuCount) }.let { index ->
-                list.subList(0, index).filterIsInstance<HomeMenus>()
-                    .map { it to true } + list.subList(index, list.size)
-                    .filterIsInstance<HomeMenus>().map { it to false }
-            }.let {
-                account.firstOrNull()?.preferences?.setHomeMenuOrder(it)
-            }
-        }
+  fun updateHomeMenu(oldIndex: Int, newIndex: Int, menus: List<Any>) = viewModelScope.launch {
+    menus.toMutableList().let { list ->
+      list.add(newIndex, list.removeAt(oldIndex))
+      list.remove(true)
+      list.indexOf(false).let { min(it, MaxMenuCount) }.let { index ->
+        list.subList(0, index).filterIsInstance<HomeMenus>()
+          .map { it to true } + list.subList(index, list.size)
+          .filterIsInstance<HomeMenus>().map { it to false }
+      }.let {
+        account.firstOrNull()?.preferences?.setHomeMenuOrder(it)
+      }
     }
+  }
 
-    fun removeMenu(current: Int, menus: List<Any>) {
-        val newIndex = menus.indexOf(false)
-        updateHomeMenu(
-            oldIndex = current,
-            newIndex = newIndex,
-            menus = menus,
-        )
-    }
+  fun removeMenu(current: Int, menus: List<Any>) {
+    val newIndex = menus.indexOf(false)
+    updateHomeMenu(
+      oldIndex = current,
+      newIndex = newIndex,
+      menus = menus,
+    )
+  }
 
-    fun addMenu(current: Int, menus: List<Any>) {
-        val newIndex = menus.indexOf(false).let {
-            if (it == MaxMenuCount + 1) {
-                it - 1
-            } else {
-                it
-            }
-        }
-        updateHomeMenu(
-            oldIndex = current,
-            newIndex = newIndex,
-            menus = menus,
-        )
+  fun addMenu(current: Int, menus: List<Any>) {
+    val newIndex = menus.indexOf(false).let {
+      if (it == MaxMenuCount + 1) {
+        it - 1
+      } else {
+        it
+      }
     }
+    updateHomeMenu(
+      oldIndex = current,
+      newIndex = newIndex,
+      menus = menus,
+    )
+  }
 
-    val user by lazy {
-        account.map {
-            it.toUi()
-        }
+  val user by lazy {
+    account.map {
+      it.toUi()
     }
+  }
 }

@@ -24,23 +24,23 @@ import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
 
 interface LookupService {
-    suspend fun lookupUserByName(
-        name: String
-    ): IUser
+  suspend fun lookupUserByName(
+    name: String
+  ): IUser
 
-    suspend fun lookupUsersByName(
-        name: List<String>
-    ): List<IUser>
+  suspend fun lookupUsersByName(
+    name: List<String>
+  ): List<IUser>
 
-    suspend fun lookupUser(
-        id: String
-    ): IUser
+  suspend fun lookupUser(
+    id: String
+  ): IUser
 
-    suspend fun lookupStatus(
-        id: String
-    ): IStatus
+  suspend fun lookupStatus(
+    id: String
+  ): IStatus
 
-    suspend fun userPinnedStatus(
-        userId: String,
-    ): List<IStatus>
+  suspend fun userPinnedStatus(
+    userId: String,
+  ): List<IStatus>
 }

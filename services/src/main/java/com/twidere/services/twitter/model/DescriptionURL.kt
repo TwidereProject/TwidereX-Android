@@ -25,13 +25,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DescriptionURL(
-    val start: Long? = null,
-    val end: Long? = null,
-    val url: String? = null,
+  val start: Long? = null,
+  val end: Long? = null,
+  val url: String? = null,
 
-    @SerialName("expanded_url")
-    val expandedURL: String? = null,
+  @SerialName("expanded_url")
+  val expandedURL: String? = null,
 
-    @SerialName("display_url")
-    val displayURL: String? = null
+  @SerialName("display_url")
+  val displayURL: String? = null
 )

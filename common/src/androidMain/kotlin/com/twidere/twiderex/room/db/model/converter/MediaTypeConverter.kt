@@ -24,13 +24,13 @@ import androidx.room.TypeConverter
 import com.twidere.twiderex.model.enums.MediaType
 
 internal class MediaTypeConverter {
-    @TypeConverter
-    fun fromMediaType(mediaType: MediaType?): String? {
-        return mediaType?.name
-    }
+  @TypeConverter
+  fun fromMediaType(mediaType: MediaType?): String? {
+    return mediaType?.name
+  }
 
-    @TypeConverter
-    fun fromString(string: String?): MediaType? {
-        return string?.let { MediaType.valueOf(it) }
-    }
+  @TypeConverter
+  fun fromString(string: String?): MediaType? {
+    return string?.let { MediaType.valueOf(it) }
+  }
 }

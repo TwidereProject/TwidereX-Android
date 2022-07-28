@@ -36,74 +36,74 @@ import kotlinx.coroutines.flow.Flow
 
 class ListsUsersRepository(private val membersCaches: MutableMap<String, PagingMemoryCache<UiUser>> = mutableMapOf()) {
 
-    @OptIn(ExperimentalPagingApi::class)
-    fun fetchMembers(
-        accountKey: MicroBlogKey,
-        service: ListsService,
-        listId: String
-    ): Flow<PagingData<UiUser>> {
-        val cache = membersCaches[listId] ?: PagingMemoryCache()
-        membersCaches[listId] = cache
-        return Pager(
-            config = PagingConfig(
-                pageSize = defaultLoadCount,
-                enablePlaceholders = false,
-            ),
-            remoteMediator = ListsMembersMediator(
-                cache,
-                accountKey,
-                service,
-                listId
-            )
-        ) {
-            MemoryCachePagingSource(cache)
-        }.flow
-    }
-
-    fun fetchSubscribers(
-        accountKey: MicroBlogKey,
-        service: ListsService,
-        listId: String
-    ): Flow<PagingData<UiUser>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = defaultLoadCount,
-                enablePlaceholders = false,
-            ),
-        ) {
-            ListsSubscribersPagingSource(
-                userKey = accountKey,
-                service = service,
-                listId = listId
-            )
-        }.flow
-    }
-
-    suspend fun addMember(
-        service: ListsService,
-        listId: String,
-        user: UiUser,
+  @OptIn(ExperimentalPagingApi::class)
+  fun fetchMembers(
+    accountKey: MicroBlogKey,
+    service: ListsService,
+    listId: String
+  ): Flow<PagingData<UiUser>> {
+    val cache = membersCaches[listId] ?: PagingMemoryCache()
+    membersCaches[listId] = cache
+    return Pager(
+      config = PagingConfig(
+        pageSize = defaultLoadCount,
+        enablePlaceholders = false,
+      ),
+      remoteMediator = ListsMembersMediator(
+        cache,
+        accountKey,
+        service,
+        listId
+      )
     ) {
-        service.addMember(
-            listId = listId,
-            userId = user.id,
-            screenName = user.screenName
-        )
-        val cache = membersCaches[listId] ?: PagingMemoryCache()
-        membersCaches[listId] = cache
-        cache.insert(listOf(user))
-    }
+      MemoryCachePagingSource(cache)
+    }.flow
+  }
 
-    suspend fun removeMember(
-        service: ListsService,
-        listId: String,
-        user: UiUser,
+  fun fetchSubscribers(
+    accountKey: MicroBlogKey,
+    service: ListsService,
+    listId: String
+  ): Flow<PagingData<UiUser>> {
+    return Pager(
+      config = PagingConfig(
+        pageSize = defaultLoadCount,
+        enablePlaceholders = false,
+      ),
     ) {
-        membersCaches[listId]?.delete(user)
-        service.removeMember(
-            listId = listId,
-            userId = user.id,
-            screenName = user.screenName
-        )
-    }
+      ListsSubscribersPagingSource(
+        userKey = accountKey,
+        service = service,
+        listId = listId
+      )
+    }.flow
+  }
+
+  suspend fun addMember(
+    service: ListsService,
+    listId: String,
+    user: UiUser,
+  ) {
+    service.addMember(
+      listId = listId,
+      userId = user.id,
+      screenName = user.screenName
+    )
+    val cache = membersCaches[listId] ?: PagingMemoryCache()
+    membersCaches[listId] = cache
+    cache.insert(listOf(user))
+  }
+
+  suspend fun removeMember(
+    service: ListsService,
+    listId: String,
+    user: UiUser,
+  ) {
+    membersCaches[listId]?.delete(user)
+    service.removeMember(
+      listId = listId,
+      userId = user.id,
+      screenName = user.screenName
+    )
+  }
 }

@@ -26,17 +26,17 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface SearchResources {
-    @GET("/api/v2/search")
-    suspend fun searchV2(
-        @Query("q") query: String,
-        @Query("account_id") account_id: String? = null,
-        @Query("max_id") max_id: String? = null,
-        @Query("min_id") min_id: String? = null,
-        @Query("type") type: SearchType? = null,
-        @Query("exclude_unreviewed") exclude_unreviewed: Boolean? = null,
-        @Query("resolve") resolve: Boolean? = null,
-        @Query("limit") limit: Int? = null,
-        @Query("offset") offset: Int? = null,
-        @Query("following") following: Boolean? = null,
-    ): SearchResult
+  @GET("/api/v2/search")
+  suspend fun searchV2(
+    @Query("q") query: String,
+    @Query("account_id") account_id: String? = null,
+    @Query("max_id") max_id: String? = null,
+    @Query("min_id") min_id: String? = null,
+    @Query("type") type: SearchType? = null,
+    @Query("exclude_unreviewed") exclude_unreviewed: Boolean? = null,
+    @Query("resolve") resolve: Boolean? = null,
+    @Query("limit") limit: Int? = null,
+    @Query("offset") offset: Int? = null,
+    @Query("following") following: Boolean? = null,
+  ): SearchResult
 }

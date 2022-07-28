@@ -27,19 +27,19 @@ import com.twidere.twiderex.scenes.home.mastodon.LocalTimelineItem
 import com.twidere.twiderex.scenes.home.mastodon.MastodonNotificationItem
 
 private val itemMap by lazy {
-    mutableMapOf(
-        HomeMenus.HomeTimeline to HomeTimelineItem(),
-        HomeMenus.MastodonNotification to MastodonNotificationItem(),
-        HomeMenus.Mention to MentionItem(),
-        HomeMenus.Search to SearchItem(),
-        HomeMenus.Me to MeItem(),
-        HomeMenus.Message to DMConversationListItem(),
-        HomeMenus.LocalTimeline to LocalTimelineItem(),
-        HomeMenus.FederatedTimeline to FederatedTimelineItem(),
-        HomeMenus.Draft to DraftNavigationItem(),
-        HomeMenus.Lists to ListsNavigationItem(),
-    )
+  mutableMapOf(
+    HomeMenus.HomeTimeline to HomeTimelineItem(),
+    HomeMenus.MastodonNotification to MastodonNotificationItem(),
+    HomeMenus.Mention to MentionItem(),
+    HomeMenus.Search to SearchItem(),
+    HomeMenus.Me to MeItem(),
+    HomeMenus.Message to DMConversationListItem(),
+    HomeMenus.LocalTimeline to LocalTimelineItem(),
+    HomeMenus.FederatedTimeline to FederatedTimelineItem(),
+    HomeMenus.Draft to DraftNavigationItem(),
+    HomeMenus.Lists to ListsNavigationItem(),
+  )
 }
 
 val HomeMenus.item: HomeNavigationItem
-    get() = itemMap.getValue(this)
+  get() = itemMap.getValue(this)

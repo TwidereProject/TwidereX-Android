@@ -31,13 +31,13 @@ import com.twidere.twiderex.db.dao.TrendDao
 import com.twidere.twiderex.db.dao.UserDao
 
 interface CacheDatabase : Database {
-    fun statusDao(): StatusDao
-    fun mediaDao(): MediaDao
-    fun userDao(): UserDao
-    fun pagingTimelineDao(): PagingTimelineDao
-    fun listsDao(): ListsDao
-    fun notificationCursorDao(): NotificationCursorDao
-    fun trendDao(): TrendDao
-    fun directMessageConversationDao(): DirectMessageConversationDao
-    fun directMessageDao(): DirectMessageEventDao
+  fun statusDao(): StatusDao
+  fun mediaDao(): MediaDao
+  fun userDao(): UserDao
+  fun pagingTimelineDao(): PagingTimelineDao
+  fun listsDao(): ListsDao
+  fun notificationCursorDao(): NotificationCursorDao
+  fun trendDao(): TrendDao
+  fun directMessageConversationDao(): DirectMessageConversationDao
+  fun directMessageDao(): DirectMessageEventDao
 }

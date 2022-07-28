@@ -35,25 +35,25 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun FollowersScene(
-    userKey: MicroBlogKey,
+  userKey: MicroBlogKey,
 ) {
-    val viewModel: FollowersViewModel = getViewModel {
-        parametersOf(userKey)
+  val viewModel: FollowersViewModel = getViewModel {
+    parametersOf(userKey)
+  }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(stringResource(res = com.twidere.twiderex.MR.strings.scene_followers_title))
+          }
+        )
+      },
+    ) {
+      UserListComponent(viewModel)
     }
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(stringResource(res = com.twidere.twiderex.MR.strings.scene_followers_title))
-                    }
-                )
-            },
-        ) {
-            UserListComponent(viewModel)
-        }
-    }
+  }
 }

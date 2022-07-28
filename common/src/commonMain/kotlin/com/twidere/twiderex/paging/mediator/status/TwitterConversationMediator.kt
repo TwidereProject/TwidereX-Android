@@ -38,118 +38,118 @@ import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingMe
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingResult
 
 class TwitterConversationMediator(
-    private val service: TwitterService,
-    private val statusKey: MicroBlogKey,
-    private val nitterService: NitterService?,
-    accountKey: MicroBlogKey,
-    database: CacheDatabase,
+  private val service: TwitterService,
+  private val statusKey: MicroBlogKey,
+  private val nitterService: NitterService?,
+  accountKey: MicroBlogKey,
+  database: CacheDatabase,
 ) : CursorWithCustomOrderPagingMediator(
-    accountKey,
-    database
+  accountKey,
+  database
 ) {
-    private var _targetTweet: StatusV2? = null
-    private suspend fun loadPrevious(): List<StatusV2> {
-        var current = _targetTweet ?: return emptyList()
-        val list = arrayListOf<StatusV2>()
-        while (true) {
-            val referencedTweetId = current.referencedTweets
-                ?.firstOrNull { it.type == ReferencedTweetType.replied_to }?.id
-            if (referencedTweetId == null) {
-                break
-            } else {
-                try {
-                    val result = service.lookupStatus(referencedTweetId)
-                    list.add(result)
-                    current = result
-                } catch (e: MicroBlogException) {
-                    // TODO: show error
-                    break
-                }
-            }
+  private var _targetTweet: StatusV2? = null
+  private suspend fun loadPrevious(): List<StatusV2> {
+    var current = _targetTweet ?: return emptyList()
+    val list = arrayListOf<StatusV2>()
+    while (true) {
+      val referencedTweetId = current.referencedTweets
+        ?.firstOrNull { it.type == ReferencedTweetType.replied_to }?.id
+      if (referencedTweetId == null) {
+        break
+      } else {
+        try {
+          val result = service.lookupStatus(referencedTweetId)
+          list.add(result)
+          current = result
+        } catch (e: MicroBlogException) {
+          // TODO: show error
+          break
         }
-        return list.reversed()
+      }
     }
+    return list.reversed()
+  }
 
-    private suspend fun loadConversation(nextPage: String? = null): ISearchResponse {
-        if (nitterService != null) {
-            try {
-                val nitterResult = nitterService.conversation(statusKey.id, statusKey.id, nextPage)
-                return nitterResult?.let {
-                    it.items.flatMap { it.statuses }
-                }?.takeIf { it.isNotEmpty() }?.let { items ->
-                    val result = service.lookupStatuses(items.mapNotNull { it.statusId })
-                    BasicSearchResponse(
-                        nextPage = nitterResult.nextPage,
-                        status = result
-                    )
-                } ?: BasicSearchResponse(null, emptyList())
-            } catch (e: MicroBlogException) {
-                e.printStackTrace()
-            }
-        }
-        return try {
-            service.searchV2(
-                "conversation_id:${_targetTweet?.conversationID}",
-                count = defaultLoadCount,
-                nextPage = nextPage
-            )
-        } catch (e: TwitterApiExceptionV2) {
-            service.searchV1(
-                "to:${_targetTweet?.user?.username} since_id:${_targetTweet?.id}",
-                count = defaultLoadCount,
-                max_id = nextPage
-            )
-        }.let {
-            BasicSearchResponse(
-                nextPage = it.nextPage,
-                status = buildConversation(it.status)
-            )
-        }
+  private suspend fun loadConversation(nextPage: String? = null): ISearchResponse {
+    if (nitterService != null) {
+      try {
+        val nitterResult = nitterService.conversation(statusKey.id, statusKey.id, nextPage)
+        return nitterResult?.let {
+          it.items.flatMap { it.statuses }
+        }?.takeIf { it.isNotEmpty() }?.let { items ->
+          val result = service.lookupStatuses(items.mapNotNull { it.statusId })
+          BasicSearchResponse(
+            nextPage = nitterResult.nextPage,
+            status = result
+          )
+        } ?: BasicSearchResponse(null, emptyList())
+      } catch (e: MicroBlogException) {
+        e.printStackTrace()
+      }
     }
-
-    override suspend fun load(
-        pageSize: Int,
-        paging: CursorWithCustomOrderPagination?
-    ): List<IStatus> {
-        if (paging != null && paging.cursor == null) {
-            return emptyList()
-        }
-        val ancestors = if (paging == null) {
-            val tweet = service.lookupStatus(statusKey.id)
-            _targetTweet =
-                tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
-                    ?: tweet
-            loadPrevious() + tweet
-        } else {
-            emptyList()
-        }
-        val descendantsResult = loadConversation(paging?.cursor)
-        val result = (ancestors + descendantsResult.status)
-
-        return CursorWithCustomOrderPagingResult(
-            data = result,
-            cursor = descendantsResult.nextPage,
-            nextOrder = paging?.nextOrder ?: 0
-        )
+    return try {
+      service.searchV2(
+        "conversation_id:${_targetTweet?.conversationID}",
+        count = defaultLoadCount,
+        nextPage = nextPage
+      )
+    } catch (e: TwitterApiExceptionV2) {
+      service.searchV1(
+        "to:${_targetTweet?.user?.username} since_id:${_targetTweet?.id}",
+        count = defaultLoadCount,
+        max_id = nextPage
+      )
+    }.let {
+      BasicSearchResponse(
+        nextPage = it.nextPage,
+        status = buildConversation(it.status)
+      )
     }
+  }
 
-    private fun buildConversation(status: List<IStatus>): List<IStatus> {
-        return status.filter {
-            when (it) {
-                is Status -> {
-                    it.inReplyToStatusID == _targetTweet?.id
-                }
-                is StatusV2 -> {
-                    it.referencedTweets
-                        ?.firstOrNull { it.type == ReferencedTweetType.replied_to }
-                        ?.status?.id == _targetTweet?.id
-                }
-                else -> {
-                    false
-                }
-            }
-        }
+  override suspend fun load(
+    pageSize: Int,
+    paging: CursorWithCustomOrderPagination?
+  ): List<IStatus> {
+    if (paging != null && paging.cursor == null) {
+      return emptyList()
     }
+    val ancestors = if (paging == null) {
+      val tweet = service.lookupStatus(statusKey.id)
+      _targetTweet =
+        tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
+          ?: tweet
+      loadPrevious() + tweet
+    } else {
+      emptyList()
+    }
+    val descendantsResult = loadConversation(paging?.cursor)
+    val result = (ancestors + descendantsResult.status)
 
-    override val pagingKey: String = "status:$statusKey"
+    return CursorWithCustomOrderPagingResult(
+      data = result,
+      cursor = descendantsResult.nextPage,
+      nextOrder = paging?.nextOrder ?: 0
+    )
+  }
+
+  private fun buildConversation(status: List<IStatus>): List<IStatus> {
+    return status.filter {
+      when (it) {
+        is Status -> {
+          it.inReplyToStatusID == _targetTweet?.id
+        }
+        is StatusV2 -> {
+          it.referencedTweets
+            ?.firstOrNull { it.type == ReferencedTweetType.replied_to }
+            ?.status?.id == _targetTweet?.id
+        }
+        else -> {
+          false
+        }
+      }
+    }
+  }
+
+  override val pagingKey: String = "status:$statusKey"
 }

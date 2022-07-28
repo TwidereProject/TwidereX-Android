@@ -26,10 +26,10 @@ import kotlinx.coroutines.flow.flow
 import moe.tlaster.precompose.viewmodel.ViewModel
 
 class PureMediaViewModel(
-    private val mediaRepository: MediaRepository,
-    private val belongKey: MicroBlogKey, // statusKey, conversationKey
+  private val mediaRepository: MediaRepository,
+  private val belongKey: MicroBlogKey, // statusKey, conversationKey
 ) : ViewModel() {
-    val source = flow {
-        emit(mediaRepository.findMediaByBelongToKey(belongKey))
-    }
+  val source = flow {
+    emit(mediaRepository.findMediaByBelongToKey(belongKey))
+  }
 }

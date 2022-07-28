@@ -23,5 +23,5 @@ package com.twidere.twiderex.paging.source.gif
 import com.twidere.services.gif.GifService
 
 class GifTrendingPagingSource(gifService: GifService) : GifPagingSource(gifService) {
-    override suspend fun loadFromService(key: String?, loadSize: Int) = service.trending(nextPage = key, limit = loadSize)
+  override suspend fun loadFromService(key: String?, loadSize: Int) = service.trending(nextPage = key, limit = loadSize)
 }

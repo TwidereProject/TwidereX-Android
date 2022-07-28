@@ -27,13 +27,13 @@ import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.paging.SinceMaxPagination
 
 abstract class MaxIdPagingMediator(
-    accountKey: MicroBlogKey,
-    database: CacheDatabase,
+  accountKey: MicroBlogKey,
+  database: CacheDatabase,
 ) : PagingTimelineMediatorBase<SinceMaxPagination>(accountKey, database) {
-    override fun provideNextPage(
-        raw: List<IStatus>,
-        result: List<PagingTimeLineWithStatus>
-    ): SinceMaxPagination {
-        return SinceMaxPagination(maxId = result.lastOrNull()?.status?.statusId)
-    }
+  override fun provideNextPage(
+    raw: List<IStatus>,
+    result: List<PagingTimeLineWithStatus>
+  ): SinceMaxPagination {
+    return SinceMaxPagination(maxId = result.lastOrNull()?.status?.statusId)
+  }
 }

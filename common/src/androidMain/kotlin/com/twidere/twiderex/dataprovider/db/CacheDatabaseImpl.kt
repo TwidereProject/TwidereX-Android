@@ -34,34 +34,34 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.room.db.RoomCacheDatabase
 
 internal class CacheDatabaseImpl(private val roomCacheDatabase: RoomCacheDatabase) : CacheDatabase {
-    private val statusDao = StatusDaoImpl(roomCacheDatabase)
-    override fun statusDao() = statusDao
+  private val statusDao = StatusDaoImpl(roomCacheDatabase)
+  override fun statusDao() = statusDao
 
-    private val mediaDao = MediaDaoImpl(roomCacheDatabase)
-    override fun mediaDao() = mediaDao
+  private val mediaDao = MediaDaoImpl(roomCacheDatabase)
+  override fun mediaDao() = mediaDao
 
-    private val userDao = UserDaoImpl(roomCacheDatabase)
-    override fun userDao() = userDao
+  private val userDao = UserDaoImpl(roomCacheDatabase)
+  override fun userDao() = userDao
 
-    private val pagingTimelineDao = PagingTimelineDaoImpl(roomCacheDatabase)
-    override fun pagingTimelineDao() = pagingTimelineDao
+  private val pagingTimelineDao = PagingTimelineDaoImpl(roomCacheDatabase)
+  override fun pagingTimelineDao() = pagingTimelineDao
 
-    private val listsDao = ListsDaoImpl(roomCacheDatabase)
-    override fun listsDao() = listsDao
+  private val listsDao = ListsDaoImpl(roomCacheDatabase)
+  override fun listsDao() = listsDao
 
-    private val notificationCursorDao = NotificationCursorDaoImpl(roomCacheDatabase)
-    override fun notificationCursorDao() = notificationCursorDao
+  private val notificationCursorDao = NotificationCursorDaoImpl(roomCacheDatabase)
+  override fun notificationCursorDao() = notificationCursorDao
 
-    private val trendDao = TrendDaoImpl(roomCacheDatabase)
-    override fun trendDao() = trendDao
+  private val trendDao = TrendDaoImpl(roomCacheDatabase)
+  override fun trendDao() = trendDao
 
-    private val dmConversationDao = DirectMessageConversationDaoImpl(roomCacheDatabase)
-    override fun directMessageConversationDao() = dmConversationDao
+  private val dmConversationDao = DirectMessageConversationDaoImpl(roomCacheDatabase)
+  override fun directMessageConversationDao() = dmConversationDao
 
-    private val dmEventDao = DirectMessageEventDaoImpl(roomCacheDatabase)
-    override fun directMessageDao() = dmEventDao
+  private val dmEventDao = DirectMessageEventDaoImpl(roomCacheDatabase)
+  override fun directMessageDao() = dmEventDao
 
-    override suspend fun clearAllTables() = roomCacheDatabase.clearAllTables()
+  override suspend fun clearAllTables() = roomCacheDatabase.clearAllTables()
 
-    override suspend fun <R> withTransaction(block: suspend () -> R) = roomCacheDatabase.withTransaction(block)
+  override suspend fun <R> withTransaction(block: suspend () -> R) = roomCacheDatabase.withTransaction(block)
 }

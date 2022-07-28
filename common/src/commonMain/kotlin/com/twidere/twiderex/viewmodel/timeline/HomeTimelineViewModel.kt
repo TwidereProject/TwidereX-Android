@@ -33,29 +33,29 @@ import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class HomeTimelineViewModel(
-    dataStore: DataStore<Preferences>,
-    database: CacheDatabase,
-    private val accountRepository: AccountRepository,
+  dataStore: DataStore<Preferences>,
+  database: CacheDatabase,
+  private val accountRepository: AccountRepository,
 ) : TimelineViewModel(dataStore) {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override val pagingMediator by lazy {
-        account.mapNotNull { it }.mapLatest {
-            HomeTimelineMediator(
-                it.service as TimelineService,
-                it.accountKey,
-                database,
-            )
-        }.asStateIn(viewModelScope, null)
-    }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  override val pagingMediator by lazy {
+    account.mapNotNull { it }.mapLatest {
+      HomeTimelineMediator(
+        it.service as TimelineService,
+        it.accountKey,
+        database,
+      )
+    }.asStateIn(viewModelScope, null)
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override val savedStateKey by lazy {
-        account.mapNotNull { it }.mapLatest {
-            "${it.accountKey}_home"
-        }.asStateIn(viewModelScope, null)
-    }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  override val savedStateKey by lazy {
+    account.mapNotNull { it }.mapLatest {
+      "${it.accountKey}_home"
+    }.asStateIn(viewModelScope, null)
+  }
 }

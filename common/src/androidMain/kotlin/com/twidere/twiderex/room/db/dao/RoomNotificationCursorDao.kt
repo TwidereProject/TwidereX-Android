@@ -30,12 +30,12 @@ import com.twidere.twiderex.room.db.model.DbNotificationCursorType
 
 @Dao
 internal interface RoomNotificationCursorDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(lists: List<DbNotificationCursor>)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertAll(lists: List<DbNotificationCursor>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun add(item: DbNotificationCursor)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun add(item: DbNotificationCursor)
 
-    @Query("SELECT * FROM notification_cursor WHERE accountKey == :accountKey AND type == :type")
-    suspend fun find(accountKey: MicroBlogKey, type: DbNotificationCursorType): DbNotificationCursor?
+  @Query("SELECT * FROM notification_cursor WHERE accountKey == :accountKey AND type == :type")
+  suspend fun find(accountKey: MicroBlogKey, type: DbNotificationCursorType): DbNotificationCursor?
 }

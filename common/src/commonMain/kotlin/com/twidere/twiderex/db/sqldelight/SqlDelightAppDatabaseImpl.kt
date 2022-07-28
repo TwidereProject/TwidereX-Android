@@ -27,18 +27,18 @@ import com.twidere.twiderex.sqldelight.SqlDelightAppDatabase
 import kotlinx.coroutines.runBlocking
 
 internal class SqlDelightAppDatabaseImpl(private val database: SqlDelightAppDatabase) : AppDatabase {
-    private val draftDao = SqlDelightDraftDaoImpl(database.draftQueries)
-    override fun draftDao() = draftDao
+  private val draftDao = SqlDelightDraftDaoImpl(database.draftQueries)
+  override fun draftDao() = draftDao
 
-    private val searchDao = SqlDelightSearchDaoImpl(database.searchQueries)
-    override fun searchDao() = searchDao
+  private val searchDao = SqlDelightSearchDaoImpl(database.searchQueries)
+  override fun searchDao() = searchDao
 
-    override suspend fun clearAllTables() {
-        database.dropQueries.clearAllTables()
-    }
+  override suspend fun clearAllTables() {
+    database.dropQueries.clearAllTables()
+  }
 
-    override suspend fun <R> withTransaction(block: suspend () -> R): R {
-        // TODO find a way to handle transaction
-        return database.transactionWithResult { runBlocking { block.invoke() } }
-    }
+  override suspend fun <R> withTransaction(block: suspend () -> R): R {
+    // TODO find a way to handle transaction
+    return database.transactionWithResult { runBlocking { block.invoke() } }
+  }
 }

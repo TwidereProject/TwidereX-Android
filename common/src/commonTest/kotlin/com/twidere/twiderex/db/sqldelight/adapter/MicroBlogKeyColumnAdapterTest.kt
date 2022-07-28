@@ -25,17 +25,17 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class MicroBlogKeyColumnAdapterTest {
-    private val adapter = MicroBlogKeyColumnAdapter()
-    @Test
-    fun decode_GenerateCorrectHostAndId() {
-        val key = adapter.decode("123@twitter.com")
-        assertEquals("123", key.id)
-        assertEquals("twitter.com", key.host)
-    }
+  private val adapter = MicroBlogKeyColumnAdapter()
+  @Test
+  fun decode_GenerateCorrectHostAndId() {
+    val key = adapter.decode("123@twitter.com")
+    assertEquals("123", key.id)
+    assertEquals("twitter.com", key.host)
+  }
 
-    @Test
-    fun encode_CombineIdAndHostToString() {
-        val string = adapter.encode(MicroBlogKey(id = "123", host = "twitter.com"))
-        assertEquals("123@twitter.com", string)
-    }
+  @Test
+  fun encode_CombineIdAndHostToString() {
+    val string = adapter.encode(MicroBlogKey(id = "123", host = "twitter.com"))
+    assertEquals("123@twitter.com", string)
+  }
 }

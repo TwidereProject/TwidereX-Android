@@ -37,37 +37,37 @@ import kotlin.test.Test
 import kotlin.test.assertNotNull
 
 internal class FollowingViewModelTest : AccountViewModelTestBase() {
-    override val mockService: MicroBlogService
-        get() = MockRelationshipService()
+  override val mockService: MicroBlogService
+    get() = MockRelationshipService()
 
-    @MockK
-    private lateinit var repository: UserListRepository
+  @MockK
+  private lateinit var repository: UserListRepository
 
-    private lateinit var viewModel: FollowingViewModel
+  private lateinit var viewModel: FollowingViewModel
 
-    override fun setUp() {
-        super.setUp()
-        every { repository.following(any(), any()) }.returns(
-            flowOf(
-                PagingData.from(
-                    (0..3).map {
-                        mockk()
-                    }
-                )
-            )
+  override fun setUp() {
+    super.setUp()
+    every { repository.following(any(), any()) }.returns(
+      flowOf(
+        PagingData.from(
+          (0..3).map {
+            mockk()
+          }
         )
-        viewModel = FollowingViewModel(
-            repository,
-            mockAccountRepository,
-            MicroBlogKey.twitter("321")
-        )
-    }
+      )
+    )
+    viewModel = FollowingViewModel(
+      repository,
+      mockAccountRepository,
+      MicroBlogKey.twitter("321")
+    )
+  }
 
-    @Test
-    fun source_any(): Unit = runBlocking {
-        viewModel.source.firstOrNull().let {
-            assertNotNull(it)
-            assert(it.collectDataForTest().any())
-        }
+  @Test
+  fun source_any(): Unit = runBlocking {
+    viewModel.source.firstOrNull().let {
+      assertNotNull(it)
+      assert(it.collectDataForTest().any())
     }
+  }
 }

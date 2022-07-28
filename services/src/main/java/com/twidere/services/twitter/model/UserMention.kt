@@ -25,14 +25,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserMention(
-    @SerialName("screen_name")
-    val screenName: String? = null,
+  @SerialName("screen_name")
+  val screenName: String? = null,
 
-    val name: String? = null,
-    val id: Long? = null,
+  val name: String? = null,
+  val id: Long? = null,
 
-    @SerialName("id_str")
-    val idStr: String? = null,
+  @SerialName("id_str")
+  val idStr: String? = null,
 
-    val indices: List<Long>? = null
+  val indices: List<Long>? = null
 )

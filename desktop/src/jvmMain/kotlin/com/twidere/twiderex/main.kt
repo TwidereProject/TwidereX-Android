@@ -26,6 +26,6 @@ import com.twidere.twiderex.media.DesktopMediaPlayerFactoryImpl
 
 @ExperimentalComposeUiApi
 fun main(args: Array<String>) {
-    DesktopMediaPlayerHelper.register(DesktopMediaPlayerFactoryImpl())
-    runDesktopApp(args)
+  DesktopMediaPlayerHelper.register(DesktopMediaPlayerFactoryImpl())
+  runDesktopApp(args)
 }

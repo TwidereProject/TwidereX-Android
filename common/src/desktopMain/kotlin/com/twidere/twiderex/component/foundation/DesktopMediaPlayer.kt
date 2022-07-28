@@ -24,33 +24,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 interface DesktopMediaPlayer {
-    fun play()
-    fun pause()
-    fun stop()
-    fun release()
-    fun setMute(mute: Boolean)
-    fun setVolume(volume: Float)
-    fun seekTo(time: Long)
-    fun duration(): Long
-    fun currentPosition(): Long
-    fun registerPlayerCallback(callBack: PlayerCallBack)
-    fun registerProgressCallback(callBack: PlayerProgressCallBack)
-    fun removePlayerCallback(callback: PlayerCallBack)
-    fun removeProgressCallback(callback: PlayerProgressCallBack)
-    @Composable
-    fun Content(modifier: Modifier, update: () -> Unit)
+  fun play()
+  fun pause()
+  fun stop()
+  fun release()
+  fun setMute(mute: Boolean)
+  fun setVolume(volume: Float)
+  fun seekTo(time: Long)
+  fun duration(): Long
+  fun currentPosition(): Long
+  fun registerPlayerCallback(callBack: PlayerCallBack)
+  fun registerProgressCallback(callBack: PlayerProgressCallBack)
+  fun removePlayerCallback(callback: PlayerCallBack)
+  fun removeProgressCallback(callback: PlayerProgressCallBack)
+  @Composable
+  fun Content(modifier: Modifier, update: () -> Unit)
 }
 
 interface DesktopMediaPlayerFactory {
-    fun create(url: String, backgroundColor: Color?, onClick: (() -> Unit)?): DesktopMediaPlayer
+  fun create(url: String, backgroundColor: Color?, onClick: (() -> Unit)?): DesktopMediaPlayer
 }
 
 object DesktopMediaPlayerHelper {
-    private var factory: DesktopMediaPlayerFactory? = null
-    fun register(factory: DesktopMediaPlayerFactory) {
-        this.factory = factory
-    }
-    internal fun create(url: String, backgroundColor: Color?, onClick: (() -> Unit)?) = factory?.create(url, backgroundColor, onClick) ?: throw Error(
-        "No DesktopMediaPlayerFactory found, please ensure DesktopMediaPlayerHelper.register(factory) invoked before use"
-    )
+  private var factory: DesktopMediaPlayerFactory? = null
+  fun register(factory: DesktopMediaPlayerFactory) {
+    this.factory = factory
+  }
+  internal fun create(url: String, backgroundColor: Color?, onClick: (() -> Unit)?) = factory?.create(url, backgroundColor, onClick) ?: throw Error(
+    "No DesktopMediaPlayerFactory found, please ensure DesktopMediaPlayerHelper.register(factory) invoked before use"
+  )
 }

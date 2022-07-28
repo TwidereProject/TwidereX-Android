@@ -29,38 +29,38 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.room.db.RoomCacheDatabase
 
 @Entity(
-    tableName = "dm_conversation",
-    indices = [Index(value = ["accountKey", "conversationKey"], unique = true)],
+  tableName = "dm_conversation",
+  indices = [Index(value = ["accountKey", "conversationKey"], unique = true)],
 )
 internal data class DbDMConversation(
-    @PrimaryKey
-    val _id: String,
-    val accountKey: MicroBlogKey,
-    // conversation
-    val conversationId: String,
-    val conversationKey: MicroBlogKey,
-    val conversationAvatar: String,
-    val conversationName: String,
-    val conversationSubName: String,
-    val conversationType: Type,
-    val recipientKey: MicroBlogKey,
+  @PrimaryKey
+  val _id: String,
+  val accountKey: MicroBlogKey,
+  // conversation
+  val conversationId: String,
+  val conversationKey: MicroBlogKey,
+  val conversationAvatar: String,
+  val conversationName: String,
+  val conversationSubName: String,
+  val conversationType: Type,
+  val recipientKey: MicroBlogKey,
 ) {
-    enum class Type {
-        ONE_TO_ONE,
-        GROUP
-    }
+  enum class Type {
+    ONE_TO_ONE,
+    GROUP
+  }
 
-    companion object {
-        suspend fun List<DbDMConversation>.saveToDb(cacheDatabase: RoomCacheDatabase) {
-            cacheDatabase.directMessageConversationDao().insertAll(this)
-        }
+  companion object {
+    suspend fun List<DbDMConversation>.saveToDb(cacheDatabase: RoomCacheDatabase) {
+      cacheDatabase.directMessageConversationDao().insertAll(this)
     }
+  }
 }
 
 internal data class DbDirectMessageConversationWithMessage(
-    @Relation(parentColumn = "conversationKey", entityColumn = "conversationKey")
-    val conversation: DbDMConversation,
+  @Relation(parentColumn = "conversationKey", entityColumn = "conversationKey")
+  val conversation: DbDMConversation,
 
-    @Embedded
-    val latestMessage: DbDMEventWithAttachments
+  @Embedded
+  val latestMessage: DbDMEventWithAttachments
 )

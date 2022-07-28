@@ -38,69 +38,69 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class ListsViewModelTest : AccountViewModelTestBase() {
-    override val mockService: MicroBlogService
-        get() = MockListsService()
+  override val mockService: MicroBlogService
+    get() = MockListsService()
 
-    @MockK
-    private lateinit var mockRepository: ListsRepository
+  @MockK
+  private lateinit var mockRepository: ListsRepository
 
-    @MockK
-    private lateinit var ownerList: UiList
+  @MockK
+  private lateinit var ownerList: UiList
 
-    @MockK
-    private lateinit var subscribeList: UiList
+  @MockK
+  private lateinit var subscribeList: UiList
 
-    private lateinit var viewModel: ListsViewModel
+  private lateinit var viewModel: ListsViewModel
 
-    override fun setUp() {
-        super.setUp()
-        every { mockRepository.fetchLists(any(), any()) }.returns(
-            flowOf(
-                PagingData.from(
-                    listOf(
-                        ownerList,
-                        subscribeList
-                    )
-                )
-            )
+  override fun setUp() {
+    super.setUp()
+    every { mockRepository.fetchLists(any(), any()) }.returns(
+      flowOf(
+        PagingData.from(
+          listOf(
+            ownerList,
+            subscribeList
+          )
         )
-        every { ownerList.isOwner(any()) }.returns(true)
-        every { subscribeList.isOwner(any()) }.returns(false)
-        every { ownerList.title }.returns("owner")
-        every { subscribeList.title }.returns("subscribe")
-        every { subscribeList.isFollowed }.returns(true)
-        viewModel = ListsViewModel(mockRepository, mockAccountRepository)
-    }
+      )
+    )
+    every { ownerList.isOwner(any()) }.returns(true)
+    every { subscribeList.isOwner(any()) }.returns(false)
+    every { ownerList.title }.returns("owner")
+    every { subscribeList.title }.returns("subscribe")
+    every { subscribeList.isFollowed }.returns(true)
+    viewModel = ListsViewModel(mockRepository, mockAccountRepository)
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun source_containsAllLists(): Unit = runBlocking(Dispatchers.Main) {
-        // check the source
-        viewModel.source.first().let {
-            val sourceItems = it.collectDataForTest()
-            assertEquals(2, sourceItems.size)
-        }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  @Test
+  fun source_containsAllLists(): Unit = runBlocking(Dispatchers.Main) {
+    // check the source
+    viewModel.source.first().let {
+      val sourceItems = it.collectDataForTest()
+      assertEquals(2, sourceItems.size)
     }
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun ownerSource_containsOwnedLists(): Unit = runBlocking(Dispatchers.Main) {
-        // make sure ownerSource only emit data which isOwner() returns true
-        viewModel.ownerSource.first().let {
-            val ownerItems = it.collectDataForTest()
-            assertEquals(1, ownerItems.size)
-            assertEquals("owner", ownerItems[0].title)
-        }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  @Test
+  fun ownerSource_containsOwnedLists(): Unit = runBlocking(Dispatchers.Main) {
+    // make sure ownerSource only emit data which isOwner() returns true
+    viewModel.ownerSource.first().let {
+      val ownerItems = it.collectDataForTest()
+      assertEquals(1, ownerItems.size)
+      assertEquals("owner", ownerItems[0].title)
     }
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun subscribeSource_containsSubscribedLists(): Unit = runBlocking(Dispatchers.Main) {
-        // make sure ownerSource only emit data which isOwner() returns true
-        viewModel.subscribedSource.first().let {
-            val subscribeItems = it.collectDataForTest()
-            assertEquals(1, subscribeItems.size)
-            assertEquals("subscribe", subscribeItems[0].title)
-        }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  @Test
+  fun subscribeSource_containsSubscribedLists(): Unit = runBlocking(Dispatchers.Main) {
+    // make sure ownerSource only emit data which isOwner() returns true
+    viewModel.subscribedSource.first().let {
+      val subscribeItems = it.collectDataForTest()
+      assertEquals(1, subscribeItems.size)
+      assertEquals("subscribe", subscribeItems[0].title)
     }
+  }
 }

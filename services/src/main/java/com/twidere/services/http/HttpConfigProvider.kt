@@ -23,5 +23,5 @@ package com.twidere.services.http
 import com.twidere.services.http.config.HttpConfig
 
 interface HttpConfigProvider {
-    fun provideConfig(): HttpConfig
+  fun provideConfig(): HttpConfig
 }

@@ -60,111 +60,111 @@ import com.twidere.twiderex.component.stringResource
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TwitterListsModifyComponent(
-    name: String,
-    desc: String,
-    isPrivate: Boolean,
-    onNameChanged: (name: String) -> Unit,
-    onDescChanged: (desc: String) -> Unit,
-    onPrivateChanged: (private: Boolean) -> Unit,
+  name: String,
+  desc: String,
+  isPrivate: Boolean,
+  onNameChanged: (name: String) -> Unit,
+  onDescChanged: (desc: String) -> Unit,
+  onPrivateChanged: (private: Boolean) -> Unit,
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(TwitterListsModifyComponentDefaults.PagePadding)
-    ) {
-        val nameInputFocusRequester = remember { FocusRequester() }
-        val descInputFocusRequester = remember { FocusRequester() }
-        val nameTextFieldVale = remember {
-            mutableStateOf(TextFieldValue(name, TextRange(name.length)))
-        }
-        val descTextFieldVale = remember {
-            mutableStateOf(TextFieldValue(desc, TextRange(desc.length)))
-        }
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
-            Text(
-                text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_name),
-                style = MaterialTheme.typography.caption,
-                modifier = Modifier.padding(TwitterListsModifyComponentDefaults.TextFieldTitle.ContentPadding)
-            )
-        }
-        LaunchedEffect(true) {
-            nameInputFocusRequester.requestFocus()
-            keyboardController?.show()
-        }
-        ProvideTextStyle(value = MaterialTheme.typography.subtitle1) {
-            TextField(
-                value = nameTextFieldVale.value,
-                onValueChange = {
-                    if (it.text != nameTextFieldVale.value.text)
-                        onNameChanged(it.text)
-                    nameTextFieldVale.value = it
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(nameInputFocusRequester),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent
-                ),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next,
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = { descInputFocusRequester.requestFocus() }
-                )
-            )
-        }
-        Spacer(modifier = Modifier.height(TwitterListsModifyComponentDefaults.VerticalPadding))
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
-            Text(
-                text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_description),
-                style = MaterialTheme.typography.caption,
-                modifier = Modifier.padding(TwitterListsModifyComponentDefaults.TextFieldTitle.ContentPadding)
-            )
-        }
-        ProvideTextStyle(value = MaterialTheme.typography.subtitle1) {
-            TextField(
-                value = descTextFieldVale.value,
-                onValueChange = {
-                    if (it.text != descTextFieldVale.value.text)
-                        onDescChanged(it.text)
-                    descTextFieldVale.value = it
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(descInputFocusRequester),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent
-                ),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done,
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = { keyboardController?.hide() }
-                )
-            )
-        }
-        Spacer(modifier = Modifier.height(TwitterListsModifyComponentDefaults.VerticalPadding))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_private), style = MaterialTheme.typography.body1)
-            ColoredSwitch(
-                checked = isPrivate,
-                onCheckedChange = onPrivateChanged,
-            )
-        }
+  val keyboardController = LocalSoftwareKeyboardController.current
+  Column(
+    modifier = Modifier
+      .fillMaxSize()
+      .padding(TwitterListsModifyComponentDefaults.PagePadding)
+  ) {
+    val nameInputFocusRequester = remember { FocusRequester() }
+    val descInputFocusRequester = remember { FocusRequester() }
+    val nameTextFieldVale = remember {
+      mutableStateOf(TextFieldValue(name, TextRange(name.length)))
     }
+    val descTextFieldVale = remember {
+      mutableStateOf(TextFieldValue(desc, TextRange(desc.length)))
+    }
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+      Text(
+        text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_name),
+        style = MaterialTheme.typography.caption,
+        modifier = Modifier.padding(TwitterListsModifyComponentDefaults.TextFieldTitle.ContentPadding)
+      )
+    }
+    LaunchedEffect(true) {
+      nameInputFocusRequester.requestFocus()
+      keyboardController?.show()
+    }
+    ProvideTextStyle(value = MaterialTheme.typography.subtitle1) {
+      TextField(
+        value = nameTextFieldVale.value,
+        onValueChange = {
+          if (it.text != nameTextFieldVale.value.text)
+            onNameChanged(it.text)
+          nameTextFieldVale.value = it
+        },
+        modifier = Modifier
+          .fillMaxWidth()
+          .focusRequester(nameInputFocusRequester),
+        colors = TextFieldDefaults.textFieldColors(
+          backgroundColor = Color.Transparent
+        ),
+        keyboardOptions = KeyboardOptions(
+          keyboardType = KeyboardType.Text,
+          imeAction = ImeAction.Next,
+        ),
+        keyboardActions = KeyboardActions(
+          onNext = { descInputFocusRequester.requestFocus() }
+        )
+      )
+    }
+    Spacer(modifier = Modifier.height(TwitterListsModifyComponentDefaults.VerticalPadding))
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+      Text(
+        text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_description),
+        style = MaterialTheme.typography.caption,
+        modifier = Modifier.padding(TwitterListsModifyComponentDefaults.TextFieldTitle.ContentPadding)
+      )
+    }
+    ProvideTextStyle(value = MaterialTheme.typography.subtitle1) {
+      TextField(
+        value = descTextFieldVale.value,
+        onValueChange = {
+          if (it.text != descTextFieldVale.value.text)
+            onDescChanged(it.text)
+          descTextFieldVale.value = it
+        },
+        modifier = Modifier
+          .fillMaxWidth()
+          .focusRequester(descInputFocusRequester),
+        colors = TextFieldDefaults.textFieldColors(
+          backgroundColor = Color.Transparent
+        ),
+        keyboardOptions = KeyboardOptions(
+          keyboardType = KeyboardType.Text,
+          imeAction = ImeAction.Done,
+        ),
+        keyboardActions = KeyboardActions(
+          onDone = { keyboardController?.hide() }
+        )
+      )
+    }
+    Spacer(modifier = Modifier.height(TwitterListsModifyComponentDefaults.VerticalPadding))
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+      Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_private), style = MaterialTheme.typography.body1)
+      ColoredSwitch(
+        checked = isPrivate,
+        onCheckedChange = onPrivateChanged,
+      )
+    }
+  }
 }
 
 private object TwitterListsModifyComponentDefaults {
-    val PagePadding = 20.dp
-    val VerticalPadding = 20.dp
+  val PagePadding = 20.dp
+  val VerticalPadding = 20.dp
 
-    object TextFieldTitle {
-        val ContentPadding = PaddingValues(start = 16.dp)
-    }
+  object TextFieldTitle {
+    val ContentPadding = PaddingValues(start = 16.dp)
+  }
 }

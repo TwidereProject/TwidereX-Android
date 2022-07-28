@@ -32,36 +32,36 @@ import com.twidere.twiderex.room.db.transform.toPagingTimeline
 import com.twidere.twiderex.room.db.transform.toUi
 
 internal class PagingTimelineDaoImpl(private val database: RoomCacheDatabase) : PagingTimelineDao {
-    override fun getPagingSource(
-        pagingKey: String,
-        accountKey: MicroBlogKey
-    ): PagingSource<Int, PagingTimeLineWithStatus> {
-        return database.pagingTimelineDao().getPagingSource(
-            accountKey = accountKey,
-            cacheDatabase = database,
-            pagingKey = pagingKey
-        )
-    }
+  override fun getPagingSource(
+    pagingKey: String,
+    accountKey: MicroBlogKey
+  ): PagingSource<Int, PagingTimeLineWithStatus> {
+    return database.pagingTimelineDao().getPagingSource(
+      accountKey = accountKey,
+      cacheDatabase = database,
+      pagingKey = pagingKey
+    )
+  }
 
-    override suspend fun clearAll(pagingKey: String, accountKey: MicroBlogKey) {
-        database.pagingTimelineDao().clearAll(pagingKey, accountKey)
-    }
+  override suspend fun clearAll(pagingKey: String, accountKey: MicroBlogKey) {
+    database.pagingTimelineDao().clearAll(pagingKey, accountKey)
+  }
 
-    override suspend fun getLatest(
-        pagingKey: String,
-        accountKey: MicroBlogKey
-    ) = database.pagingTimelineDao().getLatest(pagingKey, accountKey)?.toPagingTimeline(accountKey)
+  override suspend fun getLatest(
+    pagingKey: String,
+    accountKey: MicroBlogKey
+  ) = database.pagingTimelineDao().getLatest(pagingKey, accountKey)?.toPagingTimeline(accountKey)
 
-    override suspend fun findWithStatusKey(
-        maxStatusKey: MicroBlogKey,
-        accountKey: MicroBlogKey
-    ) = database.pagingTimelineDao().findWithStatusKey(maxStatusKey, accountKey)?.toUi()
+  override suspend fun findWithStatusKey(
+    maxStatusKey: MicroBlogKey,
+    accountKey: MicroBlogKey
+  ) = database.pagingTimelineDao().findWithStatusKey(maxStatusKey, accountKey)?.toUi()
 
-    override suspend fun insertAll(listOf: List<PagingTimeLine>) {
-        database.pagingTimelineDao().insertAll(listOf.map { it.toDbPagingTimeline() })
-    }
+  override suspend fun insertAll(listOf: List<PagingTimeLine>) {
+    database.pagingTimelineDao().insertAll(listOf.map { it.toDbPagingTimeline() })
+  }
 
-    override suspend fun delete(statusKey: MicroBlogKey) {
-        database.pagingTimelineDao().delete(statusKey)
-    }
+  override suspend fun delete(statusKey: MicroBlogKey) {
+    database.pagingTimelineDao().delete(statusKey)
+  }
 }

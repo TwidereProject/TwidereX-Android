@@ -24,23 +24,23 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DisplayPreferences(
-    val useSystemFontSize: Boolean = true,
-    val fontScale: Float = 1f,
-    val avatarStyle: AvatarStyle = AvatarStyle.Round,
-    val mediaPreview: Boolean = true,
-    val autoPlayback: AutoPlayback = AutoPlayback.Auto,
-    val urlPreview: Boolean = false,
-    val muteByDefault: Boolean = false,
+  val useSystemFontSize: Boolean = true,
+  val fontScale: Float = 1f,
+  val avatarStyle: AvatarStyle = AvatarStyle.Round,
+  val mediaPreview: Boolean = true,
+  val autoPlayback: AutoPlayback = AutoPlayback.Auto,
+  val urlPreview: Boolean = false,
+  val muteByDefault: Boolean = false,
 ) {
-    @Serializable
-    enum class AvatarStyle {
-        Round,
-        Square,
-    }
-    @Serializable
-    enum class AutoPlayback {
-        Auto,
-        Always,
-        Off,
-    }
+  @Serializable
+  enum class AvatarStyle {
+    Round,
+    Square,
+  }
+  @Serializable
+  enum class AutoPlayback {
+    Auto,
+    Always,
+    Off,
+  }
 }

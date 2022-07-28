@@ -25,17 +25,17 @@ import com.twidere.twiderex.model.ui.UiStatus
 import kotlinx.coroutines.flow.Flow
 
 interface StatusDao {
-    suspend fun insertAll(listOf: List<UiStatus>, accountKey: MicroBlogKey)
-    suspend fun findWithStatusKey(statusKey: MicroBlogKey, accountKey: MicroBlogKey): UiStatus?
-    fun findWithStatusKeyWithFlow(
-        statusKey: MicroBlogKey,
-        accountKey: MicroBlogKey
-    ): Flow<UiStatus?>
-    suspend fun delete(statusKey: MicroBlogKey)
-    suspend fun updateAction(
-        statusKey: MicroBlogKey,
-        accountKey: MicroBlogKey,
-        liked: Boolean?,
-        retweet: Boolean?
-    )
+  suspend fun insertAll(listOf: List<UiStatus>, accountKey: MicroBlogKey)
+  suspend fun findWithStatusKey(statusKey: MicroBlogKey, accountKey: MicroBlogKey): UiStatus?
+  fun findWithStatusKeyWithFlow(
+    statusKey: MicroBlogKey,
+    accountKey: MicroBlogKey
+  ): Flow<UiStatus?>
+  suspend fun delete(statusKey: MicroBlogKey)
+  suspend fun updateAction(
+    statusKey: MicroBlogKey,
+    accountKey: MicroBlogKey,
+    liked: Boolean?,
+    retweet: Boolean?
+  )
 }

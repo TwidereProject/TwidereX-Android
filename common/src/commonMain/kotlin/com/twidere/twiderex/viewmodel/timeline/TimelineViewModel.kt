@@ -45,81 +45,81 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 abstract class TimelineViewModel(
-    private val dataStore: DataStore<Preferences>
+  private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
-    abstract val pagingMediator: Flow<PagingWithGapMediator?>
-    abstract val savedStateKey: Flow<String?>
+  abstract val pagingMediator: Flow<PagingWithGapMediator?>
+  abstract val savedStateKey: Flow<String?>
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    val source: Flow<PagingData<UiStatus>> by lazy {
-        pagingMediator.mapNotNull { it }.flatMapLatest {
-            it.pager(
-                config = PagingConfig(
-                    pageSize = timelinePageSize,
-                    initialLoadSize = timelineInitialLoadSize
-                )
-            ).toUi()
-        }.cachedIn(viewModelScope)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val loadingBetween: Flow<List<MicroBlogKey>> by lazy {
-        pagingMediator.mapNotNull { it }.flatMapLatest { it.loadingBetween }
-            .asStateIn(viewModelScope, emptyList())
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun provideScrollState(): Flow<TimelineScrollState?> {
-        return savedStateKey.mapLatest {
-            val firstVisibleItemIndexKey = intPreferencesKey("${it}_firstVisibleItemIndex")
-            val firstVisibleItemScrollOffsetKey =
-                intPreferencesKey("${it}_firstVisibleItemScrollOffset")
-            dataStore.data.firstOrNull()?.let {
-                val firstVisibleItemIndex = it[firstVisibleItemIndexKey] ?: 0
-                val firstVisibleItemScrollOffset = it[firstVisibleItemScrollOffsetKey] ?: 0
-                TimelineScrollState(
-                    firstVisibleItemIndex = firstVisibleItemIndex,
-                    firstVisibleItemScrollOffset = firstVisibleItemScrollOffset,
-                )
-            }
-        }
-    }
-
-    @OptIn(androidx.paging.ExperimentalPagingApi::class)
-    fun loadBetween(
-        maxStatusKey: MicroBlogKey,
-        sinceStatueKey: MicroBlogKey,
-    ) = viewModelScope.launch {
-        pagingMediator.firstOrNull()?.loadBetween(
-            pageSize = timelinePageSize,
-            maxStatusKey = maxStatusKey,
-            sinceStatusKey = sinceStatueKey
+  @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+  val source: Flow<PagingData<UiStatus>> by lazy {
+    pagingMediator.mapNotNull { it }.flatMapLatest {
+      it.pager(
+        config = PagingConfig(
+          pageSize = timelinePageSize,
+          initialLoadSize = timelineInitialLoadSize
         )
-    }
+      ).toUi()
+    }.cachedIn(viewModelScope)
+  }
 
-    suspend fun saveScrollState(offset: TimelineScrollState) {
-        dataStore.edit { preferences ->
-            savedStateKey.firstOrNull()?.let {
-                val firstVisibleItemIndexKey = intPreferencesKey("${it}_firstVisibleItemIndex")
-                val firstVisibleItemScrollOffsetKey =
-                    intPreferencesKey("${it}_firstVisibleItemScrollOffset")
-                preferences[firstVisibleItemIndexKey] = offset.firstVisibleItemIndex
-                preferences[firstVisibleItemScrollOffsetKey] = offset.firstVisibleItemScrollOffset
-            }
-        }
-    }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  val loadingBetween: Flow<List<MicroBlogKey>> by lazy {
+    pagingMediator.mapNotNull { it }.flatMapLatest { it.loadingBetween }
+      .asStateIn(viewModelScope, emptyList())
+  }
 
-    companion object {
-        private const val timelinePageSize = 20
-        private const val timelineInitialLoadSize = 40
+  @OptIn(ExperimentalCoroutinesApi::class)
+  suspend fun provideScrollState(): Flow<TimelineScrollState?> {
+    return savedStateKey.mapLatest {
+      val firstVisibleItemIndexKey = intPreferencesKey("${it}_firstVisibleItemIndex")
+      val firstVisibleItemScrollOffsetKey =
+        intPreferencesKey("${it}_firstVisibleItemScrollOffset")
+      dataStore.data.firstOrNull()?.let {
+        val firstVisibleItemIndex = it[firstVisibleItemIndexKey] ?: 0
+        val firstVisibleItemScrollOffset = it[firstVisibleItemScrollOffsetKey] ?: 0
+        TimelineScrollState(
+          firstVisibleItemIndex = firstVisibleItemIndex,
+          firstVisibleItemScrollOffset = firstVisibleItemScrollOffset,
+        )
+      }
     }
+  }
+
+  @OptIn(androidx.paging.ExperimentalPagingApi::class)
+  fun loadBetween(
+    maxStatusKey: MicroBlogKey,
+    sinceStatueKey: MicroBlogKey,
+  ) = viewModelScope.launch {
+    pagingMediator.firstOrNull()?.loadBetween(
+      pageSize = timelinePageSize,
+      maxStatusKey = maxStatusKey,
+      sinceStatusKey = sinceStatueKey
+    )
+  }
+
+  suspend fun saveScrollState(offset: TimelineScrollState) {
+    dataStore.edit { preferences ->
+      savedStateKey.firstOrNull()?.let {
+        val firstVisibleItemIndexKey = intPreferencesKey("${it}_firstVisibleItemIndex")
+        val firstVisibleItemScrollOffsetKey =
+          intPreferencesKey("${it}_firstVisibleItemScrollOffset")
+        preferences[firstVisibleItemIndexKey] = offset.firstVisibleItemIndex
+        preferences[firstVisibleItemScrollOffsetKey] = offset.firstVisibleItemScrollOffset
+      }
+    }
+  }
+
+  companion object {
+    private const val timelinePageSize = 20
+    private const val timelineInitialLoadSize = 40
+  }
 }
 
 data class TimelineScrollState(
-    val firstVisibleItemIndex: Int = 0,
-    val firstVisibleItemScrollOffset: Int = 0,
+  val firstVisibleItemIndex: Int = 0,
+  val firstVisibleItemScrollOffset: Int = 0,
 ) {
-    companion object {
-        val Zero = TimelineScrollState(0, 0)
-    }
+  companion object {
+    val Zero = TimelineScrollState(0, 0)
+  }
 }

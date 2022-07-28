@@ -30,25 +30,25 @@ import com.twidere.twiderex.jobs.draft.SaveDraftJob
 import com.twidere.twiderex.model.job.ComposeData
 
 class SaveDraftWorker(
-    context: Context,
-    workerParams: WorkerParameters,
-    private val saveDraftJob: SaveDraftJob
+  context: Context,
+  workerParams: WorkerParameters,
+  private val saveDraftJob: SaveDraftJob
 ) : CoroutineWorker(context, workerParams) {
 
-    companion object {
-        fun create(data: ComposeData) = OneTimeWorkRequestBuilder<SaveDraftWorker>()
-            .setInputData(data.toWorkData())
-            .build()
-    }
+  companion object {
+    fun create(data: ComposeData) = OneTimeWorkRequestBuilder<SaveDraftWorker>()
+      .setInputData(data.toWorkData())
+      .build()
+  }
 
-    override suspend fun doWork(): Result {
-        val data = inputData.toComposeData()
-        return try {
-            saveDraftJob.execute(data = data)
-            Result.success()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            Result.failure()
-        }
+  override suspend fun doWork(): Result {
+    val data = inputData.toComposeData()
+    return try {
+      saveDraftJob.execute(data = data)
+      Result.success()
+    } catch (e: Throwable) {
+      e.printStackTrace()
+      Result.failure()
     }
+  }
 }

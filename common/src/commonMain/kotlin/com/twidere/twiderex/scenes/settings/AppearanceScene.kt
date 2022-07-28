@@ -74,213 +74,213 @@ import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
 @OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun AppearanceScene() {
-    var showPrimaryColorDialog by remember { mutableStateOf(false) }
-    val appearance = LocalAppearancePreferences.current
-    val viewModel: AppearanceViewModel = getViewModel()
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_title))
-                    },
-                )
+  var showPrimaryColorDialog by remember { mutableStateOf(false) }
+  val appearance = LocalAppearancePreferences.current
+  val viewModel: AppearanceViewModel = getViewModel()
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_title))
+          },
+        )
+      }
+    ) {
+      if (showPrimaryColorDialog) {
+        PrimaryColorDialog(
+          viewModel = viewModel,
+          onDismiss = {
+            showPrimaryColorDialog = false
+          }
+        )
+      }
+      Column(
+        modifier = Modifier
+          .verticalScroll(
+            rememberScrollState()
+          )
+      ) {
+        ListItem(
+          modifier = Modifier.clickable(
+            onClick = {
+              showPrimaryColorDialog = true
             }
-        ) {
-            if (showPrimaryColorDialog) {
-                PrimaryColorDialog(
-                    viewModel = viewModel,
-                    onDismiss = {
-                        showPrimaryColorDialog = false
-                    }
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .verticalScroll(
-                        rememberScrollState()
-                    )
+          ),
+          text = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_highlight_color))
+          },
+          trailing = {
+            Box(
+              modifier = Modifier
+                .height(24.dp)
+                .width(32.dp)
+                .clip(MaterialTheme.shapes.small)
+                .aspectRatio(1F)
+                .background(MaterialTheme.colors.primary),
             ) {
-                ListItem(
-                    modifier = Modifier.clickable(
-                        onClick = {
-                            showPrimaryColorDialog = true
-                        }
-                    ),
-                    text = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_highlight_color))
-                    },
-                    trailing = {
-                        Box(
-                            modifier = Modifier
-                                .height(24.dp)
-                                .width(32.dp)
-                                .clip(MaterialTheme.shapes.small)
-                                .aspectRatio(1F)
-                                .background(MaterialTheme.colors.primary),
-                        ) {
-                        }
-                    }
-                )
-                ItemDivider()
-                RadioItem(
-                    options = listOf(
-                        AppearancePreferences.TabPosition.Top,
-                        AppearancePreferences.TabPosition.Bottom,
-                    ),
-                    value = appearance.tabPosition,
-                    onChanged = {
-                        viewModel.setTabPosition(it)
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_section_header_tab_position))
-                    },
-                    itemContent = {
-                        Text(
-                            text = stringResource(
-                                arrayOf(
-                                    com.twidere.twiderex.MR.strings.scene_settings_appearance_tab_position_top,
-                                    com.twidere.twiderex.MR.strings.scene_settings_appearance_tab_position_bottom
-                                )[it.ordinal]
-                            )
-                        )
-                    }
-                )
-                ItemDivider()
-                // Scrolling Timeline
-                ItemHeader() {
-                    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_section_header_scrolling_timeline))
-                }
-                switchItem(
-                    value = appearance.hideTabBarWhenScroll,
-                    onChanged = {
-                        viewModel.setHideTabBarWhenScrolling(it)
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_scrolling_timeline_tab_bar))
-                    },
-                )
-                switchItem(
-                    value = appearance.hideAppBarWhenScroll,
-                    onChanged = {
-                        viewModel.setHideAppBarWhenScrolling(it)
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_scrolling_timeline_app_bar))
-                    },
-                )
-                switchItem(
-                    value = appearance.hideFabWhenScroll,
-                    onChanged = {
-                        viewModel.setHideFabWhenScrolling(it)
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_scrolling_timeline_fab))
-                    },
-                )
-                ItemDivider()
-                RadioItem(
-                    options = listOf(
-                        AppearancePreferences.Theme.Auto,
-                        AppearancePreferences.Theme.Light,
-                        AppearancePreferences.Theme.Dark,
-                    ),
-                    value = appearance.theme,
-                    onChanged = {
-                        viewModel.setTheme(it)
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_section_header_theme))
-                    },
-                    itemContent = {
-                        Text(
-                            text = stringResource(
-                                arrayOf(
-                                    com.twidere.twiderex.MR.strings.scene_settings_appearance_theme_auto,
-                                    com.twidere.twiderex.MR.strings.scene_settings_appearance_theme_light,
-                                    com.twidere.twiderex.MR.strings.scene_settings_appearance_theme_dark,
-                                )[it.ordinal]
-                            )
-                        )
-                    }
-                )
-                val isLightTheme = appearance.theme == AppearancePreferences.Theme.Light
-                AnimatedVisibility(visible = !isLightTheme) {
-                    switchItem(
-                        value = appearance.isDarkModePureBlack,
-                        onChanged = {
-                            viewModel.setIsDarkModePureBlack(it)
-                        },
-                    ) {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_AMOLED_optimized_mode))
-                    }
-                }
             }
+          }
+        )
+        ItemDivider()
+        RadioItem(
+          options = listOf(
+            AppearancePreferences.TabPosition.Top,
+            AppearancePreferences.TabPosition.Bottom,
+          ),
+          value = appearance.tabPosition,
+          onChanged = {
+            viewModel.setTabPosition(it)
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_section_header_tab_position))
+          },
+          itemContent = {
+            Text(
+              text = stringResource(
+                arrayOf(
+                  com.twidere.twiderex.MR.strings.scene_settings_appearance_tab_position_top,
+                  com.twidere.twiderex.MR.strings.scene_settings_appearance_tab_position_bottom
+                )[it.ordinal]
+              )
+            )
+          }
+        )
+        ItemDivider()
+        // Scrolling Timeline
+        ItemHeader() {
+          Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_section_header_scrolling_timeline))
         }
+        switchItem(
+          value = appearance.hideTabBarWhenScroll,
+          onChanged = {
+            viewModel.setHideTabBarWhenScrolling(it)
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_scrolling_timeline_tab_bar))
+          },
+        )
+        switchItem(
+          value = appearance.hideAppBarWhenScroll,
+          onChanged = {
+            viewModel.setHideAppBarWhenScrolling(it)
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_scrolling_timeline_app_bar))
+          },
+        )
+        switchItem(
+          value = appearance.hideFabWhenScroll,
+          onChanged = {
+            viewModel.setHideFabWhenScrolling(it)
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_scrolling_timeline_fab))
+          },
+        )
+        ItemDivider()
+        RadioItem(
+          options = listOf(
+            AppearancePreferences.Theme.Auto,
+            AppearancePreferences.Theme.Light,
+            AppearancePreferences.Theme.Dark,
+          ),
+          value = appearance.theme,
+          onChanged = {
+            viewModel.setTheme(it)
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_section_header_theme))
+          },
+          itemContent = {
+            Text(
+              text = stringResource(
+                arrayOf(
+                  com.twidere.twiderex.MR.strings.scene_settings_appearance_theme_auto,
+                  com.twidere.twiderex.MR.strings.scene_settings_appearance_theme_light,
+                  com.twidere.twiderex.MR.strings.scene_settings_appearance_theme_dark,
+                )[it.ordinal]
+              )
+            )
+          }
+        )
+        val isLightTheme = appearance.theme == AppearancePreferences.Theme.Light
+        AnimatedVisibility(visible = !isLightTheme) {
+          switchItem(
+            value = appearance.isDarkModePureBlack,
+            onChanged = {
+              viewModel.setIsDarkModePureBlack(it)
+            },
+          ) {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_AMOLED_optimized_mode))
+          }
+        }
+      }
     }
+  }
 }
 
 @Composable
 fun PrimaryColorDialog(
-    viewModel: AppearanceViewModel,
-    onDismiss: () -> Unit,
+  viewModel: AppearanceViewModel,
+  onDismiss: () -> Unit,
 ) {
-    val appearance = LocalAppearancePreferences.current
-    val colorIndex = appearance.primaryColorIndex
-    val colors = if (isDarkTheme()) {
-        primaryColors.map { it.second }
-    } else {
-        primaryColors.map { it.first }
-    }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_pick_color))
-        },
-        text = {
-            Row(
-                modifier = Modifier.horizontalScroll(rememberScrollState())
+  val appearance = LocalAppearancePreferences.current
+  val colorIndex = appearance.primaryColorIndex
+  val colors = if (isDarkTheme()) {
+    primaryColors.map { it.second }
+  } else {
+    primaryColors.map { it.first }
+  }
+  AlertDialog(
+    onDismissRequest = onDismiss,
+    title = {
+      Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_pick_color))
+    },
+    text = {
+      Row(
+        modifier = Modifier.horizontalScroll(rememberScrollState())
+      ) {
+        colors.forEachIndexed { index, it ->
+          Box(
+            modifier = Modifier
+              .padding(end = PrimaryColorDialog.ItemsSpacing)
+          ) {
+            Box(
+              modifier = Modifier
+                .size(UserAvatarDefaults.AvatarSize)
+                .clip(CircleShape)
+                .background(it)
+                .clickable(
+                  onClick = {
+                    viewModel.setPrimaryColorIndex(index)
+                  }
+                ),
+              contentAlignment = Alignment.Center,
             ) {
-                colors.forEachIndexed { index, it ->
-                    Box(
-                        modifier = Modifier
-                            .padding(end = PrimaryColorDialog.ItemsSpacing)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(UserAvatarDefaults.AvatarSize)
-                                .clip(CircleShape)
-                                .background(it)
-                                .clickable(
-                                    onClick = {
-                                        viewModel.setPrimaryColorIndex(index)
-                                    }
-                                ),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            if (colorIndex == index) {
-                                Checkbox(
-                                    checked = true,
-                                    onCheckedChange = {},
-                                    colors = CheckboxDefaults.colors(checkedColor = Color.Transparent)
-                                )
-                            }
-                        }
-                    }
-                }
+              if (colorIndex == index) {
+                Checkbox(
+                  checked = true,
+                  onCheckedChange = {},
+                  colors = CheckboxDefaults.colors(checkedColor = Color.Transparent)
+                )
+              }
             }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_ok))
-            }
+          }
         }
-    )
+      }
+    },
+    confirmButton = {
+      TextButton(onClick = onDismiss) {
+        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_ok))
+      }
+    }
+  )
 }
 
 object PrimaryColorDialog {
-    val ItemsSpacing = 8.dp
+  val ItemsSpacing = 8.dp
 }

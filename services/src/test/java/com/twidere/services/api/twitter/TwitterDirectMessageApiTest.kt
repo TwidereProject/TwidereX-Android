@@ -31,34 +31,34 @@ import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TwitterDirectMessageApiTest {
-    private lateinit var dmResources: DirectMessagesResources
+  private lateinit var dmResources: DirectMessagesResources
 
-    @BeforeAll
-    fun setUp() {
-        dmResources = mockRetrofit("https://api.twitter.com/", TwitterRequest2AssetPathConvertor())
-    }
+  @BeforeAll
+  fun setUp() {
+    dmResources = mockRetrofit("https://api.twitter.com/", TwitterRequest2AssetPathConvertor())
+  }
 
-    @Test
-    fun createMessage() = runBlocking {
-        val result = dmResources.sendMessage(DirectMessageEventObject())
-        assertEquals("1406873583490502662", result.event?.id)
-    }
+  @Test
+  fun createMessage() = runBlocking {
+    val result = dmResources.sendMessage(DirectMessageEventObject())
+    assertEquals("1406873583490502662", result.event?.id)
+  }
 
-    @Test
-    fun getMessageList() = runBlocking {
-        val result = dmResources.getMessages()
-        assert(result.events?.isNotEmpty() ?: false)
-    }
+  @Test
+  fun getMessageList() = runBlocking {
+    val result = dmResources.getMessages()
+    assert(result.events?.isNotEmpty() ?: false)
+  }
 
-    @Test
-    fun showMessage() = runBlocking {
-        val result = dmResources.showMessage("1406873583490502662")
-        assertEquals("1406873583490502662", result.event?.id)
-    }
+  @Test
+  fun showMessage() = runBlocking {
+    val result = dmResources.showMessage("1406873583490502662")
+    assertEquals("1406873583490502662", result.event?.id)
+  }
 
-    @Test
-    fun deleteMessage() = runBlocking {
-        dmResources.destroyMessage("1406873583490502662")
-        assert(true)
-    }
+  @Test
+  fun deleteMessage() = runBlocking {
+    dmResources.destroyMessage("1406873583490502662")
+    assert(true)
+  }
 }

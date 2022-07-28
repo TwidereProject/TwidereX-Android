@@ -24,12 +24,12 @@ import com.squareup.sqldelight.EnumColumnAdapter
 import com.twidere.twiderex.sqldelight.table.DbDMConversation
 
 object DMConversationAdapterFactory {
-    fun create() = MicroBlogKeyColumnAdapter().let {
-        DbDMConversation.Adapter(
-            accountKeyAdapter = it,
-            conversationKeyAdapter = it,
-            recipientKeyAdapter = it,
-            conversationTypeAdapter = EnumColumnAdapter()
-        )
-    }
+  fun create() = MicroBlogKeyColumnAdapter().let {
+    DbDMConversation.Adapter(
+      accountKeyAdapter = it,
+      conversationKeyAdapter = it,
+      recipientKeyAdapter = it,
+      conversationTypeAdapter = EnumColumnAdapter()
+    )
+  }
 }

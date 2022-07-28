@@ -26,13 +26,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TwitterApiException(
-    val error: String? = null,
-    val request: String? = null,
-    val errors: List<Errors>? = null,
-    val httpCode: Int? = null,
+  val error: String? = null,
+  val request: String? = null,
+  val errors: List<Errors>? = null,
+  val httpCode: Int? = null,
 ) : MicroBlogException() {
-    override val microBlogErrorMessage: String?
-        get() = error ?: errors?.firstOrNull()?.let {
-            it.detail ?: it.message
-        }
+  override val microBlogErrorMessage: String?
+    get() = error ?: errors?.firstOrNull()?.let {
+      it.detail ?: it.message
+    }
 }

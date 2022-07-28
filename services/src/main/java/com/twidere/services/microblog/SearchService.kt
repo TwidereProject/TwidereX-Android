@@ -24,22 +24,22 @@ import com.twidere.services.microblog.model.ISearchResponse
 import com.twidere.services.microblog.model.IUser
 
 interface SearchService {
-    suspend fun searchTweets(
-        query: String,
-        count: Int = 20,
-        nextPage: String? = null,
-    ): ISearchResponse
+  suspend fun searchTweets(
+    query: String,
+    count: Int = 20,
+    nextPage: String? = null,
+  ): ISearchResponse
 
-    suspend fun searchUsers(
-        query: String,
-        page: Int? = null,
-        count: Int = 20,
-        following: Boolean = false
-    ): List<IUser>
+  suspend fun searchUsers(
+    query: String,
+    page: Int? = null,
+    count: Int = 20,
+    following: Boolean = false
+  ): List<IUser>
 
-    suspend fun searchMedia(
-        query: String,
-        count: Int = 20,
-        nextPage: String? = null,
-    ): ISearchResponse
+  suspend fun searchMedia(
+    query: String,
+    count: Int = 20,
+    nextPage: String? = null,
+  ): ISearchResponse
 }

@@ -25,94 +25,94 @@ import kotlin.test.assertEquals
 
 class PagingMemoryCacheTest {
 
-    private val pagingMemoryCache = PagingMemoryCache<String>()
+  private val pagingMemoryCache = PagingMemoryCache<String>()
 
-    @Test
-    fun find() {
-        pagingMemoryCache.insert(listOf("1", "2", "3", "4"))
-        // check if
-        assertEquals("3", pagingMemoryCache.find(2, 1)[0])
+  @Test
+  fun find() {
+    pagingMemoryCache.insert(listOf("1", "2", "3", "4"))
+    // check if
+    assertEquals("3", pagingMemoryCache.find(2, 1)[0])
 
-        // check if index out of bound
-        assertEquals(4, pagingMemoryCache.find(0, 10).size)
+    // check if index out of bound
+    assertEquals(4, pagingMemoryCache.find(0, 10).size)
 
-        // check if size correct
+    // check if size correct
 
-        assertEquals(3, pagingMemoryCache.find(0, 3).size)
+    assertEquals(3, pagingMemoryCache.find(0, 3).size)
+  }
+
+  private fun PagingMemoryCache<String>.verifyInvalidate(times: Int, block: () -> Unit) {
+    var invalidateCount = 0
+    val observer = object : OnInvalidateObserver {
+      override fun onInvalidate() {
+        invalidateCount++
+      }
     }
-
-    private fun PagingMemoryCache<String>.verifyInvalidate(times: Int, block: () -> Unit) {
-        var invalidateCount = 0
-        val observer = object : OnInvalidateObserver {
-            override fun onInvalidate() {
-                invalidateCount++
-            }
-        }
-        addWeakObserver(observer)
-        block.invoke()
-        val start = System.currentTimeMillis()
-        while (invalidateCount < times && System.currentTimeMillis() - start < 3000) {
-            continue
-        }
-        unRegister(observer)
-        assertEquals(times, invalidateCount)
+    addWeakObserver(observer)
+    block.invoke()
+    val start = System.currentTimeMillis()
+    while (invalidateCount < times && System.currentTimeMillis() - start < 3000) {
+      continue
     }
+    unRegister(observer)
+    assertEquals(times, invalidateCount)
+  }
 
-    @Test
-    fun insert_NotifyObserverAfterInsertSuccess() {
-        pagingMemoryCache.verifyInvalidate(1) {
-            pagingMemoryCache.insert(listOf("1"))
-        }
+  @Test
+  fun insert_NotifyObserverAfterInsertSuccess() {
+    pagingMemoryCache.verifyInvalidate(1) {
+      pagingMemoryCache.insert(listOf("1"))
     }
+  }
 
-    @Test
-    fun insert_SilenceAfterInsertFailed() {
-        pagingMemoryCache.verifyInvalidate(0) {
-            pagingMemoryCache.insert(listOf())
-        }
+  @Test
+  fun insert_SilenceAfterInsertFailed() {
+    pagingMemoryCache.verifyInvalidate(0) {
+      pagingMemoryCache.insert(listOf())
     }
+  }
 
-    @Test
-    fun update_NotifyObserverAfterDeleteSuccess() {
-        pagingMemoryCache.verifyInvalidate(2) {
-            pagingMemoryCache.insert(listOf("1"))
-            pagingMemoryCache.update(
-                "2",
-                object : Comparable<String> {
-                    override fun compareTo(other: String): Int {
-                        return if (other == "1") 0 else 1
-                    }
-                }
-            )
+  @Test
+  fun update_NotifyObserverAfterDeleteSuccess() {
+    pagingMemoryCache.verifyInvalidate(2) {
+      pagingMemoryCache.insert(listOf("1"))
+      pagingMemoryCache.update(
+        "2",
+        object : Comparable<String> {
+          override fun compareTo(other: String): Int {
+            return if (other == "1") 0 else 1
+          }
         }
+      )
     }
+  }
 
-    @Test
-    fun update_SilenceAfterUpdateFailed() {
-        pagingMemoryCache.verifyInvalidate(0) {
-            pagingMemoryCache.update(
-                "listOf()",
-                object : Comparable<String> {
-                    override fun compareTo(other: String): Int {
-                        return 1
-                    }
-                }
-            )
+  @Test
+  fun update_SilenceAfterUpdateFailed() {
+    pagingMemoryCache.verifyInvalidate(0) {
+      pagingMemoryCache.update(
+        "listOf()",
+        object : Comparable<String> {
+          override fun compareTo(other: String): Int {
+            return 1
+          }
         }
+      )
     }
+  }
 
-    @Test
-    fun delete_NotifyObserverAfterDeleteSuccess() {
-        pagingMemoryCache.verifyInvalidate(2) {
-            pagingMemoryCache.insert(listOf("1"))
-            pagingMemoryCache.delete("1")
-        }
+  @Test
+  fun delete_NotifyObserverAfterDeleteSuccess() {
+    pagingMemoryCache.verifyInvalidate(2) {
+      pagingMemoryCache.insert(listOf("1"))
+      pagingMemoryCache.delete("1")
     }
+  }
 
-    @Test
-    fun update_SilenceAfterDeleteFailed() {
-        pagingMemoryCache.verifyInvalidate(0) {
-            pagingMemoryCache.delete("")
-        }
+  @Test
+  fun update_SilenceAfterDeleteFailed() {
+    pagingMemoryCache.verifyInvalidate(0) {
+      pagingMemoryCache.delete("")
     }
+  }
 }

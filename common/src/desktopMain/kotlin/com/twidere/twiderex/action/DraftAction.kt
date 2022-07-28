@@ -28,19 +28,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
 actual class DraftAction(
-    private val removeDraftJob: RemoveDraftJob,
-    private val saveDraftJob: SaveDraftJob,
+  private val removeDraftJob: RemoveDraftJob,
+  private val saveDraftJob: SaveDraftJob,
 ) {
-    private val scope = CoroutineScope(Dispatchers.IO)
-    actual fun delete(id: String) {
-        scope.launchCatching {
-            removeDraftJob.execute(id)
-        }
+  private val scope = CoroutineScope(Dispatchers.IO)
+  actual fun delete(id: String) {
+    scope.launchCatching {
+      removeDraftJob.execute(id)
     }
+  }
 
-    actual fun save(composeData: ComposeData) {
-        scope.launchCatching {
-            saveDraftJob.execute(composeData)
-        }
+  actual fun save(composeData: ComposeData) {
+    scope.launchCatching {
+      saveDraftJob.execute(composeData)
     }
+  }
 }

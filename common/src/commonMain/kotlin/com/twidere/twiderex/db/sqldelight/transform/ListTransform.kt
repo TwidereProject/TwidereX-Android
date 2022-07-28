@@ -24,27 +24,27 @@ import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.sqldelight.table.DbList
 
 internal fun UiList.toDbList() = DbList(
-    listId = id,
-    ownerId = ownerId,
-    title = title,
-    descriptions = descriptions,
-    mode = mode,
-    replyPolicy = replyPolicy,
-    accountKey = accountKey,
-    listKey = listKey,
-    isFollowed = isFollowed,
-    allowToSubscribe = allowToSubscribe
+  listId = id,
+  ownerId = ownerId,
+  title = title,
+  descriptions = descriptions,
+  mode = mode,
+  replyPolicy = replyPolicy,
+  accountKey = accountKey,
+  listKey = listKey,
+  isFollowed = isFollowed,
+  allowToSubscribe = allowToSubscribe
 )
 
 internal fun DbList.toUi() = UiList(
-    id = listId,
-    ownerId = ownerId,
-    title = title,
-    descriptions = descriptions,
-    mode = mode,
-    replyPolicy = replyPolicy,
-    accountKey = accountKey,
-    listKey = listKey,
-    isFollowed = isFollowed,
-    allowToSubscribe = allowToSubscribe
+  id = listId,
+  ownerId = ownerId,
+  title = title,
+  descriptions = descriptions,
+  mode = mode,
+  replyPolicy = replyPolicy,
+  accountKey = accountKey,
+  listKey = listKey,
+  isFollowed = isFollowed,
+  allowToSubscribe = allowToSubscribe
 )

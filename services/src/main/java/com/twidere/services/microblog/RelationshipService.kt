@@ -24,11 +24,11 @@ import com.twidere.services.microblog.model.IRelationship
 import com.twidere.services.microblog.model.IUser
 
 interface RelationshipService {
-    suspend fun showRelationship(target_id: String): IRelationship
-    suspend fun follow(user_id: String)
-    suspend fun unfollow(user_id: String)
-    suspend fun followers(user_id: String, nextPage: String? = null): List<IUser>
-    suspend fun following(user_id: String, nextPage: String? = null): List<IUser>
-    suspend fun block(id: String): IRelationship
-    suspend fun unblock(id: String): IRelationship
+  suspend fun showRelationship(target_id: String): IRelationship
+  suspend fun follow(user_id: String)
+  suspend fun unfollow(user_id: String)
+  suspend fun followers(user_id: String, nextPage: String? = null): List<IUser>
+  suspend fun following(user_id: String, nextPage: String? = null): List<IUser>
+  suspend fun block(id: String): IRelationship
+  suspend fun unblock(id: String): IRelationship
 }

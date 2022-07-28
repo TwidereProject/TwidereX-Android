@@ -26,24 +26,24 @@ import com.twidere.twiderex.repository.AccountRepository
 import moe.tlaster.precompose.viewmodel.ViewModel
 
 class ActiveAccountViewModel(
-    private val repository: AccountRepository,
+  private val repository: AccountRepository,
 ) : ViewModel() {
-    fun setActiveAccount(it: AccountDetails) {
-        repository.setCurrentAccount(it)
-    }
+  fun setActiveAccount(it: AccountDetails) {
+    repository.setCurrentAccount(it)
+  }
 
-    fun deleteAccount(detail: AccountDetails) {
-        repository.delete(detail)
-    }
+  fun deleteAccount(detail: AccountDetails) {
+    repository.delete(detail)
+  }
 
-    fun getTargetPlatformDefault(type: PlatformType): AccountDetails? {
-        return repository.getFirstByType(type)
-    }
+  fun getTargetPlatformDefault(type: PlatformType): AccountDetails? {
+    return repository.getFirstByType(type)
+  }
 
-    val account by lazy {
-        repository.activeAccount
-    }
-    val allAccounts by lazy {
-        repository.accounts
-    }
+  val account by lazy {
+    repository.activeAccount
+  }
+  val allAccounts by lazy {
+    repository.accounts
+  }
 }

@@ -25,14 +25,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ListUserResponse(
-    @SerialName("next_cursor")
-    val nextCursor: Long? = null,
-    @SerialName("next_cursor_str")
-    val nextCursorStr: String? = null,
-    @SerialName("previous_cursor")
-    val previousCursor: Long? = null,
-    @SerialName("previous_cursor_str")
-    val previousCursorStr: String? = null,
-    @SerialName("users")
-    val users: List<User>? = null
+  @SerialName("next_cursor")
+  val nextCursor: Long? = null,
+  @SerialName("next_cursor_str")
+  val nextCursorStr: String? = null,
+  @SerialName("previous_cursor")
+  val previousCursor: Long? = null,
+  @SerialName("previous_cursor_str")
+  val previousCursorStr: String? = null,
+  @SerialName("users")
+  val users: List<User>? = null
 )

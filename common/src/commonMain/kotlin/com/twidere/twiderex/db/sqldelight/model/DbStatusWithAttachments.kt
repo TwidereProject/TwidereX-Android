@@ -30,40 +30,40 @@ import com.twidere.twiderex.sqldelight.table.DbUrlEntity
 import com.twidere.twiderex.sqldelight.table.DbUser
 
 internal data class DbStatusWithAttachments(
-    val status: DbStatus,
-    val user: DbUser,
-    val reactions: DbStatusReactions,
-    val medias: List<DbMedia>,
-    val urls: List<DbUrlEntity>,
-    val references: Map<ReferenceType, DbStatusWithAttachments>
+  val status: DbStatus,
+  val user: DbUser,
+  val reactions: DbStatusReactions,
+  val medias: List<DbMedia>,
+  val urls: List<DbUrlEntity>,
+  val references: Map<ReferenceType, DbStatusWithAttachments>
 ) {
-    companion object {
-        fun DbStatus.withAttachments(database: SqlDelightCacheDatabase, accountKey: MicroBlogKey): DbStatusWithAttachments {
-            return database.transactionWithResult {
-                DbStatusWithAttachments(
-                    status = this@withAttachments,
-                    user = database.userQueries.findWithUserKey(userKey = userKey).executeAsOne(),
-                    medias = database.mediaQueries.findMediaByBelongToKey(belongToKey = statusKey).executeAsList(),
-                    urls = database.urlEntityQueries.findByBelongToKey(belongToKey = statusKey).executeAsList(),
-                    references = refrenceStatus.list.associateBy { it.referenceType }.mapValues {
-                        database.statusQueries.findWithStatusKey(statusKey = it.value.statusKey).executeAsOne().withAttachments(database, accountKey)
-                    },
-                    reactions = database.statusReactionsQueries.findWithStatusKey(statusKey = statusKey, accountKey = accountKey).executeAsOne()
-                )
-            }
-        }
-
-        fun List<DbStatusWithAttachments>.saveToDb(database: SqlDelightCacheDatabase) {
-            database.transaction {
-                map { it.references.map { it.value } + it }.flatten()
-                    .forEach {
-                        database.statusQueries.insert(it.status)
-                        database.userQueries.insert(it.user)
-                        database.statusReactionsQueries.insert(it.reactions)
-                        it.medias.forEach { media -> database.mediaQueries.insert(media) }
-                        it.urls.forEach { url -> database.urlEntityQueries.insert(url) }
-                    }
-            }
-        }
+  companion object {
+    fun DbStatus.withAttachments(database: SqlDelightCacheDatabase, accountKey: MicroBlogKey): DbStatusWithAttachments {
+      return database.transactionWithResult {
+        DbStatusWithAttachments(
+          status = this@withAttachments,
+          user = database.userQueries.findWithUserKey(userKey = userKey).executeAsOne(),
+          medias = database.mediaQueries.findMediaByBelongToKey(belongToKey = statusKey).executeAsList(),
+          urls = database.urlEntityQueries.findByBelongToKey(belongToKey = statusKey).executeAsList(),
+          references = refrenceStatus.list.associateBy { it.referenceType }.mapValues {
+            database.statusQueries.findWithStatusKey(statusKey = it.value.statusKey).executeAsOne().withAttachments(database, accountKey)
+          },
+          reactions = database.statusReactionsQueries.findWithStatusKey(statusKey = statusKey, accountKey = accountKey).executeAsOne()
+        )
+      }
     }
+
+    fun List<DbStatusWithAttachments>.saveToDb(database: SqlDelightCacheDatabase) {
+      database.transaction {
+        map { it.references.map { it.value } + it }.flatten()
+          .forEach {
+            database.statusQueries.insert(it.status)
+            database.userQueries.insert(it.user)
+            database.statusReactionsQueries.insert(it.reactions)
+            it.medias.forEach { media -> database.mediaQueries.insert(media) }
+            it.urls.forEach { url -> database.urlEntityQueries.insert(url) }
+          }
+      }
+    }
+  }
 }

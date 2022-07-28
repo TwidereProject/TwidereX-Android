@@ -25,6 +25,6 @@ import com.twidere.services.microblog.model.IPaging
 interface IGif
 
 class GifPaging(
-    data: List<IGif>,
-    override val nextPage: String? = null
+  data: List<IGif>,
+  override val nextPage: String? = null
 ) : ArrayList<IGif>(data), IPaging

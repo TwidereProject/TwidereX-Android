@@ -29,9 +29,9 @@ import com.twidere.twiderex.room.db.model.DbUrlEntity
 
 @Dao
 internal interface RoomUrlEntityDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(media: List<DbUrlEntity>)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertAll(media: List<DbUrlEntity>)
 
-    @Query("SELECT * FROM url_entity WHERE statusKey == :belongToKey")
-    suspend fun findWithBelongToKey(belongToKey: MicroBlogKey): List<DbUrlEntity>
+  @Query("SELECT * FROM url_entity WHERE statusKey == :belongToKey")
+  suspend fun findWithBelongToKey(belongToKey: MicroBlogKey): List<DbUrlEntity>
 }

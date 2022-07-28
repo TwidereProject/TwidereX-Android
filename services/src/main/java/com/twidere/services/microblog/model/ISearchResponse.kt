@@ -21,11 +21,11 @@
 package com.twidere.services.microblog.model
 
 interface ISearchResponse {
-    val nextPage: String?
-    val status: List<IStatus>
+  val nextPage: String?
+  val status: List<IStatus>
 }
 
 data class BasicSearchResponse(
-    override val nextPage: String?,
-    override val status: List<IStatus>
+  override val nextPage: String?,
+  override val status: List<IStatus>
 ) : ISearchResponse

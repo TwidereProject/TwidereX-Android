@@ -30,11 +30,11 @@ import moe.tlaster.placeholder.Placeholder
 
 @Composable
 fun UiImagePlaceholder(
-    modifier: Modifier = Modifier,
-    delayMillis: Long = 0,
+  modifier: Modifier = Modifier,
+  delayMillis: Long = 0,
 ) {
-    Placeholder(
-        modifier = modifier.aspectRatio(1f).fillMaxSize().clip(MaterialTheme.shapes.medium),
-        delayMillis = delayMillis,
-    )
+  Placeholder(
+    modifier = modifier.aspectRatio(1f).fillMaxSize().clip(MaterialTheme.shapes.medium),
+    delayMillis = delayMillis,
+  )
 }

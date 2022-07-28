@@ -35,32 +35,32 @@ import kotlin.test.assertTrue
 
 internal class PureMediaViewModelTest : ViewModelTestBase() {
 
-    @MockK
-    lateinit var repository: MediaRepository
+  @MockK
+  lateinit var repository: MediaRepository
 
-    lateinit var viewModel: PureMediaViewModel
+  lateinit var viewModel: PureMediaViewModel
 
-    override fun setUp() {
-        super.setUp()
-        viewModel = PureMediaViewModel(repository, MicroBlogKey.twitter("123"))
-        coEvery { repository.findMediaByBelongToKey(any()) }.returns(
-            (0..3).map {
-                mockk {
-                    every { belongToKey }.returns(MicroBlogKey.twitter("123"))
-                    every { mediaUrl }.returns(it.toString())
-                }
-            }
-        )
-    }
-
-    @Test
-    fun loadSource_success(): Unit = runBlocking {
-        viewModel.source.firstOrNull().let {
-            assertNotNull(it)
-            assertEquals(4, it.size)
-            assertTrue {
-                it.all { it.belongToKey == MicroBlogKey.twitter("123") }
-            }
+  override fun setUp() {
+    super.setUp()
+    viewModel = PureMediaViewModel(repository, MicroBlogKey.twitter("123"))
+    coEvery { repository.findMediaByBelongToKey(any()) }.returns(
+      (0..3).map {
+        mockk {
+          every { belongToKey }.returns(MicroBlogKey.twitter("123"))
+          every { mediaUrl }.returns(it.toString())
         }
+      }
+    )
+  }
+
+  @Test
+  fun loadSource_success(): Unit = runBlocking {
+    viewModel.source.firstOrNull().let {
+      assertNotNull(it)
+      assertEquals(4, it.size)
+      assertTrue {
+        it.all { it.belongToKey == MicroBlogKey.twitter("123") }
+      }
     }
+  }
 }

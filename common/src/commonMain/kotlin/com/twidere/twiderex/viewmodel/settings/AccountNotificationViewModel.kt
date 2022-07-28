@@ -33,25 +33,25 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class AccountNotificationViewModel(
-    private val accountRepository: AccountRepository,
+  private val accountRepository: AccountRepository,
 ) : ViewModel() {
-    val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    val preferences by lazy {
-        account.map {
-            accountRepository.getAccountPreferences(it.accountKey)
-        }.asStateIn(viewModelScope, null)
-    }
+  val preferences by lazy {
+    account.map {
+      accountRepository.getAccountPreferences(it.accountKey)
+    }.asStateIn(viewModelScope, null)
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val isNotificationEnabled by lazy {
-        preferences.flatMapLatest { it?.isNotificationEnabled ?: flowOf(false) }
-            .asStateIn(viewModelScope, false)
-    }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  val isNotificationEnabled by lazy {
+    preferences.flatMapLatest { it?.isNotificationEnabled ?: flowOf(false) }
+      .asStateIn(viewModelScope, false)
+  }
 
-    fun setIsNotificationEnabled(value: Boolean) = viewModelScope.launch {
-        preferences.firstOrNull()?.setIsNotificationEnabled(value)
-    }
+  fun setIsNotificationEnabled(value: Boolean) = viewModelScope.launch {
+    preferences.firstOrNull()?.setIsNotificationEnabled(value)
+  }
 }

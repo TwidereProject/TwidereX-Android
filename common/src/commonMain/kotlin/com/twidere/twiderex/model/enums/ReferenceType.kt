@@ -24,8 +24,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class ReferenceType {
-    Retweet,
-    Reply,
-    Quote,
-    MastodonNotification,
+  Retweet,
+  Reply,
+  Quote,
+  MastodonNotification,
 }

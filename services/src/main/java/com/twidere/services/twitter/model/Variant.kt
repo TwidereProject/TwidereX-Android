@@ -25,10 +25,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Variant(
-    val bitrate: Long? = null,
+  val bitrate: Long? = null,
 
-    @SerialName("content_type")
-    val contentType: String? = null,
+  @SerialName("content_type")
+  val contentType: String? = null,
 
-    val url: String? = null
+  val url: String? = null
 )

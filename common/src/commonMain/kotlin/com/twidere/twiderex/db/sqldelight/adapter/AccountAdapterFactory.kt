@@ -26,11 +26,11 @@ import com.twidere.twiderex.model.TwidereAccount
 import com.twidere.twiderex.sqldelight.table.DbAccount
 
 internal object AccountAdapterFactory {
-    fun create() = DbAccount.Adapter(
-        accountKeyAdapter = MicroBlogKeyColumnAdapter(),
-        accountAdapter = JsonColumnAdapter(TwidereAccount.serializer()),
-        typeAdapter = EnumColumnAdapter(),
-        credentials_typeAdapter = EnumColumnAdapter(),
-        userAdapter = JsonColumnAdapter(AmUser.serializer()),
-    )
+  fun create() = DbAccount.Adapter(
+    accountKeyAdapter = MicroBlogKeyColumnAdapter(),
+    accountAdapter = JsonColumnAdapter(TwidereAccount.serializer()),
+    typeAdapter = EnumColumnAdapter(),
+    credentials_typeAdapter = EnumColumnAdapter(),
+    userAdapter = JsonColumnAdapter(AmUser.serializer()),
+  )
 }

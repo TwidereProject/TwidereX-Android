@@ -30,17 +30,17 @@ import com.twidere.twiderex.paging.CursorPagination
 class CursorPagingResult<T>(data: List<T>, val cursor: String? = null) : ArrayListCompat<T>(data)
 
 abstract class CursorPagingMediator(
-    accountKey: MicroBlogKey,
-    database: CacheDatabase,
+  accountKey: MicroBlogKey,
+  database: CacheDatabase,
 ) : PagingTimelineMediatorBase<CursorPagination>(accountKey, database) {
-    override fun provideNextPage(
-        raw: List<IStatus>,
-        result: List<PagingTimeLineWithStatus>
-    ): CursorPagination {
-        return if (raw is CursorPagingResult<*>) {
-            CursorPagination(cursor = raw.cursor)
-        } else {
-            CursorPagination(cursor = null)
-        }
+  override fun provideNextPage(
+    raw: List<IStatus>,
+    result: List<PagingTimeLineWithStatus>
+  ): CursorPagination {
+    return if (raw is CursorPagingResult<*>) {
+      CursorPagination(cursor = raw.cursor)
+    } else {
+      CursorPagination(cursor = null)
     }
+  }
 }

@@ -27,23 +27,23 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 
 @Entity(
-    tableName = "media",
-    indices = [Index(value = ["belongToKey", "order"], unique = true)],
+  tableName = "media",
+  indices = [Index(value = ["belongToKey", "order"], unique = true)],
 )
 internal data class DbMedia(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    val _id: String,
-    val belongToKey: MicroBlogKey,
-    val url: String?,
-    val mediaUrl: String?,
-    val previewUrl: String?,
-    val type: MediaType,
-    val width: Long,
-    val height: Long,
-    val pageUrl: String?,
-    val altText: String,
-    val order: Int,
+  /**
+   * Id that being used in the database
+   */
+  @PrimaryKey
+  val _id: String,
+  val belongToKey: MicroBlogKey,
+  val url: String?,
+  val mediaUrl: String?,
+  val previewUrl: String?,
+  val type: MediaType,
+  val width: Long,
+  val height: Long,
+  val pageUrl: String?,
+  val altText: String,
+  val order: Int,
 )

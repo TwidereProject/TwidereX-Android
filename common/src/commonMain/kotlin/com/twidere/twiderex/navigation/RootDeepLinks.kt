@@ -31,55 +31,55 @@ import com.twidere.twiderex.model.enums.ComposeType
 const val twidereXSchema = "twiderex"
 
 @AppRoute(
-    schema = twidereXSchema
+  schema = twidereXSchema
 )
 expect object RootDeepLinks {
-    object Twitter {
-        object User : IRoute {
-            operator fun invoke(screenName: String): String
-        }
-
-        object Status : IRoute {
-            operator fun invoke(statusId: String): String
-        }
-    }
-
-    object Mastodon {
-        object Hashtag : IRoute {
-            operator fun invoke(keyword: String): String
-        }
-    }
-
+  object Twitter {
     object User : IRoute {
-        operator fun invoke(userKey: MicroBlogKey): String
+      operator fun invoke(screenName: String): String
     }
 
     object Status : IRoute {
-        operator fun invoke(statusKey: MicroBlogKey): String
+      operator fun invoke(statusId: String): String
     }
+  }
 
-    object Search : IRoute {
-        operator fun invoke(keyword: String): String
+  object Mastodon {
+    object Hashtag : IRoute {
+      operator fun invoke(keyword: String): String
     }
+  }
 
-    val SignIn: String
+  object User : IRoute {
+    operator fun invoke(userKey: MicroBlogKey): String
+  }
 
-    object Draft : IRoute {
-        operator fun invoke(draftId: String): String
+  object Status : IRoute {
+    operator fun invoke(statusKey: MicroBlogKey): String
+  }
+
+  object Search : IRoute {
+    operator fun invoke(keyword: String): String
+  }
+
+  val SignIn: String
+
+  object Draft : IRoute {
+    operator fun invoke(draftId: String): String
+  }
+
+  object Compose : IRoute {
+    operator fun invoke(composeType: ComposeType?, statusKey: MicroBlogKey?): String
+  }
+
+  object Conversation : IRoute {
+    operator fun invoke(conversationKey: MicroBlogKey): String
+  }
+
+  object Callback {
+    object SignIn {
+      val Mastodon: String
+      val Twitter: String
     }
-
-    object Compose : IRoute {
-        operator fun invoke(composeType: ComposeType?, statusKey: MicroBlogKey?): String
-    }
-
-    object Conversation : IRoute {
-        operator fun invoke(conversationKey: MicroBlogKey): String
-    }
-
-    object Callback {
-        object SignIn {
-            val Mastodon: String
-            val Twitter: String
-        }
-    }
+  }
 }

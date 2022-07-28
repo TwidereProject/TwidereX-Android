@@ -48,73 +48,73 @@ import moe.tlaster.precompose.viewmodel.viewModelScope
 
 @Composable
 fun TimelineComponent(
-    viewModel: TimelineViewModel,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    lazyListController: LazyListController? = null,
+  viewModel: TimelineViewModel,
+  contentPadding: PaddingValues = PaddingValues(0.dp),
+  lazyListController: LazyListController? = null,
 ) {
-    val items = viewModel.source.collectAsLazyPagingItems()
-    val loadingBetween by viewModel.loadingBetween.observeAsState(initial = listOf())
-    SwipeToRefreshLayout(
-        refreshingState = items.loadState.refresh is LoadState.Loading,
-        onRefresh = {
-            items.refreshOrRetry()
-        },
-        refreshIndicatorPadding = contentPadding
-    ) {
-        val listState = rememberLazyListState()
-        LaunchedEffect(Unit) {
-            viewModel.provideScrollState()
-                .filterNotNull()
-                .collectLatest {
-                    listState.scrollToItem(
-                        it.firstVisibleItemIndex,
-                        it.firstVisibleItemScrollOffset
-                    )
-                }
+  val items = viewModel.source.collectAsLazyPagingItems()
+  val loadingBetween by viewModel.loadingBetween.observeAsState(initial = listOf())
+  SwipeToRefreshLayout(
+    refreshingState = items.loadState.refresh is LoadState.Loading,
+    onRefresh = {
+      items.refreshOrRetry()
+    },
+    refreshIndicatorPadding = contentPadding
+  ) {
+    val listState = rememberLazyListState()
+    LaunchedEffect(Unit) {
+      viewModel.provideScrollState()
+        .filterNotNull()
+        .collectLatest {
+          listState.scrollToItem(
+            it.firstVisibleItemIndex,
+            it.firstVisibleItemScrollOffset
+          )
         }
-        if (items.itemCount > 0) {
-            LaunchedEffect(lazyListController) {
-                lazyListController?.listState = listState
-            }
-        }
-        LaunchedEffect(Unit) {
-            // TODO FIXME #listState 20211119: listState.isScrollInProgress is always false on desktop - https://github.com/JetBrains/compose-jb/issues/1423
-            snapshotFlow { listState.isScrollInProgress }
-                .distinctUntilChanged()
-                .filter { !it }
-                .filter { listState.layoutInfo.totalItemsCount != 0 }
-                .collect {
-                    viewModel.saveScrollState(
-                        TimelineScrollState(
-                            firstVisibleItemIndex = listState.firstVisibleItemIndex,
-                            firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
-                        )
-                    )
-                }
-        }
-        // TODO: Temporary solution， remove after [FIXME #listState] is fixed
-        if (currentPlatform == Platform.JVM) {
-            DisposableEffect(Unit) {
-                onDispose {
-                    viewModel.viewModelScope.launch {
-                        viewModel.saveScrollState(
-                            TimelineScrollState(
-                                firstVisibleItemIndex = listState.firstVisibleItemIndex,
-                                firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
-                            )
-                        )
-                    }
-                }
-            }
-        }
-        LazyUiStatusList(
-            items = items,
-            state = listState,
-            contentPadding = contentPadding,
-            loadingBetween = loadingBetween,
-            onLoadBetweenClicked = { current, next ->
-                viewModel.loadBetween(current, next)
-            },
-        )
     }
+    if (items.itemCount > 0) {
+      LaunchedEffect(lazyListController) {
+        lazyListController?.listState = listState
+      }
+    }
+    LaunchedEffect(Unit) {
+      // TODO FIXME #listState 20211119: listState.isScrollInProgress is always false on desktop - https://github.com/JetBrains/compose-jb/issues/1423
+      snapshotFlow { listState.isScrollInProgress }
+        .distinctUntilChanged()
+        .filter { !it }
+        .filter { listState.layoutInfo.totalItemsCount != 0 }
+        .collect {
+          viewModel.saveScrollState(
+            TimelineScrollState(
+              firstVisibleItemIndex = listState.firstVisibleItemIndex,
+              firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
+            )
+          )
+        }
+    }
+    // TODO: Temporary solution， remove after [FIXME #listState] is fixed
+    if (currentPlatform == Platform.JVM) {
+      DisposableEffect(Unit) {
+        onDispose {
+          viewModel.viewModelScope.launch {
+            viewModel.saveScrollState(
+              TimelineScrollState(
+                firstVisibleItemIndex = listState.firstVisibleItemIndex,
+                firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
+              )
+            )
+          }
+        }
+      }
+    }
+    LazyUiStatusList(
+      items = items,
+      state = listState,
+      contentPadding = contentPadding,
+      loadingBetween = loadingBetween,
+      onLoadBetweenClicked = { current, next ->
+        viewModel.loadBetween(current, next)
+      },
+    )
+  }
 }

@@ -24,7 +24,7 @@ import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.http.TwidereServiceFactory
 
 class TwidereServiceFactoryInitialTask : InitialTask {
-    override fun execute() {
-        TwidereServiceFactory.initiate(get())
-    }
+  override fun execute() {
+    TwidereServiceFactory.initiate(get())
+  }
 }

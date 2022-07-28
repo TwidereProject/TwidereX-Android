@@ -50,78 +50,78 @@ import moe.tlaster.precompose.ui.LocalViewModelStoreOwner
  */
 @Composable
 fun NavHost(
-    navController: NavController,
-    initialRoute: String,
-    navTransition: NavTransition = remember { NavTransition() },
-    dialogTransition: DialogTransition = remember { DialogTransition() },
-    builder: RouteBuilder.() -> Unit,
+  navController: NavController,
+  initialRoute: String,
+  navTransition: NavTransition = remember { NavTransition() },
+  dialogTransition: DialogTransition = remember { DialogTransition() },
+  builder: RouteBuilder.() -> Unit,
 ) {
-    val stateHolder = rememberSaveableStateHolder()
-    val manager = remember {
-        val graph = RouteBuilder(initialRoute = initialRoute).apply(builder).build()
-        RouteStackManager(stateHolder, graph).apply {
-            navController.stackManager = this
-        }
+  val stateHolder = rememberSaveableStateHolder()
+  val manager = remember {
+    val graph = RouteBuilder(initialRoute = initialRoute).apply(builder).build()
+    RouteStackManager(stateHolder, graph).apply {
+      navController.stackManager = this
     }
+  }
 
-    val lifecycleOwner = checkNotNull(LocalLifecycleOwner.current) {
-        "NavHost requires a LifecycleOwner to be provided via LocalLifecycleOwner"
+  val lifecycleOwner = checkNotNull(LocalLifecycleOwner.current) {
+    "NavHost requires a LifecycleOwner to be provided via LocalLifecycleOwner"
+  }
+  val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
+    "NavHost requires a ViewModelStoreOwner to be provided via LocalViewModelStoreOwner"
+  }
+  val backDispatcher = LocalBackDispatcherOwner.current?.backDispatcher
+  DisposableEffect(manager, lifecycleOwner, viewModelStoreOwner, backDispatcher) {
+    manager.lifeCycleOwner = lifecycleOwner
+    manager.setViewModelStore(viewModelStoreOwner.viewModelStore)
+    manager.backDispatcher = backDispatcher
+    onDispose {
+      manager.lifeCycleOwner = null
     }
-    val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
-        "NavHost requires a ViewModelStoreOwner to be provided via LocalViewModelStoreOwner"
-    }
-    val backDispatcher = LocalBackDispatcherOwner.current?.backDispatcher
-    DisposableEffect(manager, lifecycleOwner, viewModelStoreOwner, backDispatcher) {
-        manager.lifeCycleOwner = lifecycleOwner
-        manager.setViewModelStore(viewModelStoreOwner.viewModelStore)
-        manager.backDispatcher = backDispatcher
+  }
+
+  LaunchedEffect(manager, initialRoute) {
+    manager.navigateInitial(initialRoute)
+  }
+  val currentStack = manager.currentStack
+  if (currentStack != null) {
+    AnimatedRoute(
+      currentStack,
+      navTransition = navTransition,
+      manager = manager,
+    ) { routeStack ->
+      LaunchedEffect(routeStack) {
+        routeStack.onActive()
+      }
+      DisposableEffect(routeStack) {
         onDispose {
-            manager.lifeCycleOwner = null
+          routeStack.onInActive()
         }
-    }
-
-    LaunchedEffect(manager, initialRoute) {
-        manager.navigateInitial(initialRoute)
-    }
-    val currentStack = manager.currentStack
-    if (currentStack != null) {
-        AnimatedRoute(
-            currentStack,
-            navTransition = navTransition,
-            manager = manager,
-        ) { routeStack ->
-            LaunchedEffect(routeStack) {
-                routeStack.onActive()
-            }
-            DisposableEffect(routeStack) {
-                onDispose {
-                    routeStack.onInActive()
-                }
-            }
-            val currentEntry = routeStack.currentEntry
-            if (currentEntry != null) {
-                LaunchedEffect(currentEntry) {
-                    currentEntry.active()
-                }
-                DisposableEffect(currentEntry) {
-                    onDispose {
-                        currentEntry.inActive()
-                    }
-                }
-            }
-            AnimatedDialogRoute(
-                stack = routeStack,
-                dialogTransition = dialogTransition,
-            ) {
-                stateHolder.SaveableStateProvider(it.id) {
-                    CompositionLocalProvider(
-                        LocalViewModelStoreOwner provides it,
-                        LocalLifecycleOwner provides it,
-                    ) {
-                        it.route.content.invoke(it)
-                    }
-                }
-            }
+      }
+      val currentEntry = routeStack.currentEntry
+      if (currentEntry != null) {
+        LaunchedEffect(currentEntry) {
+          currentEntry.active()
         }
+        DisposableEffect(currentEntry) {
+          onDispose {
+            currentEntry.inActive()
+          }
+        }
+      }
+      AnimatedDialogRoute(
+        stack = routeStack,
+        dialogTransition = dialogTransition,
+      ) {
+        stateHolder.SaveableStateProvider(it.id) {
+          CompositionLocalProvider(
+            LocalViewModelStoreOwner provides it,
+            LocalLifecycleOwner provides it,
+          ) {
+            it.route.content.invoke(it)
+          }
+        }
+      }
     }
+  }
 }

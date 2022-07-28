@@ -23,7 +23,7 @@ package com.twidere.twiderex.extensions
 import androidx.compose.ui.text.input.TextFieldValue
 
 fun TextFieldValue.getTextBeforeSelection(): String =
-    text.substring(0, selection.min)
+  text.substring(0, selection.min)
 
 fun TextFieldValue.getTextAfterSelection(): String =
-    text.substring(selection.max, text.length)
+  text.substring(selection.max, text.length)

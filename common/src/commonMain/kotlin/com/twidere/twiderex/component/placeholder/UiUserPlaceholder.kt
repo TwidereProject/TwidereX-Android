@@ -34,37 +34,37 @@ import moe.tlaster.placeholder.TextPlaceHolder
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun UiUserPlaceholder(
-    delayMillis: Long = 0,
+  delayMillis: Long = 0,
 ) {
-    ListItem(
-        icon = {
-            AvatarPlaceHolder(
-                delayMillis = delayMillis,
-            )
-        },
-        text = {
-            TextPlaceHolder(
-                length = 14,
-                delayMillis = delayMillis,
-            )
-        },
-        secondaryText = {
-            TextPlaceHolder(
-                length = 10,
-                delayMillis = delayMillis
-            )
-        }
-    )
+  ListItem(
+    icon = {
+      AvatarPlaceHolder(
+        delayMillis = delayMillis,
+      )
+    },
+    text = {
+      TextPlaceHolder(
+        length = 14,
+        delayMillis = delayMillis,
+      )
+    },
+    secondaryText = {
+      TextPlaceHolder(
+        length = 10,
+        delayMillis = delayMillis
+      )
+    }
+  )
 }
 
 @Composable
 fun AvatarPlaceHolder(
-    delayMillis: Long = 0,
+  delayMillis: Long = 0,
 ) {
-    Placeholder(
-        modifier = Modifier
-            .size(UserAvatarDefaults.AvatarSize)
-            .clip(CircleShape),
-        delayMillis = delayMillis,
-    )
+  Placeholder(
+    modifier = Modifier
+      .size(UserAvatarDefaults.AvatarSize)
+      .clip(CircleShape),
+    delayMillis = delayMillis,
+  )
 }

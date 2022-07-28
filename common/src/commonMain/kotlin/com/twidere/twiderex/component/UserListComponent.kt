@@ -34,17 +34,17 @@ import com.twidere.twiderex.viewmodel.user.UserListViewModel
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun UserListComponent(
-    viewModel: UserListViewModel,
-    action: @Composable (user: UiUser) -> Unit = {}
+  viewModel: UserListViewModel,
+  action: @Composable (user: UiUser) -> Unit = {}
 ) {
-    val source = viewModel.source.collectAsLazyPagingItems()
-    val navigator = LocalNavigator.current
-    SwipeToRefreshLayout(
-        refreshingState = source.loadState.refresh is LoadState.Loading,
-        onRefresh = {
-            source.refreshOrRetry()
-        }
-    ) {
-        LazyUiUserList(items = source, onItemClicked = { navigator.user(it) }, action = action)
+  val source = viewModel.source.collectAsLazyPagingItems()
+  val navigator = LocalNavigator.current
+  SwipeToRefreshLayout(
+    refreshingState = source.loadState.refresh is LoadState.Loading,
+    onRefresh = {
+      source.refreshOrRetry()
     }
+  ) {
+    LazyUiUserList(items = source, onItemClicked = { navigator.user(it) }, action = action)
+  }
 }

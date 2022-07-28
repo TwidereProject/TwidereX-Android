@@ -55,88 +55,88 @@ import com.twidere.twiderex.ui.TwidereScene
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AccountManagementScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_manage_accounts_title))
-                    },
-                    actions = {
-                        val navController = LocalNavController.current
-                        IconButton(
-                            onClick = {
-                                navController.navigate(Root.SignIn.General)
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = stringResource(
-                                    res = com.twidere.twiderex.MR.strings.accessibility_scene_manage_accounts_add
-                                )
-                            )
-                        }
-                    }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_manage_accounts_title))
+          },
+          actions = {
+            val navController = LocalNavController.current
+            IconButton(
+              onClick = {
+                navController.navigate(Root.SignIn.General)
+              }
+            ) {
+              Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = stringResource(
+                  res = com.twidere.twiderex.MR.strings.accessibility_scene_manage_accounts_add
                 )
+              )
             }
-        ) {
-            val activeAccountViewModel = LocalActiveAccountViewModel.current
-            val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
-            LazyColumn {
-                items(items = accounts) { detail ->
-                    detail.toUi().let {
-                        ListItem(
-                            icon = {
-                                UserAvatar(
-                                    user = it,
-                                    withPlatformIcon = true,
-                                )
-                            },
-                            text = {
-                                UserName(user = it)
-                            },
-                            secondaryText = {
-                                UserScreenName(user = it)
-                            },
-                            trailing = {
-                                var expanded by remember { mutableStateOf(false) }
-                                Box {
-                                    IconButton(
-                                        onClick = {
-                                            expanded = true
-                                        },
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.MoreVert,
-                                            contentDescription = stringResource(
-                                                res = com.twidere.twiderex.MR.strings.accessibility_common_more
-                                            )
-                                        )
-                                    }
-                                    DropdownMenu(
-                                        expanded = expanded,
-                                        onDismissRequest = { expanded = false },
-                                    ) {
-                                        DropdownMenuItem(
-                                            onClick = {
-                                                activeAccountViewModel.deleteAccount(detail)
-                                            },
-                                        ) {
-                                            Text(
-                                                text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_remove),
-                                                color = Color.Red,
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        )
+          }
+        )
+      }
+    ) {
+      val activeAccountViewModel = LocalActiveAccountViewModel.current
+      val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
+      LazyColumn {
+        items(items = accounts) { detail ->
+          detail.toUi().let {
+            ListItem(
+              icon = {
+                UserAvatar(
+                  user = it,
+                  withPlatformIcon = true,
+                )
+              },
+              text = {
+                UserName(user = it)
+              },
+              secondaryText = {
+                UserScreenName(user = it)
+              },
+              trailing = {
+                var expanded by remember { mutableStateOf(false) }
+                Box {
+                  IconButton(
+                    onClick = {
+                      expanded = true
+                    },
+                  ) {
+                    Icon(
+                      imageVector = Icons.Default.MoreVert,
+                      contentDescription = stringResource(
+                        res = com.twidere.twiderex.MR.strings.accessibility_common_more
+                      )
+                    )
+                  }
+                  DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                  ) {
+                    DropdownMenuItem(
+                      onClick = {
+                        activeAccountViewModel.deleteAccount(detail)
+                      },
+                    ) {
+                      Text(
+                        text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_remove),
+                        color = Color.Red,
+                      )
                     }
+                  }
                 }
-            }
+              }
+            )
+          }
         }
+      }
     }
+  }
 }

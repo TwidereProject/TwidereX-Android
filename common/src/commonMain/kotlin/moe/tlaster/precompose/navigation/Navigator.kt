@@ -32,69 +32,69 @@ import androidx.compose.runtime.remember
  */
 @Composable
 fun rememberNavController(): NavController {
-    return remember { NavController() }
+  return remember { NavController() }
 }
 
 class NavController {
-    // FIXME: 2021/4/1 Temp workaround for deeplink
-    private var pendingNavigation: String? = null
-    internal var stackManager: RouteStackManager? = null
-        set(value) {
-            field = value
-            value?.let {
-                pendingNavigation?.let { it1 -> it.navigate(it1) }
-            }
-        }
-
-    /**
-     * Navigate to a route in the current RouteGraph.
-     *
-     * @param route route for the destination
-     * @param options navigation options for the destination
-     */
-    fun navigate(route: String, options: NavOptions? = null) {
-        stackManager?.navigate(route, options) ?: run {
-            pendingNavigation = route
-        }
+  // FIXME: 2021/4/1 Temp workaround for deeplink
+  private var pendingNavigation: String? = null
+  internal var stackManager: RouteStackManager? = null
+    set(value) {
+      field = value
+      value?.let {
+        pendingNavigation?.let { it1 -> it.navigate(it1) }
+      }
     }
 
-    suspend fun navigateForResult(route: String, options: NavOptions? = null): Any? {
-        stackManager?.navigate(route, options) ?: run {
-            pendingNavigation = route
-            return null
-        }
-        val currentEntry = stackManager?.currentEntry ?: return null
-        return stackManager?.waitingForResult(currentEntry)
+  /**
+   * Navigate to a route in the current RouteGraph.
+   *
+   * @param route route for the destination
+   * @param options navigation options for the destination
+   */
+  fun navigate(route: String, options: NavOptions? = null) {
+    stackManager?.navigate(route, options) ?: run {
+      pendingNavigation = route
     }
+  }
 
-    /**
-     * Attempts to navigate up in the navigation hierarchy. Suitable for when the
-     * user presses the "Up" button marked with a left (or start)-facing arrow in the upper left
-     * (or starting) corner of the app UI.
-     */
-    fun goBack() {
-        stackManager?.goBack()
+  suspend fun navigateForResult(route: String, options: NavOptions? = null): Any? {
+    stackManager?.navigate(route, options) ?: run {
+      pendingNavigation = route
+      return null
     }
+    val currentEntry = stackManager?.currentEntry ?: return null
+    return stackManager?.waitingForResult(currentEntry)
+  }
 
-    fun goBackWith(result: Any? = null) {
-        stackManager?.goBack(result)
-    }
+  /**
+   * Attempts to navigate up in the navigation hierarchy. Suitable for when the
+   * user presses the "Up" button marked with a left (or start)-facing arrow in the upper left
+   * (or starting) corner of the app UI.
+   */
+  fun goBack() {
+    stackManager?.goBack()
+  }
 
-    /**
-     * Compatibility layer for Jetpack Navigation
-     */
-    fun popBackStack() {
-        goBack()
-    }
+  fun goBackWith(result: Any? = null) {
+    stackManager?.goBack(result)
+  }
 
-    /**
-     * Check if navigator can navigate up
-     */
-    val canGoBack: Boolean
-        get() = stackManager?.canGoBack ?: false
+  /**
+   * Compatibility layer for Jetpack Navigation
+   */
+  fun popBackStack() {
+    goBack()
+  }
+
+  /**
+   * Check if navigator can navigate up
+   */
+  val canGoBack: Boolean
+    get() = stackManager?.canGoBack ?: false
 }
 
 @Composable
 fun NavController.currentBackStackEntryAsState(): State<BackStackEntry?>? {
-    return stackManager?.currentStack?.currentBackStackEntryFlow?.collectAsState(null)
+  return stackManager?.currentStack?.currentBackStackEntryFlow?.collectAsState(null)
 }

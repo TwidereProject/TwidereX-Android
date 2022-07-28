@@ -31,13 +31,13 @@ import java.io.OutputStream
 
 @OptIn(ExperimentalSerializationApi::class)
 object MiscPreferencesSerializer : Serializer<MiscPreferences> {
-    override val defaultValue: MiscPreferences
-        get() = MiscPreferences()
+  override val defaultValue: MiscPreferences
+    get() = MiscPreferences()
 
-    override suspend fun readFrom(input: InputStream): MiscPreferences {
-        return ProtoBuf.decodeFromByteArray(input.readBytes())
-    }
+  override suspend fun readFrom(input: InputStream): MiscPreferences {
+    return ProtoBuf.decodeFromByteArray(input.readBytes())
+  }
 
-    override suspend fun writeTo(t: MiscPreferences, output: OutputStream) =
-        output.write(ProtoBuf.encodeToByteArray(t))
+  override suspend fun writeTo(t: MiscPreferences, output: OutputStream) =
+    output.write(ProtoBuf.encodeToByteArray(t))
 }

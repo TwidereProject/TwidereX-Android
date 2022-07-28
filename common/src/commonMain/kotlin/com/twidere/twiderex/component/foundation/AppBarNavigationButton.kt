@@ -31,17 +31,17 @@ import com.twidere.twiderex.ui.LocalNavController
 
 @Composable
 fun AppBarNavigationButton(
-    icon: ImageVector = Icons.Default.ArrowBack,
+  icon: ImageVector = Icons.Default.ArrowBack,
 ) {
-    val navController = LocalNavController.current
-    IconButton(
-        onClick = {
-            navController.popBackStack()
-        }
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_back)
-        )
+  val navController = LocalNavController.current
+  IconButton(
+    onClick = {
+      navController.popBackStack()
     }
+  ) {
+    Icon(
+      imageVector = icon,
+      contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_back)
+    )
+  }
 }

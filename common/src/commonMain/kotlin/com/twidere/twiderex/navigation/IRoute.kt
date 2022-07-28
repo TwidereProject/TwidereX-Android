@@ -26,42 +26,42 @@ import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.transition.NavTransition
 
 interface IRoute {
-    val route: String
+  val route: String
 }
 
 fun List<Any>.mapToString() = map {
-    when (it) {
-        is String -> it
-        is IRoute -> it.route
-        else -> it.toString()
-    }
+  when (it) {
+    is String -> it
+    is IRoute -> it.route
+    else -> it.toString()
+  }
 }
 
 fun RouteBuilder.scene(
-    route: IRoute,
-    deepLinks: List<Any> = emptyList(),
-    navTransition: NavTransition? = null,
-    content: @Composable (BackStackEntry) -> Unit,
+  route: IRoute,
+  deepLinks: List<Any> = emptyList(),
+  navTransition: NavTransition? = null,
+  content: @Composable (BackStackEntry) -> Unit,
 ) = scene(
-    route = route.route,
-    deepLinks = deepLinks.mapToString(),
-    navTransition = navTransition,
-    content = content
+  route = route.route,
+  deepLinks = deepLinks.mapToString(),
+  navTransition = navTransition,
+  content = content
 )
 
 fun RouteBuilder.authorizedScene(
-    route: IRoute,
-    deepLinks: List<Any> = emptyList(),
-    navTransition: NavTransition? = null,
-    content: @Composable (BackStackEntry) -> Unit,
+  route: IRoute,
+  deepLinks: List<Any> = emptyList(),
+  navTransition: NavTransition? = null,
+  content: @Composable (BackStackEntry) -> Unit,
 ) = authorizedScene(
-    route = route.route,
-    deepLinks = deepLinks.mapToString(),
-    navTransition = navTransition,
-    content = content
+  route = route.route,
+  deepLinks = deepLinks.mapToString(),
+  navTransition = navTransition,
+  content = content
 )
 
 fun RouteBuilder.authorizedDialog(
-    route: IRoute,
-    content: @Composable (BackStackEntry) -> Unit,
+  route: IRoute,
+  content: @Composable (BackStackEntry) -> Unit,
 ) = authorizedDialog(route.route, content)

@@ -37,38 +37,38 @@ import com.twidere.twiderex.component.foundation.platform.PlatformDropdownMenuIt
 // issue tracker: https://issuetracker.google.com/issues/196413692
 @Composable
 fun DropdownMenu(
-    expanded: Boolean,
-    onDismissRequest: () -> Unit,
-    focusable: Boolean = true,
-    modifier: Modifier = Modifier,
-    offset: DpOffset = DpOffset(0.dp, 0.dp),
-    content: @Composable (ColumnScope.() -> Unit)
+  expanded: Boolean,
+  onDismissRequest: () -> Unit,
+  focusable: Boolean = true,
+  modifier: Modifier = Modifier,
+  offset: DpOffset = DpOffset(0.dp, 0.dp),
+  content: @Composable (ColumnScope.() -> Unit)
 ) {
-    PlatformDropdownMenu(
-        expanded = expanded,
-        onDismissRequest = onDismissRequest,
-        focusable = focusable,
-        modifier = modifier,
-        offset = offset,
-        content = content,
-    )
+  PlatformDropdownMenu(
+    expanded = expanded,
+    onDismissRequest = onDismissRequest,
+    focusable = focusable,
+    modifier = modifier,
+    offset = offset,
+    content = content,
+  )
 }
 
 @Composable
 fun DropdownMenuItem(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    contentPadding: PaddingValues = MenuDefaults.DropdownMenuItemContentPadding,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    content: @Composable (RowScope.() -> Unit)
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  contentPadding: PaddingValues = MenuDefaults.DropdownMenuItemContentPadding,
+  interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+  content: @Composable (RowScope.() -> Unit)
 ) {
-    PlatformDropdownMenuItem(
-        onClick = onClick,
-        modifier = modifier,
-        enabled = enabled,
-        contentPadding = contentPadding,
-        interactionSource = interactionSource,
-        content = content,
-    )
+  PlatformDropdownMenuItem(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    contentPadding = contentPadding,
+    interactionSource = interactionSource,
+    content = content,
+  )
 }

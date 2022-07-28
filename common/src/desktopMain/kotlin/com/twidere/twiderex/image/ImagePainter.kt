@@ -49,163 +49,163 @@ import javax.imageio.ImageIO
  * current support http/https/file/filepath only
  */
 internal class ImagePainter(
-    private val request: Any,
-    private val parentScope: CoroutineScope,
-    private val imageCache: ImageCache,
-    private val imageEffects: ImageEffects,
-    // private val httpConnection: (URL) -> HttpURLConnection = { it.openConnection() as HttpURLConnection },
-    private val callFactory: () -> OkHttpClient = { OkHttpClient() },
-    private val onImageStateChanged: (NetworkImageState) -> Unit
+  private val request: Any,
+  private val parentScope: CoroutineScope,
+  private val imageCache: ImageCache,
+  private val imageEffects: ImageEffects,
+  // private val httpConnection: (URL) -> HttpURLConnection = { it.openConnection() as HttpURLConnection },
+  private val callFactory: () -> OkHttpClient = { OkHttpClient() },
+  private val onImageStateChanged: (NetworkImageState) -> Unit
 ) : Painter(), RememberObserver {
-    private var painter = mutableStateOf<Painter?>(null)
+  private var painter = mutableStateOf<Painter?>(null)
 
-    override val intrinsicSize: Size
-        get() = painter.value?.intrinsicSize ?: Size.Unspecified
-    private var alpha: Float = 1f
-    private var colorFilter: ColorFilter? = null
-    private var rememberScope: CoroutineScope? = null
+  override val intrinsicSize: Size
+    get() = painter.value?.intrinsicSize ?: Size.Unspecified
+  private var alpha: Float = 1f
+  private var colorFilter: ColorFilter? = null
+  private var rememberScope: CoroutineScope? = null
 
-    override fun applyAlpha(alpha: Float): Boolean {
-        this.alpha = alpha
-        return true
+  override fun applyAlpha(alpha: Float): Boolean {
+    this.alpha = alpha
+    return true
+  }
+
+  override fun applyColorFilter(colorFilter: ColorFilter?): Boolean {
+    this.colorFilter = colorFilter
+    return true
+  }
+
+  override fun DrawScope.onDraw() {
+    painter.value?.apply {
+      draw(size, alpha, colorFilter)
+      if (this is GifPainter) {
+        start()
+      }
     }
+  }
 
-    override fun applyColorFilter(colorFilter: ColorFilter?): Boolean {
-        this.colorFilter = colorFilter
-        return true
+  override fun onAbandoned() = onForgotten()
+
+  override fun onForgotten() {
+    rememberScope?.cancel()
+    rememberScope = null
+    painter.value?.let {
+      if (it is GifPainter) {
+        it.stop()
+      }
     }
+  }
 
-    override fun DrawScope.onDraw() {
-        painter.value?.apply {
-            draw(size, alpha, colorFilter)
-            if (this is GifPainter) {
-                start()
-            }
-        }
+  override fun onRemembered() {
+    rememberScope?.cancel()
+    val context = parentScope.coroutineContext
+    rememberScope = CoroutineScope(parentScope.coroutineContext + SupervisorJob(context[Job]))
+    onImageStateChanged(NetworkImageState.LOADING)
+    rememberScope?.launch {
+      try {
+        execute()
+        onImageStateChanged(NetworkImageState.SUCCESS)
+      } catch (e: Throwable) {
+        onImageStateChanged(NetworkImageState.ERROR)
+      }
     }
+  }
 
-    override fun onAbandoned() = onForgotten()
-
-    override fun onForgotten() {
-        rememberScope?.cancel()
-        rememberScope = null
-        painter.value?.let {
-            if (it is GifPainter) {
-                it.stop()
-            }
-        }
-    }
-
-    override fun onRemembered() {
-        rememberScope?.cancel()
-        val context = parentScope.coroutineContext
-        rememberScope = CoroutineScope(parentScope.coroutineContext + SupervisorJob(context[Job]))
-        onImageStateChanged(NetworkImageState.LOADING)
-        rememberScope?.launch {
-            try {
-                execute()
-                onImageStateChanged(NetworkImageState.SUCCESS)
-            } catch (e: Throwable) {
-                onImageStateChanged(NetworkImageState.ERROR)
-            }
-        }
-    }
-
-    private fun generatePainter(inputStream: InputStream, mimeType: String) {
-        var error: Throwable? = null
-        try {
-            if (mimeType == "image/gif") {
-                painter.value = GifPainter(
-                    Codec.makeFromData(Data.makeFromBytes(inputStream.readAllBytes())),
-                    parentScope
-                )
-            } else {
-                ImageIO.read(inputStream)?.let { image ->
-                    imageEffects.blur?.let {
-                        ImageEffectsFilter.applyBlurFilter(
-                            image,
-                            it.blurRadius.toInt(),
-                            it.bitmapScale
-                        )
-                    } ?: image
-                }?.let {
-                    painter.value = it.toPainter()
-                }
-            }
-        } catch (e: Throwable) {
-            error = e
-        } finally {
-            try {
-                inputStream.close()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        if (error != null) throw error
-    }
-
-    private fun fileRequest(file: File) {
-        try {
-            val connection = file.toURI().toURL().openConnection()
-            val mimeType = connection.contentType
-            val input = file.inputStream()
-            generatePainter(input, mimeType)
-        } catch (e: Throwable) {
-            throw e
-        }
-    }
-
-    private suspend fun networkRequest(url: URL) {
-        var error: Throwable? = null
-        try {
-            val request = Request.Builder().url(url).build()
-            var mimeType = ""
-            val input = imageCache.fetch(url.toString())?.let {
-                mimeType = it.toURI().toURL().openConnection().contentType
-                it.inputStream()
-            } ?: callFactory().newCall(request).await().body?.use { body ->
-                mimeType = body.contentType().toString()
-                imageCache.store(url.toString(), body.byteStream())?.inputStream()
-                    ?: body.byteStream()
-            } ?: throw IOException("No response body")
-            generatePainter(
-                inputStream = input,
-                mimeType = mimeType
+  private fun generatePainter(inputStream: InputStream, mimeType: String) {
+    var error: Throwable? = null
+    try {
+      if (mimeType == "image/gif") {
+        painter.value = GifPainter(
+          Codec.makeFromData(Data.makeFromBytes(inputStream.readAllBytes())),
+          parentScope
+        )
+      } else {
+        ImageIO.read(inputStream)?.let { image ->
+          imageEffects.blur?.let {
+            ImageEffectsFilter.applyBlurFilter(
+              image,
+              it.blurRadius.toInt(),
+              it.bitmapScale
             )
-        } catch (e: Throwable) {
-            error = e
+          } ?: image
+        }?.let {
+          painter.value = it.toPainter()
         }
-        if (error != null) throw error
+      }
+    } catch (e: Throwable) {
+      error = e
+    } finally {
+      try {
+        inputStream.close()
+      } catch (e: Exception) {
+        e.printStackTrace()
+      }
     }
+    if (error != null) throw error
+  }
 
-    private suspend fun execute() {
-        when (request) {
-            is URL, is String -> {
-                request.toString().also {
-                }.request()
-            }
-
-            is File -> {
-                fileRequest(request)
-            }
-            else -> {
-                throw NotImplementedError()
-            }
-        }
+  private fun fileRequest(file: File) {
+    try {
+      val connection = file.toURI().toURL().openConnection()
+      val mimeType = connection.contentType
+      val input = file.inputStream()
+      generatePainter(input, mimeType)
+    } catch (e: Throwable) {
+      throw e
     }
+  }
 
-    private suspend fun String.request() {
-        try {
-            when {
-                isHttpRequest() -> networkRequest(URL(this))
-                isFileRequest() -> fileRequest(File(this))
-            }
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
+  private suspend fun networkRequest(url: URL) {
+    var error: Throwable? = null
+    try {
+      val request = Request.Builder().url(url).build()
+      var mimeType = ""
+      val input = imageCache.fetch(url.toString())?.let {
+        mimeType = it.toURI().toURL().openConnection().contentType
+        it.inputStream()
+      } ?: callFactory().newCall(request).await().body?.use { body ->
+        mimeType = body.contentType().toString()
+        imageCache.store(url.toString(), body.byteStream())?.inputStream()
+          ?: body.byteStream()
+      } ?: throw IOException("No response body")
+      generatePainter(
+        inputStream = input,
+        mimeType = mimeType
+      )
+    } catch (e: Throwable) {
+      error = e
     }
+    if (error != null) throw error
+  }
 
-    private fun String.isHttpRequest() = startsWith("http")
+  private suspend fun execute() {
+    when (request) {
+      is URL, is String -> {
+        request.toString().also {
+        }.request()
+      }
 
-    private fun String.isFileRequest() = File(this).exists()
+      is File -> {
+        fileRequest(request)
+      }
+      else -> {
+        throw NotImplementedError()
+      }
+    }
+  }
+
+  private suspend fun String.request() {
+    try {
+      when {
+        isHttpRequest() -> networkRequest(URL(this))
+        isFileRequest() -> fileRequest(File(this))
+      }
+    } catch (e: Throwable) {
+      e.printStackTrace()
+    }
+  }
+
+  private fun String.isHttpRequest() = startsWith("http")
+
+  private fun String.isFileRequest() = File(this).exists()
 }

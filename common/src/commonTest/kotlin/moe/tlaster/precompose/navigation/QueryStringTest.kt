@@ -25,85 +25,85 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class QueryStringTest {
-    @Test
-    fun simpleQueryString() {
-        QueryString("&foo=bar").let {
-            assertTrue(it.map.size == 1)
-            assertTrue(it.map.containsKey("foo"))
-            assertTrue(it.map.containsValue(listOf("bar")))
-            assertEquals("bar", it.query("foo"))
-        }
-        QueryString("foo=bar&").let {
-            assertTrue(it.map.size == 1)
-            assertTrue(it.map.containsKey("foo"))
-            assertTrue(it.map.containsValue(listOf("bar")))
-            assertEquals("bar", it.query("foo"))
-        }
-        QueryString("foo=bar&&").let {
-            assertTrue(it.map.size == 1)
-            assertTrue(it.map.containsKey("foo"))
-            assertTrue(it.map.containsValue(listOf("bar")))
-            assertEquals("bar", it.query("foo"))
-        }
-        QueryString("foo=bar").let {
-            assertTrue(it.map.size == 1)
-            assertTrue(it.map.containsKey("foo"))
-            assertTrue(it.map.containsValue(listOf("bar")))
-            assertEquals("bar", it.query("foo"))
-        }
-        QueryString("a=1&b=2").let {
-            assertTrue(it.map.size == 2)
-            assertTrue(it.map.containsKey("a"))
-            assertTrue(it.map.containsValue(listOf("1")))
-            assertTrue(it.map.containsKey("b"))
-            assertTrue(it.map.containsValue(listOf("2")))
-            assertEquals("1", it.query("a"))
-            assertEquals("2", it.query("b"))
-        }
-        QueryString("a=1&b=2&").let {
-            assertTrue(it.map.size == 2)
-            assertTrue(it.map.containsKey("a"))
-            assertTrue(it.map.containsValue(listOf("1")))
-            assertTrue(it.map.containsKey("b"))
-            assertTrue(it.map.containsValue(listOf("2")))
-            assertEquals("1", it.query("a"))
-            assertEquals("2", it.query("b"))
-        }
-        QueryString("a=1&&b=2&").let {
-            assertTrue(it.map.size == 2)
-            assertTrue(it.map.containsKey("a"))
-            assertTrue(it.map.containsValue(listOf("1")))
-            assertTrue(it.map.containsKey("b"))
-            assertTrue(it.map.containsValue(listOf("2")))
-            assertEquals("1", it.query("a"))
-            assertEquals("2", it.query("b"))
-        }
-        QueryString("a=1&a=2").let {
-            assertTrue(it.map.size == 1)
-            assertTrue(it.map.containsKey("a"))
-            assertTrue(it.map.containsValue(listOf("1", "2")))
-            assertEquals(listOf("1", "2"), it.queryList<String>("a").filterNotNull())
-        }
-        QueryString("a=1;a=2").let {
-            assertTrue(it.map.isEmpty())
-        }
-        QueryString("a=").let {
-            assertTrue(it.map.size == 1)
-            assertTrue(it.map.containsKey("a"))
-            assertEquals(emptyList<String>(), it.queryList<String>("a").filterNotNull())
-        }
-        QueryString("a=&").let {
-            assertTrue(it.map.size == 1)
-            assertTrue(it.map.containsKey("a"))
-            assertEquals(emptyList<String>(), it.queryList<String>("a").filterNotNull())
-        }
-        QueryString("a=&&").let {
-            assertTrue(it.map.size == 1)
-            assertTrue(it.map.containsKey("a"))
-            assertEquals(emptyList<String>(), it.queryList<String>("a").filterNotNull())
-        }
-        QueryString("").let {
-            assertTrue(it.map.isEmpty())
-        }
+  @Test
+  fun simpleQueryString() {
+    QueryString("&foo=bar").let {
+      assertTrue(it.map.size == 1)
+      assertTrue(it.map.containsKey("foo"))
+      assertTrue(it.map.containsValue(listOf("bar")))
+      assertEquals("bar", it.query("foo"))
     }
+    QueryString("foo=bar&").let {
+      assertTrue(it.map.size == 1)
+      assertTrue(it.map.containsKey("foo"))
+      assertTrue(it.map.containsValue(listOf("bar")))
+      assertEquals("bar", it.query("foo"))
+    }
+    QueryString("foo=bar&&").let {
+      assertTrue(it.map.size == 1)
+      assertTrue(it.map.containsKey("foo"))
+      assertTrue(it.map.containsValue(listOf("bar")))
+      assertEquals("bar", it.query("foo"))
+    }
+    QueryString("foo=bar").let {
+      assertTrue(it.map.size == 1)
+      assertTrue(it.map.containsKey("foo"))
+      assertTrue(it.map.containsValue(listOf("bar")))
+      assertEquals("bar", it.query("foo"))
+    }
+    QueryString("a=1&b=2").let {
+      assertTrue(it.map.size == 2)
+      assertTrue(it.map.containsKey("a"))
+      assertTrue(it.map.containsValue(listOf("1")))
+      assertTrue(it.map.containsKey("b"))
+      assertTrue(it.map.containsValue(listOf("2")))
+      assertEquals("1", it.query("a"))
+      assertEquals("2", it.query("b"))
+    }
+    QueryString("a=1&b=2&").let {
+      assertTrue(it.map.size == 2)
+      assertTrue(it.map.containsKey("a"))
+      assertTrue(it.map.containsValue(listOf("1")))
+      assertTrue(it.map.containsKey("b"))
+      assertTrue(it.map.containsValue(listOf("2")))
+      assertEquals("1", it.query("a"))
+      assertEquals("2", it.query("b"))
+    }
+    QueryString("a=1&&b=2&").let {
+      assertTrue(it.map.size == 2)
+      assertTrue(it.map.containsKey("a"))
+      assertTrue(it.map.containsValue(listOf("1")))
+      assertTrue(it.map.containsKey("b"))
+      assertTrue(it.map.containsValue(listOf("2")))
+      assertEquals("1", it.query("a"))
+      assertEquals("2", it.query("b"))
+    }
+    QueryString("a=1&a=2").let {
+      assertTrue(it.map.size == 1)
+      assertTrue(it.map.containsKey("a"))
+      assertTrue(it.map.containsValue(listOf("1", "2")))
+      assertEquals(listOf("1", "2"), it.queryList<String>("a").filterNotNull())
+    }
+    QueryString("a=1;a=2").let {
+      assertTrue(it.map.isEmpty())
+    }
+    QueryString("a=").let {
+      assertTrue(it.map.size == 1)
+      assertTrue(it.map.containsKey("a"))
+      assertEquals(emptyList<String>(), it.queryList<String>("a").filterNotNull())
+    }
+    QueryString("a=&").let {
+      assertTrue(it.map.size == 1)
+      assertTrue(it.map.containsKey("a"))
+      assertEquals(emptyList<String>(), it.queryList<String>("a").filterNotNull())
+    }
+    QueryString("a=&&").let {
+      assertTrue(it.map.size == 1)
+      assertTrue(it.map.containsKey("a"))
+      assertEquals(emptyList<String>(), it.queryList<String>("a").filterNotNull())
+    }
+    QueryString("").let {
+      assertTrue(it.map.isEmpty())
+    }
+  }
 }

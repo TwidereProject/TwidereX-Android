@@ -21,6 +21,6 @@
 package com.twidere.twiderex.kmp
 
 expect class OrientationSensorManager {
-    var onOrientationChangedListener: ((originValues: FloatArray, currentValues: FloatArray) -> Unit)?
-    fun release()
+  var onOrientationChangedListener: ((originValues: FloatArray, currentValues: FloatArray) -> Unit)?
+  fun release()
 }

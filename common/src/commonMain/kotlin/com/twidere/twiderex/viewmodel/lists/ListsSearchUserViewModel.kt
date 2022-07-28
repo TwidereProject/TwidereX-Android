@@ -38,31 +38,31 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class ListsSearchUserViewModel(
-    private val accountRepository: AccountRepository,
-    following: Boolean = false,
+  private val accountRepository: AccountRepository,
+  following: Boolean = false,
 ) : ViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
+
+  val text = MutableStateFlow("")
+
+  @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+  val source = text.debounce(666L).filterNot { it.isEmpty() }.flatMapLatest {
+    account.flatMapLatest { account ->
+      Pager(
+        config = PagingConfig(
+          pageSize = defaultLoadCount,
+          enablePlaceholders = false,
+        )
+      ) {
+        SearchUserPagingSource(
+          accountKey = account.accountKey,
+          it,
+          account.service as SearchService,
+          following = following
+        )
+      }.flow
     }
-
-    val text = MutableStateFlow("")
-
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val source = text.debounce(666L).filterNot { it.isEmpty() }.flatMapLatest {
-        account.flatMapLatest { account ->
-            Pager(
-                config = PagingConfig(
-                    pageSize = defaultLoadCount,
-                    enablePlaceholders = false,
-                )
-            ) {
-                SearchUserPagingSource(
-                    accountKey = account.accountKey,
-                    it,
-                    account.service as SearchService,
-                    following = following
-                )
-            }.flow
-        }
-    }.cachedIn(viewModelScope)
+  }.cachedIn(viewModelScope)
 }

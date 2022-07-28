@@ -46,37 +46,37 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun TwitterUserScene(screenName: String) {
-    val viewModel: TwitterUserViewModel = getViewModel {
-        parametersOf(screenName)
+  val viewModel: TwitterUserViewModel = getViewModel {
+    parametersOf(screenName)
+  }
+  val user by viewModel.user.observeAsState(initial = null)
+  val error by viewModel.error.observeAsState(initial = null)
+  val navigator = LocalNavigator.current
+  LaunchedEffect(user) {
+    user?.let {
+      navigator.user(
+        user = it,
+        NavOptions(popUpTo = PopUpTo(RootDeepLinks.Twitter.User.route, inclusive = true))
+      )
     }
-    val user by viewModel.user.observeAsState(initial = null)
-    val error by viewModel.error.observeAsState(initial = null)
-    val navigator = LocalNavigator.current
-    LaunchedEffect(user) {
-        user?.let {
-            navigator.user(
-                user = it,
-                NavOptions(popUpTo = PopUpTo(RootDeepLinks.Twitter.User.route, inclusive = true))
-            )
-        }
-    }
+  }
 
-    TwidereScene {
-        InAppNotificationScaffold {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                error?.let {
-                    Icon(
-                        Icons.Default.Error,
-                        modifier = Modifier.size(40.dp),
-                        contentDescription = null,
-                    )
-                } ?: run {
-                    CircularProgressIndicator()
-                }
-            }
+  TwidereScene {
+    InAppNotificationScaffold {
+      Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+      ) {
+        error?.let {
+          Icon(
+            Icons.Default.Error,
+            modifier = Modifier.size(40.dp),
+            contentDescription = null,
+          )
+        } ?: run {
+          CircularProgressIndicator()
         }
+      }
     }
+  }
 }

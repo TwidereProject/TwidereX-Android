@@ -34,59 +34,59 @@ import kotlin.math.sqrt
 
 @Composable
 fun GridLayout(
-    modifier: Modifier = Modifier,
-    spacing: Dp = 0.dp,
-    content: @Composable () -> Unit
+  modifier: Modifier = Modifier,
+  spacing: Dp = 0.dp,
+  content: @Composable () -> Unit
 ) {
-    val pxSpacing = with(LocalDensity.current) {
-        spacing.roundToPx()
-    }
-    val measurePolicy = gridLayoutMeasurePolicy(pxSpacing)
-    Layout(
-        content = { content() },
-        measurePolicy = measurePolicy,
-        modifier = modifier
-    )
+  val pxSpacing = with(LocalDensity.current) {
+    spacing.roundToPx()
+  }
+  val measurePolicy = gridLayoutMeasurePolicy(pxSpacing)
+  Layout(
+    content = { content() },
+    measurePolicy = measurePolicy,
+    modifier = modifier
+  )
 }
 
 @Composable
 private fun gridLayoutMeasurePolicy(
-    spacing: Int,
+  spacing: Int,
 ) = remember(spacing) {
-    MeasurePolicy { measurables, constraints ->
-        val columns = ceil(sqrt(measurables.size.toDouble()))
-        val rows = ceil((measurables.size.toDouble() / columns))
-        val infinityWidth = ((Constraints.Infinity - spacing * (columns - 1)) / columns).toInt()
-        val itemWidth =
-            ((constraints.maxWidth.toDouble() - spacing * (columns - 1)) / columns).toInt().coerceAtLeast(0)
-        val itemHeight = if (constraints.maxHeight != Constraints.Infinity) {
-            ((constraints.maxHeight.toDouble() - spacing * (rows - 1)) / rows).toInt().coerceAtLeast(0)
-        } else {
-            itemWidth
-        }
-        val placeables = measurables.map { measurable ->
-            measurable.measure(if (itemWidth >= infinityWidth) Constraints.fixed(0, 0) else Constraints.fixed(width = itemWidth, height = itemHeight))
-        }
-        layout(
-            width = constraints.maxWidth,
-            // workaround for the unknown desktop crash （Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException:
-            // Can't represent a size of 1073741961 in Constraints at androidx.compose.ui.unit.Constraints$Companion.bitsNeedForSize(Constraints.kt:408)）
-            height = minOf(GridLayoutDefault.MaxHeight, (itemHeight * rows + spacing * (rows - 1)).toInt())
-        ) {
-            var currentX = 0
-            var currentY = 0
-            placeables.forEach { placeable ->
-                placeable.placeRelative(x = currentX, y = currentY)
-                currentX += (itemWidth + spacing)
-                if (currentX >= constraints.maxWidth) {
-                    currentX = 0
-                    currentY += (itemHeight + spacing)
-                }
-            }
-        }
+  MeasurePolicy { measurables, constraints ->
+    val columns = ceil(sqrt(measurables.size.toDouble()))
+    val rows = ceil((measurables.size.toDouble() / columns))
+    val infinityWidth = ((Constraints.Infinity - spacing * (columns - 1)) / columns).toInt()
+    val itemWidth =
+      ((constraints.maxWidth.toDouble() - spacing * (columns - 1)) / columns).toInt().coerceAtLeast(0)
+    val itemHeight = if (constraints.maxHeight != Constraints.Infinity) {
+      ((constraints.maxHeight.toDouble() - spacing * (rows - 1)) / rows).toInt().coerceAtLeast(0)
+    } else {
+      itemWidth
     }
+    val placeables = measurables.map { measurable ->
+      measurable.measure(if (itemWidth >= infinityWidth) Constraints.fixed(0, 0) else Constraints.fixed(width = itemWidth, height = itemHeight))
+    }
+    layout(
+      width = constraints.maxWidth,
+      // workaround for the unknown desktop crash （Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException:
+      // Can't represent a size of 1073741961 in Constraints at androidx.compose.ui.unit.Constraints$Companion.bitsNeedForSize(Constraints.kt:408)）
+      height = minOf(GridLayoutDefault.MaxHeight, (itemHeight * rows + spacing * (rows - 1)).toInt())
+    ) {
+      var currentX = 0
+      var currentY = 0
+      placeables.forEach { placeable ->
+        placeable.placeRelative(x = currentX, y = currentY)
+        currentX += (itemWidth + spacing)
+        if (currentX >= constraints.maxWidth) {
+          currentX = 0
+          currentY += (itemHeight + spacing)
+        }
+      }
+    }
+  }
 }
 
 object GridLayoutDefault {
-    const val MaxHeight = 10000
+  const val MaxHeight = 10000
 }

@@ -30,63 +30,63 @@ import kotlinx.coroutines.flow.flow
 import org.jetbrains.annotations.TestOnly
 
 internal class MockListsDao @TestOnly constructor() : ListsDao {
-    private val fakeDb = mutableMapOf<MicroBlogKey, MutableList<UiList>>()
+  private val fakeDb = mutableMapOf<MicroBlogKey, MutableList<UiList>>()
 
-    override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiList> {
-        return MockPagingSource(fakeDb[accountKey]?.toList() ?: emptyList())
-    }
+  override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiList> {
+    return MockPagingSource(fakeDb[accountKey]?.toList() ?: emptyList())
+  }
 
-    override fun findWithListKeyWithFlow(
-        listKey: MicroBlogKey,
-        accountKey: MicroBlogKey
-    ): Flow<UiList?> {
-        return flow {
-            emit(
-                fakeDb[accountKey]?.let {
-                    it.find { list -> list.listKey == listKey }
-                }
-            )
+  override fun findWithListKeyWithFlow(
+    listKey: MicroBlogKey,
+    accountKey: MicroBlogKey
+  ): Flow<UiList?> {
+    return flow {
+      emit(
+        fakeDb[accountKey]?.let {
+          it.find { list -> list.listKey == listKey }
         }
+      )
     }
+  }
 
-    override suspend fun insertAll(listOf: List<UiList>) {
-        listOf.forEach { list ->
-            fakeDb[list.accountKey].let {
-                if (it.isNullOrEmpty()) {
-                    fakeDb[list.accountKey] = mutableListOf(list)
-                } else {
-                    it.add(list)
-                }
-            }
+  override suspend fun insertAll(listOf: List<UiList>) {
+    listOf.forEach { list ->
+      fakeDb[list.accountKey].let {
+        if (it.isNullOrEmpty()) {
+          fakeDb[list.accountKey] = mutableListOf(list)
+        } else {
+          it.add(list)
         }
+      }
     }
+  }
 
-    override suspend fun findWithListKey(listKey: MicroBlogKey, accountKey: MicroBlogKey): UiList? {
-        return fakeDb[accountKey]?.let {
-            it.find { list -> list.listKey == listKey }
+  override suspend fun findWithListKey(listKey: MicroBlogKey, accountKey: MicroBlogKey): UiList? {
+    return fakeDb[accountKey]?.let {
+      it.find { list -> list.listKey == listKey }
+    }
+  }
+
+  override suspend fun update(listOf: List<UiList>) {
+    listOf.forEach { list ->
+      fakeDb[list.accountKey].let {
+        if (it.isNullOrEmpty()) {
+          fakeDb[list.accountKey] = mutableListOf(list)
+        } else {
+          it.removeAll { origin -> origin.listKey == list.listKey }
+          it.add(list)
         }
+      }
     }
+  }
 
-    override suspend fun update(listOf: List<UiList>) {
-        listOf.forEach { list ->
-            fakeDb[list.accountKey].let {
-                if (it.isNullOrEmpty()) {
-                    fakeDb[list.accountKey] = mutableListOf(list)
-                } else {
-                    it.removeAll { origin -> origin.listKey == list.listKey }
-                    it.add(list)
-                }
-            }
-        }
+  override suspend fun delete(listOf: List<UiList>) {
+    listOf.forEach { list ->
+      fakeDb[list.accountKey]?.removeAll { it.listKey == list.listKey }
     }
+  }
 
-    override suspend fun delete(listOf: List<UiList>) {
-        listOf.forEach { list ->
-            fakeDb[list.accountKey]?.removeAll { it.listKey == list.listKey }
-        }
-    }
-
-    override suspend fun clearAll(accountKey: MicroBlogKey) {
-        fakeDb.clear()
-    }
+  override suspend fun clearAll(accountKey: MicroBlogKey) {
+    fakeDb.clear()
+  }
 }

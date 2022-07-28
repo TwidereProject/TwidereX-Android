@@ -35,73 +35,73 @@ import com.twidere.twiderex.worker.status.UnRetweetWorker
 import com.twidere.twiderex.worker.status.UpdateStatusWorker
 
 actual class StatusActions(
-    private val workManager: WorkManager,
+  private val workManager: WorkManager,
 ) : IStatusActions {
-    actual override fun delete(status: UiStatus, account: AccountDetails) {
-        workManager.beginWith(
-            DeleteStatusWorker.create(
-                status = status,
-                accountKey = account.accountKey
-            )
-        ).then(DeleteDbStatusWorker.create(status.statusKey))
-            .enqueue()
-    }
+  actual override fun delete(status: UiStatus, account: AccountDetails) {
+    workManager.beginWith(
+      DeleteStatusWorker.create(
+        status = status,
+        accountKey = account.accountKey
+      )
+    ).then(DeleteDbStatusWorker.create(status.statusKey))
+      .enqueue()
+  }
 
-    actual override fun like(status: UiStatus, account: AccountDetails) {
-        workManager.beginWith(
-            UpdateStatusWorker.create(
-                StatusResult(
-                    accountKey = account.accountKey,
-                    statusKey = status.statusKey,
-                    liked = !status.liked
-                )
-            )
-        ).then(
-            if (status.liked) {
-                StatusWorker.create<UnLikeWorker>(
-                    accountKey = account.accountKey,
-                    status = status
-                )
-            } else {
-                StatusWorker.create<LikeWorker>(
-                    accountKey = account.accountKey,
-                    status = status
-                )
-            }
-        ).then(listOf(UpdateStatusWorker.create())).enqueue()
-    }
+  actual override fun like(status: UiStatus, account: AccountDetails) {
+    workManager.beginWith(
+      UpdateStatusWorker.create(
+        StatusResult(
+          accountKey = account.accountKey,
+          statusKey = status.statusKey,
+          liked = !status.liked
+        )
+      )
+    ).then(
+      if (status.liked) {
+        StatusWorker.create<UnLikeWorker>(
+          accountKey = account.accountKey,
+          status = status
+        )
+      } else {
+        StatusWorker.create<LikeWorker>(
+          accountKey = account.accountKey,
+          status = status
+        )
+      }
+    ).then(listOf(UpdateStatusWorker.create())).enqueue()
+  }
 
-    actual override fun retweet(status: UiStatus, account: AccountDetails) {
-        workManager.beginWith(
-            UpdateStatusWorker.create(
-                StatusResult(
-                    accountKey = account.accountKey,
-                    statusKey = status.statusKey,
-                    retweeted = !status.retweeted
-                )
-            )
-        ).then(
-            if (status.retweeted) {
-                StatusWorker.create<UnRetweetWorker>(
-                    accountKey = account.accountKey,
-                    status = status
-                )
-            } else {
-                StatusWorker.create<RetweetWorker>(
-                    accountKey = account.accountKey,
-                    status = status
-                )
-            }
-        ).then(listOf(UpdateStatusWorker.create())).enqueue()
-    }
+  actual override fun retweet(status: UiStatus, account: AccountDetails) {
+    workManager.beginWith(
+      UpdateStatusWorker.create(
+        StatusResult(
+          accountKey = account.accountKey,
+          statusKey = status.statusKey,
+          retweeted = !status.retweeted
+        )
+      )
+    ).then(
+      if (status.retweeted) {
+        StatusWorker.create<UnRetweetWorker>(
+          accountKey = account.accountKey,
+          status = status
+        )
+      } else {
+        StatusWorker.create<RetweetWorker>(
+          accountKey = account.accountKey,
+          status = status
+        )
+      }
+    ).then(listOf(UpdateStatusWorker.create())).enqueue()
+  }
 
-    actual override fun vote(status: UiStatus, account: AccountDetails, votes: List<Int>) {
-        workManager.beginWith(
-            MastodonVoteWorker.create(
-                statusKey = status.statusKey,
-                accountKey = account.accountKey,
-                votes = votes
-            )
-        ).enqueue()
-    }
+  actual override fun vote(status: UiStatus, account: AccountDetails, votes: List<Int>) {
+    workManager.beginWith(
+      MastodonVoteWorker.create(
+        statusKey = status.statusKey,
+        accountKey = account.accountKey,
+        votes = votes
+      )
+    ).enqueue()
+  }
 }

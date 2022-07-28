@@ -24,9 +24,9 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 
 inline fun <reified T : Any> LazyPagingItems<T>.refreshOrRetry() {
-    if (loadState.refresh is LoadState.Error) {
-        retry()
-    } else {
-        refresh()
-    }
+  if (loadState.refresh is LoadState.Error) {
+    retry()
+  } else {
+    refresh()
+  }
 }

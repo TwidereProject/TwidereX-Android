@@ -29,26 +29,26 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface MastodonOAuthResources {
-    @POST("/api/v1/apps")
-    @FormUrlEncoded
-    suspend fun createApplication(
-        @Field("client_name") client_name: String,
-        @Field("redirect_uris") redirect_uris: String,
-        @Field("scopes") scopes: String,
-        @Field("website") website: String?,
-    ): CreateApplicationResponse
+  @POST("/api/v1/apps")
+  @FormUrlEncoded
+  suspend fun createApplication(
+    @Field("client_name") client_name: String,
+    @Field("redirect_uris") redirect_uris: String,
+    @Field("scopes") scopes: String,
+    @Field("website") website: String?,
+  ): CreateApplicationResponse
 
-    @GET("/api/v1/accounts/verify_credentials")
-    suspend fun verifyCredentials(): Account
+  @GET("/api/v1/accounts/verify_credentials")
+  suspend fun verifyCredentials(): Account
 
-    @POST("/oauth/token")
-    @FormUrlEncoded
-    suspend fun requestToken(
-        @Field("client_id") client_id: String,
-        @Field("client_secret") client_secret: String,
-        @Field("redirect_uri") redirect_uri: String,
-        @Field("scope") scope: String,
-        @Field("code") code: String,
-        @Field("grant_type") grant_type: String,
-    ): RequestTokenResponse
+  @POST("/oauth/token")
+  @FormUrlEncoded
+  suspend fun requestToken(
+    @Field("client_id") client_id: String,
+    @Field("client_secret") client_secret: String,
+    @Field("redirect_uri") redirect_uri: String,
+    @Field("scope") scope: String,
+    @Field("code") code: String,
+    @Field("grant_type") grant_type: String,
+  ): RequestTokenResponse
 }

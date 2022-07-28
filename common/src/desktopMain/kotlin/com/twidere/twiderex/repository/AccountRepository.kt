@@ -37,99 +37,99 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 actual class AccountRepository(
-    private val accountQueries: AccountQueries,
-    private val preferencesFactory: AccountPreferencesFactory,
+  private val accountQueries: AccountQueries,
+  private val preferencesFactory: AccountPreferencesFactory,
 ) {
-    private val preferencesCache = linkedMapOf<MicroBlogKey, AccountPreferences>()
-    private val _accounts = MutableStateFlow(getAccounts())
-    private val _activeAccount = MutableStateFlow(
-        getCurrentAccount()
+  private val preferencesCache = linkedMapOf<MicroBlogKey, AccountPreferences>()
+  private val _accounts = MutableStateFlow(getAccounts())
+  private val _activeAccount = MutableStateFlow(
+    getCurrentAccount()
+  )
+  actual val activeAccount: Flow<AccountDetails?>
+    get() = _activeAccount
+  actual val accounts: Flow<List<AccountDetails>>
+    get() = _accounts
+
+  actual fun updateAccount(user: UiUser) {
+    findByAccountKey(user.userKey)?.copy(
+      user = user.toAmUser()
+    )?.let {
+      updateAccount(it)
+    }
+  }
+
+  actual fun updateAccount(detail: AccountDetails) {
+    accountQueries.insert(detail.toDbAccount())
+    _activeAccount.value = getCurrentAccount()
+    _accounts.value = getAccounts()
+  }
+
+  actual fun getAccounts(): List<AccountDetails> {
+    return accountQueries.findAll().executeAsList().map { account -> account.toUi(getAccountPreferences(account.accountKey)) }
+  }
+
+  private fun getCurrentAccount(): AccountDetails? {
+    return getAccounts().maxByOrNull { it.lastActive }
+  }
+
+  actual fun hasAccount(): Boolean {
+    return getAccounts().isNotEmpty()
+  }
+
+  actual fun findByAccountKey(accountKey: MicroBlogKey): AccountDetails? {
+    return accountQueries.findWithAccountKey(accountKey = accountKey).executeAsOneOrNull()?.let {
+      it.toUi(getAccountPreferences(it.accountKey))
+    }
+  }
+
+  actual fun setCurrentAccount(detail: AccountDetails) {
+    detail.lastActive = System.currentTimeMillis()
+    updateAccount(detail)
+  }
+
+  actual fun addAccount(
+    displayKey: MicroBlogKey,
+    type: PlatformType,
+    accountKey: MicroBlogKey,
+    credentials_type: CredentialsType,
+    credentials_json: String,
+    extras_json: String,
+    user: AmUser,
+    lastActive: Long
+  ) {
+    val account = TwidereAccount(displayKey.toString(), "ACCOUNT_TYPE")
+    val detail = AccountDetails(
+      account = account,
+      type = type,
+      accountKey = accountKey,
+      credentials_type = credentials_type,
+      credentials_json = credentials_json,
+      extras_json = extras_json,
+      user = user,
+      lastActive = lastActive,
+      preferences = getAccountPreferences(accountKey)
     )
-    actual val activeAccount: Flow<AccountDetails?>
-        get() = _activeAccount
-    actual val accounts: Flow<List<AccountDetails>>
-        get() = _accounts
+    setCurrentAccount(detail)
+  }
 
-    actual fun updateAccount(user: UiUser) {
-        findByAccountKey(user.userKey)?.copy(
-            user = user.toAmUser()
-        )?.let {
-            updateAccount(it)
-        }
+  actual fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences {
+    return preferencesCache.getOrPut(accountKey) {
+      preferencesFactory.create(accountKey)
     }
+  }
 
-    actual fun updateAccount(detail: AccountDetails) {
-        accountQueries.insert(detail.toDbAccount())
-        _activeAccount.value = getCurrentAccount()
-        _accounts.value = getAccounts()
-    }
+  actual fun containsAccount(key: MicroBlogKey): Boolean {
+    return findByAccountKey(key) != null
+  }
 
-    actual fun getAccounts(): List<AccountDetails> {
-        return accountQueries.findAll().executeAsList().map { account -> account.toUi(getAccountPreferences(account.accountKey)) }
-    }
+  actual fun delete(detail: AccountDetails) {
+    accountQueries.delete(detail.accountKey)
+    preferencesCache.remove(detail.accountKey)?.close()
+    _activeAccount.value = getCurrentAccount()
+    _accounts.value = getAccounts()
+  }
 
-    private fun getCurrentAccount(): AccountDetails? {
-        return getAccounts().maxByOrNull { it.lastActive }
-    }
-
-    actual fun hasAccount(): Boolean {
-        return getAccounts().isNotEmpty()
-    }
-
-    actual fun findByAccountKey(accountKey: MicroBlogKey): AccountDetails? {
-        return accountQueries.findWithAccountKey(accountKey = accountKey).executeAsOneOrNull()?.let {
-            it.toUi(getAccountPreferences(it.accountKey))
-        }
-    }
-
-    actual fun setCurrentAccount(detail: AccountDetails) {
-        detail.lastActive = System.currentTimeMillis()
-        updateAccount(detail)
-    }
-
-    actual fun addAccount(
-        displayKey: MicroBlogKey,
-        type: PlatformType,
-        accountKey: MicroBlogKey,
-        credentials_type: CredentialsType,
-        credentials_json: String,
-        extras_json: String,
-        user: AmUser,
-        lastActive: Long
-    ) {
-        val account = TwidereAccount(displayKey.toString(), "ACCOUNT_TYPE")
-        val detail = AccountDetails(
-            account = account,
-            type = type,
-            accountKey = accountKey,
-            credentials_type = credentials_type,
-            credentials_json = credentials_json,
-            extras_json = extras_json,
-            user = user,
-            lastActive = lastActive,
-            preferences = getAccountPreferences(accountKey)
-        )
-        setCurrentAccount(detail)
-    }
-
-    actual fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences {
-        return preferencesCache.getOrPut(accountKey) {
-            preferencesFactory.create(accountKey)
-        }
-    }
-
-    actual fun containsAccount(key: MicroBlogKey): Boolean {
-        return findByAccountKey(key) != null
-    }
-
-    actual fun delete(detail: AccountDetails) {
-        accountQueries.delete(detail.accountKey)
-        preferencesCache.remove(detail.accountKey)?.close()
-        _activeAccount.value = getCurrentAccount()
-        _accounts.value = getAccounts()
-    }
-
-    actual fun getFirstByType(type: PlatformType): AccountDetails? {
-        return _accounts.value.sortedByDescending { it.lastActive }.firstOrNull { it.type == type }
-    }
+  actual fun getFirstByType(type: PlatformType): AccountDetails? {
+    return _accounts.value.sortedByDescending { it.lastActive }.firstOrNull { it.type == type }
+  }
 }
