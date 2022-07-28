@@ -76,9 +76,9 @@ import com.twidere.twiderex.scenes.search.SearchInputScene
 import com.twidere.twiderex.scenes.search.SearchScene
 import com.twidere.twiderex.scenes.settings.AboutScene
 import com.twidere.twiderex.scenes.settings.AccountManagementScene
-import com.twidere.twiderex.scenes.settings.AppearanceScene
 import com.twidere.twiderex.scenes.settings.SettingsScene
 import com.twidere.twiderex.scenes.settings.accountNotification.AccountNotificationScene
+import com.twidere.twiderex.scenes.settings.appearance.AppearanceScene
 import com.twidere.twiderex.scenes.settings.display.DisplayScene
 import com.twidere.twiderex.scenes.settings.layout.LayoutScene
 import com.twidere.twiderex.scenes.settings.misc.MiscScene

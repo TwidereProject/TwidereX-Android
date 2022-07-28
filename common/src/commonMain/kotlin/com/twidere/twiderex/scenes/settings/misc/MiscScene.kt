@@ -48,7 +48,6 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,6 +59,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.foundation.AlertDialog
@@ -72,18 +72,18 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.settings.RadioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.preferences.model.MiscPreferences
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.settings.MiscViewModel
 
 @Composable
 fun MiscScene() {
-  val viewModel: MiscViewModel = getViewModel()
-  val account = LocalActiveAccount.current
+  val (state, channel) = rememberPresenterState { MiscPresenter(it) }
+  if (state !is MiscState.State) {
+    // TODO: Show other states
+    return
+  }
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -92,24 +92,11 @@ fun MiscScene() {
             AppBarNavigationButton()
           },
           title = {
-            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_title))
+            Text(text = stringResource(res = MR.strings.scene_settings_misc_title))
           }
         )
       }
     ) {
-      val showProxyTypeDialog = remember { mutableStateOf(false) }
-      val proxyTypeValue by viewModel.proxyType.observeAsState(initial = MiscPreferences.ProxyType.HTTP)
-      val showProxyInputDialog = remember { mutableStateOf(false) }
-      val inputTitle = remember {
-        mutableStateOf("")
-      }
-      val inputValue = remember {
-        mutableStateOf("")
-      }
-      val inputChanged = remember {
-        mutableStateOf<(value: String) -> Unit>({})
-      }
-
       Box(contentAlignment = Alignment.Center) {
         Column(
           modifier = Modifier
@@ -117,38 +104,74 @@ fun MiscScene() {
               rememberScrollState()
             )
         ) {
-          if (account?.type == PlatformType.Twitter) {
-            NitterPreference(viewModel)
+          if (state.user.platformType == PlatformType.Twitter) {
+            NitterPreference(
+              state = state.nitterState,
+              onChanged = {
+                channel.trySend(MiscEvent.Nitter(NitterEvent.NitterChanged(it)))
+              },
+              onShowUsageDialog = {
+                channel.trySend(MiscEvent.Nitter(NitterEvent.ShowUsageDialog))
+              },
+              onHideUsageDialog = {
+                channel.trySend(MiscEvent.Nitter(NitterEvent.HideUsageDialog))
+              },
+              onShowInformationDialog = {
+                channel.trySend(MiscEvent.Nitter(NitterEvent.ShowInformationDialog))
+              },
+              onHideInformationDialog = {
+                channel.trySend(MiscEvent.Nitter(NitterEvent.HideInformationDialog))
+              },
+              onConfirm = {
+                channel.trySend(MiscEvent.Nitter(NitterEvent.Confirm))
+              },
+              onVerify = {
+                channel.trySend(MiscEvent.Nitter(NitterEvent.Verify))
+              },
+            )
           }
           ProxyPreference(
-            viewModel = viewModel,
-            showProxyInputDialog = showProxyInputDialog,
-            showProxyTypeDialog = showProxyTypeDialog,
-            inputTitle = inputTitle,
-            inputValue = inputValue,
-            inputChanged = inputChanged
+            proxyState = state.proxyState,
+            onProxyEnabledChanged = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ProxyEnabledChanged(it)))
+            },
+            onShowProxyTypeDialog = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ShowProxyTypeDialog(true)))
+            },
+            onShowProxyServerDialog = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ShowProxyHostDialog(true)))
+            },
+            onShowProxyPortDialog = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ShowProxyPortDialog(true)))
+            },
+            onShowProxyUserNameDialog = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ShowProxyUserNameDialog(true)))
+            },
+            onShowProxyPasswordDialog = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ShowProxyPasswordDialog(true)))
+            },
           )
         }
 
-        if (showProxyTypeDialog.value) {
-          ProxyTypeSelectDialog(
-            onDismissRequest = { showProxyTypeDialog.value = false },
-            onSelect = {
-              viewModel.setProxyType(it.name)
-            },
-            value = proxyTypeValue
-          )
-        }
-        if (showProxyInputDialog.value) {
-          ProxyInputDialog(
-            title = inputTitle.value,
-            value = inputValue.value,
-            onValueChanged = inputChanged.value,
-            onDismissRequest = {
-              showProxyInputDialog.value = false
-            }
-          )
-        }
+        // if (showProxyTypeDialog.value) {
+        //   ProxyTypeSelectDialog(
+        //     onDismissRequest = { showProxyTypeDialog.value = false },
+        //     onSelect = {
+        //       viewModel.setProxyType(it.name)
+        //     },
+        //     value = proxyTypeValue
+        //   )
+        // }
+        // if (showProxyInputDialog.value) {
+        //   ProxyInputDialog(
+        //     title = inputTitle.value,
+        //     value = inputValue.value,
+        //     onValueChanged = inputChanged.value,
+        //     onDismissRequest = {
+        //       showProxyInputDialog.value = false
+        //     }
+        //   )
+        // }
       }
     }
   }
@@ -156,104 +179,77 @@ fun MiscScene() {
 
 @Composable
 fun ColumnScope.ProxyPreference(
-  viewModel: MiscViewModel,
-  showProxyInputDialog: MutableState<Boolean>,
-  showProxyTypeDialog: MutableState<Boolean>,
-  inputTitle: MutableState<String>,
-  inputValue: MutableState<String>,
-  inputChanged: MutableState<(value: String) -> Unit>
+  proxyState: ProxyState,
+  onProxyEnabledChanged: (Boolean) -> Unit,
+  onShowProxyTypeDialog: () -> Unit,
+  onShowProxyServerDialog: () -> Unit,
+  onShowProxyPortDialog: () -> Unit,
+  onShowProxyUserNameDialog: () -> Unit,
+  onShowProxyPasswordDialog: () -> Unit,
 ) {
-  val useProxy by viewModel.useProxy.observeAsState(false)
-  val proxyType by viewModel.proxyType.observeAsState(MiscPreferences.ProxyType.HTTP)
-  val proxyServer by viewModel.proxyServer.observeAsState("")
-  val proxyPort by viewModel.proxyPort.observeAsState(null)
-  val proxyUserName by viewModel.proxyUserName.observeAsState("")
-  val proxyPassword by viewModel.proxyPassword.observeAsState("")
+  val useProxy = proxyState.proxyEnabled
+  val proxyType = proxyState.proxyType
+  val proxyServer = proxyState.proxyHost
+  val proxyPort = proxyState.proxyPort
+  val proxyUserName = proxyState.proxyUserName
+  val proxyPassword = proxyState.proxyPassword
 
   ItemHeader {
-    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_title))
+    Text(text = stringResource(res = MR.strings.scene_settings_misc_proxy_title))
   }
   switchItem(
     value = useProxy,
     onChanged = {
-      viewModel.setUseProxy(it)
+      onProxyEnabledChanged.invoke(it)
     },
     describe = {
-      Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_enable_description))
+      Text(text = stringResource(res = MR.strings.scene_settings_misc_proxy_enable_description))
     }
   ) {
-    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_enable_title))
+    Text(text = stringResource(res = MR.strings.scene_settings_misc_proxy_enable_title))
   }
   ItemProxy(
     enable = useProxy,
     title = stringResource(res = MR.strings.scene_settings_misc_proxy_type_title),
     content = proxyTypeValue(type = proxyType),
     onClick = {
-      showProxyTypeDialog.value = true
+      onShowProxyTypeDialog.invoke()
     }
   )
 
-  val serverTitle = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_server)
   ItemProxy(
     enable = useProxy,
-    title = serverTitle,
+    title = stringResource(res = MR.strings.scene_settings_misc_proxy_server),
     content = proxyServer,
     onClick = {
-      inputTitle.value = serverTitle
-      inputValue.value = proxyServer
-      inputChanged.value = {
-        viewModel.setProxyServer(it)
-      }
-      showProxyInputDialog.value = true
+      onShowProxyServerDialog.invoke()
     }
   )
 
-  val portTitle = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_port_title)
   ItemProxy(
     enable = useProxy,
-    title = portTitle,
-    content = proxyPort?.toString() ?: "",
+    title = stringResource(res = MR.strings.scene_settings_misc_proxy_port_title),
+    content = proxyPort.toString(),
     onClick = {
-      inputTitle.value = portTitle
-      inputValue.value = proxyPort?.toString() ?: ""
-      inputChanged.value = {
-        it.toIntOrNull()?.let {
-          viewModel.setProxyPort(it)
-        } ?: run {
-          // TODO: show error
-        }
-      }
-      showProxyInputDialog.value = true
+      onShowProxyPortDialog.invoke()
     }
   )
 
-  val userNameTitle = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_username)
   ItemProxy(
     enable = useProxy,
-    title = userNameTitle,
+    title = stringResource(res = MR.strings.scene_settings_misc_proxy_username),
     content = proxyUserName,
     onClick = {
-      inputTitle.value = userNameTitle
-      inputValue.value = proxyUserName
-      inputChanged.value = {
-        viewModel.setProxyUserName(it)
-      }
-      showProxyInputDialog.value = true
+      onShowProxyUserNameDialog.invoke()
     }
   )
 
-  val passwordTitle = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_password)
   ItemProxy(
     enable = useProxy,
-    title = passwordTitle,
+    title = stringResource(res = MR.strings.scene_settings_misc_proxy_password),
     content = proxyPassword,
     onClick = {
-      inputTitle.value = passwordTitle
-      inputValue.value = proxyPassword
-      inputChanged.value = {
-        viewModel.setProxyPassword(it)
-      }
-      showProxyInputDialog.value = true
+      onShowProxyPasswordDialog.invoke()
     }
   )
 }
@@ -261,9 +257,9 @@ fun ColumnScope.ProxyPreference(
 @Composable
 fun proxyTypeValue(type: MiscPreferences.ProxyType): String {
   return when (type) {
-    MiscPreferences.ProxyType.HTTP -> stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_type_http)
-    MiscPreferences.ProxyType.SOCKS -> stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_type_socks)
-    MiscPreferences.ProxyType.REVERSE -> stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_type_reverse)
+    MiscPreferences.ProxyType.HTTP -> stringResource(res = MR.strings.scene_settings_misc_proxy_type_http)
+    MiscPreferences.ProxyType.SOCKS -> stringResource(res = MR.strings.scene_settings_misc_proxy_type_socks)
+    MiscPreferences.ProxyType.REVERSE -> stringResource(res = MR.strings.scene_settings_misc_proxy_type_reverse)
   }
 }
 
@@ -297,36 +293,41 @@ fun ItemProxy(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun NitterPreference(viewModel: MiscViewModel) {
-  val value by viewModel.nitter.observeAsState(initial = "")
-  val nitterVerify by viewModel.nitterVerify.observeAsState(initial = false)
-  val nitterVerifyLoading by viewModel.nitterVerifyLoading.observeAsState(initial = false)
-  val isNitterInputValid by viewModel.isNitterInputValid.observeAsState(initial = false)
-  var showInformationDialog by remember {
-    mutableStateOf(false)
-  }
-  var showUsageDialog by remember {
-    mutableStateOf(false)
-  }
+fun NitterPreference(
+  state: NitterState,
+  onChanged: (value: TextFieldValue) -> Unit,
+  onShowUsageDialog: () -> Unit,
+  onHideUsageDialog: () -> Unit,
+  onShowInformationDialog: () -> Unit,
+  onHideInformationDialog: () -> Unit,
+  onConfirm: () -> Unit,
+  onVerify: () -> Unit,
+) {
+  val value = state.nitter
+  val nitterVerify = state.nitterVerify
+  val nitterVerifyLoading = state.nitterVerifyLoading
+  val isNitterInputValid = state.isNitterInputValid
+  val showInformationDialog = state.showInformationDialog
+  val showUsageDialog = state.showUsageDialog
   if (showUsageDialog) {
     NitterUsageDialog(
       onDismissRequest = {
-        showUsageDialog = false
+        onHideUsageDialog.invoke()
       },
       value = value,
       onConfirm = {
-        viewModel.setNitterInstance(it)
+        onConfirm.invoke()
       },
-      onValidCheck = {
-        viewModel.checkIfNitterInputValid(it)
-      },
-      isValid = isNitterInputValid
+      isValid = isNitterInputValid,
+      onValueChange = {
+        onChanged.invoke(it)
+      }
     )
   }
   if (showInformationDialog) {
     NitterInformationDialog(
       onDismissRequest = {
-        showInformationDialog = false
+        onHideInformationDialog.invoke()
       }
     )
   }
@@ -334,21 +335,21 @@ fun NitterPreference(viewModel: MiscViewModel) {
     trailing = {
       IconButton(
         onClick = {
-          showInformationDialog = true
+          onShowInformationDialog.invoke()
         }
       ) {
         Icon(
-          painter = painterResource(res = com.twidere.twiderex.MR.files.ic_info_circle),
+          painter = painterResource(res = MR.files.ic_info_circle),
           contentDescription = null,
         )
       }
     }
   ) {
-    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_title))
+    Text(text = stringResource(res = MR.strings.scene_settings_misc_nitter_title))
   }
   ListItem(
     text = {
-      Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_placeholder))
+      Text(text = stringResource(res = MR.strings.scene_settings_misc_nitter_input_placeholder))
     },
     trailing = {
       if (nitterVerifyLoading) {
@@ -357,21 +358,21 @@ fun NitterPreference(viewModel: MiscViewModel) {
             .padding(NitterPreferenceDefaults.Loading.Padding),
           strokeWidth = NitterPreferenceDefaults.Loading.StrokeWidth
         )
-      } else if (value.isNotEmpty()) {
+      } else if (value.text.isNotEmpty()) {
         IconButton(
           onClick = {
-            viewModel.verifyNitterInstance()
+            onVerify.invoke()
           }
         ) {
           if (nitterVerify) {
             Icon(
-              painter = painterResource(res = com.twidere.twiderex.MR.files.ic_link_success),
+              painter = painterResource(res = MR.files.ic_link_success),
               contentDescription = null,
               tint = MaterialTheme.colors.primary
             )
           } else {
             Icon(
-              painter = painterResource(res = com.twidere.twiderex.MR.files.ic_link_error),
+              painter = painterResource(res = MR.files.ic_link_error),
               contentDescription = null,
               tint = MaterialTheme.colors.error
             )
@@ -380,16 +381,19 @@ fun NitterPreference(viewModel: MiscViewModel) {
       }
     },
     secondaryText = {
-      Text(text = value.takeIf { it.isNotEmpty() } ?: stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_value))
+      Text(
+        text = value.text.takeIf { it.isNotEmpty() }
+          ?: stringResource(res = MR.strings.scene_settings_misc_nitter_input_value)
+      )
     },
     modifier = Modifier.clickable {
-      showUsageDialog = true
+      onShowUsageDialog.invoke()
     }
   )
   Column(modifier = Modifier.padding(start = NitterPreferenceDefaults.ContentPaddingStart)) {
     Divider()
     Spacer(modifier = Modifier.height(NitterPreferenceDefaults.ContentVerticalSpacing))
-    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_description))
+    Text(text = stringResource(res = MR.strings.scene_settings_misc_nitter_input_description))
   }
 }
 
@@ -399,6 +403,7 @@ private object NitterPreferenceDefaults {
     val Padding = PaddingValues(12.dp)
     val StrokeWidth = 2.dp
   }
+
   val ContentPaddingStart = 16.dp
   val ContentVerticalSpacing = 8.dp
 }
@@ -406,32 +411,25 @@ private object NitterPreferenceDefaults {
 @Composable
 fun NitterUsageDialog(
   onDismissRequest: () -> Unit,
-  value: String,
-  onConfirm: (String) -> Unit,
-  onValidCheck: (String) -> Unit,
+  value: TextFieldValue,
+  onValueChange: (TextFieldValue) -> Unit,
+  onConfirm: () -> Unit,
   isValid: Boolean
 ) {
   val navigator = LocalNavigator.current
-  var input by remember {
-    mutableStateOf(value)
-  }
-
   AlertDialog(
     onDismissRequest = onDismissRequest,
     title = {
-      Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_dialog_usage_title))
+      Text(text = stringResource(res = MR.strings.scene_settings_misc_nitter_dialog_usage_title))
     },
     text = {
       Column {
-        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_dialog_usage_content))
+        Text(text = stringResource(res = MR.strings.scene_settings_misc_nitter_dialog_usage_content))
         TextField(
-          value = input,
-          onValueChange = {
-            onValidCheck.invoke(it)
-            input = it
-          },
+          value = value,
+          onValueChange = onValueChange,
           placeholder = {
-            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_value),)
+            Text(text = stringResource(res = MR.strings.scene_settings_misc_nitter_input_value))
           },
           colors = TextFieldDefaults.textFieldColors(
             backgroundColor = Color.Transparent
@@ -440,7 +438,7 @@ fun NitterUsageDialog(
         )
         if (!isValid) {
           Text(
-            text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_input_invalid),
+            text = stringResource(res = MR.strings.scene_settings_misc_nitter_input_invalid),
             modifier = Modifier.padding(NitterUsageDialogDefaults.InvalidTextPadding),
             style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.error)
           )
@@ -448,13 +446,15 @@ fun NitterUsageDialog(
       }
     },
     confirmButton = {
-      TextButton(onClick = {
-        if (isValid) {
-          onConfirm.invoke(input)
-          onDismissRequest.invoke()
-        }
-      }, enabled = isValid) {
-        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_ok))
+      TextButton(
+        onClick = {
+          if (isValid) {
+            onConfirm.invoke()
+          }
+        },
+        enabled = isValid,
+      ) {
+        Text(text = stringResource(res = MR.strings.common_controls_actions_ok))
       }
     },
     dismissButton = {
@@ -466,7 +466,7 @@ fun NitterUsageDialog(
           )
         }
       ) {
-        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_dialog_usage_project_button))
+        Text(text = stringResource(res = MR.strings.scene_settings_misc_nitter_dialog_usage_project_button))
       }
     }
   )
@@ -485,16 +485,16 @@ fun NitterInformationDialog(
       onDismissRequest.invoke()
     },
     title = {
-      Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_dialog_information_title))
+      Text(text = stringResource(res = MR.strings.scene_settings_misc_nitter_dialog_information_title))
     },
     text = {
-      Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_nitter_dialog_information_content))
+      Text(text = stringResource(res = MR.strings.scene_settings_misc_nitter_dialog_information_content))
     },
     confirmButton = {
       TextButton(
         onClick = onDismissRequest,
       ) {
-        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_ok))
+        Text(text = stringResource(res = MR.strings.common_controls_actions_ok))
       }
     }
   )
@@ -512,7 +512,7 @@ fun ProxyTypeSelectDialog(
   AlertDialog(
     onDismissRequest = onDismissRequest,
     title = {
-      Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_type_title))
+      Text(text = stringResource(res = MR.strings.scene_settings_misc_proxy_type_title))
     },
     text = {
       Column {
@@ -542,7 +542,7 @@ fun ProxyTypeSelectDialog(
           onDismissRequest.invoke()
         }
       ) {
-        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_ok))
+        Text(text = stringResource(res = MR.strings.common_controls_actions_ok))
       }
     }
   )
@@ -589,7 +589,7 @@ fun ProxyInputDialog(
           onDismissRequest.invoke()
         }
       ) {
-        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_ok))
+        Text(text = stringResource(res = MR.strings.common_controls_actions_ok))
       }
     }
   )

@@ -41,29 +41,29 @@ fun DisplayPresenter(
   var fontScale by remember { mutableStateOf(display.fontScale) }
 
   LaunchedEffect(Unit) {
-    event.collect {
-      when (it) {
+    event.collect { event ->
+      when (event) {
         DisplayEvent.CommitFontScale -> preferencesHolder.displayPreferences.updateData {
           it.copy(fontScale = fontScale)
         }
         is DisplayEvent.SetAutoPlayback -> preferencesHolder.displayPreferences.updateData {
-          it.copy(autoPlayback = it.autoPlayback)
+          it.copy(autoPlayback = event.value)
         }
         is DisplayEvent.SetAvatarStyle -> preferencesHolder.displayPreferences.updateData {
-          it.copy(avatarStyle = it.avatarStyle)
+          it.copy(avatarStyle = event.avatarStyle)
         }
-        is DisplayEvent.SetFontScale -> fontScale = it.fontScale
+        is DisplayEvent.SetFontScale -> fontScale = event.fontScale
         is DisplayEvent.SetMediaPreview -> preferencesHolder.displayPreferences.updateData {
-          it.copy(mediaPreview = it.mediaPreview)
+          it.copy(mediaPreview = event.value)
         }
         is DisplayEvent.SetMuteByDefault -> preferencesHolder.displayPreferences.updateData {
-          it.copy(muteByDefault = it.muteByDefault)
+          it.copy(muteByDefault = event.value)
         }
         is DisplayEvent.SetUrlPreview -> preferencesHolder.displayPreferences.updateData {
-          it.copy(urlPreview = it.urlPreview)
+          it.copy(urlPreview = event.value)
         }
         is DisplayEvent.SetUseSystemFontSize -> preferencesHolder.displayPreferences.updateData {
-          it.copy(useSystemFontSize = it.useSystemFontSize)
+          it.copy(useSystemFontSize = event.useSystemFont)
         }
       }
     }
