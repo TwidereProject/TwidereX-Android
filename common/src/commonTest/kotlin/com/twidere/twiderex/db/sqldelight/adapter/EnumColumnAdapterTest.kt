@@ -27,18 +27,18 @@ import kotlin.test.assertEquals
 
 @Serializable
 private enum class JsonEnum {
-    ENUM_ONE,
-    ENUM_TWO,
-    ENUM_THREE
+  ENUM_ONE,
+  ENUM_TWO,
+  ENUM_THREE
 }
 class EnumColumnAdapterTest {
 
-    @Test
-    fun decodeAndEncodeEnumClass() {
-        val adapter = EnumColumnAdapter<JsonEnum>()
-        val origin = JsonEnum.ENUM_TWO
-        val string = adapter.encode(origin)
-        val obj = adapter.decode(string)
-        assertEquals(origin, obj)
-    }
+  @Test
+  fun decodeAndEncodeEnumClass() {
+    val adapter = EnumColumnAdapter<JsonEnum>()
+    val origin = JsonEnum.ENUM_TWO
+    val string = adapter.encode(origin)
+    val obj = adapter.decode(string)
+    assertEquals(origin, obj)
+  }
 }

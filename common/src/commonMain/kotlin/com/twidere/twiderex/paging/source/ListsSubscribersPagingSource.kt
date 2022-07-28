@@ -26,12 +26,12 @@ import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 
 class ListsSubscribersPagingSource(
-    userKey: MicroBlogKey,
-    private val service: ListsService,
-    private val listId: String,
+  userKey: MicroBlogKey,
+  private val service: ListsService,
+  private val listId: String,
 ) : UserPagingSource(userKey) {
 
-    override suspend fun loadUsers(params: LoadParams<String>): List<IUser> {
-        return service.listSubscribers(listId = listId, count = defaultLoadCount, params.key)
-    }
+  override suspend fun loadUsers(params: LoadParams<String>): List<IUser> {
+    return service.listSubscribers(listId = listId, count = defaultLoadCount, params.key)
+  }
 }

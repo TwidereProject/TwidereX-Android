@@ -21,5 +21,5 @@
 package androidx.paging.compose
 
 expect class PagingPlaceholderKey(index: Int) {
-    val index: Int
+  val index: Int
 }

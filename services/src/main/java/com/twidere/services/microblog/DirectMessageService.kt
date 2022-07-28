@@ -23,16 +23,16 @@ package com.twidere.services.microblog
 import com.twidere.services.microblog.model.IDirectMessage
 
 interface DirectMessageService {
-    suspend fun getDirectMessages(
-        cursor: String? = null,
-        count: Int? = null,
-    ): List<IDirectMessage>
+  suspend fun getDirectMessages(
+    cursor: String? = null,
+    count: Int? = null,
+  ): List<IDirectMessage>
 
-    suspend fun showDirectMessage(
-        id: String
-    ): IDirectMessage?
+  suspend fun showDirectMessage(
+    id: String
+  ): IDirectMessage?
 
-    suspend fun destroyDirectMessage(
-        id: String
-    )
+  suspend fun destroyDirectMessage(
+    id: String
+  )
 }

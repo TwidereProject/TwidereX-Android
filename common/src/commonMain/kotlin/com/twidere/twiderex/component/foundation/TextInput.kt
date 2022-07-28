@@ -53,136 +53,136 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TextInput(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    readOnly: Boolean = false,
-    textStyle: TextStyle = LocalTextStyle.current,
-    autoFocus: Boolean = false,
-    placeholder: @Composable (() -> Unit)? = null,
-    isError: Boolean = false,
-    alignment: Alignment = Alignment.TopStart,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions(),
-    singleLine: Boolean = false,
-    maxLines: Int = Int.MAX_VALUE,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
+  value: String,
+  onValueChange: (String) -> Unit,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  readOnly: Boolean = false,
+  textStyle: TextStyle = LocalTextStyle.current,
+  autoFocus: Boolean = false,
+  placeholder: @Composable (() -> Unit)? = null,
+  isError: Boolean = false,
+  alignment: Alignment = Alignment.TopStart,
+  visualTransformation: VisualTransformation = VisualTransformation.None,
+  keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+  keyboardActions: KeyboardActions = KeyboardActions(),
+  singleLine: Boolean = false,
+  maxLines: Int = Int.MAX_VALUE,
+  interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+  colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
 ) {
-    var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
-    val textFieldValue = textFieldValueState.copy(text = value)
-    TextInput(
-        value = textFieldValue,
-        onValueChange = {
-            textFieldValueState = it
-            if (value != it.text) {
-                onValueChange(it.text)
-            }
-        },
-        modifier = modifier,
-        enabled = enabled,
-        readOnly = readOnly,
-        textStyle = textStyle,
-        autoFocus = autoFocus,
-        placeholder = placeholder,
-        isError = isError,
-        alignment = alignment,
-        visualTransformation = visualTransformation,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        singleLine = singleLine,
-        maxLines = maxLines,
-        interactionSource = interactionSource,
-        colors = colors,
-    )
+  var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
+  val textFieldValue = textFieldValueState.copy(text = value)
+  TextInput(
+    value = textFieldValue,
+    onValueChange = {
+      textFieldValueState = it
+      if (value != it.text) {
+        onValueChange(it.text)
+      }
+    },
+    modifier = modifier,
+    enabled = enabled,
+    readOnly = readOnly,
+    textStyle = textStyle,
+    autoFocus = autoFocus,
+    placeholder = placeholder,
+    isError = isError,
+    alignment = alignment,
+    visualTransformation = visualTransformation,
+    keyboardOptions = keyboardOptions,
+    keyboardActions = keyboardActions,
+    singleLine = singleLine,
+    maxLines = maxLines,
+    interactionSource = interactionSource,
+    colors = colors,
+  )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TextInput(
-    value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    readOnly: Boolean = false,
-    textStyle: TextStyle = LocalTextStyle.current,
-    autoFocus: Boolean = false,
-    placeholder: @Composable (() -> Unit)? = null,
-    isError: Boolean = false,
-    alignment: Alignment = Alignment.TopStart,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions(),
-    singleLine: Boolean = false,
-    maxLines: Int = Int.MAX_VALUE,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
+  value: TextFieldValue,
+  onValueChange: (TextFieldValue) -> Unit,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  readOnly: Boolean = false,
+  textStyle: TextStyle = LocalTextStyle.current,
+  autoFocus: Boolean = false,
+  placeholder: @Composable (() -> Unit)? = null,
+  isError: Boolean = false,
+  alignment: Alignment = Alignment.TopStart,
+  visualTransformation: VisualTransformation = VisualTransformation.None,
+  keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+  keyboardActions: KeyboardActions = KeyboardActions(),
+  singleLine: Boolean = false,
+  maxLines: Int = Int.MAX_VALUE,
+  interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+  colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
 ) {
-    val textColor = textStyle.color.takeOrElse {
-        colors.textColor(enabled).value
+  val textColor = textStyle.color.takeOrElse {
+    colors.textColor(enabled).value
+  }
+  val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
+  val focusRequester = remember { FocusRequester() }
+  val keyboardController = LocalSoftwareKeyboardController.current
+  LaunchedEffect(autoFocus) {
+    if (autoFocus) {
+      delay(500)
+      focusRequester.requestFocus()
+      keyboardController?.show()
     }
-    val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
-    val focusRequester = remember { FocusRequester() }
-    val keyboardController = LocalSoftwareKeyboardController.current
-    LaunchedEffect(autoFocus) {
-        if (autoFocus) {
-            delay(500)
-            focusRequester.requestFocus()
-            keyboardController?.show()
+  }
+
+  val transformedText = remember(value.annotatedString, visualTransformation) {
+    visualTransformation.filter(value.annotatedString)
+  }.text
+  val decoratedPlaceholder: @Composable (() -> Unit)? =
+    if (placeholder != null && transformedText.isEmpty()) {
+      @Composable {
+        CompositionLocalProvider(
+          LocalContentAlpha provides ContentAlpha.medium,
+        ) {
+          placeholder.invoke()
         }
+      }
+    } else null
+
+  BasicTextField(
+    value = value,
+    modifier = modifier
+      .focusRequester(focusRequester),
+    onValueChange = onValueChange,
+    enabled = enabled,
+    readOnly = readOnly,
+    textStyle = mergedTextStyle,
+    cursorBrush = SolidColor(colors.cursorColor(isError).value),
+    visualTransformation = visualTransformation,
+    keyboardOptions = keyboardOptions,
+    keyboardActions = keyboardActions,
+    interactionSource = interactionSource,
+    singleLine = singleLine,
+    maxLines = maxLines,
+    decorationBox = @Composable { coreTextField ->
+      TextFieldLayout(
+        textField = coreTextField,
+        placeholder = decoratedPlaceholder,
+        alignment = alignment,
+      )
     }
-
-    val transformedText = remember(value.annotatedString, visualTransformation) {
-        visualTransformation.filter(value.annotatedString)
-    }.text
-    val decoratedPlaceholder: @Composable (() -> Unit)? =
-        if (placeholder != null && transformedText.isEmpty()) {
-            @Composable {
-                CompositionLocalProvider(
-                    LocalContentAlpha provides ContentAlpha.medium,
-                ) {
-                    placeholder.invoke()
-                }
-            }
-        } else null
-
-    BasicTextField(
-        value = value,
-        modifier = modifier
-            .focusRequester(focusRequester),
-        onValueChange = onValueChange,
-        enabled = enabled,
-        readOnly = readOnly,
-        textStyle = mergedTextStyle,
-        cursorBrush = SolidColor(colors.cursorColor(isError).value),
-        visualTransformation = visualTransformation,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        interactionSource = interactionSource,
-        singleLine = singleLine,
-        maxLines = maxLines,
-        decorationBox = @Composable { coreTextField ->
-            TextFieldLayout(
-                textField = coreTextField,
-                placeholder = decoratedPlaceholder,
-                alignment = alignment,
-            )
-        }
-    )
+  )
 }
 
 @Composable
 private fun TextFieldLayout(
-    textField: @Composable () -> Unit,
-    placeholder: @Composable (() -> Unit)?,
-    alignment: Alignment,
+  textField: @Composable () -> Unit,
+  placeholder: @Composable (() -> Unit)?,
+  alignment: Alignment,
 ) {
-    Box(
-        contentAlignment = alignment,
-    ) {
-        textField.invoke()
-        placeholder?.invoke()
-    }
+  Box(
+    contentAlignment = alignment,
+  ) {
+    textField.invoke()
+    placeholder?.invoke()
+  }
 }

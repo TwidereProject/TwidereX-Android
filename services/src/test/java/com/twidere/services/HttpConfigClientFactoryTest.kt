@@ -30,46 +30,46 @@ import kotlin.test.assertNotSame
 import kotlin.test.assertSame
 
 class HttpConfigClientFactoryTest {
-    private var config = HttpConfig()
-    private val configProvider = object : HttpConfigProvider {
-        override fun provideConfig(): HttpConfig {
-            return config
-        }
+  private var config = HttpConfig()
+  private val configProvider = object : HttpConfigProvider {
+    override fun provideConfig(): HttpConfig {
+      return config
     }
+  }
 
-    @Test
-    fun createResourceUsingCache() {
-        val factory = HttpConfigClientFactory(configProvider)
-        val resourceOld = factory.createResources<TwitterResources>(
-            TwitterResources::class.java,
-            baseUrl = "https://www.twitter.com",
-            EmptyAuthorization(),
-            useCache = true
-        )
+  @Test
+  fun createResourceUsingCache() {
+    val factory = HttpConfigClientFactory(configProvider)
+    val resourceOld = factory.createResources<TwitterResources>(
+      TwitterResources::class.java,
+      baseUrl = "https://www.twitter.com",
+      EmptyAuthorization(),
+      useCache = true
+    )
 
-        val resourceNew = factory.createResources<TwitterResources>(
-            TwitterResources::class.java,
-            baseUrl = "https://www.twitter.com",
-            EmptyAuthorization(),
-            useCache = true
-        )
-        assertSame(resourceOld, resourceNew)
-    }
+    val resourceNew = factory.createResources<TwitterResources>(
+      TwitterResources::class.java,
+      baseUrl = "https://www.twitter.com",
+      EmptyAuthorization(),
+      useCache = true
+    )
+    assertSame(resourceOld, resourceNew)
+  }
 
-    @Test
-    fun createResourceNotUsingCache() {
-        val factory = HttpConfigClientFactory(configProvider)
-        val resourceOld = factory.createResources<TwitterResources>(
-            TwitterResources::class.java,
-            baseUrl = "https://www.twitter.com",
-            EmptyAuthorization(),
-        )
+  @Test
+  fun createResourceNotUsingCache() {
+    val factory = HttpConfigClientFactory(configProvider)
+    val resourceOld = factory.createResources<TwitterResources>(
+      TwitterResources::class.java,
+      baseUrl = "https://www.twitter.com",
+      EmptyAuthorization(),
+    )
 
-        val resourceNew = factory.createResources<TwitterResources>(
-            TwitterResources::class.java,
-            baseUrl = "https://www.twitter.com",
-            EmptyAuthorization(),
-        )
-        assertNotSame(resourceOld, resourceNew)
-    }
+    val resourceNew = factory.createResources<TwitterResources>(
+      TwitterResources::class.java,
+      baseUrl = "https://www.twitter.com",
+      EmptyAuthorization(),
+    )
+    assertNotSame(resourceOld, resourceNew)
+  }
 }

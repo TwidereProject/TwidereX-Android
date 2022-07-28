@@ -36,43 +36,43 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 
 class DirectMessageFetchJob(
-    private val repository: DirectMessageRepository,
-    private val accountRepository: AccountRepository,
-    private val notificationManager: AppNotificationManager,
-    private val resLoader: ResLoader,
+  private val repository: DirectMessageRepository,
+  private val accountRepository: AccountRepository,
+  private val notificationManager: AppNotificationManager,
+  private val resLoader: ResLoader,
 ) {
-    suspend fun execute() {
-        accountRepository.activeAccount.firstOrNull()?.takeIf {
-            accountRepository.getAccountPreferences(it.accountKey).isNotificationEnabled.first()
-        }?.let { account ->
-            (account.service as? DirectMessageService)?.let { directMessageService ->
-                val result = repository.checkNewMessages(
-                    accountKey = account.accountKey,
-                    service = directMessageService,
-                    lookupService = account.service as LookupService
-                )
-                result.forEach {
-                    notification(account = account, message = it)
-                }
-            }
+  suspend fun execute() {
+    accountRepository.activeAccount.firstOrNull()?.takeIf {
+      accountRepository.getAccountPreferences(it.accountKey).isNotificationEnabled.first()
+    }?.let { account ->
+      (account.service as? DirectMessageService)?.let { directMessageService ->
+        val result = repository.checkNewMessages(
+          accountKey = account.accountKey,
+          service = directMessageService,
+          lookupService = account.service as LookupService
+        )
+        result.forEach {
+          notification(account = account, message = it)
         }
+      }
     }
+  }
 
-    private fun notification(account: AccountDetails, message: UiDMConversationWithLatestMessage) {
-        val builder = AppNotification
-            .Builder(
-                account.accountKey.notificationChannelId(
-                    NotificationChannelSpec.ContentMessages.id
-                )
-            )
-            .setContentTitle(resLoader.getString(com.twidere.twiderex.MR.strings.common_notification_messages_title))
-            .setContentText(
-                resLoader.getString(
-                    com.twidere.twiderex.MR.strings.common_notification_messages_content,
-                    message.latestMessage.sender.displayName
-                )
-            )
-            .setDeepLink(RootDeepLinks.Conversation(message.conversation.conversationKey))
-        notificationManager.notify(message.latestMessage.messageKey.hashCode(), builder.build())
-    }
+  private fun notification(account: AccountDetails, message: UiDMConversationWithLatestMessage) {
+    val builder = AppNotification
+      .Builder(
+        account.accountKey.notificationChannelId(
+          NotificationChannelSpec.ContentMessages.id
+        )
+      )
+      .setContentTitle(resLoader.getString(com.twidere.twiderex.MR.strings.common_notification_messages_title))
+      .setContentText(
+        resLoader.getString(
+          com.twidere.twiderex.MR.strings.common_notification_messages_content,
+          message.latestMessage.sender.displayName
+        )
+      )
+      .setDeepLink(RootDeepLinks.Conversation(message.conversation.conversationKey))
+    notificationManager.notify(message.latestMessage.messageKey.hashCode(), builder.build())
+  }
 }

@@ -32,25 +32,25 @@ import com.twidere.twiderex.component.lazy.ItemHeader
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun <T : Enum<T>> ColumnScope.RadioItem(
-    options: List<T>,
-    value: T,
-    onChanged: (T) -> Unit,
-    title: @Composable () -> Unit,
-    itemContent: @Composable (T) -> Unit,
+  options: List<T>,
+  value: T,
+  onChanged: (T) -> Unit,
+  title: @Composable () -> Unit,
+  itemContent: @Composable (T) -> Unit,
 ) {
-    ItemHeader() {
-        title.invoke()
-    }
+  ItemHeader() {
+    title.invoke()
+  }
 
-    options.forEach {
-        ListItem(
-            modifier = Modifier.clickable(onClick = { onChanged.invoke(it) }),
-            text = {
-                itemContent.invoke(it)
-            },
-            trailing = {
-                RadioButton(selected = it == value, onClick = { onChanged.invoke(it) })
-            }
-        )
-    }
+  options.forEach {
+    ListItem(
+      modifier = Modifier.clickable(onClick = { onChanged.invoke(it) }),
+      text = {
+        itemContent.invoke(it)
+      },
+      trailing = {
+        RadioButton(selected = it == value, onClick = { onChanged.invoke(it) })
+      }
+    )
+  }
 }

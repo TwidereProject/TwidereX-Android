@@ -25,30 +25,30 @@ import com.twidere.twiderex.di.ext.get
 import java.io.File
 
 actual class StorageProvider(private val context: Context) {
-    // for persistence data
-    actual val appDir: String get() = "${context.filesDir.absolutePath}/app".mkdirs()
+  // for persistence data
+  actual val appDir: String get() = "${context.filesDir.absolutePath}/app".mkdirs()
 
-    // for cache data
-    actual val cacheDir: String get() = "${context.externalCacheDir?.absolutePath ?: context.cacheDir}/caches".mkdirs()
+  // for cache data
+  actual val cacheDir: String get() = "${context.externalCacheDir?.absolutePath ?: context.cacheDir}/caches".mkdirs()
 
-    // for media caches e.g image, video
-    actual val mediaCacheDir: String get() = "${context.externalCacheDir?.absolutePath ?: context.cacheDir}/mediaCache".mkdirs()
+  // for media caches e.g image, video
+  actual val mediaCacheDir: String get() = "${context.externalCacheDir?.absolutePath ?: context.cacheDir}/mediaCache".mkdirs()
 
-    actual fun clearCaches(dir: String, deleteDirAlso: Boolean) {
-        val cacheDir = File(dir)
-        if (!cacheDir.exists()) return
-        if (deleteDirAlso)
-            cacheDir.deleteRecursively()
-        else {
-            cacheDir.listFiles()?.forEach { file ->
-                file.deleteRecursively()
-            }
-        }
+  actual fun clearCaches(dir: String, deleteDirAlso: Boolean) {
+    val cacheDir = File(dir)
+    if (!cacheDir.exists()) return
+    if (deleteDirAlso)
+      cacheDir.deleteRecursively()
+    else {
+      cacheDir.listFiles()?.forEach { file ->
+        file.deleteRecursively()
+      }
     }
+  }
 
-    actual companion object {
-        actual fun create(): StorageProvider {
-            return com.twidere.twiderex.kmp.StorageProvider(get())
-        }
+  actual companion object {
+    actual fun create(): StorageProvider {
+      return com.twidere.twiderex.kmp.StorageProvider(get())
     }
+  }
 }

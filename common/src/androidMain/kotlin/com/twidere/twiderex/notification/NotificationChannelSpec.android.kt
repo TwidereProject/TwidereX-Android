@@ -23,8 +23,8 @@ package com.twidere.twiderex.notification
 import androidx.core.app.NotificationManagerCompat
 
 val NotificationChannelSpec.importance
-    get() = when (this) {
-        NotificationChannelSpec.BackgroundProgresses -> NotificationManagerCompat.IMPORTANCE_HIGH
-        NotificationChannelSpec.ContentInteractions -> NotificationManagerCompat.IMPORTANCE_HIGH
-        NotificationChannelSpec.ContentMessages -> NotificationManagerCompat.IMPORTANCE_HIGH
-    }
+  get() = when (this) {
+    NotificationChannelSpec.BackgroundProgresses -> NotificationManagerCompat.IMPORTANCE_HIGH
+    NotificationChannelSpec.ContentInteractions -> NotificationManagerCompat.IMPORTANCE_HIGH
+    NotificationChannelSpec.ContentMessages -> NotificationManagerCompat.IMPORTANCE_HIGH
+  }

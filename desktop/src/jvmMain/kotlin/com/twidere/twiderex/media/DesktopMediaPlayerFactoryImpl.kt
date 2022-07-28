@@ -25,7 +25,7 @@ import com.twidere.twiderex.component.foundation.DesktopMediaPlayer
 import com.twidere.twiderex.component.foundation.DesktopMediaPlayerFactory
 
 class DesktopMediaPlayerFactoryImpl : DesktopMediaPlayerFactory {
-    override fun create(url: String, backgroundColor: Color?, onClick: (() -> Unit)?): DesktopMediaPlayer {
-        return JFXMediaPlayer(url, backgroundColor, onClick)
-    }
+  override fun create(url: String, backgroundColor: Color?, onClick: (() -> Unit)?): DesktopMediaPlayer {
+    return JFXMediaPlayer(url, backgroundColor, onClick)
+  }
 }

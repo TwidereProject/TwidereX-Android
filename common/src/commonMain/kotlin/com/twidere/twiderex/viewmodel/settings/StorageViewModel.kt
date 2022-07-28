@@ -27,27 +27,27 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class StorageViewModel(
-    private val repository: CacheRepository,
+  private val repository: CacheRepository,
 ) : ViewModel() {
-    val loading = MutableStateFlow(false)
+  val loading = MutableStateFlow(false)
 
-    fun clearImageCache() = viewModelScope.launch {
-        loading.value = true
-        repository.clearImageCache()
-        loading.value = false
-    }
+  fun clearImageCache() = viewModelScope.launch {
+    loading.value = true
+    repository.clearImageCache()
+    loading.value = false
+  }
 
-    fun clearSearchHistory() = viewModelScope.launch {
-        loading.value = true
-        repository.clearSearchHistory()
-        loading.value = false
-    }
+  fun clearSearchHistory() = viewModelScope.launch {
+    loading.value = true
+    repository.clearSearchHistory()
+    loading.value = false
+  }
 
-    fun clearAllCaches() = viewModelScope.launch {
-        loading.value = true
-        repository.clearDatabaseCache()
-        repository.clearCacheDir()
-        repository.clearImageCache()
-        loading.value = false
-    }
+  fun clearAllCaches() = viewModelScope.launch {
+    loading.value = true
+    repository.clearDatabaseCache()
+    repository.clearCacheDir()
+    repository.clearImageCache()
+    loading.value = false
+  }
 }

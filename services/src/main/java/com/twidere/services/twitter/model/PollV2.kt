@@ -27,16 +27,16 @@ import org.joda.time.DateTime
 
 @Serializable
 data class PollV2(
-    val id: String? = null,
-    val options: List<PollV2Option>? = null,
+  val id: String? = null,
+  val options: List<PollV2Option>? = null,
 
-    @SerialName("duration_minutes")
-    val durationMinutes: Long? = null,
+  @SerialName("duration_minutes")
+  val durationMinutes: Long? = null,
 
-    @SerialName("end_datetime")
-    @Serializable(with = DateSerializerV2::class)
-    val endDatetime: DateTime? = null,
+  @SerialName("end_datetime")
+  @Serializable(with = DateSerializerV2::class)
+  val endDatetime: DateTime? = null,
 
-    @SerialName("voting_status")
-    val votingStatus: String? = null
+  @SerialName("voting_status")
+  val votingStatus: String? = null
 )

@@ -30,21 +30,21 @@ import com.twidere.twiderex.room.db.paging.getPagingSource
 import com.twidere.twiderex.room.db.transform.toDbTrendWithHistory
 
 internal class TrendDaoImpl(
-    val roomCacheDatabase: RoomCacheDatabase
+  val roomCacheDatabase: RoomCacheDatabase
 ) : TrendDao {
-    override suspend fun insertAll(trends: List<UiTrend>) {
-        trends.toDbTrendWithHistory().saveToDb(roomCacheDatabase)
-    }
+  override suspend fun insertAll(trends: List<UiTrend>) {
+    trends.toDbTrendWithHistory().saveToDb(roomCacheDatabase)
+  }
 
-    override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiTrend> {
-        return roomCacheDatabase.trendDao().getPagingSource(
-            cacheDatabase = roomCacheDatabase,
-            accountKey = accountKey
-        )
-    }
+  override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiTrend> {
+    return roomCacheDatabase.trendDao().getPagingSource(
+      cacheDatabase = roomCacheDatabase,
+      accountKey = accountKey
+    )
+  }
 
-    override suspend fun clear(accountKey: MicroBlogKey) {
-        roomCacheDatabase.trendDao().clearAll(accountKey)
-        roomCacheDatabase.trendHistoryDao().clearAll(accountKey)
-    }
+  override suspend fun clear(accountKey: MicroBlogKey) {
+    roomCacheDatabase.trendDao().clearAll(accountKey)
+    roomCacheDatabase.trendHistoryDao().clearAll(accountKey)
+  }
 }

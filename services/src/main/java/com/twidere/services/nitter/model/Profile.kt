@@ -23,6 +23,6 @@ package com.twidere.services.nitter.model
 import moe.tlaster.hson.annotations.HtmlSerializable
 
 data class Profile(
-    @HtmlSerializable(".profile-card-username",)
-    val username: String,
+  @HtmlSerializable(".profile-card-username",)
+  val username: String,
 )

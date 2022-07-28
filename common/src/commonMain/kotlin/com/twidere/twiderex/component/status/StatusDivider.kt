@@ -28,15 +28,15 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun StatusDivider() {
-    Divider(
-        modifier = Modifier.padding(
-            start = StatusDividerDefaults.PaddingStart,
-        ),
-        thickness = StatusDividerDefaults.ThickNess
-    )
+  Divider(
+    modifier = Modifier.padding(
+      start = StatusDividerDefaults.PaddingStart,
+    ),
+    thickness = StatusDividerDefaults.ThickNess
+  )
 }
 
 object StatusDividerDefaults {
-    val PaddingStart = UserAvatarDefaults.AvatarSize + 24.dp
-    val ThickNess = 0.5.dp
+  val PaddingStart = UserAvatarDefaults.AvatarSize + 24.dp
+  val ThickNess = 0.5.dp
 }

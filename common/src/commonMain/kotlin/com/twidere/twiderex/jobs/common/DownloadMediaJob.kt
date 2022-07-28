@@ -29,26 +29,26 @@ import com.twidere.twiderex.notification.StringNotificationEvent.Companion.show
 import com.twidere.twiderex.repository.AccountRepository
 
 class DownloadMediaJob(
-    private val accountRepository: AccountRepository,
-    private val inAppNotification: InAppNotification,
-    private val fileResolver: FileResolver,
-    private val resLoader: ResLoader,
+  private val accountRepository: AccountRepository,
+  private val inAppNotification: InAppNotification,
+  private val fileResolver: FileResolver,
+  private val resLoader: ResLoader,
 ) {
-    suspend fun execute(
-        target: String,
-        source: String,
-        accountKey: MicroBlogKey,
-    ) {
-        val accountDetails = accountKey.let {
-            accountRepository.findByAccountKey(accountKey = it)
-        } ?: throw Error("Can't find any account matches:$$accountKey")
-        val service = accountDetails.service
-        if (service !is DownloadMediaService) {
-            throw Error("Service must be DownloadMediaService")
-        }
-        fileResolver.openOutputStream(target)?.use {
-            service.download(target = source).copyTo(it)
-        } ?: throw Error("Download failed")
-        inAppNotification.show(resLoader.getString(com.twidere.twiderex.MR.strings.common_controls_actions_save))
+  suspend fun execute(
+    target: String,
+    source: String,
+    accountKey: MicroBlogKey,
+  ) {
+    val accountDetails = accountKey.let {
+      accountRepository.findByAccountKey(accountKey = it)
+    } ?: throw Error("Can't find any account matches:$$accountKey")
+    val service = accountDetails.service
+    if (service !is DownloadMediaService) {
+      throw Error("Service must be DownloadMediaService")
     }
+    fileResolver.openOutputStream(target)?.use {
+      service.download(target = source).copyTo(it)
+    } ?: throw Error("Download failed")
+    inAppNotification.show(resLoader.getString(com.twidere.twiderex.MR.strings.common_controls_actions_save))
+  }
 }

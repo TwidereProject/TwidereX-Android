@@ -46,88 +46,88 @@ import com.twidere.twiderex.ui.TwidereScene
 import kotlinx.coroutines.launch
 
 class MastodonNotificationItem : HomeNavigationItem() {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_title)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_title)
+  }
 
-    override val route: String
-        get() = Root.Mastodon.Notification
+  override val route: String
+    get() = Root.Mastodon.Notification
 
-    @Composable
-    override fun icon(): Painter {
-        return painterResource(res = com.twidere.twiderex.MR.files.ic_bell)
-    }
+  @Composable
+  override fun icon(): Painter {
+    return painterResource(res = com.twidere.twiderex.MR.files.ic_bell)
+  }
 
-    override var lazyListController: LazyListController = LazyListController()
+  override var lazyListController: LazyListController = LazyListController()
 
-    @Composable
-    override fun Content() {
-        MastodonNotificationSceneContent(
-            setLazyListController = {
-                lazyListController = it
-            }
-        )
-    }
+  @Composable
+  override fun Content() {
+    MastodonNotificationSceneContent(
+      setLazyListController = {
+        lazyListController = it
+      }
+    )
+  }
 }
 
 @Composable
 fun MastodonNotificationScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_title))
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    }
-                )
-            }
-        ) {
-            MastodonNotificationSceneContent()
-        }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_title))
+          },
+          navigationIcon = {
+            AppBarNavigationButton()
+          }
+        )
+      }
+    ) {
+      MastodonNotificationSceneContent()
     }
+  }
 }
 
 @Composable
 fun MastodonNotificationSceneContent(
-    setLazyListController: ((lazyListController: LazyListController) -> Unit)? = null,
+  setLazyListController: ((lazyListController: LazyListController) -> Unit)? = null,
 ) {
-    val account = LocalActiveAccount.current ?: return
-    if (account.service !is NotificationService) {
-        return
+  val account = LocalActiveAccount.current ?: return
+  if (account.service !is NotificationService) {
+    return
+  }
+  val tabs = remember {
+    listOf(
+      AllNotificationItem(),
+      MentionItem(),
+    )
+  }
+  val pagerState = rememberPagerState(pageCount = tabs.size)
+  LaunchedEffect(pagerState.currentPage) {
+    // FIXME: 2021/5/17 A little bit dirty
+    setLazyListController?.invoke(tabs[pagerState.currentPage].lazyListController)
+  }
+  val scope = rememberCoroutineScope()
+  Scaffold(
+    topBar = {
+      TextTabsComponent(
+        items = tabs.map { it.name() },
+        selectedItem = pagerState.currentPage,
+        onItemSelected = {
+          scope.launch {
+            pagerState.selectPage {
+              pagerState.currentPage = it
+            }
+          }
+        },
+      )
     }
-    val tabs = remember {
-        listOf(
-            AllNotificationItem(),
-            MentionItem(),
-        )
+  ) {
+    Pager(state = pagerState) {
+      tabs[page].Content()
     }
-    val pagerState = rememberPagerState(pageCount = tabs.size)
-    LaunchedEffect(pagerState.currentPage) {
-        // FIXME: 2021/5/17 A little bit dirty
-        setLazyListController?.invoke(tabs[pagerState.currentPage].lazyListController)
-    }
-    val scope = rememberCoroutineScope()
-    Scaffold(
-        topBar = {
-            TextTabsComponent(
-                items = tabs.map { it.name() },
-                selectedItem = pagerState.currentPage,
-                onItemSelected = {
-                    scope.launch {
-                        pagerState.selectPage {
-                            pagerState.currentPage = it
-                        }
-                    }
-                },
-            )
-        }
-    ) {
-        Pager(state = pagerState) {
-            tabs[page].Content()
-        }
-    }
+  }
 }

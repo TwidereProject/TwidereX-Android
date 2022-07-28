@@ -30,55 +30,55 @@ import com.twidere.twiderex.mock.model.toIPaging
 import org.jetbrains.annotations.TestOnly
 
 internal class MockRelationshipService @TestOnly constructor() : MicroBlogService,
-    RelationshipService,
-    ErrorService() {
-    private val followings = mutableListOf<String>()
-    private val followers = mutableListOf<String>()
-    override suspend fun block(id: String): IRelationship {
-        TODO("Not yet implemented")
-    }
+  RelationshipService,
+  ErrorService() {
+  private val followings = mutableListOf<String>()
+  private val followers = mutableListOf<String>()
+  override suspend fun block(id: String): IRelationship {
+    TODO("Not yet implemented")
+  }
 
-    override suspend fun follow(user_id: String) {
-        checkError()
-        followings.add(user_id)
-    }
+  override suspend fun follow(user_id: String) {
+    checkError()
+    followings.add(user_id)
+  }
 
-    override suspend fun followers(user_id: String, nextPage: String?): List<IUser> {
-        checkError()
-        val id = nextPage ?: System.currentTimeMillis().toString()
-        return listOf(
-            mockIUser(id = id).also {
-                followers.add(id)
-            }
-        ).toIPaging()
-    }
+  override suspend fun followers(user_id: String, nextPage: String?): List<IUser> {
+    checkError()
+    val id = nextPage ?: System.currentTimeMillis().toString()
+    return listOf(
+      mockIUser(id = id).also {
+        followers.add(id)
+      }
+    ).toIPaging()
+  }
 
-    override suspend fun following(user_id: String, nextPage: String?): List<IUser> {
-        checkError()
-        val id = nextPage ?: System.currentTimeMillis().toString()
-        return listOf(
-            mockIUser(id = id).also {
-                followings.add(id)
-            }
-        ).toIPaging()
-    }
+  override suspend fun following(user_id: String, nextPage: String?): List<IUser> {
+    checkError()
+    val id = nextPage ?: System.currentTimeMillis().toString()
+    return listOf(
+      mockIUser(id = id).also {
+        followings.add(id)
+      }
+    ).toIPaging()
+  }
 
-    override suspend fun showRelationship(target_id: String): IRelationship {
-        checkError()
-        return Relationship(
-            followedBy = followers.contains(target_id),
-            following = followings.contains(target_id),
-            blockedBy = false,
-            blocking = false
-        )
-    }
+  override suspend fun showRelationship(target_id: String): IRelationship {
+    checkError()
+    return Relationship(
+      followedBy = followers.contains(target_id),
+      following = followings.contains(target_id),
+      blockedBy = false,
+      blocking = false
+    )
+  }
 
-    override suspend fun unblock(id: String): IRelationship {
-        TODO("Not yet implemented")
-    }
+  override suspend fun unblock(id: String): IRelationship {
+    TODO("Not yet implemented")
+  }
 
-    override suspend fun unfollow(user_id: String) {
-        checkError()
-        followings.remove(user_id)
-    }
+  override suspend fun unfollow(user_id: String) {
+    checkError()
+    followings.remove(user_id)
+  }
 }

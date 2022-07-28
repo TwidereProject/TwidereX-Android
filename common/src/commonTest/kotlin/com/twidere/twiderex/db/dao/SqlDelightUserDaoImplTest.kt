@@ -32,15 +32,15 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 internal class SqlDelightUserDaoImplTest : BaseCacheDatabaseTest() {
-    @Test
-    fun findWithUserKeyFlow_FlowUpdatesWhenDatabaseUpdates() = runBlocking {
-        val dao = SqlDelightUserDaoImpl(database.userQueries)
-        val user = mockIUser(name = "insert").toUi(MicroBlogKey.twitter("account"))
-        val flow = dao.findWithUserKeyFlow(user.userKey)
-        assertNull(flow.firstOrNull())
-        dao.insertAll(listOf(user))
-        assertEquals("insert", flow.firstOrNull()?.name)
-        dao.insertAll(listOf(user.copy(name = "replace")))
-        assertEquals("replace", flow.firstOrNull()?.name)
-    }
+  @Test
+  fun findWithUserKeyFlow_FlowUpdatesWhenDatabaseUpdates() = runBlocking {
+    val dao = SqlDelightUserDaoImpl(database.userQueries)
+    val user = mockIUser(name = "insert").toUi(MicroBlogKey.twitter("account"))
+    val flow = dao.findWithUserKeyFlow(user.userKey)
+    assertNull(flow.firstOrNull())
+    dao.insertAll(listOf(user))
+    assertEquals("insert", flow.firstOrNull()?.name)
+    dao.insertAll(listOf(user.copy(name = "replace")))
+    assertEquals("replace", flow.firstOrNull()?.name)
+  }
 }

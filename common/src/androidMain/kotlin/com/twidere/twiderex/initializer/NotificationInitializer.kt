@@ -35,21 +35,21 @@ class NotificationInitializerHolder
 private const val NotificationWorkName = "twiderex_notification"
 
 class NotificationInitializer : Initializer<NotificationInitializerHolder>, KoinComponent {
-    private val workManager: WorkManager by inject()
+  private val workManager: WorkManager by inject()
 
-    override fun create(context: Context): NotificationInitializerHolder {
-        val request = PeriodicWorkRequestBuilder<NotificationWorker>(15, TimeUnit.MINUTES)
-            .build()
-        workManager.enqueueUniquePeriodicWork(
-            NotificationWorkName,
-            ExistingPeriodicWorkPolicy.KEEP,
-            request
-        )
-
-        return NotificationInitializerHolder()
-    }
-
-    override fun dependencies() = listOf(
-        NotificationChannelInitializer::class.java,
+  override fun create(context: Context): NotificationInitializerHolder {
+    val request = PeriodicWorkRequestBuilder<NotificationWorker>(15, TimeUnit.MINUTES)
+      .build()
+    workManager.enqueueUniquePeriodicWork(
+      NotificationWorkName,
+      ExistingPeriodicWorkPolicy.KEEP,
+      request
     )
+
+    return NotificationInitializerHolder()
+  }
+
+  override fun dependencies() = listOf(
+    NotificationChannelInitializer::class.java,
+  )
 }

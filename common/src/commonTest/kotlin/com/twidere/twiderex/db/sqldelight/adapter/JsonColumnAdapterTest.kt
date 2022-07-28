@@ -25,20 +25,20 @@ import org.junit.Test
 import kotlin.test.assertEquals
 @Serializable
 private data class JsonObject(
-    val arg1: String,
-    val arg2: Int,
-    val arg3: Boolean
+  val arg1: String,
+  val arg2: Int,
+  val arg3: Boolean
 )
 class JsonColumnAdapterTest {
 
-    @Test
-    fun decodeAndEncodeDataClass() {
-        val adapter = JsonColumnAdapter(JsonObject.serializer())
-        val origin = JsonObject(arg1 = "test", arg2 = 2, arg3 = true)
-        val string = adapter.encode(origin)
-        val obj = adapter.decode(string)
-        assertEquals(origin.arg1, obj.arg1)
-        assertEquals(origin.arg2, obj.arg2)
-        assertEquals(origin.arg3, obj.arg3)
-    }
+  @Test
+  fun decodeAndEncodeDataClass() {
+    val adapter = JsonColumnAdapter(JsonObject.serializer())
+    val origin = JsonObject(arg1 = "test", arg2 = 2, arg3 = true)
+    val string = adapter.encode(origin)
+    val obj = adapter.decode(string)
+    assertEquals(origin.arg1, obj.arg1)
+    assertEquals(origin.arg2, obj.arg2)
+    assertEquals(origin.arg3, obj.arg3)
+  }
 }

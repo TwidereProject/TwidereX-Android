@@ -24,8 +24,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class EntitiesURL(
-    val display_url: String? = null,
-    val expanded_url: String? = null,
-    val url: String? = null,
-    val indices: List<Long>? = null
+  val display_url: String? = null,
+  val expanded_url: String? = null,
+  val url: String? = null,
+  val indices: List<Long>? = null
 )

@@ -25,6 +25,6 @@ import com.twidere.twiderex.model.enums.NotificationCursorType
 import com.twidere.twiderex.model.paging.NotificationCursor
 
 interface NotificationCursorDao {
-    suspend fun find(accountKey: MicroBlogKey, type: NotificationCursorType): NotificationCursor?
-    suspend fun add(notificationCursor: NotificationCursor)
+  suspend fun find(accountKey: MicroBlogKey, type: NotificationCursorType): NotificationCursor?
+  suspend fun add(notificationCursor: NotificationCursor)
 }

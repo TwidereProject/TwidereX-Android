@@ -30,35 +30,35 @@ import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
 
 class UnlikeStatusJob(
-    accountRepository: AccountRepository,
-    statusRepository: StatusRepository,
-    inAppNotification: InAppNotification,
+  accountRepository: AccountRepository,
+  statusRepository: StatusRepository,
+  inAppNotification: InAppNotification,
 ) : StatusJob(
-    accountRepository, statusRepository, inAppNotification
+  accountRepository, statusRepository, inAppNotification
 ) {
-    override suspend fun doWork(
-        accountKey: MicroBlogKey,
-        service: StatusService,
-        status: UiStatus
-    ): StatusResult {
-        val newStatus = service.unlike(status.statusId)
-            .toUi(accountKey = accountKey).let {
-                it.retweet ?: it
-            }
-        return StatusResult(
-            statusKey = newStatus.statusKey,
-            accountKey = accountKey,
-            liked = false,
-            retweetCount = newStatus.metrics.retweet,
-            likeCount = newStatus.metrics.like,
-        )
-    }
-    override fun fallback(
-        accountKey: MicroBlogKey,
-        status: UiStatus,
-    ) = StatusResult(
-        accountKey = accountKey,
-        statusKey = status.statusKey,
-        liked = true,
+  override suspend fun doWork(
+    accountKey: MicroBlogKey,
+    service: StatusService,
+    status: UiStatus
+  ): StatusResult {
+    val newStatus = service.unlike(status.statusId)
+      .toUi(accountKey = accountKey).let {
+        it.retweet ?: it
+      }
+    return StatusResult(
+      statusKey = newStatus.statusKey,
+      accountKey = accountKey,
+      liked = false,
+      retweetCount = newStatus.metrics.retweet,
+      likeCount = newStatus.metrics.like,
     )
+  }
+  override fun fallback(
+    accountKey: MicroBlogKey,
+    status: UiStatus,
+  ) = StatusResult(
+    accountKey = accountKey,
+    statusKey = status.statusKey,
+    liked = true,
+  )
 }

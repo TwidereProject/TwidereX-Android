@@ -28,16 +28,16 @@ import java.util.UUID
 import kotlin.test.assertEquals
 
 internal class NotificationCursorTransformTest {
-    @Test
-    fun transform() {
-        val ui = NotificationCursor(
-            accountKey = MicroBlogKey.twitter("account"),
-            _id = UUID.randomUUID().toString(),
-            type = NotificationCursorType.Mentions,
-            value = "value",
-            timestamp = System.currentTimeMillis()
-        )
-        val db = ui.toDb()
-        assertEquals(ui, db.toUi())
-    }
+  @Test
+  fun transform() {
+    val ui = NotificationCursor(
+      accountKey = MicroBlogKey.twitter("account"),
+      _id = UUID.randomUUID().toString(),
+      type = NotificationCursorType.Mentions,
+      value = "value",
+      timestamp = System.currentTimeMillis()
+    )
+    val db = ui.toDb()
+    assertEquals(ui, db.toUi())
+  }
 }

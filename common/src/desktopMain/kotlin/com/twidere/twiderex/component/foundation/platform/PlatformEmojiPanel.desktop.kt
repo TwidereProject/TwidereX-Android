@@ -37,24 +37,24 @@ import com.twidere.twiderex.model.ui.UiEmojiCategory
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 actual fun PlatformEmojiPanel(
-    items: List<UiEmojiCategory>,
-    showEmoji: Boolean,
-    onEmojiSelected: (UiEmoji) -> Unit,
+  items: List<UiEmojiCategory>,
+  showEmoji: Boolean,
+  onEmojiSelected: (UiEmoji) -> Unit,
 ) {
-    AnimatedVisibility(
-        visible = showEmoji
+  AnimatedVisibility(
+    visible = showEmoji
+  ) {
+    Box(
+      modifier = Modifier
+        .height(height = PlatformEmojiPanelDefaults.Height)
+        .fillMaxWidth(),
+      contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier = Modifier
-                .height(height = PlatformEmojiPanelDefaults.Height)
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center,
-        ) {
-            EmojiList(items = items, onEmojiSelected = onEmojiSelected)
-        }
+      EmojiList(items = items, onEmojiSelected = onEmojiSelected)
     }
+  }
 }
 
 private object PlatformEmojiPanelDefaults {
-    val Height = 200.dp
+  val Height = 200.dp
 }

@@ -28,27 +28,27 @@ import moe.tlaster.hson.annotations.HtmlSerializable
 import java.util.Date
 
 data class Status(
-    @HtmlSerializable(".media-body", ".quote-text", serializer = StatusBodySerializer::class)
-    val content: String?,
-    @HtmlSerializable(".replying-to")
-    val replyTo: String?,
-    @HtmlSerializable(".tweet-header", ".tweet-name-row")
-    val user: User?,
-    @HtmlSerializable(".tweet-date > a", attr = "title", serializer = DateSerializer::class)
-    val createdAt: Date?,
-    @HtmlSerializable(
-        ".tweet-link",
-        ".quote-link",
-        attr = "href",
-        serializer = StatusIdSerializer::class
-    )
-    val statusId: String?,
-    @HtmlSerializable(".attachment")
-    val attachments: List<Attachments>?,
-    @HtmlSerializable(".tweet-stats")
-    val stats: StatusStats? = null,
-    @HtmlSerializable(".quote")
-    val quote: Status? = null,
-    @HtmlSerializable(".tweet-body .card")
-    val card: StatusCard? = null,
+  @HtmlSerializable(".media-body", ".quote-text", serializer = StatusBodySerializer::class)
+  val content: String?,
+  @HtmlSerializable(".replying-to")
+  val replyTo: String?,
+  @HtmlSerializable(".tweet-header", ".tweet-name-row")
+  val user: User?,
+  @HtmlSerializable(".tweet-date > a", attr = "title", serializer = DateSerializer::class)
+  val createdAt: Date?,
+  @HtmlSerializable(
+    ".tweet-link",
+    ".quote-link",
+    attr = "href",
+    serializer = StatusIdSerializer::class
+  )
+  val statusId: String?,
+  @HtmlSerializable(".attachment")
+  val attachments: List<Attachments>?,
+  @HtmlSerializable(".tweet-stats")
+  val stats: StatusStats? = null,
+  @HtmlSerializable(".quote")
+  val quote: Status? = null,
+  @HtmlSerializable(".tweet-body .card")
+  val card: StatusCard? = null,
 ) : IStatus

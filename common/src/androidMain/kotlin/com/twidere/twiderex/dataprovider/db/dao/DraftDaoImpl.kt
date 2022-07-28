@@ -29,15 +29,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 internal class DraftDaoImpl(private val roomDraftDao: RoomDraftDao) : DraftDao {
-    override fun getAll(): Flow<List<UiDraft>> = roomDraftDao.getAll().map {
-        it.map { dbDraft -> dbDraft.toUiDraft() }
-    }
+  override fun getAll(): Flow<List<UiDraft>> = roomDraftDao.getAll().map {
+    it.map { dbDraft -> dbDraft.toUiDraft() }
+  }
 
-    override fun getDraftCount() = roomDraftDao.getDraftCount().map { it.toLong() }
+  override fun getDraftCount() = roomDraftDao.getDraftCount().map { it.toLong() }
 
-    override suspend fun insert(it: UiDraft) = roomDraftDao.insertAll(it.toDbDraft())
+  override suspend fun insert(it: UiDraft) = roomDraftDao.insertAll(it.toDbDraft())
 
-    override suspend fun get(draftId: String) = roomDraftDao.get(draftId)?.toUiDraft()
+  override suspend fun get(draftId: String) = roomDraftDao.get(draftId)?.toUiDraft()
 
-    override suspend fun remove(draft: UiDraft) = roomDraftDao.remove(draft.toDbDraft())
+  override suspend fun remove(draft: UiDraft) = roomDraftDao.remove(draft.toDbDraft())
 }

@@ -28,31 +28,31 @@ import androidx.work.workDataOf
 import com.twidere.twiderex.jobs.draft.RemoveDraftJob
 
 class RemoveDraftWorker(
-    appContext: Context,
-    params: WorkerParameters,
-    private val removeDraftJob: RemoveDraftJob
+  appContext: Context,
+  params: WorkerParameters,
+  private val removeDraftJob: RemoveDraftJob
 ) : CoroutineWorker(appContext, params) {
 
-    companion object {
-        fun create(draftId: String) = OneTimeWorkRequestBuilder<RemoveDraftWorker>()
-            .setInputData(
-                workDataOf(
-                    "draftId" to draftId
-                )
-            )
-            .build()
-    }
+  companion object {
+    fun create(draftId: String) = OneTimeWorkRequestBuilder<RemoveDraftWorker>()
+      .setInputData(
+        workDataOf(
+          "draftId" to draftId
+        )
+      )
+      .build()
+  }
 
-    override suspend fun doWork(): Result {
-        val draftId = inputData.getString("draftId") ?: return Result.failure()
-        return try {
-            removeDraftJob.execute(
-                draftId = draftId
-            )
-            Result.success()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            Result.failure()
-        }
+  override suspend fun doWork(): Result {
+    val draftId = inputData.getString("draftId") ?: return Result.failure()
+    return try {
+      removeDraftJob.execute(
+        draftId = draftId
+      )
+      Result.success()
+    } catch (e: Throwable) {
+      e.printStackTrace()
+      Result.failure()
     }
+  }
 }

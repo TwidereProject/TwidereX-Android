@@ -31,24 +31,24 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface RoomSearchDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(search: List<DbSearch>)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertAll(search: List<DbSearch>)
 
-    @Query("SELECT * FROM search where accountKey == :accountKey ORDER BY lastActive DESC")
-    fun getAll(accountKey: MicroBlogKey): Flow<List<DbSearch>>
+  @Query("SELECT * FROM search where accountKey == :accountKey ORDER BY lastActive DESC")
+  fun getAll(accountKey: MicroBlogKey): Flow<List<DbSearch>>
 
-    @Query("SELECT * FROM search where saved == 0 AND accountKey == :accountKey ORDER BY lastActive DESC")
-    fun getAllHistory(accountKey: MicroBlogKey): Flow<List<DbSearch>>
+  @Query("SELECT * FROM search where saved == 0 AND accountKey == :accountKey ORDER BY lastActive DESC")
+  fun getAllHistory(accountKey: MicroBlogKey): Flow<List<DbSearch>>
 
-    @Query("SELECT * FROM search where saved == 1 AND accountKey == :accountKey ORDER BY lastActive DESC")
-    fun getAllSaved(accountKey: MicroBlogKey): Flow<List<DbSearch>>
+  @Query("SELECT * FROM search where saved == 1 AND accountKey == :accountKey ORDER BY lastActive DESC")
+  fun getAllSaved(accountKey: MicroBlogKey): Flow<List<DbSearch>>
 
-    @Query("SELECT * FROM search WHERE content == :content AND accountKey == :accountKey")
-    suspend fun get(content: String, accountKey: MicroBlogKey): DbSearch?
+  @Query("SELECT * FROM search WHERE content == :content AND accountKey == :accountKey")
+  suspend fun get(content: String, accountKey: MicroBlogKey): DbSearch?
 
-    @Delete
-    suspend fun remove(search: DbSearch)
+  @Delete
+  suspend fun remove(search: DbSearch)
 
-    @Query("DELETE FROM search where saved == 0")
-    suspend fun clear()
+  @Query("DELETE FROM search where saved == 0")
+  suspend fun clear()
 }

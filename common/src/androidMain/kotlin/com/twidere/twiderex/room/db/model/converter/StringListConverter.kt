@@ -25,15 +25,15 @@ import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
 
 internal class StringListConverter {
-    @TypeConverter
-    fun fromString(value: String?): List<String>? {
-        return value?.let {
-            value.fromJson<List<String>>()
-        }
+  @TypeConverter
+  fun fromString(value: String?): List<String>? {
+    return value?.let {
+      value.fromJson<List<String>>()
     }
+  }
 
-    @TypeConverter
-    fun fromList(list: List<String>?): String? {
-        return list?.json()
-    }
+  @TypeConverter
+  fun fromList(list: List<String>?): String? {
+    return list?.json()
+  }
 }

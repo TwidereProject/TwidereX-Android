@@ -33,31 +33,31 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 
 actual class ComposeAction(
-    private val repository: AccountRepository,
-    private val saveDraftJob: SaveDraftJob,
-    private val removeDraftJob: RemoveDraftJob,
-    private val twitterComposeJob: TwitterComposeJob,
-    private val mastodonComposeJob: MastodonComposeJob,
+  private val repository: AccountRepository,
+  private val saveDraftJob: SaveDraftJob,
+  private val removeDraftJob: RemoveDraftJob,
+  private val twitterComposeJob: TwitterComposeJob,
+  private val mastodonComposeJob: MastodonComposeJob,
 ) {
 
-    private val scope = CoroutineScope(Dispatchers.IO)
+  private val scope = CoroutineScope(Dispatchers.IO)
 
-    actual fun commit(
-        data: ComposeData,
-    ) {
-        scope.launchCatching {
-            repository.activeAccount.firstOrNull()?.toUi()?.let { account ->
-                val platformType = account.platformType
-                val accountKey = account.userKey
-                saveDraftJob.execute(data)
-                when (platformType) {
-                    PlatformType.Twitter -> twitterComposeJob.execute(data, accountKey)
-                    PlatformType.StatusNet -> TODO()
-                    PlatformType.Fanfou -> TODO()
-                    PlatformType.Mastodon -> mastodonComposeJob.execute(data, accountKey)
-                }
-                removeDraftJob.execute(data.draftId)
-            }
+  actual fun commit(
+    data: ComposeData,
+  ) {
+    scope.launchCatching {
+      repository.activeAccount.firstOrNull()?.toUi()?.let { account ->
+        val platformType = account.platformType
+        val accountKey = account.userKey
+        saveDraftJob.execute(data)
+        when (platformType) {
+          PlatformType.Twitter -> twitterComposeJob.execute(data, accountKey)
+          PlatformType.StatusNet -> TODO()
+          PlatformType.Fanfou -> TODO()
+          PlatformType.Mastodon -> mastodonComposeJob.execute(data, accountKey)
         }
+        removeDraftJob.execute(data.draftId)
+      }
     }
+  }
 }

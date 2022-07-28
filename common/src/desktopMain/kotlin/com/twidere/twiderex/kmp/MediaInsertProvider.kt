@@ -25,20 +25,20 @@ import com.twidere.twiderex.model.ui.UiMediaInsert
 import java.io.File
 
 actual class MediaInsertProvider {
-    actual suspend fun provideUiMediaInsert(filePath: String): UiMediaInsert {
-        val file = File(filePath)
-        val mimeType = file.toURI().toURL().openConnection().contentType
-        val type = (mimeType ?: "image/*").let {
-            when {
-                it.startsWith("video") -> MediaType.video
-                it == "image/gif" -> MediaType.animated_gif
-                else -> MediaType.photo
-            }
-        }
-        return UiMediaInsert(
-            filePath = filePath,
-            type = type,
-            preview = filePath // TODO video file preview
-        )
+  actual suspend fun provideUiMediaInsert(filePath: String): UiMediaInsert {
+    val file = File(filePath)
+    val mimeType = file.toURI().toURL().openConnection().contentType
+    val type = (mimeType ?: "image/*").let {
+      when {
+        it.startsWith("video") -> MediaType.video
+        it == "image/gif" -> MediaType.animated_gif
+        else -> MediaType.photo
+      }
     }
+    return UiMediaInsert(
+      filePath = filePath,
+      type = type,
+      preview = filePath // TODO video file preview
+    )
+  }
 }

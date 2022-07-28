@@ -38,56 +38,56 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineViewModel
 
 class AllNotificationItem : HomeNavigationItem() {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_tabs_all)
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_tabs_all)
+  }
+
+  override val route: String
+    get() = TODO("Not yet implemented")
+
+  @Composable
+  override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_message_circle)
+
+  @Composable
+  override fun Content() {
+    val account = LocalActiveAccount.current ?: return
+    if (account.service !is NotificationService) {
+      return
     }
-
-    override val route: String
-        get() = TODO("Not yet implemented")
-
-    @Composable
-    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_message_circle)
-
-    @Composable
-    override fun Content() {
-        val account = LocalActiveAccount.current ?: return
-        if (account.service !is NotificationService) {
-            return
-        }
-        AllNotificationSceneContent(
-            lazyListController = lazyListController,
-        )
-    }
+    AllNotificationSceneContent(
+      lazyListController = lazyListController,
+    )
+  }
 }
 
 @Composable
 fun AllNotificationScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_tabs_all))
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    }
-                )
-            }
-        ) {
-            AllNotificationSceneContent()
-        }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_tabs_all))
+          },
+          navigationIcon = {
+            AppBarNavigationButton()
+          }
+        )
+      }
+    ) {
+      AllNotificationSceneContent()
     }
+  }
 }
 
 @Composable
 fun AllNotificationSceneContent(
-    lazyListController: LazyListController? = null,
+  lazyListController: LazyListController? = null,
 ) {
-    val viewModel: NotificationTimelineViewModel = getViewModel()
-    TimelineComponent(
-        viewModel = viewModel,
-        lazyListController = lazyListController,
-    )
+  val viewModel: NotificationTimelineViewModel = getViewModel()
+  TimelineComponent(
+    viewModel = viewModel,
+    lazyListController = lazyListController,
+  )
 }

@@ -25,16 +25,16 @@ import com.twidere.twiderex.component.foundation.DialogProperties
 
 @Composable
 actual fun PlatformDialog(
-    onDismissRequest: () -> Unit,
-    properties: DialogProperties,
-    content: @Composable (() -> Unit)
+  onDismissRequest: () -> Unit,
+  properties: DialogProperties,
+  content: @Composable (() -> Unit)
 ) {
-    androidx.compose.ui.window.Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = androidx.compose.ui.window.DialogProperties(
-            dismissOnBackPress = properties.dismissOnBackPress,
-            dismissOnClickOutside = properties.dismissOnClickOutside
-        ),
-        content = content,
-    )
+  androidx.compose.ui.window.Dialog(
+    onDismissRequest = onDismissRequest,
+    properties = androidx.compose.ui.window.DialogProperties(
+      dismissOnBackPress = properties.dismissOnBackPress,
+      dismissOnClickOutside = properties.dismissOnClickOutside
+    ),
+    content = content,
+  )
 }

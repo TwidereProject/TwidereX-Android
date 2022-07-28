@@ -24,13 +24,13 @@ import androidx.room.TypeConverter
 import com.twidere.twiderex.room.db.model.DbNotificationCursorType
 
 internal class NotificationCursorTypeConverter {
-    @TypeConverter
-    fun fromString(value: String?): DbNotificationCursorType? {
-        return value?.let { DbNotificationCursorType.valueOf(it) }
-    }
+  @TypeConverter
+  fun fromString(value: String?): DbNotificationCursorType? {
+    return value?.let { DbNotificationCursorType.valueOf(it) }
+  }
 
-    @TypeConverter
-    fun fromNotificationType(type: DbNotificationCursorType?): String? {
-        return type?.name
-    }
+  @TypeConverter
+  fun fromNotificationType(type: DbNotificationCursorType?): String? {
+    return type?.name
+  }
 }

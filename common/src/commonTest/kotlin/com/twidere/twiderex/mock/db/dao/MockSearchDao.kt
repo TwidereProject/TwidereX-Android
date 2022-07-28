@@ -29,48 +29,48 @@ import kotlinx.coroutines.flow.map
 import org.jetbrains.annotations.TestOnly
 
 class MockSearchDao @TestOnly constructor() : SearchDao {
-    private val fakeDb = mutableMapOf<MicroBlogKey, MutableList<UiSearch>>()
-    override suspend fun insertAll(search: List<UiSearch>) {
-        search.forEach { uiSearch ->
-            fakeDb[uiSearch.accountKey].let {
-                if (it.isNullOrEmpty()) {
-                    fakeDb[uiSearch.accountKey] = mutableListOf(uiSearch)
-                } else {
-                    it.add(uiSearch)
-                }
-            }
+  private val fakeDb = mutableMapOf<MicroBlogKey, MutableList<UiSearch>>()
+  override suspend fun insertAll(search: List<UiSearch>) {
+    search.forEach { uiSearch ->
+      fakeDb[uiSearch.accountKey].let {
+        if (it.isNullOrEmpty()) {
+          fakeDb[uiSearch.accountKey] = mutableListOf(uiSearch)
+        } else {
+          it.add(uiSearch)
         }
+      }
     }
+  }
 
-    override fun getAll(accountKey: MicroBlogKey): Flow<List<UiSearch>> {
-        return flow {
-            fakeDb[accountKey]?.toList()?.let {
-                emit(it)
-            } ?: emit(emptyList<UiSearch>())
-        }
+  override fun getAll(accountKey: MicroBlogKey): Flow<List<UiSearch>> {
+    return flow {
+      fakeDb[accountKey]?.toList()?.let {
+        emit(it)
+      } ?: emit(emptyList<UiSearch>())
     }
+  }
 
-    override fun getAllHistory(accountKey: MicroBlogKey): Flow<List<UiSearch>> {
-        return getAll(accountKey)
-            .map { it.filter { search -> !search.saved } }
-    }
+  override fun getAllHistory(accountKey: MicroBlogKey): Flow<List<UiSearch>> {
+    return getAll(accountKey)
+      .map { it.filter { search -> !search.saved } }
+  }
 
-    override fun getAllSaved(accountKey: MicroBlogKey): Flow<List<UiSearch>> {
-        return getAll(accountKey)
-            .map { it.filter { search -> search.saved } }
-    }
+  override fun getAllSaved(accountKey: MicroBlogKey): Flow<List<UiSearch>> {
+    return getAll(accountKey)
+      .map { it.filter { search -> search.saved } }
+  }
 
-    override suspend fun get(content: String, accountKey: MicroBlogKey): UiSearch? {
-        return fakeDb[accountKey]?.find {
-            it.content == content
-        }
+  override suspend fun get(content: String, accountKey: MicroBlogKey): UiSearch? {
+    return fakeDb[accountKey]?.find {
+      it.content == content
     }
+  }
 
-    override suspend fun remove(search: UiSearch) {
-        fakeDb[search.accountKey]?.removeAll { it.content == search.content }
-    }
+  override suspend fun remove(search: UiSearch) {
+    fakeDb[search.accountKey]?.removeAll { it.content == search.content }
+  }
 
-    override suspend fun clear() {
-        fakeDb.clear()
-    }
+  override suspend fun clear() {
+    fakeDb.clear()
+  }
 }

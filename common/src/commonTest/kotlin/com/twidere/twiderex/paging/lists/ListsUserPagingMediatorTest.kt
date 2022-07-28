@@ -41,30 +41,30 @@ import kotlin.test.Test
 
 @OptIn(ExperimentalPagingApi::class)
 class TestListsUserPagingMediator(
-    userKey: MicroBlogKey,
-    memoryCache: PagingMemoryCache<UiUser>
+  userKey: MicroBlogKey,
+  memoryCache: PagingMemoryCache<UiUser>
 ) : ListsUserPagingMediator(userKey, memoryCache) {
-    override suspend fun loadUsers(key: String?, count: Int): List<IUser> {
-        return TwitterPaging(
-            listOf(Account(id = "1", displayName = "x", username = "x", acct = "x")),
-            nextPage = "$key next"
-        )
-    }
+  override suspend fun loadUsers(key: String?, count: Int): List<IUser> {
+    return TwitterPaging(
+      listOf(Account(id = "1", displayName = "x", username = "x", acct = "x")),
+      nextPage = "$key next"
+    )
+  }
 
-    val nextKey get() = paging
+  val nextKey get() = paging
 }
 
 class ListsUserPagingMediatorTest {
-    @OptIn(ExperimentalPagingApi::class)
-    @Test
-    fun load_nextKeyIsCorrect() {
-        runBlocking {
-            val mediator = TestListsUserPagingMediator(MicroBlogKey.twitter("123"), PagingMemoryCache())
-            val pagingState = PagingState<Int, UiUser>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
-            mediator.load(LoadType.REFRESH, pagingState)
-            Assert.assertEquals("null next", mediator.nextKey)
-            mediator.load(LoadType.APPEND, pagingState)
-            Assert.assertEquals("null next next", mediator.nextKey)
-        }
+  @OptIn(ExperimentalPagingApi::class)
+  @Test
+  fun load_nextKeyIsCorrect() {
+    runBlocking {
+      val mediator = TestListsUserPagingMediator(MicroBlogKey.twitter("123"), PagingMemoryCache())
+      val pagingState = PagingState<Int, UiUser>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
+      mediator.load(LoadType.REFRESH, pagingState)
+      Assert.assertEquals("null next", mediator.nextKey)
+      mediator.load(LoadType.APPEND, pagingState)
+      Assert.assertEquals("null next next", mediator.nextKey)
     }
+  }
 }

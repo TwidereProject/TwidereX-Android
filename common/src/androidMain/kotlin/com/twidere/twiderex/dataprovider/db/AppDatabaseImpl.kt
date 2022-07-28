@@ -29,21 +29,21 @@ import com.twidere.twiderex.db.dao.SearchDao
 import com.twidere.twiderex.room.db.RoomAppDatabase
 
 internal class AppDatabaseImpl(private val roomDatabase: RoomAppDatabase) : AppDatabase {
-    private val draftDao = DraftDaoImpl(roomDatabase.draftDao())
-    private val searchDao = SearchDaoImpl(roomDatabase)
-    override fun draftDao(): DraftDao {
-        return draftDao
-    }
+  private val draftDao = DraftDaoImpl(roomDatabase.draftDao())
+  private val searchDao = SearchDaoImpl(roomDatabase)
+  override fun draftDao(): DraftDao {
+    return draftDao
+  }
 
-    override fun searchDao(): SearchDao {
-        return searchDao
-    }
+  override fun searchDao(): SearchDao {
+    return searchDao
+  }
 
-    override suspend fun clearAllTables() {
-        roomDatabase.clearAllTables()
-    }
+  override suspend fun clearAllTables() {
+    roomDatabase.clearAllTables()
+  }
 
-    override suspend fun <R> withTransaction(block: suspend () -> R) = roomDatabase.withTransaction {
-        block.invoke()
-    }
+  override suspend fun <R> withTransaction(block: suspend () -> R) = roomDatabase.withTransaction {
+    block.invoke()
+  }
 }

@@ -33,23 +33,23 @@ import com.twidere.twiderex.room.db.RoomAppDatabase
 import com.twidere.twiderex.room.db.RoomCacheDatabase
 
 actual class DataProvider private constructor(context: Context) {
-    // data provide functions....
-    actual companion object Factory {
-        actual fun create(): DataProvider {
-            return DataProvider(get())
-        }
+  // data provide functions....
+  actual companion object Factory {
+    actual fun create(): DataProvider {
+      return DataProvider(get())
     }
+  }
 
-    private val roomCacheDatabase = Room.databaseBuilder(context, RoomCacheDatabase::class.java, "twiderex-db")
-        .fallbackToDestructiveMigration()
-        .build()
+  private val roomCacheDatabase = Room.databaseBuilder(context, RoomCacheDatabase::class.java, "twiderex-db")
+    .fallbackToDestructiveMigration()
+    .build()
 
-    private val roomAppDatabase = Room.databaseBuilder(context, RoomAppDatabase::class.java, "twiderex-draft-db")
-        .addMigrations(AppDatabase_Migration_1_2)
-        .addMigrations(AppDatabase_Migration_2_3)
-        .build()
+  private val roomAppDatabase = Room.databaseBuilder(context, RoomAppDatabase::class.java, "twiderex-draft-db")
+    .addMigrations(AppDatabase_Migration_1_2)
+    .addMigrations(AppDatabase_Migration_2_3)
+    .build()
 
-    actual val appDatabase: AppDatabase = AppDatabaseImpl(roomAppDatabase)
+  actual val appDatabase: AppDatabase = AppDatabaseImpl(roomAppDatabase)
 
-    actual val cacheDatabase: CacheDatabase = CacheDatabaseImpl(roomCacheDatabase)
+  actual val cacheDatabase: CacheDatabase = CacheDatabaseImpl(roomCacheDatabase)
 }

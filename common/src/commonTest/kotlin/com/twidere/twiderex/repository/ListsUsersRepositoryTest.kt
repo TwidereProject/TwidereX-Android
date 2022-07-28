@@ -32,27 +32,27 @@ import kotlin.test.assertEquals
 
 internal class ListsUsersRepositoryTest {
 
-    @Test
-    fun addMembers_updateToMemoryCacheWhenSuccess() = runBlocking {
-        val memoryCache = mutableMapOf<String, PagingMemoryCache<UiUser>>()
-        val accountKey = MicroBlogKey.twitter("test")
-        val repository = ListsUsersRepository(memoryCache)
-        val user = mockIUser().toUi(accountKey)
-        repository.addMember(MockListsService(), "fake listId", user)
-        assertEquals(user.id, memoryCache["fake listId"]?.find(0, 1)?.get(0)?.id)
-    }
+  @Test
+  fun addMembers_updateToMemoryCacheWhenSuccess() = runBlocking {
+    val memoryCache = mutableMapOf<String, PagingMemoryCache<UiUser>>()
+    val accountKey = MicroBlogKey.twitter("test")
+    val repository = ListsUsersRepository(memoryCache)
+    val user = mockIUser().toUi(accountKey)
+    repository.addMember(MockListsService(), "fake listId", user)
+    assertEquals(user.id, memoryCache["fake listId"]?.find(0, 1)?.get(0)?.id)
+  }
 
-    @Test
-    fun removeMembers_updateToMemoryCacheWhenSuccess() = runBlocking {
-        val memoryCache = mutableMapOf<String, PagingMemoryCache<UiUser>>()
-        val accountKey = MicroBlogKey.twitter("test")
-        val repository = ListsUsersRepository(memoryCache)
-        val mockListsService = MockListsService()
-        val user = mockIUser().toUi(accountKey)
-        repository.addMember(mockListsService, "fake listId", user)
-        assertEquals(true, memoryCache["fake listId"]?.find(0, 1)?.isNotEmpty())
+  @Test
+  fun removeMembers_updateToMemoryCacheWhenSuccess() = runBlocking {
+    val memoryCache = mutableMapOf<String, PagingMemoryCache<UiUser>>()
+    val accountKey = MicroBlogKey.twitter("test")
+    val repository = ListsUsersRepository(memoryCache)
+    val mockListsService = MockListsService()
+    val user = mockIUser().toUi(accountKey)
+    repository.addMember(mockListsService, "fake listId", user)
+    assertEquals(true, memoryCache["fake listId"]?.find(0, 1)?.isNotEmpty())
 
-        repository.removeMember(mockListsService, "fake listId", user)
-        assertEquals(true, memoryCache["fake listId"]?.find(0, 1)?.isEmpty())
-    }
+    repository.removeMember(mockListsService, "fake listId", user)
+    assertEquals(true, memoryCache["fake listId"]?.find(0, 1)?.isEmpty())
+  }
 }

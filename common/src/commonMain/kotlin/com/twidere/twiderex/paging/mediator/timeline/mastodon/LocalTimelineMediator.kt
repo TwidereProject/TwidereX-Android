@@ -26,11 +26,11 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 
 class LocalTimelineMediator(
-    private val service: MastodonService,
-    accountKey: MicroBlogKey,
-    database: CacheDatabase,
+  private val service: MastodonService,
+  accountKey: MicroBlogKey,
+  database: CacheDatabase,
 ) : PagingWithGapMediator(accountKey, database) {
-    override val pagingKey: String = "local:$accountKey"
-    override suspend fun loadBetweenImpl(pageSize: Int, max_id: String?, since_id: String?) =
-        service.localTimeline(pageSize, max_id = max_id, since_id = since_id)
+  override val pagingKey: String = "local:$accountKey"
+  override suspend fun loadBetweenImpl(pageSize: Int, max_id: String?, since_id: String?) =
+    service.localTimeline(pageSize, max_id = max_id, since_id = since_id)
 }

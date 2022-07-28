@@ -25,18 +25,18 @@ import com.twidere.twiderex.component.foundation.platform.PlatformDialog
 
 @Composable
 fun Dialog(
-    onDismissRequest: () -> Unit,
-    properties: DialogProperties = DialogProperties(),
-    content: @Composable (() -> Unit)
+  onDismissRequest: () -> Unit,
+  properties: DialogProperties = DialogProperties(),
+  content: @Composable (() -> Unit)
 ) {
-    PlatformDialog(
-        onDismissRequest = onDismissRequest,
-        properties = properties,
-        content = content
-    )
+  PlatformDialog(
+    onDismissRequest = onDismissRequest,
+    properties = properties,
+    content = content
+  )
 }
 
 data class DialogProperties(
-    val dismissOnBackPress: Boolean = true,
-    val dismissOnClickOutside: Boolean = true
+  val dismissOnBackPress: Boolean = true,
+  val dismissOnClickOutside: Boolean = true
 )

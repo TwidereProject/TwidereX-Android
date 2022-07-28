@@ -32,41 +32,41 @@ import kotlin.test.assertNotNull
 
 internal class NotificationRepositoryTest {
 
-    @Test
-    fun notification_AddLatestNotificationCursorAfterSuccess() = runBlocking {
-        val repo = NotificationRepository(MockCacheDatabase())
-        val service = MockNotificationService()
-        val accountKey = MicroBlogKey.twitter("test")
-        var list = repo.activities(
-            accountKey = accountKey,
-            service = service
-        )
-        assertNotNull(repo.findCursor(accountKey, NotificationCursorType.General))
-        assert(list.isEmpty())
-        list = repo.activities(
-            accountKey = accountKey,
-            service = service
-        )
-        assert(list.isNotEmpty())
-        assertEquals(list.first().statusId, repo.findCursor(accountKey, NotificationCursorType.General)?.value)
-    }
+  @Test
+  fun notification_AddLatestNotificationCursorAfterSuccess() = runBlocking {
+    val repo = NotificationRepository(MockCacheDatabase())
+    val service = MockNotificationService()
+    val accountKey = MicroBlogKey.twitter("test")
+    var list = repo.activities(
+      accountKey = accountKey,
+      service = service
+    )
+    assertNotNull(repo.findCursor(accountKey, NotificationCursorType.General))
+    assert(list.isEmpty())
+    list = repo.activities(
+      accountKey = accountKey,
+      service = service
+    )
+    assert(list.isNotEmpty())
+    assertEquals(list.first().statusId, repo.findCursor(accountKey, NotificationCursorType.General)?.value)
+  }
 
-    @Test
-    fun mention_AddLatestNotificationCursorAfterSuccess() = runBlocking {
-        val repo = NotificationRepository(MockCacheDatabase())
-        val service = MockTimelineService()
-        val accountKey = MicroBlogKey.twitter("test")
-        var list = repo.activities(
-            accountKey = accountKey,
-            service = service
-        )
-        assertNotNull(repo.findCursor(accountKey, NotificationCursorType.Mentions))
-        assert(list.isEmpty())
-        list = repo.activities(
-            accountKey = accountKey,
-            service = service
-        )
-        assert(list.isNotEmpty())
-        assertEquals(list.first().statusId, repo.findCursor(accountKey, NotificationCursorType.Mentions)?.value)
-    }
+  @Test
+  fun mention_AddLatestNotificationCursorAfterSuccess() = runBlocking {
+    val repo = NotificationRepository(MockCacheDatabase())
+    val service = MockTimelineService()
+    val accountKey = MicroBlogKey.twitter("test")
+    var list = repo.activities(
+      accountKey = accountKey,
+      service = service
+    )
+    assertNotNull(repo.findCursor(accountKey, NotificationCursorType.Mentions))
+    assert(list.isEmpty())
+    list = repo.activities(
+      accountKey = accountKey,
+      service = service
+    )
+    assert(list.isNotEmpty())
+    assertEquals(list.first().statusId, repo.findCursor(accountKey, NotificationCursorType.Mentions)?.value)
+  }
 }

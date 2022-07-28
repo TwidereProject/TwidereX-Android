@@ -28,46 +28,46 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface LookupResources {
-    @GET("/2/users/{id}")
-    suspend fun lookupUser(
-        @Path(value = "id") id: String,
-        @Query("tweet.fields", encoded = true) tweetFields: String? = null,
-        @Query("user.fields", encoded = true) userFields: String? = null,
-    ): TwitterResponseV2<UserV2>
+  @GET("/2/users/{id}")
+  suspend fun lookupUser(
+    @Path(value = "id") id: String,
+    @Query("tweet.fields", encoded = true) tweetFields: String? = null,
+    @Query("user.fields", encoded = true) userFields: String? = null,
+  ): TwitterResponseV2<UserV2>
 
-    @GET("/2/users/by/username/{name}")
-    suspend fun lookupUserByName(
-        @Path(value = "name") name: String,
-        @Query("tweet.fields", encoded = true) tweetFields: String? = null,
-        @Query("user.fields", encoded = true) userFields: String? = null,
-    ): TwitterResponseV2<UserV2>
+  @GET("/2/users/by/username/{name}")
+  suspend fun lookupUserByName(
+    @Path(value = "name") name: String,
+    @Query("tweet.fields", encoded = true) tweetFields: String? = null,
+    @Query("user.fields", encoded = true) userFields: String? = null,
+  ): TwitterResponseV2<UserV2>
 
-    @GET("/2/users/by")
-    suspend fun lookupUsersByName(
-        @Query(value = "usernames") names: String,
-        @Query("tweet.fields", encoded = true) tweetFields: String? = null,
-        @Query("user.fields", encoded = true) userFields: String? = null,
-    ): TwitterResponseV2<List<UserV2>>
+  @GET("/2/users/by")
+  suspend fun lookupUsersByName(
+    @Query(value = "usernames") names: String,
+    @Query("tweet.fields", encoded = true) tweetFields: String? = null,
+    @Query("user.fields", encoded = true) userFields: String? = null,
+  ): TwitterResponseV2<List<UserV2>>
 
-    @GET("/2/tweets/{id}")
-    suspend fun lookupTweet(
-        @Path(value = "id") id: String,
-        @Query("tweet.fields", encoded = true) tweetFields: String? = null,
-        @Query("expansions", encoded = true) expansions: String? = null,
-        @Query("media.fields", encoded = true) mediaFields: String? = null,
-        @Query("place.fields", encoded = true) placeFields: String? = null,
-        @Query("poll.fields", encoded = true) pollFields: String? = null,
-        @Query("user.fields", encoded = true) userFields: String? = null,
-    ): TwitterResponseV2<StatusV2>
+  @GET("/2/tweets/{id}")
+  suspend fun lookupTweet(
+    @Path(value = "id") id: String,
+    @Query("tweet.fields", encoded = true) tweetFields: String? = null,
+    @Query("expansions", encoded = true) expansions: String? = null,
+    @Query("media.fields", encoded = true) mediaFields: String? = null,
+    @Query("place.fields", encoded = true) placeFields: String? = null,
+    @Query("poll.fields", encoded = true) pollFields: String? = null,
+    @Query("user.fields", encoded = true) userFields: String? = null,
+  ): TwitterResponseV2<StatusV2>
 
-    @GET("/2/tweets")
-    suspend fun lookupTweets(
-        @Query(value = "ids") ids: String,
-        @Query("tweet.fields", encoded = true) tweetFields: String? = null,
-        @Query("expansions", encoded = true) expansions: String? = null,
-        @Query("media.fields", encoded = true) mediaFields: String? = null,
-        @Query("place.fields", encoded = true) placeFields: String? = null,
-        @Query("poll.fields", encoded = true) pollFields: String? = null,
-        @Query("user.fields", encoded = true) userFields: String? = null,
-    ): TwitterResponseV2<List<StatusV2>>
+  @GET("/2/tweets")
+  suspend fun lookupTweets(
+    @Query(value = "ids") ids: String,
+    @Query("tweet.fields", encoded = true) tweetFields: String? = null,
+    @Query("expansions", encoded = true) expansions: String? = null,
+    @Query("media.fields", encoded = true) mediaFields: String? = null,
+    @Query("place.fields", encoded = true) placeFields: String? = null,
+    @Query("poll.fields", encoded = true) pollFields: String? = null,
+    @Query("user.fields", encoded = true) userFields: String? = null,
+  ): TwitterResponseV2<List<StatusV2>>
 }

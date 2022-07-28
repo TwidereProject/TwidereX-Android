@@ -24,33 +24,33 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class StringListColumnAdapterTest {
-    @Test
-    fun decode_splitStringWithGivenSeparator() {
-        var adapter = StringListColumnAdapter(";")
-        val originString = "a,b,c,d"
-        var list = adapter.decode(originString)
-        assertEquals(1, list.size)
-        assertEquals(originString, list.first())
-        adapter = StringListColumnAdapter(",")
-        list = adapter.decode(originString)
-        list.forEachIndexed { index, s ->
-            when (index) {
-                0 -> assertEquals("a", s)
-                1 -> assertEquals("b", s)
-                2 -> assertEquals("c", s)
-                3 -> assertEquals("d", s)
-            }
-        }
+  @Test
+  fun decode_splitStringWithGivenSeparator() {
+    var adapter = StringListColumnAdapter(";")
+    val originString = "a,b,c,d"
+    var list = adapter.decode(originString)
+    assertEquals(1, list.size)
+    assertEquals(originString, list.first())
+    adapter = StringListColumnAdapter(",")
+    list = adapter.decode(originString)
+    list.forEachIndexed { index, s ->
+      when (index) {
+        0 -> assertEquals("a", s)
+        1 -> assertEquals("b", s)
+        2 -> assertEquals("c", s)
+        3 -> assertEquals("d", s)
+      }
     }
+  }
 
-    @Test
-    fun encode_combineListContentToStringWithGivenSeparator() {
-        var adapter = StringListColumnAdapter(";")
-        val originList = listOf("a", "b", "c", "d")
-        var string = adapter.encode(originList)
-        assertEquals("a;b;c;d", string)
-        adapter = StringListColumnAdapter("|")
-        string = adapter.encode(originList)
-        assertEquals("a|b|c|d", string)
-    }
+  @Test
+  fun encode_combineListContentToStringWithGivenSeparator() {
+    var adapter = StringListColumnAdapter(";")
+    val originList = listOf("a", "b", "c", "d")
+    var string = adapter.encode(originList)
+    assertEquals("a;b;c;d", string)
+    adapter = StringListColumnAdapter("|")
+    string = adapter.encode(originList)
+    assertEquals("a|b|c|d", string)
+  }
 }

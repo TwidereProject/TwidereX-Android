@@ -36,32 +36,32 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CheckboxItem(
-    checked: Boolean,
-    onCheckedChange: ((Boolean) -> Unit)?,
-    text: String,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    colors: CheckboxColors = CheckboxDefaults.colors(),
+  checked: Boolean,
+  onCheckedChange: ((Boolean) -> Unit)?,
+  text: String,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+  colors: CheckboxColors = CheckboxDefaults.colors(),
 ) {
-    Row(
-        modifier = modifier
-            .clickable {
-                onCheckedChange?.invoke(!checked)
-            }
-    ) {
-        Checkbox(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            enabled = enabled,
-            interactionSource = interactionSource,
-            colors = colors,
-        )
-        Spacer(modifier = Modifier.width(CheckboxItemDefaults.CheckboxSpacing))
-        Text(text = text)
-    }
+  Row(
+    modifier = modifier
+      .clickable {
+        onCheckedChange?.invoke(!checked)
+      }
+  ) {
+    Checkbox(
+      checked = checked,
+      onCheckedChange = onCheckedChange,
+      enabled = enabled,
+      interactionSource = interactionSource,
+      colors = colors,
+    )
+    Spacer(modifier = Modifier.width(CheckboxItemDefaults.CheckboxSpacing))
+    Text(text = text)
+  }
 }
 
 object CheckboxItemDefaults {
-    val CheckboxSpacing = 8.dp
+  val CheckboxSpacing = 8.dp
 }

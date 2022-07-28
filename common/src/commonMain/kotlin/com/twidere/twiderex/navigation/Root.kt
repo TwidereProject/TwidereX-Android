@@ -27,155 +27,155 @@ import com.twidere.twiderex.model.enums.MediaType
 
 @AppRoute
 expect object Root {
+  val Home: String
+  val HomeTimeline: String
+  val Notification: String
+  val Mentions: String
+  val Me: String
+
+  object Draft {
+    val List: String
+
+    object Compose : IRoute {
+      operator fun invoke(draftId: String): String
+    }
+  }
+
+  object SignIn {
+    val General: String
+
+    object Twitter : IRoute {
+      operator fun invoke(consumerKey: String, consumerSecret: String): String
+    }
+
+    val Mastodon: String
+
+    object Web {
+      object Twitter : IRoute {
+        operator fun invoke(target: String): String
+      }
+    }
+  }
+
+  object User : IRoute {
+    operator fun invoke(userKey: MicroBlogKey): String
+  }
+
+  object Media {
+    object Status : IRoute {
+      operator fun invoke(statusKey: MicroBlogKey, selectedIndex: Int?): String
+    }
+
+    object Raw : IRoute {
+      operator fun invoke(type: MediaType, url: String): String
+    }
+
+    object Pure : IRoute {
+      operator fun invoke(belongToKey: MicroBlogKey, selectedIndex: Int?): String
+    }
+  }
+
+  object Search {
     val Home: String
-    val HomeTimeline: String
-    val Notification: String
-    val Mentions: String
-    val Me: String
 
-    object Draft {
-        val List: String
-
-        object Compose : IRoute {
-            operator fun invoke(draftId: String): String
-        }
+    object Result : IRoute {
+      operator fun invoke(keyword: String): String
     }
 
-    object SignIn {
-        val General: String
-
-        object Twitter : IRoute {
-            operator fun invoke(consumerKey: String, consumerSecret: String): String
-        }
-
-        val Mastodon: String
-
-        object Web {
-            object Twitter : IRoute {
-                operator fun invoke(target: String): String
-            }
-        }
+    object Input : IRoute {
+      operator fun invoke(keyword: String?): String
     }
+  }
 
-    object User : IRoute {
-        operator fun invoke(userKey: MicroBlogKey): String
-    }
-
-    object Media {
-        object Status : IRoute {
-            operator fun invoke(statusKey: MicroBlogKey, selectedIndex: Int?): String
-        }
-
-        object Raw : IRoute {
-            operator fun invoke(type: MediaType, url: String): String
-        }
-
-        object Pure : IRoute {
-            operator fun invoke(belongToKey: MicroBlogKey, selectedIndex: Int?): String
-        }
+  object Compose {
+    object Home : IRoute {
+      operator fun invoke(composeType: ComposeType?, statusKey: MicroBlogKey?): String
     }
 
     object Search {
-        val Home: String
-
-        object Result : IRoute {
-            operator fun invoke(keyword: String): String
-        }
-
-        object Input : IRoute {
-            operator fun invoke(keyword: String?): String
-        }
+      val User: String
     }
+  }
+
+  object Following : IRoute {
+    operator fun invoke(userKey: MicroBlogKey): String
+  }
+
+  object Followers : IRoute {
+    operator fun invoke(userKey: MicroBlogKey): String
+  }
+
+  object Settings {
+    val Home: String
+    val Appearance: String
+    val Display: String
+    val Storage: String
+    val About: String
+    val AccountManagement: String
+    val Misc: String
+    val Notification: String
+    val Layout: String
+
+    object AccountNotification : IRoute {
+      operator fun invoke(accountKey: MicroBlogKey): String
+    }
+  }
+
+  object Status : IRoute {
+    operator fun invoke(statusKey: MicroBlogKey): String
+  }
+
+  object Mastodon {
+    object Hashtag : IRoute {
+      operator fun invoke(keyword: String): String
+    }
+
+    val Notification: String
+    val FederatedTimeline: String
+    val LocalTimeline: String
 
     object Compose {
-        object Home : IRoute {
-            operator fun invoke(composeType: ComposeType?, statusKey: MicroBlogKey?): String
-        }
+      val Hashtag: String
+    }
+  }
 
-        object Search {
-            val User: String
-        }
+  object Lists {
+    val Home: String
+    val MastodonCreateDialog: String
+    val TwitterCreate: String
+
+    object TwitterEdit : IRoute {
+      operator fun invoke(listKey: MicroBlogKey): String
     }
 
-    object Following : IRoute {
-        operator fun invoke(userKey: MicroBlogKey): String
+    object Timeline : IRoute {
+      operator fun invoke(listKey: MicroBlogKey): String
     }
 
-    object Followers : IRoute {
-        operator fun invoke(userKey: MicroBlogKey): String
+    object Members : IRoute {
+      operator fun invoke(listKey: MicroBlogKey, owned: Boolean?): String
     }
 
-    object Settings {
-        val Home: String
-        val Appearance: String
-        val Display: String
-        val Storage: String
-        val About: String
-        val AccountManagement: String
-        val Misc: String
-        val Notification: String
-        val Layout: String
-
-        object AccountNotification : IRoute {
-            operator fun invoke(accountKey: MicroBlogKey): String
-        }
+    object Subscribers : IRoute {
+      operator fun invoke(listKey: MicroBlogKey): String
     }
 
-    object Status : IRoute {
-        operator fun invoke(statusKey: MicroBlogKey): String
+    object AddMembers : IRoute {
+      operator fun invoke(listKey: MicroBlogKey): String
+    }
+  }
+
+  object Messages {
+    val Home: String
+
+    object Conversation : IRoute {
+      operator fun invoke(conversationKey: MicroBlogKey): String
     }
 
-    object Mastodon {
-        object Hashtag : IRoute {
-            operator fun invoke(keyword: String): String
-        }
+    val NewConversation: String
+  }
 
-        val Notification: String
-        val FederatedTimeline: String
-        val LocalTimeline: String
-
-        object Compose {
-            val Hashtag: String
-        }
-    }
-
-    object Lists {
-        val Home: String
-        val MastodonCreateDialog: String
-        val TwitterCreate: String
-
-        object TwitterEdit : IRoute {
-            operator fun invoke(listKey: MicroBlogKey): String
-        }
-
-        object Timeline : IRoute {
-            operator fun invoke(listKey: MicroBlogKey): String
-        }
-
-        object Members : IRoute {
-            operator fun invoke(listKey: MicroBlogKey, owned: Boolean?): String
-        }
-
-        object Subscribers : IRoute {
-            operator fun invoke(listKey: MicroBlogKey): String
-        }
-
-        object AddMembers : IRoute {
-            operator fun invoke(listKey: MicroBlogKey): String
-        }
-    }
-
-    object Messages {
-        val Home: String
-
-        object Conversation : IRoute {
-            operator fun invoke(conversationKey: MicroBlogKey): String
-        }
-
-        val NewConversation: String
-    }
-
-    object Gif {
-        val Home: String
-    }
+  object Gif {
+    val Home: String
+  }
 }

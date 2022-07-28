@@ -32,65 +32,65 @@ import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 
 class NitterService(
-    private val host: String,
-    private val httpClientFactory: HttpClientFactory,
+  private val host: String,
+  private val httpClientFactory: HttpClientFactory,
 ) {
-    suspend fun verifyInstance(screenName: String) {
-        val target = "$host/$screenName"
-        if (request<Profile>(target) == null) throw TweetNotFoundException()
-    }
+  suspend fun verifyInstance(screenName: String) {
+    val target = "$host/$screenName"
+    if (request<Profile>(target) == null) throw TweetNotFoundException()
+  }
 
-    suspend fun conversation(
-        screenName: String,
-        statusId: String,
-        cursor: String? = null,
-    ): ConversationTimeline? {
-        val target = "$host/$screenName/status/$statusId".let {
-            if (cursor != null) {
-                it + cursor
-            } else {
-                it
-            }
+  suspend fun conversation(
+    screenName: String,
+    statusId: String,
+    cursor: String? = null,
+  ): ConversationTimeline? {
+    val target = "$host/$screenName/status/$statusId".let {
+      if (cursor != null) {
+        it + cursor
+      } else {
+        it
+      }
+    }
+    return request(target)
+  }
+
+  private suspend inline fun <reified T> request(target: String): T? {
+    return httpClientFactory.createHttpClientBuilder()
+      .addNetworkInterceptor {
+        it.proceed(it.request()).also { response ->
+          if (response.code != 200) {
+            throw MicroBlogHttpException(response.code)
+          }
         }
-        return request(target)
-    }
-
-    private suspend inline fun <reified T> request(target: String): T? {
-        return httpClientFactory.createHttpClientBuilder()
-            .addNetworkInterceptor {
-                it.proceed(it.request()).also { response ->
-                    if (response.code != 200) {
-                        throw MicroBlogHttpException(response.code)
-                    }
-                }
-            }.apply {
-                if (DEBUG) {
-                    addInterceptor(
-                        HttpLoggingInterceptor().apply {
-                            setLevel(HttpLoggingInterceptor.Level.BODY)
-                        }
-                    )
-                }
+      }.apply {
+        if (DEBUG) {
+          addInterceptor(
+            HttpLoggingInterceptor().apply {
+              setLevel(HttpLoggingInterceptor.Level.BODY)
             }
-            .build()
-            .newCall(
-                Request
-                    .Builder()
-                    .url(target)
-                    .get()
-                    .build()
-            )
-            .await()
-            .body
-            ?.string()
-            ?.also {
-                val notFound = Hson.deserializeKData<TweetNotFound>(it)
-                if (!notFound.notFound.isNullOrEmpty()) {
-                    throw TweetNotFoundException()
-                }
-            }
-            ?.let {
-                Hson.deserializeKData(it)
-            }
-    }
+          )
+        }
+      }
+      .build()
+      .newCall(
+        Request
+          .Builder()
+          .url(target)
+          .get()
+          .build()
+      )
+      .await()
+      .body
+      ?.string()
+      ?.also {
+        val notFound = Hson.deserializeKData<TweetNotFound>(it)
+        if (!notFound.notFound.isNullOrEmpty()) {
+          throw TweetNotFoundException()
+        }
+      }
+      ?.let {
+        Hson.deserializeKData(it)
+      }
+  }
 }

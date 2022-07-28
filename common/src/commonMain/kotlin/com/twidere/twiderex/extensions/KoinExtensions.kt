@@ -29,15 +29,15 @@ import org.koin.core.module.Module
 import org.koin.core.qualifier.Qualifier
 
 inline fun <reified T : ViewModel> Module.viewModel(
-    qualifier: Qualifier? = null,
-    noinline definition: Definition<T>
+  qualifier: Qualifier? = null,
+  noinline definition: Definition<T>
 ): Pair<Module, InstanceFactory<T>> {
-    return factory(qualifier, definition)
+  return factory(qualifier, definition)
 }
 
 @KoinReflectAPI
 inline fun <reified T : ViewModel> Module.viewModel(
-    qualifier: Qualifier? = null
+  qualifier: Qualifier? = null
 ): Pair<Module, InstanceFactory<T>> {
-    return factory(qualifier) { newInstance(it) }
+  return factory(qualifier) { newInstance(it) }
 }

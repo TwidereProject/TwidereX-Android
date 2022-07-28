@@ -36,39 +36,39 @@ import kotlinx.coroutines.flow.filterNotNull
 
 @Composable
 fun <T : Any> LazyUiList(
-    items: LazyPagingItems<T>,
-    empty: @Composable () -> Unit = {},
-    loading: @Composable () -> Unit = {},
-    content: @Composable () -> Unit,
+  items: LazyPagingItems<T>,
+  empty: @Composable () -> Unit = {},
+  loading: @Composable () -> Unit = {},
+  content: @Composable () -> Unit,
 ) {
-    val refresh = items.loadState.refresh
-    val event = remember(refresh) {
-        if (refresh is LoadState.Error) {
-            refresh.error.generateNotificationEvent()
-        } else {
-            null
-        }
+  val refresh = items.loadState.refresh
+  val event = remember(refresh) {
+    if (refresh is LoadState.Error) {
+      refresh.error.generateNotificationEvent()
+    } else {
+      null
     }
-    Crossfade(targetState = items.itemCount == 0) { isEmpty ->
-        if (isEmpty) {
-            Crossfade(targetState = refresh) { refresh ->
-                when (refresh) {
-                    is LoadState.NotLoading -> empty()
-                    LoadState.Loading -> loading()
-                    is LoadState.Error -> ErrorPlaceholder(event)
-                }
-            }
-        } else {
-            val inAppNotification = LocalInAppNotification.current
-            LaunchedEffect(event) {
-                snapshotFlow { event }
-                    .distinctUntilChanged()
-                    .filterNotNull()
-                    .collect {
-                        inAppNotification.show(it)
-                    }
-            }
-            content.invoke()
+  }
+  Crossfade(targetState = items.itemCount == 0) { isEmpty ->
+    if (isEmpty) {
+      Crossfade(targetState = refresh) { refresh ->
+        when (refresh) {
+          is LoadState.NotLoading -> empty()
+          LoadState.Loading -> loading()
+          is LoadState.Error -> ErrorPlaceholder(event)
         }
+      }
+    } else {
+      val inAppNotification = LocalInAppNotification.current
+      LaunchedEffect(event) {
+        snapshotFlow { event }
+          .distinctUntilChanged()
+          .filterNotNull()
+          .collect {
+            inAppNotification.show(it)
+          }
+      }
+      content.invoke()
     }
+  }
 }

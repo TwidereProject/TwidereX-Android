@@ -31,20 +31,20 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class TrendViewModel(
-    private val repository: TrendRepository,
-    private val accountRepository: AccountRepository,
+  private val repository: TrendRepository,
+  private val accountRepository: AccountRepository,
 ) : ViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val source by lazy {
-        account.flatMapLatest {
-            repository.trendsSource(
-                accountKey = it.accountKey,
-                service = it.service as TrendService
-            )
-        }.cachedIn(viewModelScope)
-    }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  val source by lazy {
+    account.flatMapLatest {
+      repository.trendsSource(
+        accountKey = it.accountKey,
+        service = it.service as TrendService
+      )
+    }.cachedIn(viewModelScope)
+  }
 }

@@ -27,13 +27,13 @@ import androidx.compose.ui.graphics.Shape
 
 @Composable
 expect fun PlatformAlertDialog(
-    onDismissRequest: () -> Unit,
-    confirmButton: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    dismissButton: @Composable (() -> Unit)? = null,
-    title: @Composable (() -> Unit)? = null,
-    text: @Composable (() -> Unit)? = null,
-    shape: Shape? = null,
-    backgroundColor: Color? = null,
-    contentColor: Color? = null,
+  onDismissRequest: () -> Unit,
+  confirmButton: @Composable () -> Unit,
+  modifier: Modifier = Modifier,
+  dismissButton: @Composable (() -> Unit)? = null,
+  title: @Composable (() -> Unit)? = null,
+  text: @Composable (() -> Unit)? = null,
+  shape: Shape? = null,
+  backgroundColor: Color? = null,
+  contentColor: Color? = null,
 )

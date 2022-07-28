@@ -25,28 +25,28 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SearchMetadataV1(
-    @SerialName("completed_in")
-    val completedIn: Double? = null,
+  @SerialName("completed_in")
+  val completedIn: Double? = null,
 
-    @SerialName("max_id")
-    val maxID: Double? = null,
+  @SerialName("max_id")
+  val maxID: Double? = null,
 
-    @SerialName("max_id_str")
-    val maxIDStr: String? = null,
+  @SerialName("max_id_str")
+  val maxIDStr: String? = null,
 
-    @SerialName("next_results")
-    val nextResults: String? = null,
+  @SerialName("next_results")
+  val nextResults: String? = null,
 
-    val query: String? = null,
+  val query: String? = null,
 
-    @SerialName("refresh_url")
-    val refreshURL: String? = null,
+  @SerialName("refresh_url")
+  val refreshURL: String? = null,
 
-    val count: Long? = null,
+  val count: Long? = null,
 
-    @SerialName("since_id")
-    val sinceID: Long? = null,
+  @SerialName("since_id")
+  val sinceID: Long? = null,
 
-    @SerialName("since_id_str")
-    val sinceIDStr: String? = null
+  @SerialName("since_id_str")
+  val sinceIDStr: String? = null
 )

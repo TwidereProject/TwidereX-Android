@@ -30,77 +30,77 @@ import com.twidere.twiderex.room.db.RoomCacheDatabase
 import com.twidere.twiderex.room.db.model.DbDMEvent.Companion.saveToDb
 
 @Entity(
-    tableName = "dm_event",
-    indices = [Index(value = ["accountKey", "conversationKey", "messageKey"], unique = true)],
+  tableName = "dm_event",
+  indices = [Index(value = ["accountKey", "conversationKey", "messageKey"], unique = true)],
 )
 internal data class DbDMEvent(
-    @PrimaryKey
-    val _id: String,
-    val accountKey: MicroBlogKey,
-    val sortId: Long,
-    // message
-    val conversationKey: MicroBlogKey,
-    val messageId: String,
-    val messageKey: MicroBlogKey,
-    // include hash tag in this parameter
-    val htmlText: String,
-    val originText: String,
-    val createdTimestamp: Long,
-    val messageType: String,
-    val senderAccountKey: MicroBlogKey,
-    val recipientAccountKey: MicroBlogKey,
-    val sendStatus: SendStatus
+  @PrimaryKey
+  val _id: String,
+  val accountKey: MicroBlogKey,
+  val sortId: Long,
+  // message
+  val conversationKey: MicroBlogKey,
+  val messageId: String,
+  val messageKey: MicroBlogKey,
+  // include hash tag in this parameter
+  val htmlText: String,
+  val originText: String,
+  val createdTimestamp: Long,
+  val messageType: String,
+  val senderAccountKey: MicroBlogKey,
+  val recipientAccountKey: MicroBlogKey,
+  val sendStatus: SendStatus
 ) {
-    val conversationUserKey: MicroBlogKey
-        get() = if (accountKey == senderAccountKey) recipientAccountKey else senderAccountKey
+  val conversationUserKey: MicroBlogKey
+    get() = if (accountKey == senderAccountKey) recipientAccountKey else senderAccountKey
 
-    companion object {
-        suspend fun List<DbDMEvent>.saveToDb(cacheDatabase: RoomCacheDatabase) {
-            cacheDatabase.directMessageDao().insertAll(this)
-        }
+  companion object {
+    suspend fun List<DbDMEvent>.saveToDb(cacheDatabase: RoomCacheDatabase) {
+      cacheDatabase.directMessageDao().insertAll(this)
     }
+  }
 
-    enum class SendStatus {
-        PENDING,
-        SUCCESS,
-        FAILED
-    }
+  enum class SendStatus {
+    PENDING,
+    SUCCESS,
+    FAILED
+  }
 }
 
 internal data class DbDMEventWithAttachments(
-    @Embedded
-    val message: DbDMEvent,
+  @Embedded
+  val message: DbDMEvent,
 
-    @Relation(parentColumn = "messageKey", entityColumn = "belongToKey", entity = DbMedia::class)
-    val media: List<DbMedia>,
+  @Relation(parentColumn = "messageKey", entityColumn = "belongToKey", entity = DbMedia::class)
+  val media: List<DbMedia>,
 
-    @Relation(parentColumn = "messageKey", entityColumn = "statusKey", entity = DbUrlEntity::class)
-    val urlEntity: List<DbUrlEntity>,
+  @Relation(parentColumn = "messageKey", entityColumn = "statusKey", entity = DbUrlEntity::class)
+  val urlEntity: List<DbUrlEntity>,
 
-    @Relation(parentColumn = "senderAccountKey", entityColumn = "userKey", entity = DbUser::class)
-    val sender: DbUser
+  @Relation(parentColumn = "senderAccountKey", entityColumn = "userKey", entity = DbUser::class)
+  val sender: DbUser
 ) {
-    companion object {
-        suspend fun List<DbDMEventWithAttachments>.saveToDb(cacheDatabase: RoomCacheDatabase) {
-            map {
-                it.message
-            }.saveToDb(cacheDatabase)
+  companion object {
+    suspend fun List<DbDMEventWithAttachments>.saveToDb(cacheDatabase: RoomCacheDatabase) {
+      map {
+        it.message
+      }.saveToDb(cacheDatabase)
 
-            cacheDatabase.mediaDao().insertAll(
-                map {
-                    it.media
-                }.flatten()
-            )
+      cacheDatabase.mediaDao().insertAll(
+        map {
+          it.media
+        }.flatten()
+      )
 
-            cacheDatabase.urlEntityDao().insertAll(
-                map {
-                    it.urlEntity
-                }.flatten()
-            )
+      cacheDatabase.urlEntityDao().insertAll(
+        map {
+          it.urlEntity
+        }.flatten()
+      )
 
-            cacheDatabase.userDao().insertAll(
-                map { it.sender }
-            )
-        }
+      cacheDatabase.userDao().insertAll(
+        map { it.sender }
+      )
     }
+  }
 }

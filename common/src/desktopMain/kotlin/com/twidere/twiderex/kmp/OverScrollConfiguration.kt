@@ -26,7 +26,7 @@ import androidx.compose.runtime.Composable
 @ExperimentalFoundationApi
 @Composable
 actual fun ProvideOverScrollConfiguration(
-    content: @Composable () -> Unit
+  content: @Composable () -> Unit
 ) {
-    content.invoke()
+  content.invoke()
 }

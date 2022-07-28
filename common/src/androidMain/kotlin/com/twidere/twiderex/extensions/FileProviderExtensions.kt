@@ -30,14 +30,14 @@ private const val PROVIDER_NAME = "com.twidere.twiderex.fileprovider"
 
 private val uriRex = Regex("[a-zA-z]+://.+")
 internal fun String.toUri(context: Context): Uri {
-    return try {
-        if (!uriRex.matches(this)) throw Error()
-        Uri.parse(this)
-    } catch (e: Throwable) {
-        file().fileProviderUri(context)
-    }
+  return try {
+    if (!uriRex.matches(this)) throw Error()
+    Uri.parse(this)
+  } catch (e: Throwable) {
+    file().fileProviderUri(context)
+  }
 }
 
 internal fun File.fileProviderUri(context: Context): Uri {
-    return FileProvider.getUriForFile(context, PROVIDER_NAME, this)
+  return FileProvider.getUriForFile(context, PROVIDER_NAME, this)
 }

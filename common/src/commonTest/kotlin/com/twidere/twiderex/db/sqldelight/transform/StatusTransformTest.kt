@@ -27,11 +27,11 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class StatusTransformTest {
-    @Test
-    fun transform() {
-        val accountKey = MicroBlogKey.twitter("account")
-        val ui = mockIStatus().toUi(accountKey = accountKey, isGap = true)
-        val db = ui.toDbStatusWithAttachments(accountKey = accountKey)
-        assertEquals(ui, db.toUi())
-    }
+  @Test
+  fun transform() {
+    val accountKey = MicroBlogKey.twitter("account")
+    val ui = mockIStatus().toUi(accountKey = accountKey, isGap = true)
+    val db = ui.toDbStatusWithAttachments(accountKey = accountKey)
+    assertEquals(ui, db.toUi())
+  }
 }

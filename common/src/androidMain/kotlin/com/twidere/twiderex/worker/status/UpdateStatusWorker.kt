@@ -34,40 +34,40 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.StatusResult
 
 class UpdateStatusWorker(
-    appContext: Context,
-    params: WorkerParameters,
-    private val updateStatusJob: UpdateStatusJob,
+  appContext: Context,
+  params: WorkerParameters,
+  private val updateStatusJob: UpdateStatusJob,
 ) : CoroutineWorker(appContext, params) {
-    companion object {
-        fun create(statusResult: StatusResult? = null) = OneTimeWorkRequestBuilder<UpdateStatusWorker>()
-            .setInputMerger(OverwritingInputMerger::class)
-            .apply {
-                statusResult?.let {
-                    setInputData(it.toWorkData())
-                }
-            }
-            .build()
-    }
+  companion object {
+    fun create(statusResult: StatusResult? = null) = OneTimeWorkRequestBuilder<UpdateStatusWorker>()
+      .setInputMerger(OverwritingInputMerger::class)
+      .apply {
+        statusResult?.let {
+          setInputData(it.toWorkData())
+        }
+      }
+      .build()
+  }
 
-    override suspend fun doWork(): Result {
-        val accountKey = inputData.getString("accountKey")?.let {
-            MicroBlogKey.valueOf(it)
-        } ?: return Result.failure()
-        val statusKey = inputData.getString("statusKey")?.let {
-            MicroBlogKey.valueOf(it)
-        } ?: return Result.failure()
-        val liked = inputData.getNullableBoolean("liked")
-        val retweeted = inputData.getNullableBoolean("retweeted")
-        val retweetCount = inputData.getNullableLong("retweetCount")
-        val likeCount = inputData.getNullableLong("likeCount")
-        updateStatusJob.execute(
-            accountKey = accountKey,
-            statusKey = statusKey,
-            liked = liked,
-            likeCount = likeCount,
-            retweeted = retweeted,
-            retweetCount = retweetCount,
-        )
-        return Result.success()
-    }
+  override suspend fun doWork(): Result {
+    val accountKey = inputData.getString("accountKey")?.let {
+      MicroBlogKey.valueOf(it)
+    } ?: return Result.failure()
+    val statusKey = inputData.getString("statusKey")?.let {
+      MicroBlogKey.valueOf(it)
+    } ?: return Result.failure()
+    val liked = inputData.getNullableBoolean("liked")
+    val retweeted = inputData.getNullableBoolean("retweeted")
+    val retweetCount = inputData.getNullableLong("retweetCount")
+    val likeCount = inputData.getNullableLong("likeCount")
+    updateStatusJob.execute(
+      accountKey = accountKey,
+      statusKey = statusKey,
+      liked = liked,
+      likeCount = likeCount,
+      retweeted = retweeted,
+      retweetCount = retweetCount,
+    )
+    return Result.success()
+  }
 }

@@ -26,5 +26,5 @@ import kotlinx.coroutines.flow.Flow
 import moe.tlaster.precompose.viewmodel.ViewModel
 
 abstract class UserListViewModel : ViewModel() {
-    abstract val source: Flow<PagingData<UiUser>>
+  abstract val source: Flow<PagingData<UiUser>>
 }

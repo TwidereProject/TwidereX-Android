@@ -27,18 +27,18 @@ import com.twidere.twiderex.model.paging.NotificationCursor
 import org.jetbrains.annotations.TestOnly
 
 internal class MockNotificationCursorDao @TestOnly constructor() : NotificationCursorDao {
-    private val fakeDb = mutableMapOf<MicroBlogKey, MutableList<NotificationCursor>>()
-    override suspend fun find(
-        accountKey: MicroBlogKey,
-        type: NotificationCursorType
-    ): NotificationCursor? {
-        return fakeDb[accountKey]?.find { it.type == type }
-    }
+  private val fakeDb = mutableMapOf<MicroBlogKey, MutableList<NotificationCursor>>()
+  override suspend fun find(
+    accountKey: MicroBlogKey,
+    type: NotificationCursorType
+  ): NotificationCursor? {
+    return fakeDb[accountKey]?.find { it.type == type }
+  }
 
-    override suspend fun add(notificationCursor: NotificationCursor) {
-        fakeDb[notificationCursor.accountKey]?.let {
-            it.removeAll { cursor -> cursor.type == cursor.type }
-            it.add(notificationCursor)
-        } ?: let { fakeDb[notificationCursor.accountKey] = mutableListOf(notificationCursor) }
-    }
+  override suspend fun add(notificationCursor: NotificationCursor) {
+    fakeDb[notificationCursor.accountKey]?.let {
+      it.removeAll { cursor -> cursor.type == cursor.type }
+      it.add(notificationCursor)
+    } ?: let { fakeDb[notificationCursor.accountKey] = mutableListOf(notificationCursor) }
+  }
 }

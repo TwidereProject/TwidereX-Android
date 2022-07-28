@@ -27,19 +27,19 @@ import com.twidere.twiderex.viewmodel.compose.VoteExpired
 import java.util.UUID
 
 data class ComposeData(
-    val content: String,
-    val images: List<String>,
-    val composeType: ComposeType,
-    val statusKey: MicroBlogKey? = null,
-    val lat: Double? = null,
-    val long: Double? = null,
-    val draftId: String = UUID.randomUUID().toString(),
-    val excludedReplyUserIds: List<String>? = null,
-    val voteOptions: List<String>? = null,
-    val voteExpired: VoteExpired? = null,
-    val voteMultiple: Boolean? = null,
-    val visibility: MastodonVisibility? = null,
-    val isSensitive: Boolean? = null,
-    val contentWarningText: String? = null,
-    val isThreadMode: Boolean = false
+  val content: String,
+  val images: List<String>,
+  val composeType: ComposeType,
+  val statusKey: MicroBlogKey? = null,
+  val lat: Double? = null,
+  val long: Double? = null,
+  val draftId: String = UUID.randomUUID().toString(),
+  val excludedReplyUserIds: List<String>? = null,
+  val voteOptions: List<String>? = null,
+  val voteExpired: VoteExpired? = null,
+  val voteMultiple: Boolean? = null,
+  val visibility: MastodonVisibility? = null,
+  val isSensitive: Boolean? = null,
+  val contentWarningText: String? = null,
+  val isThreadMode: Boolean = false
 )

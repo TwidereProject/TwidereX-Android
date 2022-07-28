@@ -28,35 +28,35 @@ import com.twidere.services.twitter.model.OAuthToken
 import com.twidere.services.utils.queryString
 
 class TwitterOAuthService(
-    private val consumerKey: String,
-    private val consumerSecret: String,
-    private val httpClientFactory: HttpClientFactory,
+  private val consumerKey: String,
+  private val consumerSecret: String,
+  private val httpClientFactory: HttpClientFactory,
 ) {
-    suspend fun getOAuthToken(
-        callback: String = "oob"
-    ): OAuthToken {
-        return httpClientFactory.createResources<TwitterOAuthResources>(
-            TwitterOAuthResources::class.java,
-            TWITTER_BASE_URL,
-            OAuth1Authorization(
-                consumerKey,
-                consumerSecret,
-            ),
-        ).requestToken(callback).queryString()
-    }
+  suspend fun getOAuthToken(
+    callback: String = "oob"
+  ): OAuthToken {
+    return httpClientFactory.createResources<TwitterOAuthResources>(
+      TwitterOAuthResources::class.java,
+      TWITTER_BASE_URL,
+      OAuth1Authorization(
+        consumerKey,
+        consumerSecret,
+      ),
+    ).requestToken(callback).queryString()
+  }
 
-    suspend fun getAccessToken(pinCode: String, token: OAuthToken): AccessToken {
-        return httpClientFactory.createResources<TwitterOAuthResources>(
-            TwitterOAuthResources::class.java,
-            TWITTER_BASE_URL,
-            OAuth1Authorization(
-                consumerKey,
-                consumerSecret,
-                token.oauth_token
-            ),
-        ).accessToken(pinCode).queryString()
-    }
+  suspend fun getAccessToken(pinCode: String, token: OAuthToken): AccessToken {
+    return httpClientFactory.createResources<TwitterOAuthResources>(
+      TwitterOAuthResources::class.java,
+      TWITTER_BASE_URL,
+      OAuth1Authorization(
+        consumerKey,
+        consumerSecret,
+        token.oauth_token
+      ),
+    ).accessToken(pinCode).queryString()
+  }
 
-    fun getWebOAuthUrl(token: OAuthToken) =
-        "https://api.twitter.com/oauth/authorize?oauth_token=${token.oauth_token}"
+  fun getWebOAuthUrl(token: OAuthToken) =
+    "https://api.twitter.com/oauth/authorize?oauth_token=${token.oauth_token}"
 }

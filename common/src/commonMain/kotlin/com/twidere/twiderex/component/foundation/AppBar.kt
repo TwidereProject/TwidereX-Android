@@ -32,20 +32,20 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun AppBar(
-    modifier: Modifier = Modifier,
-    title: @Composable () -> Unit = {},
-    navigationIcon: @Composable (() -> Unit)? = null,
-    actions: @Composable RowScope.() -> Unit = {},
-    backgroundColor: Color = MaterialTheme.colors.surface,
-    contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = AppBarDefaults.TopAppBarElevation
+  modifier: Modifier = Modifier,
+  title: @Composable () -> Unit = {},
+  navigationIcon: @Composable (() -> Unit)? = null,
+  actions: @Composable RowScope.() -> Unit = {},
+  backgroundColor: Color = MaterialTheme.colors.surface,
+  contentColor: Color = contentColorFor(backgroundColor),
+  elevation: Dp = AppBarDefaults.TopAppBarElevation
 ) {
-    TopAppBar(
-        title, modifier, navigationIcon, actions, backgroundColor, contentColor, elevation,
-    )
+  TopAppBar(
+    title, modifier, navigationIcon, actions, backgroundColor, contentColor, elevation,
+  )
 }
 
 object AppBarDefaults {
-    val TopAppBarElevation = 4.dp
-    val AppBarHeight = 56.dp
+  val TopAppBarElevation = 4.dp
+  val AppBarHeight = 56.dp
 }

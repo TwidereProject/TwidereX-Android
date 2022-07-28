@@ -39,40 +39,40 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun <T> LazyGridForIndexed(
-    modifier: Modifier = Modifier,
-    data: List<T>,
-    rowSize: Int,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    spacing: Dp = 0.dp,
-    padding: Dp = 0.dp,
-    itemContent: @Composable BoxScope.(Int, T) -> Unit,
+  modifier: Modifier = Modifier,
+  data: List<T>,
+  rowSize: Int,
+  contentPadding: PaddingValues = PaddingValues(0.dp),
+  horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+  spacing: Dp = 0.dp,
+  padding: Dp = 0.dp,
+  itemContent: @Composable BoxScope.(Int, T) -> Unit,
 ) {
-    val rows = data.windowed(rowSize, rowSize, true)
-    LazyColumn(
-        modifier = modifier,
-        contentPadding = contentPadding,
-        horizontalAlignment = horizontalAlignment,
-    ) {
-        itemsIndexed(items = rows) { index, row ->
-            Column(
-                modifier = Modifier.fillParentMaxWidth().padding(horizontal = padding)
-            ) {
-                Row {
-                    for (i in row.indices) {
-                        val item = row[i]
-                        Box(modifier = Modifier.weight(1f)) {
-                            itemContent(data.indexOf(item), item)
-                        }
-                        if (i != row.lastIndex) {
-                            Spacer(modifier = Modifier.width(spacing))
-                        }
-                    }
-                }
-                if (index != rows.lastIndex) {
-                    Spacer(modifier = Modifier.height(spacing))
-                }
+  val rows = data.windowed(rowSize, rowSize, true)
+  LazyColumn(
+    modifier = modifier,
+    contentPadding = contentPadding,
+    horizontalAlignment = horizontalAlignment,
+  ) {
+    itemsIndexed(items = rows) { index, row ->
+      Column(
+        modifier = Modifier.fillParentMaxWidth().padding(horizontal = padding)
+      ) {
+        Row {
+          for (i in row.indices) {
+            val item = row[i]
+            Box(modifier = Modifier.weight(1f)) {
+              itemContent(data.indexOf(item), item)
             }
+            if (i != row.lastIndex) {
+              Spacer(modifier = Modifier.width(spacing))
+            }
+          }
         }
+        if (index != rows.lastIndex) {
+          Spacer(modifier = Modifier.height(spacing))
+        }
+      }
     }
+  }
 }

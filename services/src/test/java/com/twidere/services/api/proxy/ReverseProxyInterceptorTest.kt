@@ -26,44 +26,44 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class ReverseProxyInterceptorTest {
-    @Test
-    fun testReplaceUrl() {
-        val format1 = "https://proxy.com/[SCHEME]/[AUTHORITY]/[PATH][?QUERY][#FRAGMENT]"
-        val format2 = "https://proxy.com/[AUTHORITY]/[PATH][?QUERY][#FRAGMENT]"
-        val format3 = "https://proxy.com/[AUTHORITY][/PATH][?QUERY][#FRAGMENT]"
-        val url1 = "https://example.com:8080/path?query=value#fragment".toHttpUrlOrNull()!!
-        val url2 = "https://example.com:8080/path?query=value".toHttpUrlOrNull()!!
-        val url3 = "https://example.com:8080/path#fragment".toHttpUrlOrNull()!!
-        val url4 = "https://example.com:8080/path".toHttpUrlOrNull()!!
-        val url5 = "https://example.com/path".toHttpUrlOrNull()!!
+  @Test
+  fun testReplaceUrl() {
+    val format1 = "https://proxy.com/[SCHEME]/[AUTHORITY]/[PATH][?QUERY][#FRAGMENT]"
+    val format2 = "https://proxy.com/[AUTHORITY]/[PATH][?QUERY][#FRAGMENT]"
+    val format3 = "https://proxy.com/[AUTHORITY][/PATH][?QUERY][#FRAGMENT]"
+    val url1 = "https://example.com:8080/path?query=value#fragment".toHttpUrlOrNull()!!
+    val url2 = "https://example.com:8080/path?query=value".toHttpUrlOrNull()!!
+    val url3 = "https://example.com:8080/path#fragment".toHttpUrlOrNull()!!
+    val url4 = "https://example.com:8080/path".toHttpUrlOrNull()!!
+    val url5 = "https://example.com/path".toHttpUrlOrNull()!!
 
-        assertEquals(
-            "https://proxy.com/https/example.com%3A8080/path?query=value#fragment",
-            ReverseProxyHandler.replaceUrl(url1, format1)
-        )
-        assertEquals(
-            "https://proxy.com/example.com%3A8080/path?query=value#fragment",
-            ReverseProxyHandler.replaceUrl(url1, format2)
-        )
-        assertEquals(
-            "https://proxy.com/example.com%3A8080/path?query=value#fragment",
-            ReverseProxyHandler.replaceUrl(url1, format3)
-        )
-        assertEquals(
-            "https://proxy.com/https/example.com%3A8080/path?query=value",
-            ReverseProxyHandler.replaceUrl(url2, format1)
-        )
-        assertEquals(
-            "https://proxy.com/https/example.com%3A8080/path#fragment",
-            ReverseProxyHandler.replaceUrl(url3, format1)
-        )
-        assertEquals(
-            "https://proxy.com/https/example.com%3A8080/path",
-            ReverseProxyHandler.replaceUrl(url4, format1)
-        )
-        assertEquals(
-            "https://proxy.com/https/example.com/path",
-            ReverseProxyHandler.replaceUrl(url5, format1)
-        )
-    }
+    assertEquals(
+      "https://proxy.com/https/example.com%3A8080/path?query=value#fragment",
+      ReverseProxyHandler.replaceUrl(url1, format1)
+    )
+    assertEquals(
+      "https://proxy.com/example.com%3A8080/path?query=value#fragment",
+      ReverseProxyHandler.replaceUrl(url1, format2)
+    )
+    assertEquals(
+      "https://proxy.com/example.com%3A8080/path?query=value#fragment",
+      ReverseProxyHandler.replaceUrl(url1, format3)
+    )
+    assertEquals(
+      "https://proxy.com/https/example.com%3A8080/path?query=value",
+      ReverseProxyHandler.replaceUrl(url2, format1)
+    )
+    assertEquals(
+      "https://proxy.com/https/example.com%3A8080/path#fragment",
+      ReverseProxyHandler.replaceUrl(url3, format1)
+    )
+    assertEquals(
+      "https://proxy.com/https/example.com%3A8080/path",
+      ReverseProxyHandler.replaceUrl(url4, format1)
+    )
+    assertEquals(
+      "https://proxy.com/https/example.com/path",
+      ReverseProxyHandler.replaceUrl(url5, format1)
+    )
+  }
 }

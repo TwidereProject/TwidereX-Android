@@ -40,72 +40,72 @@ import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 actual class AppNotificationManager(
-    private val context: Context,
-    private val notificationManagerCompat: NotificationManagerCompat
+  private val context: Context,
+  private val notificationManagerCompat: NotificationManagerCompat
 ) {
-    private val scope = CoroutineScope(Dispatchers.IO)
-    actual fun notify(notificationId: Int, appNotification: AppNotification) {
-        if (!notificationManagerCompat.areNotificationsEnabled()) {
-            return
-        }
-        scope.launch {
-            val builder = NotificationCompat.Builder(
-                context,
-                appNotification.channelId
-            ).setSmallIcon(R.drawable.ic_notification)
-                .setCategory(NotificationCompat.CATEGORY_SOCIAL)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true)
-                .setContentTitle(appNotification.title)
-                .setOngoing(appNotification.ongoing)
-                .setSilent(appNotification.silent)
-                .setProgress(
-                    appNotification.progressMax,
-                    appNotification.progress,
-                    appNotification.progressIndeterminate
-                )
-            appNotification.content?.let {
-                builder.setContentText(it)
-                    .setStyle(NotificationCompat.BigTextStyle().bigText(it))
-            }
-            appNotification.deepLink?.let {
-                builder.setContentIntent(
-                    PendingIntent.getActivity(
-                        context,
-                        0,
-                        Intent(Intent.ACTION_VIEW, Uri.parse(it)),
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            PendingIntent.FLAG_IMMUTABLE
-                        } else {
-                            PendingIntent.FLAG_UPDATE_CURRENT
-                        },
-                    )
-                )
-            }
-            appNotification.largeIcon?.let {
-                val result = context.imageLoader.execute(
-                    ImageRequest.Builder(context)
-                        .data(it)
-                        .build()
-                )
-                if (result is SuccessResult) {
-                    builder.setLargeIcon(result.drawable.toBitmap())
-                }
-            }
-            notificationManagerCompat.notify(notificationId, builder.build())
-        }
+  private val scope = CoroutineScope(Dispatchers.IO)
+  actual fun notify(notificationId: Int, appNotification: AppNotification) {
+    if (!notificationManagerCompat.areNotificationsEnabled()) {
+      return
     }
+    scope.launch {
+      val builder = NotificationCompat.Builder(
+        context,
+        appNotification.channelId
+      ).setSmallIcon(R.drawable.ic_notification)
+        .setCategory(NotificationCompat.CATEGORY_SOCIAL)
+        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        .setAutoCancel(true)
+        .setContentTitle(appNotification.title)
+        .setOngoing(appNotification.ongoing)
+        .setSilent(appNotification.silent)
+        .setProgress(
+          appNotification.progressMax,
+          appNotification.progress,
+          appNotification.progressIndeterminate
+        )
+      appNotification.content?.let {
+        builder.setContentText(it)
+          .setStyle(NotificationCompat.BigTextStyle().bigText(it))
+      }
+      appNotification.deepLink?.let {
+        builder.setContentIntent(
+          PendingIntent.getActivity(
+            context,
+            0,
+            Intent(Intent.ACTION_VIEW, Uri.parse(it)),
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+              PendingIntent.FLAG_IMMUTABLE
+            } else {
+              PendingIntent.FLAG_UPDATE_CURRENT
+            },
+          )
+        )
+      }
+      appNotification.largeIcon?.let {
+        val result = context.imageLoader.execute(
+          ImageRequest.Builder(context)
+            .data(it)
+            .build()
+        )
+        if (result is SuccessResult) {
+          builder.setLargeIcon(result.drawable.toBitmap())
+        }
+      }
+      notificationManagerCompat.notify(notificationId, builder.build())
+    }
+  }
 
-    @OptIn(ExperimentalTime::class)
-    actual fun notifyTransient(
-        notificationId: Int,
-        appNotification: AppNotification,
-        duration: Duration
-    ) {
-        notify(notificationId, appNotification)
-        scope.launch {
-            delay(duration)
-            notificationManagerCompat.cancel(notificationId)
-        }
+  @OptIn(ExperimentalTime::class)
+  actual fun notifyTransient(
+    notificationId: Int,
+    appNotification: AppNotification,
+    duration: Duration
+  ) {
+    notify(notificationId, appNotification)
+    scope.launch {
+      delay(duration)
+      notificationManagerCompat.cancel(notificationId)
     }
+  }
 }

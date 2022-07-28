@@ -30,26 +30,26 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 
 class TwidereHttpConfigProvider(
-    private val miscPreferences: DataStore<MiscPreferences>
+  private val miscPreferences: DataStore<MiscPreferences>
 ) : HttpConfigProvider {
-    override fun provideConfig(): HttpConfig {
-        return runBlocking {
-            miscPreferences.data.map {
-                HttpConfig(
-                    proxyConfig = ProxyConfig(
-                        enable = it.useProxy,
-                        server = it.proxyServer,
-                        port = it.proxyPort,
-                        userName = it.proxyUserName,
-                        password = it.proxyPassword,
-                        type = when (it.proxyType) {
-                            MiscPreferences.ProxyType.REVERSE -> ProxyConfig.Type.REVERSE
-                            MiscPreferences.ProxyType.SOCKS -> ProxyConfig.Type.SOCKS
-                            else -> ProxyConfig.Type.HTTP
-                        }
-                    )
-                )
-            }.first()
-        }
+  override fun provideConfig(): HttpConfig {
+    return runBlocking {
+      miscPreferences.data.map {
+        HttpConfig(
+          proxyConfig = ProxyConfig(
+            enable = it.useProxy,
+            server = it.proxyServer,
+            port = it.proxyPort,
+            userName = it.proxyUserName,
+            password = it.proxyPassword,
+            type = when (it.proxyType) {
+              MiscPreferences.ProxyType.REVERSE -> ProxyConfig.Type.REVERSE
+              MiscPreferences.ProxyType.SOCKS -> ProxyConfig.Type.SOCKS
+              else -> ProxyConfig.Type.HTTP
+            }
+          )
+        )
+      }.first()
     }
+  }
 }

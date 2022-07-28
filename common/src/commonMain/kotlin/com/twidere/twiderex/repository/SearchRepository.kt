@@ -32,49 +32,49 @@ import com.twidere.twiderex.paging.mediator.search.SearchMediaMediator
 import kotlinx.coroutines.flow.map
 
 class SearchRepository(
-    private val database: AppDatabase,
-    private val cacheDatabase: CacheDatabase,
+  private val database: AppDatabase,
+  private val cacheDatabase: CacheDatabase,
 ) {
-    fun searchHistory(accountKey: MicroBlogKey) = database.searchDao().getAllHistory(accountKey)
+  fun searchHistory(accountKey: MicroBlogKey) = database.searchDao().getAllHistory(accountKey)
 
-    fun savedSearch(accountKey: MicroBlogKey) = database.searchDao().getAllSaved(accountKey)
+  fun savedSearch(accountKey: MicroBlogKey) = database.searchDao().getAllSaved(accountKey)
 
-    fun media(keyword: String, accountKey: MicroBlogKey, service: SearchService) =
-        SearchMediaMediator(keyword, cacheDatabase, accountKey, service)
-            .pager()
-            .flow.map { it.map { it.status } }
-            .map {
-                it.flatMap {
-                    it.media.map { media -> media to it }
-                }
-            }
+  fun media(keyword: String, accountKey: MicroBlogKey, service: SearchService) =
+    SearchMediaMediator(keyword, cacheDatabase, accountKey, service)
+      .pager()
+      .flow.map { it.map { it.status } }
+      .map {
+        it.flatMap {
+          it.media.map { media -> media to it }
+        }
+      }
 
-    suspend fun addOrUpgrade(
-        content: String,
-        accountKey: MicroBlogKey,
-        saved: Boolean = false
-    ) {
-        val search = database.searchDao().get(content, accountKey)?.let {
-            it.copy(
-                lastActive = System.currentTimeMillis(),
-                saved = if (it.saved) it.saved else saved
-            )
-        } ?: UiSearch(
-            content = content,
-            lastActive = System.currentTimeMillis(),
-            saved = saved,
-            accountKey = accountKey
-        )
-        database.searchDao().insertAll(
-            listOf(search)
-        )
-    }
+  suspend fun addOrUpgrade(
+    content: String,
+    accountKey: MicroBlogKey,
+    saved: Boolean = false
+  ) {
+    val search = database.searchDao().get(content, accountKey)?.let {
+      it.copy(
+        lastActive = System.currentTimeMillis(),
+        saved = if (it.saved) it.saved else saved
+      )
+    } ?: UiSearch(
+      content = content,
+      lastActive = System.currentTimeMillis(),
+      saved = saved,
+      accountKey = accountKey
+    )
+    database.searchDao().insertAll(
+      listOf(search)
+    )
+  }
 
-    suspend fun remove(item: UiSearch) {
-        database.searchDao().remove(item)
-    }
+  suspend fun remove(item: UiSearch) {
+    database.searchDao().remove(item)
+  }
 
-    suspend fun get(content: String, accountKey: MicroBlogKey): UiSearch? {
-        return database.searchDao().get(content, accountKey)
-    }
+  suspend fun get(content: String, accountKey: MicroBlogKey): UiSearch? {
+    return database.searchDao().get(content, accountKey)
+  }
 }

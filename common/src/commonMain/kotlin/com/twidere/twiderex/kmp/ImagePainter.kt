@@ -29,10 +29,10 @@ import com.twidere.twiderex.component.image.ImageEffects
 
 @Composable
 internal expect fun rememberNetworkImagePainter(
-    data: Any,
-    authorization: Authorization,
-    httpConfig: HttpConfig,
-    effects: ImageEffects,
-    cacheDir: String,
-    onImageStateChanged: (NetworkImageState) -> Unit
+  data: Any,
+  authorization: Authorization,
+  httpConfig: HttpConfig,
+  effects: ImageEffects,
+  cacheDir: String,
+  onImageStateChanged: (NetworkImageState) -> Unit
 ): Painter

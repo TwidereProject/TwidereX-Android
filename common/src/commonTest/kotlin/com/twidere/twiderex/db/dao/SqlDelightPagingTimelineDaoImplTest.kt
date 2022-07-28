@@ -33,60 +33,60 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class SqlDelightPagingTimelineDaoImplTest : BaseCacheDatabaseTest() {
-    private lateinit var dao: SqlDelightPagingTimelineDaoImpl
-    private val accountKey = MicroBlogKey.twitter("account")
-    override fun setUp() {
-        super.setUp()
-        dao = SqlDelightPagingTimelineDaoImpl(
-            database = database
-        )
-    }
+  private lateinit var dao: SqlDelightPagingTimelineDaoImpl
+  private val accountKey = MicroBlogKey.twitter("account")
+  override fun setUp() {
+    super.setUp()
+    dao = SqlDelightPagingTimelineDaoImpl(
+      database = database
+    )
+  }
 
-    @Test
-    fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
-        val pagingKey = "pagingKey"
-        val list = listOf(
-            mockIStatus().toPagingTimeline(accountKey, pagingKey),
-            mockIStatus().toPagingTimeline(accountKey, pagingKey),
-            mockIStatus().toPagingTimeline(accountKey, pagingKey),
-        )
-        dao.insertAll(list.map { it.timeline })
-        list.map { it.status.toDbStatusWithAttachments(accountKey = accountKey) }
-            .saveToDb(database)
-        val pagingSource = dao.getPagingSource(
-            accountKey = accountKey,
-            pagingKey = pagingKey
-        )
-        val limit = 2
-        val result = pagingSource.load(params = PagingSource.LoadParams.Refresh(0, limit, false))
-        assert(result is PagingSource.LoadResult.Page)
-        assertEquals(limit, (result as PagingSource.LoadResult.Page).nextKey)
-        assertEquals(limit, result.data.size)
+  @Test
+  fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
+    val pagingKey = "pagingKey"
+    val list = listOf(
+      mockIStatus().toPagingTimeline(accountKey, pagingKey),
+      mockIStatus().toPagingTimeline(accountKey, pagingKey),
+      mockIStatus().toPagingTimeline(accountKey, pagingKey),
+    )
+    dao.insertAll(list.map { it.timeline })
+    list.map { it.status.toDbStatusWithAttachments(accountKey = accountKey) }
+      .saveToDb(database)
+    val pagingSource = dao.getPagingSource(
+      accountKey = accountKey,
+      pagingKey = pagingKey
+    )
+    val limit = 2
+    val result = pagingSource.load(params = PagingSource.LoadParams.Refresh(0, limit, false))
+    assert(result is PagingSource.LoadResult.Page)
+    assertEquals(limit, (result as PagingSource.LoadResult.Page).nextKey)
+    assertEquals(limit, result.data.size)
 
-        val loadMoreResult = pagingSource.load(params = PagingSource.LoadParams.Append(result.nextKey ?: 0, limit, false))
-        assert(loadMoreResult is PagingSource.LoadResult.Page)
-        assertEquals(null, (loadMoreResult as PagingSource.LoadResult.Page).nextKey)
-    }
+    val loadMoreResult = pagingSource.load(params = PagingSource.LoadParams.Append(result.nextKey ?: 0, limit, false))
+    assert(loadMoreResult is PagingSource.LoadResult.Page)
+    assertEquals(null, (loadMoreResult as PagingSource.LoadResult.Page).nextKey)
+  }
 
-    @Test
-    fun getPagingSource_pagingSourceInvalidateAfterDbUpdate() = runBlocking {
-        val pagingKey = "pagingKey"
-        val timeline = mockIStatus().toPagingTimeline(accountKey, pagingKey).timeline
-        var invalidate = false
-        dao.getPagingSource(
-            accountKey = accountKey,
-            pagingKey = pagingKey
-        ).apply {
-            registerInvalidatedCallback {
-                invalidate = true
-            }
-            load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
-        }
-        dao.insertAll(listOf(timeline))
-        val start = System.currentTimeMillis()
-        while (!invalidate && System.currentTimeMillis() - start < 3000) {
-            continue
-        }
-        assert(invalidate)
+  @Test
+  fun getPagingSource_pagingSourceInvalidateAfterDbUpdate() = runBlocking {
+    val pagingKey = "pagingKey"
+    val timeline = mockIStatus().toPagingTimeline(accountKey, pagingKey).timeline
+    var invalidate = false
+    dao.getPagingSource(
+      accountKey = accountKey,
+      pagingKey = pagingKey
+    ).apply {
+      registerInvalidatedCallback {
+        invalidate = true
+      }
+      load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
     }
+    dao.insertAll(listOf(timeline))
+    val start = System.currentTimeMillis()
+    while (!invalidate && System.currentTimeMillis() - start < 3000) {
+      continue
+    }
+    assert(invalidate)
+  }
 }

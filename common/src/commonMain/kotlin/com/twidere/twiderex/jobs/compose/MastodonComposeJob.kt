@@ -41,66 +41,66 @@ import java.io.File
 import java.net.URI
 
 class MastodonComposeJob(
-    accountRepository: AccountRepository,
-    notificationManager: AppNotificationManager,
-    exifScrambler: ExifScrambler,
-    remoteNavigator: RemoteNavigator,
-    resLoader: ResLoader,
-    private val fileResolver: FileResolver,
-    private val cacheDatabase: CacheDatabase,
+  accountRepository: AccountRepository,
+  notificationManager: AppNotificationManager,
+  exifScrambler: ExifScrambler,
+  remoteNavigator: RemoteNavigator,
+  resLoader: ResLoader,
+  private val fileResolver: FileResolver,
+  private val cacheDatabase: CacheDatabase,
 ) : ComposeJob<MastodonService>(
-    accountRepository,
-    notificationManager,
-    exifScrambler,
-    remoteNavigator,
-    resLoader,
+  accountRepository,
+  notificationManager,
+  exifScrambler,
+  remoteNavigator,
+  resLoader,
 ) {
-    override suspend fun compose(
-        service: MastodonService,
-        composeData: ComposeData,
-        accountKey: MicroBlogKey,
-        mediaIds: ArrayList<String>
-    ): UiStatus {
-        return service.compose(
-            PostStatus(
-                status = composeData.content,
-                inReplyToID = if (composeData.composeType == ComposeType.Reply || composeData.composeType == ComposeType.Thread) composeData.statusKey?.id else null,
-                mediaIDS = mediaIds,
-                sensitive = composeData.isSensitive,
-                spoilerText = composeData.contentWarningText,
-                visibility = when (composeData.visibility) {
-                    MastodonVisibility.Public, null -> Visibility.Public
-                    MastodonVisibility.Unlisted -> Visibility.Unlisted
-                    MastodonVisibility.Private -> Visibility.Private
-                    MastodonVisibility.Direct -> Visibility.Direct
-                },
-                poll = composeData.voteOptions?.let {
-                    PostPoll(
-                        options = composeData.voteOptions,
-                        expiresIn = composeData.voteExpired?.value,
-                        multiple = composeData.voteMultiple
-                    )
-                }
-            )
-        ).toUi(accountKey).also {
-            cacheDatabase.statusDao().insertAll(listOf = listOf(it), accountKey = accountKey)
+  override suspend fun compose(
+    service: MastodonService,
+    composeData: ComposeData,
+    accountKey: MicroBlogKey,
+    mediaIds: ArrayList<String>
+  ): UiStatus {
+    return service.compose(
+      PostStatus(
+        status = composeData.content,
+        inReplyToID = if (composeData.composeType == ComposeType.Reply || composeData.composeType == ComposeType.Thread) composeData.statusKey?.id else null,
+        mediaIDS = mediaIds,
+        sensitive = composeData.isSensitive,
+        spoilerText = composeData.contentWarningText,
+        visibility = when (composeData.visibility) {
+          MastodonVisibility.Public, null -> Visibility.Public
+          MastodonVisibility.Unlisted -> Visibility.Unlisted
+          MastodonVisibility.Private -> Visibility.Private
+          MastodonVisibility.Direct -> Visibility.Direct
+        },
+        poll = composeData.voteOptions?.let {
+          PostPoll(
+            options = composeData.voteOptions,
+            expiresIn = composeData.voteExpired?.value,
+            multiple = composeData.voteMultiple
+          )
         }
+      )
+    ).toUi(accountKey).also {
+      cacheDatabase.statusDao().insertAll(listOf = listOf(it), accountKey = accountKey)
     }
+  }
 
-    override suspend fun uploadImage(
-        originUri: String,
-        scramblerUri: String,
-        service: MastodonService
-    ): String? {
-        val id = fileResolver.openInputStream(scramblerUri)?.use { input ->
-            service.upload(
-                input,
-                URI.create(originUri).path?.let { File(it).name }?.takeIf { it.isNotEmpty() } ?: "file"
-            )
-        } ?: throw Error()
-        return id.id
-    }
+  override suspend fun uploadImage(
+    originUri: String,
+    scramblerUri: String,
+    service: MastodonService
+  ): String? {
+    val id = fileResolver.openInputStream(scramblerUri)?.use { input ->
+      service.upload(
+        input,
+        URI.create(originUri).path?.let { File(it).name }?.takeIf { it.isNotEmpty() } ?: "file"
+      )
+    } ?: throw Error()
+    return id.id
+  }
 
-    override val imageMaxSize: Long
-        get() = 100 * 1024 * 1024
+  override val imageMaxSize: Long
+    get() = 100 * 1024 * 1024
 }

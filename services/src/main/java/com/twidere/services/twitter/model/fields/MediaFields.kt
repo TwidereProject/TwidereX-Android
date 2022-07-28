@@ -21,12 +21,12 @@
 package com.twidere.services.twitter.model.fields
 
 enum class MediaFields {
-    duration_ms,
-    height,
-    media_key,
-    preview_image_url,
-    public_metrics,
-    type,
-    url,
-    width,
+  duration_ms,
+  height,
+  media_key,
+  preview_image_url,
+  public_metrics,
+  type,
+  url,
+  width,
 }

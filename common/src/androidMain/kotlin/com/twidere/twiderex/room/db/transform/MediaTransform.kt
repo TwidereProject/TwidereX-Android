@@ -25,32 +25,32 @@ import com.twidere.twiderex.room.db.model.DbMedia
 import java.util.UUID
 
 internal fun List<DbMedia>.toUi() = sortedBy { it.order }.map {
-    UiMedia(
-        url = it.url,
-        belongToKey = it.belongToKey,
-        mediaUrl = it.mediaUrl,
-        previewUrl = it.previewUrl,
-        type = it.type,
-        width = it.width,
-        height = it.height,
-        pageUrl = it.pageUrl,
-        altText = it.altText,
-        order = it.order,
-    )
+  UiMedia(
+    url = it.url,
+    belongToKey = it.belongToKey,
+    mediaUrl = it.mediaUrl,
+    previewUrl = it.previewUrl,
+    type = it.type,
+    width = it.width,
+    height = it.height,
+    pageUrl = it.pageUrl,
+    altText = it.altText,
+    order = it.order,
+  )
 }
 
 internal fun List<UiMedia>.toDbMedia() = map {
-    DbMedia(
-        url = it.url,
-        belongToKey = it.belongToKey,
-        mediaUrl = it.mediaUrl,
-        previewUrl = it.previewUrl?.toString(),
-        type = it.type,
-        width = it.width,
-        height = it.height,
-        pageUrl = it.pageUrl,
-        altText = it.altText,
-        order = it.order,
-        _id = UUID.randomUUID().toString(),
-    )
+  DbMedia(
+    url = it.url,
+    belongToKey = it.belongToKey,
+    mediaUrl = it.mediaUrl,
+    previewUrl = it.previewUrl?.toString(),
+    type = it.type,
+    width = it.width,
+    height = it.height,
+    pageUrl = it.pageUrl,
+    altText = it.altText,
+    order = it.order,
+    _id = UUID.randomUUID().toString(),
+  )
 }

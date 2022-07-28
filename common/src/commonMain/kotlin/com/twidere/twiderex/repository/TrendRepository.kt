@@ -30,18 +30,18 @@ import com.twidere.twiderex.paging.mediator.trend.TrendMediator.Companion.toUi
 import kotlinx.coroutines.flow.Flow
 
 class TrendRepository(private val database: CacheDatabase) {
-    private val worldWideId = "1"
+  private val worldWideId = "1"
 
-    fun trendsSource(
-        accountKey: MicroBlogKey,
-        service: TrendService,
-        locationId: String = worldWideId
-    ): Flow<PagingData<UiTrend>> {
-        return TrendMediator(
-            database = database,
-            service = service,
-            accountKey = accountKey,
-            locationId = locationId
-        ).pager().toUi()
-    }
+  fun trendsSource(
+    accountKey: MicroBlogKey,
+    service: TrendService,
+    locationId: String = worldWideId
+  ): Flow<PagingData<UiTrend>> {
+    return TrendMediator(
+      database = database,
+      service = service,
+      accountKey = accountKey,
+      locationId = locationId
+    ).pager().toUi()
+  }
 }

@@ -24,9 +24,9 @@ import com.twidere.twiderex.model.ui.UiDraft
 import kotlinx.coroutines.flow.Flow
 
 interface DraftDao {
-    fun getAll(): Flow<List<UiDraft>>
-    fun getDraftCount(): Flow<Long>
-    suspend fun insert(it: UiDraft)
-    suspend fun get(draftId: String): UiDraft?
-    suspend fun remove(draft: UiDraft)
+  fun getAll(): Flow<List<UiDraft>>
+  fun getDraftCount(): Flow<Long>
+  suspend fun insert(it: UiDraft)
+  suspend fun get(draftId: String): UiDraft?
+  suspend fun remove(draft: UiDraft)
 }

@@ -44,81 +44,81 @@ import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
 
 class HomeTimelineItem : HomeNavigationItem() {
 
-    @Composable
-    override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_timeline_title)
-    override val route: String
-        get() = Root.HomeTimeline
+  @Composable
+  override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_timeline_title)
+  override val route: String
+    get() = Root.HomeTimeline
 
-    @Composable
-    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_home)
+  @Composable
+  override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_home)
 
-    @Composable
-    override fun Content() {
-        HomeTimelineSceneContent(
-            lazyListController = lazyListController
-        )
-    }
+  @Composable
+  override fun Content() {
+    HomeTimelineSceneContent(
+      lazyListController = lazyListController
+    )
+  }
 
-    @Composable
-    override fun Fab() {
-        HomeTimelineFab()
-    }
+  @Composable
+  override fun Fab() {
+    HomeTimelineFab()
+  }
 
-    override val fabSize: Dp
-        get() = HomeTimeLineItemDefaults.FabSize
+  override val fabSize: Dp
+    get() = HomeTimeLineItemDefaults.FabSize
 }
 
 @Composable
 fun HomeTimelineScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_timeline_title))
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    }
-                )
-            },
-            floatingActionButton = {
-                HomeTimelineFab()
-            }
-        ) {
-            HomeTimelineSceneContent()
-        }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_timeline_title))
+          },
+          navigationIcon = {
+            AppBarNavigationButton()
+          }
+        )
+      },
+      floatingActionButton = {
+        HomeTimelineFab()
+      }
+    ) {
+      HomeTimelineSceneContent()
     }
+  }
 }
 
 @Composable
 private fun HomeTimelineFab() {
-    val navigator = LocalNavigator.current
-    FloatingActionButton(
-        onClick = {
-            navigator.compose(ComposeType.New)
-        }
-    ) {
-        Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_feather),
-            contentDescription = stringResource(
-                res = com.twidere.twiderex.MR.strings.accessibility_scene_home_compose
-            )
-        )
+  val navigator = LocalNavigator.current
+  FloatingActionButton(
+    onClick = {
+      navigator.compose(ComposeType.New)
     }
+  ) {
+    Icon(
+      painter = painterResource(res = com.twidere.twiderex.MR.files.ic_feather),
+      contentDescription = stringResource(
+        res = com.twidere.twiderex.MR.strings.accessibility_scene_home_compose
+      )
+    )
+  }
 }
 
 @Composable
 fun HomeTimelineSceneContent(
-    lazyListController: LazyListController? = null
+  lazyListController: LazyListController? = null
 ) {
-    val viewModel: HomeTimelineViewModel = getViewModel()
-    TimelineComponent(
-        viewModel = viewModel,
-        lazyListController = lazyListController,
-    )
+  val viewModel: HomeTimelineViewModel = getViewModel()
+  TimelineComponent(
+    viewModel = viewModel,
+    lazyListController = lazyListController,
+  )
 }
 
 private object HomeTimeLineItemDefaults {
-    val FabSize = 56.dp
+  val FabSize = 56.dp
 }

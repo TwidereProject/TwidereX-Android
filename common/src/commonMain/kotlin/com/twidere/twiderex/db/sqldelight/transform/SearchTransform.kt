@@ -24,15 +24,15 @@ import com.twidere.twiderex.model.ui.UiSearch
 import com.twidere.twiderex.sqldelight.table.Search
 
 internal fun Search.toUi() = UiSearch(
-    content = content,
-    lastActive = lastActive,
-    saved = saved,
-    accountKey = accountKey
+  content = content,
+  lastActive = lastActive,
+  saved = saved,
+  accountKey = accountKey
 )
 
 internal fun UiSearch.toDbSearch() = Search(
-    content = content,
-    lastActive = lastActive,
-    saved = saved,
-    accountKey = accountKey
+  content = content,
+  lastActive = lastActive,
+  saved = saved,
+  accountKey = accountKey
 )

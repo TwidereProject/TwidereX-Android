@@ -34,16 +34,16 @@ import com.twidere.twiderex.component.painterResource
 
 @Composable
 internal fun GifTag(modifier: Modifier = Modifier, resize: Boolean = false) {
-    Image(
-        painter = painterResource(res = MR.files.ic_gif_tag),
-        contentDescription = "gif tag",
-        modifier = if (resize) modifier else modifier.size(width = GifTagDefaults.Width, height = GifTagDefaults.Height)
-            .padding(paddingValues = GifTagDefaults.padding)
-    )
+  Image(
+    painter = painterResource(res = MR.files.ic_gif_tag),
+    contentDescription = "gif tag",
+    modifier = if (resize) modifier else modifier.size(width = GifTagDefaults.Width, height = GifTagDefaults.Height)
+      .padding(paddingValues = GifTagDefaults.padding)
+  )
 }
 
 private object GifTagDefaults {
-    val Width = 48.dp
-    val Height = 36.dp
-    val padding = PaddingValues(10.dp)
+  val Width = 48.dp
+  val Height = 36.dp
+  val padding = PaddingValues(10.dp)
 }

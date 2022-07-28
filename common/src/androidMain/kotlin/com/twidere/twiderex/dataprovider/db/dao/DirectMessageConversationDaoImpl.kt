@@ -33,36 +33,36 @@ import com.twidere.twiderex.room.db.transform.toUi
 import kotlinx.coroutines.flow.map
 
 internal class DirectMessageConversationDaoImpl(private val database: RoomCacheDatabase) : DirectMessageConversationDao {
-    override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiDMConversationWithLatestMessage> {
-        return database.directMessageConversationDao().getPagingSource(cacheDatabase = database, accountKey = accountKey)
+  override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiDMConversationWithLatestMessage> {
+    return database.directMessageConversationDao().getPagingSource(cacheDatabase = database, accountKey = accountKey)
+  }
+
+  override fun findWithConversationKeyFlow(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey
+  ) = database.directMessageConversationDao().findWithConversationKeyFlow(accountKey, conversationKey).map { it?.toUi() }
+
+  override suspend fun findWithConversationKey(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey
+  ) = database.directMessageConversationDao().findWithConversationKey(accountKey, conversationKey)?.toUi()
+
+  override suspend fun insertAll(listOf: List<UiDMConversation>) {
+    database.directMessageConversationDao().insertAll(listOf.map { it.toDbDMConversation() })
+  }
+
+  override suspend fun find(
+    accountKey: MicroBlogKey
+  ) = database.directMessageConversationDao().find(accountKey).map { it.toUi() }
+
+  override suspend fun delete(conversation: UiDMConversation) {
+    database.withTransaction {
+      database.directMessageConversationDao().findWithConversationKey(
+        accountKey = conversation.accountKey,
+        conversationKey = conversation.conversationKey
+      )?.let {
+        database.directMessageConversationDao().delete(it)
+      }
     }
-
-    override fun findWithConversationKeyFlow(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey
-    ) = database.directMessageConversationDao().findWithConversationKeyFlow(accountKey, conversationKey).map { it?.toUi() }
-
-    override suspend fun findWithConversationKey(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey
-    ) = database.directMessageConversationDao().findWithConversationKey(accountKey, conversationKey)?.toUi()
-
-    override suspend fun insertAll(listOf: List<UiDMConversation>) {
-        database.directMessageConversationDao().insertAll(listOf.map { it.toDbDMConversation() })
-    }
-
-    override suspend fun find(
-        accountKey: MicroBlogKey
-    ) = database.directMessageConversationDao().find(accountKey).map { it.toUi() }
-
-    override suspend fun delete(conversation: UiDMConversation) {
-        database.withTransaction {
-            database.directMessageConversationDao().findWithConversationKey(
-                accountKey = conversation.accountKey,
-                conversationKey = conversation.conversationKey
-            )?.let {
-                database.directMessageConversationDao().delete(it)
-            }
-        }
-    }
+  }
 }

@@ -31,13 +31,13 @@ import java.io.OutputStream
 
 @OptIn(ExperimentalSerializationApi::class)
 object DisplayPreferencesSerializer : Serializer<DisplayPreferences> {
-    override val defaultValue: DisplayPreferences
-        get() = DisplayPreferences()
+  override val defaultValue: DisplayPreferences
+    get() = DisplayPreferences()
 
-    override suspend fun readFrom(input: InputStream): DisplayPreferences {
-        return ProtoBuf.decodeFromByteArray(input.readBytes())
-    }
+  override suspend fun readFrom(input: InputStream): DisplayPreferences {
+    return ProtoBuf.decodeFromByteArray(input.readBytes())
+  }
 
-    override suspend fun writeTo(t: DisplayPreferences, output: OutputStream) =
-        output.write(ProtoBuf.encodeToByteArray(t))
+  override suspend fun writeTo(t: DisplayPreferences, output: OutputStream) =
+    output.write(ProtoBuf.encodeToByteArray(t))
 }

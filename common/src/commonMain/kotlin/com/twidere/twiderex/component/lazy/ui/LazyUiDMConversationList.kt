@@ -55,132 +55,132 @@ import com.twidere.twiderex.model.ui.UiDMEvent
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LazyUiDMConversationList(
-    modifier: Modifier = Modifier,
-    items: LazyPagingItems<UiDMConversationWithLatestMessage>,
-    state: LazyListState = rememberLazyListState(),
-    key: ((item: UiDMConversationWithLatestMessage) -> Any) = { it.conversation.conversationKey.hashCode() },
-    onItemClicked: (UiDMConversationWithLatestMessage) -> Unit = {},
-    header: LazyListScope.() -> Unit = {},
-    action: @Composable (user: UiDMConversationWithLatestMessage) -> Unit = {}
+  modifier: Modifier = Modifier,
+  items: LazyPagingItems<UiDMConversationWithLatestMessage>,
+  state: LazyListState = rememberLazyListState(),
+  key: ((item: UiDMConversationWithLatestMessage) -> Any) = { it.conversation.conversationKey.hashCode() },
+  onItemClicked: (UiDMConversationWithLatestMessage) -> Unit = {},
+  header: LazyListScope.() -> Unit = {},
+  action: @Composable (user: UiDMConversationWithLatestMessage) -> Unit = {}
 ) {
-    val resLoader = LocalResLoader.current
-    LazyUiList(items = items) {
-        LazyColumn(
-            modifier = modifier,
-            state = state,
-        ) {
-            header.invoke(this)
-            items(
-                items,
-                key = key
-            ) {
-                it?.let {
-                    Row(
-                        modifier = Modifier.clickable {
-                            onItemClicked.invoke(it)
-                        },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        ListItem(
-                            modifier = Modifier.weight(1f),
-                            icon = {
-                                RoundAvatar(
-                                    avatar = it.conversation.conversationAvatar,
-                                    onClick = {
-                                        onItemClicked(it)
-                                    }
-                                )
-                            },
-                            text = {
-                                Row {
-                                    UserName(userName = it.conversation.conversationName)
-                                    Spacer(
-                                        modifier = Modifier.width(
-                                            LazyUiDMConversationListDefaults.HorizontalPadding
-                                        )
-                                    )
-                                    UserScreenName(name = it.conversation.conversationSubName)
-                                }
-                            },
-                            secondaryText = {
-                                HtmlText(
-                                    htmlText = it.latestMessage.htmlText,
-                                    maxLines = 1,
-                                    linkResolver = { href ->
-                                        it.latestMessage.resolveLink(
-                                            href,
-                                            resLoader
-                                        )
-                                    },
-                                )
-                            },
-                        )
-                        Box(modifier = Modifier.padding(end = LazyUiDMConversationListDefaults.TrailingRightPadding)) {
-                            action.invoke(it)
-                        }
-                    }
-                } ?: run {
-                    LoadingUserPlaceholder()
+  val resLoader = LocalResLoader.current
+  LazyUiList(items = items) {
+    LazyColumn(
+      modifier = modifier,
+      state = state,
+    ) {
+      header.invoke(this)
+      items(
+        items,
+        key = key
+      ) {
+        it?.let {
+          Row(
+            modifier = Modifier.clickable {
+              onItemClicked.invoke(it)
+            },
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            ListItem(
+              modifier = Modifier.weight(1f),
+              icon = {
+                RoundAvatar(
+                  avatar = it.conversation.conversationAvatar,
+                  onClick = {
+                    onItemClicked(it)
+                  }
+                )
+              },
+              text = {
+                Row {
+                  UserName(userName = it.conversation.conversationName)
+                  Spacer(
+                    modifier = Modifier.width(
+                      LazyUiDMConversationListDefaults.HorizontalPadding
+                    )
+                  )
+                  UserScreenName(name = it.conversation.conversationSubName)
                 }
+              },
+              secondaryText = {
+                HtmlText(
+                  htmlText = it.latestMessage.htmlText,
+                  maxLines = 1,
+                  linkResolver = { href ->
+                    it.latestMessage.resolveLink(
+                      href,
+                      resLoader
+                    )
+                  },
+                )
+              },
+            )
+            Box(modifier = Modifier.padding(end = LazyUiDMConversationListDefaults.TrailingRightPadding)) {
+              action.invoke(it)
             }
-            loadState(items.loadState.append) {
-                items.retry()
-            }
+          }
+        } ?: run {
+          LoadingUserPlaceholder()
         }
+      }
+      loadState(items.loadState.append) {
+        items.retry()
+      }
     }
+  }
 }
 
 object LazyUiDMConversationListDefaults {
-    val HorizontalPadding = 8.dp
-    val TrailingRightPadding = 16.dp
+  val HorizontalPadding = 8.dp
+  val TrailingRightPadding = 16.dp
 }
 
 @Composable
 private fun LoadingUserPlaceholder() {
-    Column(
-        modifier = Modifier
-            .wrapContentHeight(
-                align = Alignment.Top,
-                unbounded = true
-            )
-    ) {
-        repeat(10) {
-            UiUserPlaceholder(
-                delayMillis = it * 50L
-            )
-        }
+  Column(
+    modifier = Modifier
+      .wrapContentHeight(
+        align = Alignment.Top,
+        unbounded = true
+      )
+  ) {
+    repeat(10) {
+      UiUserPlaceholder(
+        delayMillis = it * 50L
+      )
     }
+  }
 }
 
 private fun UiDMEvent.resolveLink(
-    href: String,
-    resLoader: ResLoader,
+  href: String,
+  resLoader: ResLoader,
 ): ResolvedLink {
-    val entity = urlEntity.firstOrNull { it.url == href }
-    val media = media.firstOrNull { it.url == href }
-    return when {
-        media != null -> {
-            ResolvedLink(
-                expanded = "[${media.type.name}]",
-                clickable = false
-            )
-        }
-        entity != null -> {
-            if (entity.displayUrl.contains("pic.twitter.com")) {
-                ResolvedLink(
-                    expanded = resLoader.getString(com.twidere.twiderex.MR.strings.scene_messages_expanded_photo),
-                    clickable = false
-                )
-            } else {
-                ResolvedLink(
-                    expanded = entity.expandedUrl,
-                    display = entity.displayUrl,
-                    clickable = false
-                )
-            }
-        }
-        else -> {
-            ResolvedLink(expanded = null, clickable = false)
-        }
+  val entity = urlEntity.firstOrNull { it.url == href }
+  val media = media.firstOrNull { it.url == href }
+  return when {
+    media != null -> {
+      ResolvedLink(
+        expanded = "[${media.type.name}]",
+        clickable = false
+      )
     }
+    entity != null -> {
+      if (entity.displayUrl.contains("pic.twitter.com")) {
+        ResolvedLink(
+          expanded = resLoader.getString(com.twidere.twiderex.MR.strings.scene_messages_expanded_photo),
+          clickable = false
+        )
+      } else {
+        ResolvedLink(
+          expanded = entity.expandedUrl,
+          display = entity.displayUrl,
+          clickable = false
+        )
+      }
+    }
+    else -> {
+      ResolvedLink(expanded = null, clickable = false)
+    }
+  }
 }

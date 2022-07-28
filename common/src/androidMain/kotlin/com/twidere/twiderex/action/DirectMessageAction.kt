@@ -28,28 +28,28 @@ import com.twidere.twiderex.worker.dm.DirectMessageDeleteWorker
 import com.twidere.twiderex.worker.dm.TwitterDirectMessageSendWorker
 
 actual class DirectMessageAction(
-    private val workManager: WorkManager,
+  private val workManager: WorkManager,
 ) {
-    actual fun send(
-        platformType: PlatformType,
-        data: DirectMessageSendData,
-    ) {
-        if (platformType == PlatformType.Twitter) {
-            val worker = TwitterDirectMessageSendWorker.create(
-                data = data,
-            )
-            workManager
-                .beginWith(worker)
-                .enqueue()
-        }
+  actual fun send(
+    platformType: PlatformType,
+    data: DirectMessageSendData,
+  ) {
+    if (platformType == PlatformType.Twitter) {
+      val worker = TwitterDirectMessageSendWorker.create(
+        data = data,
+      )
+      workManager
+        .beginWith(worker)
+        .enqueue()
     }
+  }
 
-    actual fun delete(
-        data: DirectMessageDeleteData
-    ) {
-        val worker = DirectMessageDeleteWorker.createWorker(deleteData = data)
-        workManager
-            .beginWith(worker)
-            .enqueue()
-    }
+  actual fun delete(
+    data: DirectMessageDeleteData
+  ) {
+    val worker = DirectMessageDeleteWorker.createWorker(deleteData = data)
+    workManager
+      .beginWith(worker)
+      .enqueue()
+  }
 }

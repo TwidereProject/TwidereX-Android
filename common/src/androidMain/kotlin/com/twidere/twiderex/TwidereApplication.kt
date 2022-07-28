@@ -29,13 +29,13 @@ import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 
 abstract class TwidereApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        startKoin {
-            androidLogger(Level.NONE)
-            androidContext(this@TwidereApplication)
-            workManagerFactory()
-            setupModules()
-        }
+  override fun onCreate() {
+    super.onCreate()
+    startKoin {
+      androidLogger(Level.NONE)
+      androidContext(this@TwidereApplication)
+      workManagerFactory()
+      setupModules()
     }
+  }
 }

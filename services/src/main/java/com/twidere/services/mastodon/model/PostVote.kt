@@ -24,5 +24,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PostVote(
-    val choices: List<String>,
+  val choices: List<String>,
 )

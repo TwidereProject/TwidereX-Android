@@ -27,7 +27,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 actual fun AccountNotificationChannelDetail(
-    enabled: Boolean,
-    accountKey: MicroBlogKey,
+  enabled: Boolean,
+  accountKey: MicroBlogKey,
 ) {
 }

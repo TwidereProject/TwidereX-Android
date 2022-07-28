@@ -46,15 +46,15 @@ import kotlin.math.withSign
  */
 @Composable
 fun rememberNestedScrollViewState(): NestedScrollViewState {
-    val scope = rememberCoroutineScope()
-    val saver = remember {
-        NestedScrollViewState.Saver(scope = scope)
-    }
-    return rememberSaveable(
-        saver = saver
-    ) {
-        NestedScrollViewState(scope = scope)
-    }
+  val scope = rememberCoroutineScope()
+  val saver = remember {
+    NestedScrollViewState.Saver(scope = scope)
+  }
+  return rememberSaveable(
+    saver = saver
+  ) {
+    NestedScrollViewState(scope = scope)
+  }
 }
 
 /**
@@ -64,135 +64,135 @@ fun rememberNestedScrollViewState(): NestedScrollViewState {
  */
 @Stable
 class NestedScrollViewState(
-    private val scope: CoroutineScope,
-    initialOffset: Float = 0f,
-    initialMaxOffset: Float = 0f,
+  private val scope: CoroutineScope,
+  initialOffset: Float = 0f,
+  initialMaxOffset: Float = 0f,
 ) {
-    companion object {
-        fun Saver(
-            scope: CoroutineScope,
-        ): Saver<NestedScrollViewState, *> = listSaver(
-            save = {
-                listOf(it.offset, it._maxOffset.value)
-            },
-            restore = {
-                NestedScrollViewState(
-                    scope = scope,
-                    initialOffset = it[0],
-                    initialMaxOffset = it[1],
-                )
-            }
+  companion object {
+    fun Saver(
+      scope: CoroutineScope,
+    ): Saver<NestedScrollViewState, *> = listSaver(
+      save = {
+        listOf(it.offset, it._maxOffset.value)
+      },
+      restore = {
+        NestedScrollViewState(
+          scope = scope,
+          initialOffset = it[0],
+          initialMaxOffset = it[1],
         )
+      }
+    )
+  }
+
+  /**
+   * The maximum value for [NestedScrollView] Content to translate
+   */
+  @get:FloatRange(from = 0.0)
+  val maxOffset: Float
+    get() = _maxOffset.value.absoluteValue
+
+  /**
+   * The current value for [NestedScrollView] Content translate
+   */
+  @get:FloatRange(from = 0.0)
+  val offset: Float
+    get() = _offset.value
+
+  var lastPreScroll: Float = 0f
+
+  var shouldFling = true
+
+  internal val nestedScrollConnectionHolder = object : NestedScrollConnection {
+    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+      lastPreScroll = available.y
+      return takeIf {
+        available.y < 0 && source == NestedScrollSource.Drag
+      }?.let {
+        Offset(0f, drag(available.y))
+      } ?: Offset.Zero
     }
 
-    /**
-     * The maximum value for [NestedScrollView] Content to translate
-     */
-    @get:FloatRange(from = 0.0)
-    val maxOffset: Float
-        get() = _maxOffset.value.absoluteValue
-
-    /**
-     * The current value for [NestedScrollView] Content translate
-     */
-    @get:FloatRange(from = 0.0)
-    val offset: Float
-        get() = _offset.value
-
-    var lastPreScroll: Float = 0f
-
-    var shouldFling = true
-
-    internal val nestedScrollConnectionHolder = object : NestedScrollConnection {
-        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-            lastPreScroll = available.y
-            return takeIf {
-                available.y < 0 && source == NestedScrollSource.Drag
-            }?.let {
-                Offset(0f, drag(available.y))
-            } ?: Offset.Zero
-        }
-
-        override fun onPostScroll(
-            consumed: Offset,
-            available: Offset,
-            source: NestedScrollSource
-        ): Offset {
-            return takeIf {
-                available.y > 0 && source == NestedScrollSource.Drag
-            }?.let {
-                Offset(0f, drag(available.y))
-            } ?: Offset.Zero
-        }
-
-        private fun delayFling() {
-            shouldFling = false
-            scope.launch {
-                delay(100)
-                shouldFling = true
-            }
-        }
-
-        override suspend fun onPreFling(available: Velocity): Velocity {
-            // FIXME: 2021/4/1 Temp workaround for https://github.com/TwidereProject/TwidereX-Android/issues/468
-            if (lastPreScroll < 0 && available.y > 0) {
-                delayFling()
-            }
-            return Velocity(0f, fling(available.y))
-        }
-
-        override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-            return Velocity(0f, fling(available.y))
-        }
+    override fun onPostScroll(
+      consumed: Offset,
+      available: Offset,
+      source: NestedScrollSource
+    ): Offset {
+      return takeIf {
+        available.y > 0 && source == NestedScrollSource.Drag
+      }?.let {
+        Offset(0f, drag(available.y))
+      } ?: Offset.Zero
     }
 
-    private var changes = 0f
-    private var _offset = Animatable(initialOffset)
-    private val _maxOffset = mutableStateOf(initialMaxOffset)
-
-    private suspend fun snapTo(value: Float) {
-        _offset.snapTo(value)
+    private fun delayFling() {
+      shouldFling = false
+      scope.launch {
+        delay(100)
+        shouldFling = true
+      }
     }
 
-    internal suspend fun fling(velocity: Float): Float {
-        if (!shouldFling) {
-            return velocity
-        }
-        if (velocity == 0f || velocity > 0 && offset == 0f) {
-            return velocity
-        }
-        val realVelocity = velocity.withSign(changes)
-        changes = 0f
-        return if (offset > _maxOffset.value && offset <= 0) {
-            _offset.animateDecay(
-                realVelocity,
-                exponentialDecay()
-            ).endState.velocity.let {
-                if (offset == 0f) {
-                    velocity
-                } else {
-                    it
-                }
-            }
+    override suspend fun onPreFling(available: Velocity): Velocity {
+      // FIXME: 2021/4/1 Temp workaround for https://github.com/TwidereProject/TwidereX-Android/issues/468
+      if (lastPreScroll < 0 && available.y > 0) {
+        delayFling()
+      }
+      return Velocity(0f, fling(available.y))
+    }
+
+    override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+      return Velocity(0f, fling(available.y))
+    }
+  }
+
+  private var changes = 0f
+  private var _offset = Animatable(initialOffset)
+  private val _maxOffset = mutableStateOf(initialMaxOffset)
+
+  private suspend fun snapTo(value: Float) {
+    _offset.snapTo(value)
+  }
+
+  internal suspend fun fling(velocity: Float): Float {
+    if (!shouldFling) {
+      return velocity
+    }
+    if (velocity == 0f || velocity > 0 && offset == 0f) {
+      return velocity
+    }
+    val realVelocity = velocity.withSign(changes)
+    changes = 0f
+    return if (offset > _maxOffset.value && offset <= 0) {
+      _offset.animateDecay(
+        realVelocity,
+        exponentialDecay()
+      ).endState.velocity.let {
+        if (offset == 0f) {
+          velocity
         } else {
-            0f
+          it
         }
+      }
+    } else {
+      0f
     }
+  }
 
-    internal fun drag(delta: Float): Float {
-        return if (delta < 0 && offset > _maxOffset.value || delta > 0 && offset < 0f) {
-            changes = delta
-            scope.launch {
-                snapTo((offset + delta).coerceIn(_maxOffset.value, 0f))
-            }
-            delta
-        } else {
-            0f
-        }
+  internal fun drag(delta: Float): Float {
+    return if (delta < 0 && offset > _maxOffset.value || delta > 0 && offset < 0f) {
+      changes = delta
+      scope.launch {
+        snapTo((offset + delta).coerceIn(_maxOffset.value, 0f))
+      }
+      delta
+    } else {
+      0f
     }
+  }
 
-    internal fun updateBounds(maxOffset: Float) {
-        _maxOffset.value = maxOffset
-        _offset.updateBounds(maxOffset, 0f)
-    }
+  internal fun updateBounds(maxOffset: Float) {
+    _maxOffset.value = maxOffset
+    _offset.updateBounds(maxOffset, 0f)
+  }
 }

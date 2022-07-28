@@ -35,28 +35,28 @@ import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
 import org.koin.core.parameter.parametersOf
 
 class TwitterSearchMediaItem : SearchSceneItem {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_search_tabs_media)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_search_tabs_media)
+  }
 
-    @Composable
-    override fun Content(keyword: String) {
-        val viewModel: TwitterSearchMediaViewModel = getViewModel {
-            parametersOf(keyword)
-        }
-        val source = viewModel.source.collectAsLazyPagingItems()
-        CompositionLocalProvider(
-            LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
-        ) {
-            SwipeToRefreshLayout(
-                refreshingState = source.loadState.refresh is LoadState.Loading,
-                onRefresh = {
-                    source.refreshOrRetry()
-                }
-            ) {
-                LazyUiStatusImageList(items = source)
-            }
-        }
+  @Composable
+  override fun Content(keyword: String) {
+    val viewModel: TwitterSearchMediaViewModel = getViewModel {
+      parametersOf(keyword)
     }
+    val source = viewModel.source.collectAsLazyPagingItems()
+    CompositionLocalProvider(
+      LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
+    ) {
+      SwipeToRefreshLayout(
+        refreshingState = source.loadState.refresh is LoadState.Loading,
+        onRefresh = {
+          source.refreshOrRetry()
+        }
+      ) {
+        LazyUiStatusImageList(items = source)
+      }
+    }
+  }
 }

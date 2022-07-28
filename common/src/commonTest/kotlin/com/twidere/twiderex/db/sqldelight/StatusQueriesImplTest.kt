@@ -31,21 +31,21 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 internal class StatusQueriesImplTest : BaseCacheDatabaseTest() {
-    @Test
-    fun findWithStatusKey() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("account")
-        val status = mockIStatus().toUi(accountKey = accountKey)
-        database.statusQueries.insert(status.toDbStatusWithAttachments(accountKey).status)
-        assertEquals(status.statusKey, database.statusQueries.findWithStatusKey(statusKey = status.statusKey).executeAsOneOrNull()?.statusKey)
-    }
+  @Test
+  fun findWithStatusKey() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("account")
+    val status = mockIStatus().toUi(accountKey = accountKey)
+    database.statusQueries.insert(status.toDbStatusWithAttachments(accountKey).status)
+    assertEquals(status.statusKey, database.statusQueries.findWithStatusKey(statusKey = status.statusKey).executeAsOneOrNull()?.statusKey)
+  }
 
-    @Test
-    fun delete_WithGivenStatusKey() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("account")
-        val status = mockIStatus().toUi(accountKey = accountKey)
-        database.statusQueries.insert(status.toDbStatusWithAttachments(accountKey).status)
-        assertEquals(status.statusKey, database.statusQueries.findWithStatusKey(statusKey = status.statusKey).executeAsOneOrNull()?.statusKey)
-        database.statusQueries.delete(status.statusKey)
-        assertNull(database.statusQueries.findWithStatusKey(statusKey = status.statusKey).executeAsOneOrNull())
-    }
+  @Test
+  fun delete_WithGivenStatusKey() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("account")
+    val status = mockIStatus().toUi(accountKey = accountKey)
+    database.statusQueries.insert(status.toDbStatusWithAttachments(accountKey).status)
+    assertEquals(status.statusKey, database.statusQueries.findWithStatusKey(statusKey = status.statusKey).executeAsOneOrNull()?.statusKey)
+    database.statusQueries.delete(status.statusKey)
+    assertNull(database.statusQueries.findWithStatusKey(statusKey = status.statusKey).executeAsOneOrNull())
+  }
 }

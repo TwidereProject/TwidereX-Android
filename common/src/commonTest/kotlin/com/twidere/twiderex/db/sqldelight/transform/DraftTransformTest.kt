@@ -29,18 +29,18 @@ import kotlin.test.assertEquals
 
 internal class DraftTransformTest {
 
-    @Test
-    fun transform() {
-        val uiDraft = UiDraft(
-            draftId = UUID.randomUUID().toString(),
-            content = "draft",
-            media = listOf("media"),
-            createdAt = System.currentTimeMillis(),
-            composeType = ComposeType.New,
-            statusKey = MicroBlogKey.valueOf("status"),
-            excludedReplyUserIds = listOf("userId")
-        )
-        val draft = uiDraft.toDbDraft()
-        assertEquals(uiDraft, draft.toUi())
-    }
+  @Test
+  fun transform() {
+    val uiDraft = UiDraft(
+      draftId = UUID.randomUUID().toString(),
+      content = "draft",
+      media = listOf("media"),
+      createdAt = System.currentTimeMillis(),
+      composeType = ComposeType.New,
+      statusKey = MicroBlogKey.valueOf("status"),
+      excludedReplyUserIds = listOf("userId")
+    )
+    val draft = uiDraft.toDbDraft()
+    assertEquals(uiDraft, draft.toUi())
+  }
 }

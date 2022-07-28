@@ -23,8 +23,8 @@ package com.twidere.services.microblog
 import com.twidere.services.microblog.model.ITrend
 
 interface TrendService {
-    suspend fun trends(
-        locationId: String,
-        limit: Int? = null
-    ): List<ITrend>
+  suspend fun trends(
+    locationId: String,
+    limit: Int? = null
+  ): List<ITrend>
 }

@@ -34,51 +34,51 @@ import com.twidere.twiderex.room.db.model.DbPagingTimelineWithStatus
 @Dao
 internal interface RoomPagingTimelineDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(timeline: List<DbPagingTimeline>)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertAll(timeline: List<DbPagingTimeline>)
 
-    @Query("SELECT * FROM paging_timeline WHERE statusKey == :statusKey AND accountKey == :accountKey")
-    suspend fun findWithStatusKey(statusKey: MicroBlogKey, accountKey: MicroBlogKey): DbPagingTimeline?
+  @Query("SELECT * FROM paging_timeline WHERE statusKey == :statusKey AND accountKey == :accountKey")
+  suspend fun findWithStatusKey(statusKey: MicroBlogKey, accountKey: MicroBlogKey): DbPagingTimeline?
 
-    @Query("SELECT * FROM paging_timeline WHERE statusKey in (:statusKey)")
-    suspend fun findAllWithStatusKey(statusKey: List<MicroBlogKey>): List<DbPagingTimeline>
+  @Query("SELECT * FROM paging_timeline WHERE statusKey in (:statusKey)")
+  suspend fun findAllWithStatusKey(statusKey: List<MicroBlogKey>): List<DbPagingTimeline>
 
-    @Transaction
-    @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY sortId DESC LIMIT :limit OFFSET :offset")
-    suspend fun getPagingList(
-        pagingKey: String,
-        accountKey: MicroBlogKey,
-        limit: Int,
-        offset: Int
-    ): List<DbPagingTimelineWithStatus>
+  @Transaction
+  @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY sortId DESC LIMIT :limit OFFSET :offset")
+  suspend fun getPagingList(
+    pagingKey: String,
+    accountKey: MicroBlogKey,
+    limit: Int,
+    offset: Int
+  ): List<DbPagingTimelineWithStatus>
 
-    @Transaction
-    @Query("SELECT COUNT(*) FROM (SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY sortId DESC)")
-    suspend fun getPagingListCount(
-        pagingKey: String,
-        accountKey: MicroBlogKey,
-    ): Int
+  @Transaction
+  @Query("SELECT COUNT(*) FROM (SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY sortId DESC)")
+  suspend fun getPagingListCount(
+    pagingKey: String,
+    accountKey: MicroBlogKey,
+  ): Int
 
-    @Transaction
-    @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY sortId DESC")
-    fun getPagingSourceYeah(
-        pagingKey: String,
-        accountKey: MicroBlogKey,
-    ): PagingSource<Int, DbPagingTimelineWithStatus>
+  @Transaction
+  @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY sortId DESC")
+  fun getPagingSourceYeah(
+    pagingKey: String,
+    accountKey: MicroBlogKey,
+  ): PagingSource<Int, DbPagingTimelineWithStatus>
 
-    @Transaction
-    @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY timestamp DESC")
-    fun getLatest(pagingKey: String, accountKey: MicroBlogKey): DbPagingTimelineWithStatus?
+  @Transaction
+  @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY timestamp DESC")
+  fun getLatest(pagingKey: String, accountKey: MicroBlogKey): DbPagingTimelineWithStatus?
 
-    @Query("DELETE FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey")
-    suspend fun clearAll(
-        pagingKey: String,
-        accountKey: MicroBlogKey,
-    )
+  @Query("DELETE FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey")
+  suspend fun clearAll(
+    pagingKey: String,
+    accountKey: MicroBlogKey,
+  )
 
-    @Delete
-    suspend fun delete(timeline: List<DbPagingTimeline>)
+  @Delete
+  suspend fun delete(timeline: List<DbPagingTimeline>)
 
-    @Query("DELETE FROM paging_timeline WHERE statusKey == :key")
-    suspend fun delete(key: MicroBlogKey)
+  @Query("DELETE FROM paging_timeline WHERE statusKey == :key")
+  suspend fun delete(key: MicroBlogKey)
 }

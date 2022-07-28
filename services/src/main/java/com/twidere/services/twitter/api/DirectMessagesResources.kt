@@ -30,18 +30,18 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface DirectMessagesResources {
-    @POST("/1.1/direct_messages/events/new.json")
-    suspend fun sendMessage(@Body event: DirectMessageEventObject): DirectMessageEventObject
+  @POST("/1.1/direct_messages/events/new.json")
+  suspend fun sendMessage(@Body event: DirectMessageEventObject): DirectMessageEventObject
 
-    @GET("/1.1/direct_messages/events/list.json")
-    suspend fun getMessages(
-        @Query("cursor") cursor: String? = null,
-        @Query("count") count: Int? = null // default 20, 50 max
-    ): DirectMessageResponse
+  @GET("/1.1/direct_messages/events/list.json")
+  suspend fun getMessages(
+    @Query("cursor") cursor: String? = null,
+    @Query("count") count: Int? = null // default 20, 50 max
+  ): DirectMessageResponse
 
-    @GET("/1.1/direct_messages/events/show.json")
-    suspend fun showMessage(@Query("id") id: String): DirectMessageEventObject
+  @GET("/1.1/direct_messages/events/show.json")
+  suspend fun showMessage(@Query("id") id: String): DirectMessageEventObject
 
-    @DELETE("/1.1/direct_messages/events/destroy.json")
-    suspend fun destroyMessage(@Query("id") id: String): Response<Unit>
+  @DELETE("/1.1/direct_messages/events/destroy.json")
+  suspend fun destroyMessage(@Query("id") id: String): Response<Unit>
 }

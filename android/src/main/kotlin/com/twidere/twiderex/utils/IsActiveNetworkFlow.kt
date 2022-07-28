@@ -30,15 +30,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
 fun ConnectivityManager.asIsActiveNetworkFlow(): Flow<Boolean> = callbackFlow {
-    val request = NetworkRequest.Builder().build()
-    val networkCallback = object : ConnectivityManager.NetworkCallback() {
-        override fun onCapabilitiesChanged(
-            network: Network,
-            networkCapabilities: NetworkCapabilities
-        ) {
-            trySend(ConnectivityManagerCompat.isActiveNetworkMetered(this@asIsActiveNetworkFlow))
-        }
+  val request = NetworkRequest.Builder().build()
+  val networkCallback = object : ConnectivityManager.NetworkCallback() {
+    override fun onCapabilitiesChanged(
+      network: Network,
+      networkCapabilities: NetworkCapabilities
+    ) {
+      trySend(ConnectivityManagerCompat.isActiveNetworkMetered(this@asIsActiveNetworkFlow))
     }
-    registerNetworkCallback(request, networkCallback)
-    awaitClose { unregisterNetworkCallback(networkCallback) }
+  }
+  registerNetworkCallback(request, networkCallback)
+  awaitClose { unregisterNetworkCallback(networkCallback) }
 }

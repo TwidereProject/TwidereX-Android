@@ -36,22 +36,22 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class UserMediaTimelineViewModel(
-    private val repository: TimelineRepository,
-    private val accountRepository: AccountRepository,
-    private val userKey: MicroBlogKey,
+  private val repository: TimelineRepository,
+  private val accountRepository: AccountRepository,
+  private val userKey: MicroBlogKey,
 ) : ViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val source: Flow<PagingData<Pair<UiMedia, UiStatus>>> by lazy {
-        account.flatMapLatest {
-            repository.mediaTimeline(
-                userKey,
-                it.accountKey,
-                it.service as TimelineService
-            )
-        }.cachedIn(viewModelScope)
-    }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  val source: Flow<PagingData<Pair<UiMedia, UiStatus>>> by lazy {
+    account.flatMapLatest {
+      repository.mediaTimeline(
+        userKey,
+        it.accountKey,
+        it.service as TimelineService
+      )
+    }.cachedIn(viewModelScope)
+  }
 }

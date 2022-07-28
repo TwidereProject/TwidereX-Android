@@ -31,35 +31,35 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.DirectMessageDeleteData
 
 class DirectMessageDeleteWorker(
-    context: Context,
-    workerParams: WorkerParameters,
-    private val deleteJob: DirectMessageDeleteJob
+  context: Context,
+  workerParams: WorkerParameters,
+  private val deleteJob: DirectMessageDeleteJob
 ) : CoroutineWorker(
-    context,
-    workerParams
+  context,
+  workerParams
 ) {
-    companion object {
-        fun createWorker(deleteData: DirectMessageDeleteData) = OneTimeWorkRequestBuilder<DirectMessageDeleteWorker>()
-            .setInputData(
-                deleteData.toWorkData()
-            )
-            .build()
-    }
+  companion object {
+    fun createWorker(deleteData: DirectMessageDeleteData) = OneTimeWorkRequestBuilder<DirectMessageDeleteWorker>()
+      .setInputData(
+        deleteData.toWorkData()
+      )
+      .build()
+  }
 
-    override suspend fun doWork(): Result {
-        val deleteData = inputData.toDirectMessageDeleteData()
-        val accountKey = inputData.getString("accountKey")?.let {
-            MicroBlogKey.valueOf(it)
-        } ?: return Result.failure()
-        return try {
-            deleteJob.execute(
-                deleteData = deleteData,
-                accountKey = accountKey
-            )
-            Result.success()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            Result.failure()
-        }
+  override suspend fun doWork(): Result {
+    val deleteData = inputData.toDirectMessageDeleteData()
+    val accountKey = inputData.getString("accountKey")?.let {
+      MicroBlogKey.valueOf(it)
+    } ?: return Result.failure()
+    return try {
+      deleteJob.execute(
+        deleteData = deleteData,
+        accountKey = accountKey
+      )
+      Result.success()
+    } catch (e: Throwable) {
+      e.printStackTrace()
+      Result.failure()
     }
+  }
 }

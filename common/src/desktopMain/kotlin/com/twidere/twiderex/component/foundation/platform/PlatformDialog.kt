@@ -25,14 +25,14 @@ import com.twidere.twiderex.component.foundation.DialogProperties
 
 @Composable
 actual fun PlatformDialog(
-    onDismissRequest: () -> Unit,
-    properties: DialogProperties,
-    content: @Composable (() -> Unit)
+  onDismissRequest: () -> Unit,
+  properties: DialogProperties,
+  content: @Composable (() -> Unit)
 ) {
-    androidx.compose.ui.window.Dialog(
-        onCloseRequest = onDismissRequest,
-        content = {
-            content.invoke()
-        }
-    )
+  androidx.compose.ui.window.Dialog(
+    onCloseRequest = onDismissRequest,
+    content = {
+      content.invoke()
+    }
+  )
 }

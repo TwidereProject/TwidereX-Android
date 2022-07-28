@@ -24,12 +24,12 @@ import com.squareup.sqldelight.EnumColumnAdapter
 import com.twidere.twiderex.sqldelight.table.Draft
 
 internal object DraftAdapterFactory {
-    fun create() = StringListColumnAdapter().let {
-        Draft.Adapter(
-            mediaAdapter = it,
-            composeTypeAdapter = EnumColumnAdapter(),
-            statusKeyAdapter = MicroBlogKeyColumnAdapter(),
-            excludedReplyUserIdsAdapter = it
-        )
-    }
+  fun create() = StringListColumnAdapter().let {
+    Draft.Adapter(
+      mediaAdapter = it,
+      composeTypeAdapter = EnumColumnAdapter(),
+      statusKeyAdapter = MicroBlogKeyColumnAdapter(),
+      excludedReplyUserIdsAdapter = it
+    )
+  }
 }

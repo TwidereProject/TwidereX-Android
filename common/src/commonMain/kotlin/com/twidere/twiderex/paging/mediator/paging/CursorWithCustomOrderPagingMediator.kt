@@ -29,56 +29,56 @@ import com.twidere.twiderex.paging.ArrayListCompat
 import com.twidere.twiderex.paging.IPagination
 
 class CursorWithCustomOrderPagingResult<T>(
-    data: List<T>,
-    val cursor: String? = null,
-    val nextOrder: Long = 0,
+  data: List<T>,
+  val cursor: String? = null,
+  val nextOrder: Long = 0,
 ) : ArrayListCompat<T>(data)
 
 data class CursorWithCustomOrderPagination(
-    val cursor: String?,
-    val nextOrder: Long,
+  val cursor: String?,
+  val nextOrder: Long,
 ) : IPagination
 
 abstract class CursorWithCustomOrderPagingMediator(
-    accountKey: MicroBlogKey,
-    database: CacheDatabase,
+  accountKey: MicroBlogKey,
+  database: CacheDatabase,
 ) : PagingTimelineMediatorBase<CursorWithCustomOrderPagination>(
-    accountKey,
-    database
+  accountKey,
+  database
 ) {
-    override fun provideNextPage(
-        raw: List<IStatus>,
-        result: List<PagingTimeLineWithStatus>
-    ): CursorWithCustomOrderPagination {
-        return if (raw is CursorWithCustomOrderPagingResult<*>) {
-            CursorWithCustomOrderPagination(
-                cursor = raw.cursor,
-                nextOrder = raw.nextOrder - result.size
-            )
-        } else {
-            CursorWithCustomOrderPagination(
-                cursor = result.lastOrNull()?.status?.statusId,
-                nextOrder = (result.lastOrNull()?.timeline?.sortId ?: 0) - result.size
-            )
-        }
+  override fun provideNextPage(
+    raw: List<IStatus>,
+    result: List<PagingTimeLineWithStatus>
+  ): CursorWithCustomOrderPagination {
+    return if (raw is CursorWithCustomOrderPagingResult<*>) {
+      CursorWithCustomOrderPagination(
+        cursor = raw.cursor,
+        nextOrder = raw.nextOrder - result.size
+      )
+    } else {
+      CursorWithCustomOrderPagination(
+        cursor = result.lastOrNull()?.status?.statusId,
+        nextOrder = (result.lastOrNull()?.timeline?.sortId ?: 0) - result.size
+      )
     }
+  }
 
-    override fun transform(
-        state: PagingState<Int, PagingTimeLineWithStatus>,
-        data: List<PagingTimeLineWithStatus>,
-        list: List<IStatus>
-    ): List<PagingTimeLineWithStatus> {
-        val lastId = if (list is CursorWithCustomOrderPagingResult<*>) {
-            list.nextOrder
-        } else {
-            state.lastItemOrNull()?.timeline?.sortId ?: 0
-        }
-        return data.mapIndexed { index, pagingTimelineWithStatus ->
-            pagingTimelineWithStatus.copy(
-                timeline = pagingTimelineWithStatus.timeline.copy(
-                    sortId = lastId - index
-                )
-            )
-        }
+  override fun transform(
+    state: PagingState<Int, PagingTimeLineWithStatus>,
+    data: List<PagingTimeLineWithStatus>,
+    list: List<IStatus>
+  ): List<PagingTimeLineWithStatus> {
+    val lastId = if (list is CursorWithCustomOrderPagingResult<*>) {
+      list.nextOrder
+    } else {
+      state.lastItemOrNull()?.timeline?.sortId ?: 0
     }
+    return data.mapIndexed { index, pagingTimelineWithStatus ->
+      pagingTimelineWithStatus.copy(
+        timeline = pagingTimelineWithStatus.timeline.copy(
+          sortId = lastId - index
+        )
+      )
+    }
+  }
 }

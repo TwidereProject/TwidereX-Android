@@ -29,20 +29,20 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class UrlEntityQueriesImplTest : BaseCacheDatabaseTest() {
-    @Test
-    fun insertUrlAndReturnResultWithGivenBelongToKey() = runBlocking {
-        val belongToKey = MicroBlogKey.valueOf("test")
-        assert(database.urlEntityQueries.findByBelongToKey(belongToKey).executeAsList().isEmpty())
-        database.urlEntityQueries.insert(mockUiUrlEntity().toDbUrlEntity(belongToKey = belongToKey))
-        assert(database.urlEntityQueries.findByBelongToKey(belongToKey).executeAsList().isNotEmpty())
-        assert(database.urlEntityQueries.findByBelongToKey(MicroBlogKey.valueOf("test_not_insert")).executeAsList().isEmpty())
-    }
+  @Test
+  fun insertUrlAndReturnResultWithGivenBelongToKey() = runBlocking {
+    val belongToKey = MicroBlogKey.valueOf("test")
+    assert(database.urlEntityQueries.findByBelongToKey(belongToKey).executeAsList().isEmpty())
+    database.urlEntityQueries.insert(mockUiUrlEntity().toDbUrlEntity(belongToKey = belongToKey))
+    assert(database.urlEntityQueries.findByBelongToKey(belongToKey).executeAsList().isNotEmpty())
+    assert(database.urlEntityQueries.findByBelongToKey(MicroBlogKey.valueOf("test_not_insert")).executeAsList().isEmpty())
+  }
 
-    @Test
-    fun insert_ReplaceWhenBelongToKeyAndUrlEquals() = runBlocking {
-        val belongToKey = MicroBlogKey.valueOf("test")
-        database.urlEntityQueries.insert(mockUiUrlEntity(url = "url").toDbUrlEntity(belongToKey = belongToKey))
-        database.urlEntityQueries.insert(mockUiUrlEntity(url = "url").toDbUrlEntity(belongToKey = belongToKey))
-        assertEquals(1, database.urlEntityQueries.findByBelongToKey(belongToKey).executeAsList().size)
-    }
+  @Test
+  fun insert_ReplaceWhenBelongToKeyAndUrlEquals() = runBlocking {
+    val belongToKey = MicroBlogKey.valueOf("test")
+    database.urlEntityQueries.insert(mockUiUrlEntity(url = "url").toDbUrlEntity(belongToKey = belongToKey))
+    database.urlEntityQueries.insert(mockUiUrlEntity(url = "url").toDbUrlEntity(belongToKey = belongToKey))
+    assertEquals(1, database.urlEntityQueries.findByBelongToKey(belongToKey).executeAsList().size)
+  }
 }

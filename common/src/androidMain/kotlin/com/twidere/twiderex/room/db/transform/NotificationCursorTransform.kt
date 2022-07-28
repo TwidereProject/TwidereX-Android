@@ -26,29 +26,29 @@ import com.twidere.twiderex.room.db.model.DbNotificationCursor
 import com.twidere.twiderex.room.db.model.DbNotificationCursorType
 
 internal fun DbNotificationCursor.toUi() = NotificationCursor(
-    _id = _id,
-    accountKey = accountKey,
-    type = type.toUi(),
-    value = value,
-    timestamp = timestamp
+  _id = _id,
+  accountKey = accountKey,
+  type = type.toUi(),
+  value = value,
+  timestamp = timestamp
 )
 
 internal fun NotificationCursor.toDbCursor() = DbNotificationCursor(
-    _id = _id,
-    accountKey = accountKey,
-    type = type.toDb(),
-    value = value,
-    timestamp = timestamp
+  _id = _id,
+  accountKey = accountKey,
+  type = type.toDb(),
+  value = value,
+  timestamp = timestamp
 )
 
 internal fun DbNotificationCursorType.toUi() = when (this) {
-    DbNotificationCursorType.General -> NotificationCursorType.General
-    DbNotificationCursorType.Mentions -> NotificationCursorType.Mentions
-    DbNotificationCursorType.Follower -> NotificationCursorType.Follower
+  DbNotificationCursorType.General -> NotificationCursorType.General
+  DbNotificationCursorType.Mentions -> NotificationCursorType.Mentions
+  DbNotificationCursorType.Follower -> NotificationCursorType.Follower
 }
 
 internal fun NotificationCursorType.toDb() = when (this) {
-    NotificationCursorType.General -> DbNotificationCursorType.General
-    NotificationCursorType.Mentions -> DbNotificationCursorType.Mentions
-    NotificationCursorType.Follower -> DbNotificationCursorType.Follower
+  NotificationCursorType.General -> DbNotificationCursorType.General
+  NotificationCursorType.Mentions -> DbNotificationCursorType.Mentions
+  NotificationCursorType.Follower -> DbNotificationCursorType.Follower
 }

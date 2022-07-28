@@ -31,40 +31,40 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 
 abstract class StatusWorker(
-    appContext: Context,
-    params: WorkerParameters,
-    private val statusJob: StatusJob,
+  appContext: Context,
+  params: WorkerParameters,
+  private val statusJob: StatusJob,
 ) : CoroutineWorker(appContext, params) {
-    companion object {
-        inline fun <reified T : StatusWorker> create(
-            accountKey: MicroBlogKey,
-            status: UiStatus,
-        ) = OneTimeWorkRequestBuilder<T>()
-            .setInputData(
-                workDataOf(
-                    "accountKey" to accountKey.toString(),
-                    "statusKey" to status.statusKey.toString(),
-                )
-            )
-            .build()
-    }
+  companion object {
+    inline fun <reified T : StatusWorker> create(
+      accountKey: MicroBlogKey,
+      status: UiStatus,
+    ) = OneTimeWorkRequestBuilder<T>()
+      .setInputData(
+        workDataOf(
+          "accountKey" to accountKey.toString(),
+          "statusKey" to status.statusKey.toString(),
+        )
+      )
+      .build()
+  }
 
-    override suspend fun doWork(): Result {
-        val accountKey = inputData.getString("accountKey")?.let {
-            MicroBlogKey.valueOf(it)
-        } ?: return Result.failure()
-        val statusKey = inputData.getString("statusKey")?.let {
-            MicroBlogKey.valueOf(it)
-        } ?: return Result.failure()
-        return try {
-            statusJob.execute(
-                accountKey = accountKey,
-                statusKey = statusKey
-            ).let {
-                Result.success(it.toWorkData())
-            }
-        } catch (e: Throwable) {
-            Result.failure()
-        }
+  override suspend fun doWork(): Result {
+    val accountKey = inputData.getString("accountKey")?.let {
+      MicroBlogKey.valueOf(it)
+    } ?: return Result.failure()
+    val statusKey = inputData.getString("statusKey")?.let {
+      MicroBlogKey.valueOf(it)
+    } ?: return Result.failure()
+    return try {
+      statusJob.execute(
+        accountKey = accountKey,
+        statusKey = statusKey
+      ).let {
+        Result.success(it.toWorkData())
+      }
+    } catch (e: Throwable) {
+      Result.failure()
     }
+  }
 }

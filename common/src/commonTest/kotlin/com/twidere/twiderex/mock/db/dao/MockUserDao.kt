@@ -28,22 +28,22 @@ import kotlinx.coroutines.flow.flow
 import org.jetbrains.annotations.TestOnly
 
 internal class MockUserDao @TestOnly constructor() : UserDao {
-    private val fakeDb = mutableMapOf<String, UiUser>()
-    override suspend fun findWithUserKey(userKey: MicroBlogKey): UiUser? {
-        return fakeDb[userKey.toString()]
-    }
+  private val fakeDb = mutableMapOf<String, UiUser>()
+  override suspend fun findWithUserKey(userKey: MicroBlogKey): UiUser? {
+    return fakeDb[userKey.toString()]
+  }
 
-    override suspend fun insertAll(listOf: List<UiUser>) {
-        listOf.map {
-            fakeDb[it.userKey.toString()] = it
-        }
+  override suspend fun insertAll(listOf: List<UiUser>) {
+    listOf.map {
+      fakeDb[it.userKey.toString()] = it
     }
+  }
 
-    override fun findWithUserKeyFlow(userKey: MicroBlogKey): Flow<UiUser?> {
-        return flow {
-            emit(findWithUserKey(userKey))
-        }
+  override fun findWithUserKeyFlow(userKey: MicroBlogKey): Flow<UiUser?> {
+    return flow {
+      emit(findWithUserKey(userKey))
     }
+  }
 
-    val datas get() = fakeDb.values.toList()
+  val datas get() = fakeDb.values.toList()
 }

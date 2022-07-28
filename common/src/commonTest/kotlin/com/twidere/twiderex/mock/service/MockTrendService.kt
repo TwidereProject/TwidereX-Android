@@ -27,18 +27,18 @@ import com.twidere.twiderex.mock.model.mockITrend
 import com.twidere.twiderex.mock.model.toIPaging
 
 internal class MockTrendService : TrendService, MicroBlogService, ErrorService() {
-    override suspend fun trends(locationId: String, limit: Int?): List<ITrend> {
-        checkError()
-        return if (locationId == "error")
-            throw IllegalArgumentException("service error")
-        else {
-            val list = mutableListOf<ITrend>()
-            for (i in 0 until (limit ?: 1)) {
-                list.add(
-                    mockITrend()
-                )
-            }
-            list.toIPaging()
-        }
+  override suspend fun trends(locationId: String, limit: Int?): List<ITrend> {
+    checkError()
+    return if (locationId == "error")
+      throw IllegalArgumentException("service error")
+    else {
+      val list = mutableListOf<ITrend>()
+      for (i in 0 until (limit ?: 1)) {
+        list.add(
+          mockITrend()
+        )
+      }
+      list.toIPaging()
     }
+  }
 }

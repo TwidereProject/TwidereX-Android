@@ -59,92 +59,92 @@ import moe.tlaster.precompose.navigation.PopUpTo
 
 @Composable
 fun DMNewConversationScene() {
-    val navController = LocalNavController.current
-    val viewModel: DMNewConversationViewModel = getViewModel()
-    val keyWord by viewModel.input.observeAsState("")
-    val source = viewModel.sourceFlow.collectAsLazyPagingItems()
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                Column {
-                    AppBar(
-                        navigationIcon = {
-                            AppBarNavigationButton(
-                                icon = Icons.Default.Close
-                            )
-                        },
-                        title = {
-                            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_new_conversation_title))
-                        },
-                        elevation = 0.dp
-                    )
-                    SearchInput(
-                        modifier = Modifier.fillMaxWidth(),
-                        input = keyWord,
-                        onValueChanged = { viewModel.input.value = it },
-                    )
-                    Divider()
-                }
+  val navController = LocalNavController.current
+  val viewModel: DMNewConversationViewModel = getViewModel()
+  val keyWord by viewModel.input.observeAsState("")
+  val source = viewModel.sourceFlow.collectAsLazyPagingItems()
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        Column {
+          AppBar(
+            navigationIcon = {
+              AppBarNavigationButton(
+                icon = Icons.Default.Close
+              )
             },
-        ) {
-            SearchResult(
-                source,
-                onItemClick = { user ->
-                    viewModel.createNewConversation(
-                        user,
-                        onResult = { key ->
-                            key?.let {
-                                navController.navigate(
-                                    Root.Messages.Conversation(it),
-                                    NavOptions(popUpTo = PopUpTo(Root.Messages.Home))
-                                )
-                            }
-                        }
-                    )
-                }
-            )
+            title = {
+              Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_new_conversation_title))
+            },
+            elevation = 0.dp
+          )
+          SearchInput(
+            modifier = Modifier.fillMaxWidth(),
+            input = keyWord,
+            onValueChanged = { viewModel.input.value = it },
+          )
+          Divider()
         }
+      },
+    ) {
+      SearchResult(
+        source,
+        onItemClick = { user ->
+          viewModel.createNewConversation(
+            user,
+            onResult = { key ->
+              key?.let {
+                navController.navigate(
+                  Root.Messages.Conversation(it),
+                  NavOptions(popUpTo = PopUpTo(Root.Messages.Home))
+                )
+              }
+            }
+          )
+        }
+      )
     }
+  }
 }
 
 @Composable
 fun SearchInput(
-    modifier: Modifier = Modifier,
-    input: String,
-    onValueChanged: (value: String) -> Unit
+  modifier: Modifier = Modifier,
+  input: String,
+  onValueChanged: (value: String) -> Unit
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.padding(SearchInputDefaults.ContentPadding)
-    ) {
-        Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
-            contentDescription = stringResource(
-                res = com.twidere.twiderex.MR.strings.scene_search_title
-            )
-        )
-        Spacer(modifier = Modifier.width(SearchInputDefaults.ContentSpacing))
-        TextInput(
-            value = input,
-            onValueChange = onValueChanged, modifier = Modifier.weight(1f),
-            placeholder = {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_new_conversation_search))
-            },
-            maxLines = 1
-        )
-    }
+  Row(
+    verticalAlignment = Alignment.CenterVertically,
+    modifier = modifier.padding(SearchInputDefaults.ContentPadding)
+  ) {
+    Icon(
+      painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
+      contentDescription = stringResource(
+        res = com.twidere.twiderex.MR.strings.scene_search_title
+      )
+    )
+    Spacer(modifier = Modifier.width(SearchInputDefaults.ContentSpacing))
+    TextInput(
+      value = input,
+      onValueChange = onValueChanged, modifier = Modifier.weight(1f),
+      placeholder = {
+        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_new_conversation_search))
+      },
+      maxLines = 1
+    )
+  }
 }
 
 private object SearchInputDefaults {
-    val ContentPadding = PaddingValues(16.dp)
-    val ContentSpacing = 16.dp
+  val ContentPadding = PaddingValues(16.dp)
+  val ContentSpacing = 16.dp
 }
 
 @Composable
 fun SearchResult(source: LazyPagingItems<UiUser>, onItemClick: (user: UiUser) -> Unit) {
-    LazyUiUserList(
-        items = source,
-        onItemClicked = onItemClick,
-        modifier = Modifier.fillMaxSize()
-    )
+  LazyUiUserList(
+    items = source,
+    onItemClicked = onItemClick,
+    modifier = Modifier.fillMaxSize()
+  )
 }

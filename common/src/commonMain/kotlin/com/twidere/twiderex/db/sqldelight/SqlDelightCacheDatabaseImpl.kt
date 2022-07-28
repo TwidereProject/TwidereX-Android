@@ -34,39 +34,39 @@ import com.twidere.twiderex.sqldelight.SqlDelightCacheDatabase
 import kotlinx.coroutines.runBlocking
 
 internal class SqlDelightCacheDatabaseImpl(private val database: SqlDelightCacheDatabase) : CacheDatabase {
-    private val statusDao = SqlDelightStatusDaoImpl(database)
-    override fun statusDao() = statusDao
+  private val statusDao = SqlDelightStatusDaoImpl(database)
+  override fun statusDao() = statusDao
 
-    private val mediaDao = SqlDelightMediaDaoImpl(database.mediaQueries)
-    override fun mediaDao() = mediaDao
+  private val mediaDao = SqlDelightMediaDaoImpl(database.mediaQueries)
+  override fun mediaDao() = mediaDao
 
-    private val userDao = SqlDelightUserDaoImpl(database.userQueries)
-    override fun userDao() = userDao
+  private val userDao = SqlDelightUserDaoImpl(database.userQueries)
+  override fun userDao() = userDao
 
-    private val pagingTimelineDao = SqlDelightPagingTimelineDaoImpl(database)
-    override fun pagingTimelineDao() = pagingTimelineDao
+  private val pagingTimelineDao = SqlDelightPagingTimelineDaoImpl(database)
+  override fun pagingTimelineDao() = pagingTimelineDao
 
-    private val listDao = SqlDelightListsDaoImpl(database.listQueries)
-    override fun listsDao() = listDao
+  private val listDao = SqlDelightListsDaoImpl(database.listQueries)
+  override fun listsDao() = listDao
 
-    private val notificationCursorDao = SqlDelightNotificationCursorDaoImpl(database.notificationCursorQueries)
-    override fun notificationCursorDao() = notificationCursorDao
+  private val notificationCursorDao = SqlDelightNotificationCursorDaoImpl(database.notificationCursorQueries)
+  override fun notificationCursorDao() = notificationCursorDao
 
-    private val trendDao = SqlDelightTrendDaoImpl(database)
-    override fun trendDao() = trendDao
+  private val trendDao = SqlDelightTrendDaoImpl(database)
+  override fun trendDao() = trendDao
 
-    private val dmConversationDao = SqlDelightDirectMessageConversationDaoImpl(database)
-    override fun directMessageConversationDao() = dmConversationDao
+  private val dmConversationDao = SqlDelightDirectMessageConversationDaoImpl(database)
+  override fun directMessageConversationDao() = dmConversationDao
 
-    private val dmEventDao = SqlDelightDirectMessageEventDaoImpl(database)
-    override fun directMessageDao() = dmEventDao
+  private val dmEventDao = SqlDelightDirectMessageEventDaoImpl(database)
+  override fun directMessageDao() = dmEventDao
 
-    override suspend fun clearAllTables() {
-        database.cacheDropQueries.clearAllTables()
-    }
+  override suspend fun clearAllTables() {
+    database.cacheDropQueries.clearAllTables()
+  }
 
-    override suspend fun <R> withTransaction(block: suspend () -> R): R {
-        // TODO find a way to handle transaction
-        return database.transactionWithResult { runBlocking { block.invoke() } }
-    }
+  override suspend fun <R> withTransaction(block: suspend () -> R): R {
+    // TODO find a way to handle transaction
+    return database.transactionWithResult { runBlocking { block.invoke() } }
+  }
 }

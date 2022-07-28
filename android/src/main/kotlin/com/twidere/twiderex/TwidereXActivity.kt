@@ -86,124 +86,124 @@ import org.koin.core.component.inject
 
 class TwidereXActivity : PreComposeActivity(), KoinComponent {
 
-    private val navController by lazy {
-        NavController()
+  private val navController by lazy {
+    NavController()
+  }
+
+  private val statusActions: StatusActions by inject()
+
+  private val preferencesHolder: PreferencesHolder by inject()
+
+  private val inAppNotification: InAppNotification by inject()
+
+  private val connectivityManager: ConnectivityManager by inject()
+
+  private val platformResolver: PlatformResolver by inject()
+
+  private val remoteNavigator: RemoteNavigator by inject()
+
+  private val isActiveNetworkMetered = MutableStateFlow(false)
+
+  @OptIn(ExperimentalAnimationApi::class)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    FilePicker.init(activityResultRegistry, this, contentResolver)
+    WindowCompat.setDecorFitsSystemWindows(window, false)
+    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+    connectivityManager.asIsActiveNetworkFlow()
+      .flowWithLifecycle(getLifecycle())
+      .onEach { isActiveNetworkMetered.value = it }
+      .launchIn(lifecycleScope)
+    setContent {
+      var showSplash by rememberSaveable { mutableStateOf(true) }
+      LaunchedEffect(Unit) {
+        preferencesHolder.warmup()
+        showSplash = false
+      }
+      App()
+      AnimatedVisibility(
+        visible = showSplash,
+        enter = fadeIn(),
+        exit = fadeOut(),
+      ) {
+        Splash()
+      }
     }
-
-    private val statusActions: StatusActions by inject()
-
-    private val preferencesHolder: PreferencesHolder by inject()
-
-    private val inAppNotification: InAppNotification by inject()
-
-    private val connectivityManager: ConnectivityManager by inject()
-
-    private val platformResolver: PlatformResolver by inject()
-
-    private val remoteNavigator: RemoteNavigator by inject()
-
-    private val isActiveNetworkMetered = MutableStateFlow(false)
-
-    @OptIn(ExperimentalAnimationApi::class)
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        FilePicker.init(activityResultRegistry, this, contentResolver)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        connectivityManager.asIsActiveNetworkFlow()
-            .flowWithLifecycle(getLifecycle())
-            .onEach { isActiveNetworkMetered.value = it }
-            .launchIn(lifecycleScope)
-        setContent {
-            var showSplash by rememberSaveable { mutableStateOf(true) }
-            LaunchedEffect(Unit) {
-                preferencesHolder.warmup()
-                showSplash = false
-            }
-            App()
-            AnimatedVisibility(
-                visible = showSplash,
-                enter = fadeIn(),
-                exit = fadeOut(),
-            ) {
-                Splash()
-            }
-        }
-        intent.data?.let {
-            onDeeplink(it)
-        }
+    intent.data?.let {
+      onDeeplink(it)
     }
+  }
 
-    @Composable
-    private fun Splash() {
-        MaterialTheme(
-            colors = if (isSystemInDarkTheme()) {
-                darkColors()
-            } else {
-                lightColors()
-            }
-        ) {
-            Box(Modifier.fillMaxSize(), Alignment.Center) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_login_logo),
-                    contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_logo_twidere)
-                )
-            }
-        }
+  @Composable
+  private fun Splash() {
+    MaterialTheme(
+      colors = if (isSystemInDarkTheme()) {
+        darkColors()
+      } else {
+        lightColors()
+      }
+    ) {
+      Box(Modifier.fillMaxSize(), Alignment.Center) {
+        Image(
+          painter = painterResource(id = R.drawable.ic_login_logo),
+          contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_logo_twidere)
+        )
+      }
     }
+  }
 
-    @Composable
-    private fun App() {
-        val windowInsetsControllerCompat =
-            remember { WindowInsetsControllerCompat(window, window.decorView) }
-        val accountViewModel =
-            com.twidere.twiderex.di.ext.getViewModel<com.twidere.twiderex.viewmodel.ActiveAccountViewModel>()
-        val account by accountViewModel.account.observeAsState(null)
-        val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
-        CompositionLocalProvider(
-            LocalInAppNotification provides inAppNotification,
-            LocalWindowInsetsController provides windowInsetsControllerCompat,
-            LocalActiveAccount provides account,
-            LocalStatusActions provides statusActions,
-            LocalActiveAccountViewModel provides accountViewModel,
-            LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
-            LocalPlatformResolver provides platformResolver,
-            LocalResLoader provides ResLoader(this),
-            LocalRemoteNavigator provides remoteNavigator,
-            LocalPlatformWindow provides PlatformWindow(window),
-        ) {
-            ProvidePreferences(
-                preferencesHolder,
-            ) {
-                Router(
-                    navController = navController,
-                    isDebug = moe.tlaster.kfilepicker.BuildConfig.DEBUG
-                )
-            }
-        }
+  @Composable
+  private fun App() {
+    val windowInsetsControllerCompat =
+      remember { WindowInsetsControllerCompat(window, window.decorView) }
+    val accountViewModel =
+      com.twidere.twiderex.di.ext.getViewModel<com.twidere.twiderex.viewmodel.ActiveAccountViewModel>()
+    val account by accountViewModel.account.observeAsState(null)
+    val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
+    CompositionLocalProvider(
+      LocalInAppNotification provides inAppNotification,
+      LocalWindowInsetsController provides windowInsetsControllerCompat,
+      LocalActiveAccount provides account,
+      LocalStatusActions provides statusActions,
+      LocalActiveAccountViewModel provides accountViewModel,
+      LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
+      LocalPlatformResolver provides platformResolver,
+      LocalResLoader provides ResLoader(this),
+      LocalRemoteNavigator provides remoteNavigator,
+      LocalPlatformWindow provides PlatformWindow(window),
+    ) {
+      ProvidePreferences(
+        preferencesHolder,
+      ) {
+        Router(
+          navController = navController,
+          isDebug = moe.tlaster.kfilepicker.BuildConfig.DEBUG
+        )
+      }
     }
+  }
 
-    private fun onDeeplink(it: Uri) {
-        if (CustomTabSignInChannel.canHandle(it.toString())) {
-            lifecycleScope.launchWhenResumed {
-                CustomTabSignInChannel.send(it.toString())
-            }
-        } else {
-            navController.navigate(it.toString())
-        }
+  private fun onDeeplink(it: Uri) {
+    if (CustomTabSignInChannel.canHandle(it.toString())) {
+      lifecycleScope.launchWhenResumed {
+        CustomTabSignInChannel.send(it.toString())
+      }
+    } else {
+      navController.navigate(it.toString())
     }
+  }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        intent?.data?.let {
-            onDeeplink(it)
-        }
+  override fun onNewIntent(intent: Intent?) {
+    super.onNewIntent(intent)
+    intent?.data?.let {
+      onDeeplink(it)
     }
+  }
 
-    override fun onResume() {
-        super.onResume()
-        lifecycleScope.launchWhenResumed {
-            CustomTabSignInChannel.onClose()
-        }
+  override fun onResume() {
+    super.onResume()
+    lifecycleScope.launchWhenResumed {
+      CustomTabSignInChannel.onClose()
     }
+  }
 }

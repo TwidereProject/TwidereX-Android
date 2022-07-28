@@ -25,23 +25,23 @@ import com.twidere.twiderex.sqldelight.table.DbTrend
 import com.twidere.twiderex.sqldelight.table.DbTrendHistory
 
 internal data class DbTrendWithHistory(
-    val trend: DbTrend,
-    val history: List<DbTrendHistory>
+  val trend: DbTrend,
+  val history: List<DbTrendHistory>
 ) {
-    companion object {
-        fun List<DbTrendWithHistory>.saveToDb(database: SqlDelightCacheDatabase) {
-            database.transaction {
-                forEach { database.trendQueries.insert(it.trend) }
-                map { it.history }.flatten().forEach { database.trendHistoryQueries.insert(it) }
-            }
-        }
-
-        fun DbTrend.withHistory(database: SqlDelightCacheDatabase) = DbTrendWithHistory(
-            trend = this,
-            history = database.trendHistoryQueries.findWithTrendKey(
-                trendKey = trendKey,
-                accountKey = accountKey
-            ).executeAsList()
-        )
+  companion object {
+    fun List<DbTrendWithHistory>.saveToDb(database: SqlDelightCacheDatabase) {
+      database.transaction {
+        forEach { database.trendQueries.insert(it.trend) }
+        map { it.history }.flatten().forEach { database.trendHistoryQueries.insert(it) }
+      }
     }
+
+    fun DbTrend.withHistory(database: SqlDelightCacheDatabase) = DbTrendWithHistory(
+      trend = this,
+      history = database.trendHistoryQueries.findWithTrendKey(
+        trendKey = trendKey,
+        accountKey = accountKey
+      ).executeAsList()
+    )
+  }
 }

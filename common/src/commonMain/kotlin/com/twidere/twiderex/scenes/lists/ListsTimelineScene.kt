@@ -73,253 +73,253 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ListTimeLineScene(
-    listKey: MicroBlogKey
+  listKey: MicroBlogKey
 ) {
-    val account = LocalActiveAccount.current ?: return
-    val navController = LocalNavController.current
-    val viewModel: ListsModifyViewModel = getViewModel {
-        parametersOf(listKey)
-    }
-    val source by viewModel.source.observeAsState(initial = null)
-    val loading by viewModel.loading.observeAsState(initial = false)
-    var showEditDialog by remember {
-        mutableStateOf(false)
-    }
-    var showDeleteConfirmDialog by remember {
-        mutableStateOf(false)
-    }
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = source?.title
-                                    ?: stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_title),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            if (source?.isPrivate == true)
-                                Icon(
-                                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_lock),
-                                    contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_icons_private),
-                                    modifier = Modifier
-                                        .alpha(ContentAlpha.disabled)
-                                        .padding(start = ListTimelineSceneDefaults.LockIconPadding)
-                                        .size(ListTimelineSceneDefaults.LockIconSize)
-                                )
-                        }
-                    },
-                    actions = {
-                        var menuExpand by remember {
-                            mutableStateOf(false)
-                        }
-                        IconButton(onClick = { menuExpand = !menuExpand }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = stringResource(
-                                    res = com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_edit_list
-                                )
-                            )
-                        }
-                        source?.let { uiList ->
-                            DropdownMenu(
-                                expanded = menuExpand,
-                                onDismissRequest = { menuExpand = false }
-                            ) {
-                                if (!uiList.isOwner(account.user.userId)) {
-                                    val following = uiList.isFollowed
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            if (following) {
-                                                viewModel.unsubscribeList(uiList.listKey)
-                                            } else {
-                                                viewModel.subscribeList(uiList.listKey)
-                                            }
-                                            menuExpand = false
-                                        }
-                                    ) {
-                                        Text(
-                                            text = stringResource(
-                                                res = if (following)
-                                                    com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_unfollow
-                                                else
-                                                    com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_follow
-                                            )
-                                        )
-                                    }
-                                }
-
-                                DropdownMenuItem(
-                                    onClick = {
-                                        menuExpand = false
-                                        navController.navigate(
-                                            Root.Lists.Members(
-                                                listKey,
-                                                uiList.isOwner(account.user.userId)
-                                            )
-                                        )
-                                    }
-                                ) {
-                                    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_tabs_members))
-                                }
-
-                                if (uiList.allowToSubscribe) {
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            menuExpand = false
-                                            navController.navigate(
-                                                Root.Lists.Subscribers(
-                                                    listKey
-                                                )
-                                            )
-                                        }
-                                    ) {
-                                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_tabs_subscriber))
-                                    }
-                                }
-
-                                if (uiList.isOwner(account.user.userId)) {
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            menuExpand = false
-                                            when (account.type) {
-                                                PlatformType.Twitter -> navController.navigate(
-                                                    Root.Lists.TwitterEdit(listKey = listKey)
-                                                )
-                                                PlatformType.StatusNet -> TODO()
-                                                PlatformType.Fanfou -> TODO()
-                                                PlatformType.Mastodon -> showEditDialog = true
-                                            }
-                                        }
-                                    ) {
-                                        Text(
-                                            text = if (account.type == PlatformType.Mastodon)
-                                                stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_rename_list)
-                                            else
-                                                stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_edit_list)
-                                        )
-                                    }
-                                }
-
-                                if (uiList.isOwner(account.user.userId)) {
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            menuExpand = false
-                                            showDeleteConfirmDialog = true
-                                        }
-                                    ) {
-                                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_delete_list))
-                                    }
-                                }
-                            }
-                        }
-                    },
+  val account = LocalActiveAccount.current ?: return
+  val navController = LocalNavController.current
+  val viewModel: ListsModifyViewModel = getViewModel {
+    parametersOf(listKey)
+  }
+  val source by viewModel.source.observeAsState(initial = null)
+  val loading by viewModel.loading.observeAsState(initial = false)
+  var showEditDialog by remember {
+    mutableStateOf(false)
+  }
+  var showDeleteConfirmDialog by remember {
+    mutableStateOf(false)
+  }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton()
+          },
+          title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+              Text(
+                text = source?.title
+                  ?: stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_title),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+              )
+              if (source?.isPrivate == true)
+                Icon(
+                  painter = painterResource(res = com.twidere.twiderex.MR.files.ic_lock),
+                  contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_icons_private),
+                  modifier = Modifier
+                    .alpha(ContentAlpha.disabled)
+                    .padding(start = ListTimelineSceneDefaults.LockIconPadding)
+                    .size(ListTimelineSceneDefaults.LockIconSize)
                 )
-            },
-        ) {
-            Box {
-                ListTimelineComponent(listKey)
-                if (showEditDialog) {
-                    MastodonListsEditDialog(listKey) {
-                        showEditDialog = false
-                    }
-                }
-                if (loading) {
-                    Dialog(onDismissRequest = { }) {
-                        LoadingProgress()
-                    }
-                }
-                source?.let {
-                    if (showDeleteConfirmDialog) {
-                        ListDeleteConfirmDialog(
-                            title = it.title,
-                            onDismissRequest = {
-                                showDeleteConfirmDialog = false
-                            }
-                        ) {
-                            viewModel.deleteList { success, _ ->
-                                if (success) navController.popBackStack()
-                            }
-                        }
-                    }
-                }
             }
+          },
+          actions = {
+            var menuExpand by remember {
+              mutableStateOf(false)
+            }
+            IconButton(onClick = { menuExpand = !menuExpand }) {
+              Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(
+                  res = com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_edit_list
+                )
+              )
+            }
+            source?.let { uiList ->
+              DropdownMenu(
+                expanded = menuExpand,
+                onDismissRequest = { menuExpand = false }
+              ) {
+                if (!uiList.isOwner(account.user.userId)) {
+                  val following = uiList.isFollowed
+                  DropdownMenuItem(
+                    onClick = {
+                      if (following) {
+                        viewModel.unsubscribeList(uiList.listKey)
+                      } else {
+                        viewModel.subscribeList(uiList.listKey)
+                      }
+                      menuExpand = false
+                    }
+                  ) {
+                    Text(
+                      text = stringResource(
+                        res = if (following)
+                          com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_unfollow
+                        else
+                          com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_follow
+                      )
+                    )
+                  }
+                }
+
+                DropdownMenuItem(
+                  onClick = {
+                    menuExpand = false
+                    navController.navigate(
+                      Root.Lists.Members(
+                        listKey,
+                        uiList.isOwner(account.user.userId)
+                      )
+                    )
+                  }
+                ) {
+                  Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_tabs_members))
+                }
+
+                if (uiList.allowToSubscribe) {
+                  DropdownMenuItem(
+                    onClick = {
+                      menuExpand = false
+                      navController.navigate(
+                        Root.Lists.Subscribers(
+                          listKey
+                        )
+                      )
+                    }
+                  ) {
+                    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_tabs_subscriber))
+                  }
+                }
+
+                if (uiList.isOwner(account.user.userId)) {
+                  DropdownMenuItem(
+                    onClick = {
+                      menuExpand = false
+                      when (account.type) {
+                        PlatformType.Twitter -> navController.navigate(
+                          Root.Lists.TwitterEdit(listKey = listKey)
+                        )
+                        PlatformType.StatusNet -> TODO()
+                        PlatformType.Fanfou -> TODO()
+                        PlatformType.Mastodon -> showEditDialog = true
+                      }
+                    }
+                  ) {
+                    Text(
+                      text = if (account.type == PlatformType.Mastodon)
+                        stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_rename_list)
+                      else
+                        stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_edit_list)
+                    )
+                  }
+                }
+
+                if (uiList.isOwner(account.user.userId)) {
+                  DropdownMenuItem(
+                    onClick = {
+                      menuExpand = false
+                      showDeleteConfirmDialog = true
+                    }
+                  ) {
+                    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_delete_list))
+                  }
+                }
+              }
+            }
+          },
+        )
+      },
+    ) {
+      Box {
+        ListTimelineComponent(listKey)
+        if (showEditDialog) {
+          MastodonListsEditDialog(listKey) {
+            showEditDialog = false
+          }
         }
+        if (loading) {
+          Dialog(onDismissRequest = { }) {
+            LoadingProgress()
+          }
+        }
+        source?.let {
+          if (showDeleteConfirmDialog) {
+            ListDeleteConfirmDialog(
+              title = it.title,
+              onDismissRequest = {
+                showDeleteConfirmDialog = false
+              }
+            ) {
+              viewModel.deleteList { success, _ ->
+                if (success) navController.popBackStack()
+              }
+            }
+          }
+        }
+      }
     }
+  }
 }
 
 @Composable
 private fun ListTimelineComponent(listKey: MicroBlogKey) {
-    val viewModel: ListsTimelineViewModel = getViewModel {
-        parametersOf(listKey)
-    }
-    val timelineSource = viewModel.source.collectAsLazyPagingItems()
-    // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
-    @Suppress("UNUSED_VARIABLE")
-    timelineSource.loadState
-    SwipeToRefreshLayout(
-        refreshingState = timelineSource.loadState.refresh is LoadState.Loading,
-        onRefresh = { timelineSource.refresh() }
-    ) {
-        LazyUiStatusList(
-            items = timelineSource,
-        )
-    }
+  val viewModel: ListsTimelineViewModel = getViewModel {
+    parametersOf(listKey)
+  }
+  val timelineSource = viewModel.source.collectAsLazyPagingItems()
+  // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
+  @Suppress("UNUSED_VARIABLE")
+  timelineSource.loadState
+  SwipeToRefreshLayout(
+    refreshingState = timelineSource.loadState.refresh is LoadState.Loading,
+    onRefresh = { timelineSource.refresh() }
+  ) {
+    LazyUiStatusList(
+      items = timelineSource,
+    )
+  }
 }
 
 @Composable
 private fun ListDeleteConfirmDialog(
-    title: String,
-    onDismissRequest: () -> Unit,
-    onConfirm: () -> Unit
+  title: String,
+  onDismissRequest: () -> Unit,
+  onConfirm: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = {
-            onDismissRequest.invoke()
-        },
-        title = {
-            Text(
-                text = stringResource(
-                    res = com.twidere.twiderex.MR.strings.scene_lists_details_delete_list_title,
-                    title
-                ),
-                style = MaterialTheme.typography.subtitle1
-            )
-        },
-        text = {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text(text = title, style = MaterialTheme.typography.body2)
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest.invoke()
-                }
-            ) {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_cancel))
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirm()
-                    onDismissRequest.invoke()
-                }
-            ) {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_yes))
-            }
-        },
+  AlertDialog(
+    onDismissRequest = {
+      onDismissRequest.invoke()
+    },
+    title = {
+      Text(
+        text = stringResource(
+          res = com.twidere.twiderex.MR.strings.scene_lists_details_delete_list_title,
+          title
+        ),
+        style = MaterialTheme.typography.subtitle1
+      )
+    },
+    text = {
+      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        Text(text = title, style = MaterialTheme.typography.body2)
+      }
+    },
+    dismissButton = {
+      TextButton(
+        onClick = {
+          onDismissRequest.invoke()
+        }
+      ) {
+        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_cancel))
+      }
+    },
+    confirmButton = {
+      TextButton(
+        onClick = {
+          onConfirm()
+          onDismissRequest.invoke()
+        }
+      ) {
+        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_yes))
+      }
+    },
 
-    )
+  )
 }
 
 private object ListTimelineSceneDefaults {
-    val LockIconSize = 24.dp
-    val LockIconPadding = 8.dp
+  val LockIconSize = 24.dp
+  val LockIconPadding = 8.dp
 }

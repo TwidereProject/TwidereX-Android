@@ -49,203 +49,203 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 
 class HttpConfigClientFactory(private val configProvider: HttpConfigProvider) : HttpClientFactory {
-    private val resourceCache = mutableMapOf<Class<*>, Pair<*, CacheIdentifier>>()
+  private val resourceCache = mutableMapOf<Class<*>, Pair<*, CacheIdentifier>>()
 
-    @OptIn(ExperimentalSerializationApi::class)
-    @Suppress("UNCHECKED_CAST")
-    override fun <T> createResources(
-        clazz: Class<T>,
-        baseUrl: String,
-        authorization: Authorization,
-        useCache: Boolean
-    ): T {
-        val cache = resourceCache[clazz]
-        val cacheIdentifier = CacheIdentifier(configProvider.provideConfig(), baseUrl)
-        val result: T = if (cache != null && cache.second == cacheIdentifier && useCache) {
-            cache.first as T
-        } else {
-            val interceptors = when (clazz) {
-                TwitterResources::class.java -> Interceptor { chain ->
-                    val response = chain.proceed(chain.request())
-                    if (!response.isSuccessful) {
-                        response.body?.string()?.takeIf {
-                            it.isNotEmpty()
-                        }?.let { content ->
-                            runCatching {
-                                JSON.decodeFromString<TwitterApiException>(content)
-                            }.getOrNull()?.takeIf {
-                                !it.microBlogErrorMessage.isNullOrEmpty()
-                            }.let {
-                                it ?: runCatching {
-                                    JSON.decodeFromString<TwitterApiExceptionV2>(content)
-                                }.getOrNull()
-                            }?.let {
-                                throw it
-                            } ?: throw MicroBlogHttpException(response.code)
-                        } ?: throw MicroBlogHttpException(response.code)
-                    } else {
-                        response
-                    }
-                }
-                MastodonResources::class.java -> Interceptor { chain ->
-                    val response = chain.proceed(chain.request())
-                    if (!response.isSuccessful) {
-                        response.body?.string()?.takeIf {
-                            it.isNotEmpty()
-                        }?.let { content ->
-                            runCatching {
-                                JSON.decodeFromString<MastodonException>(content)
-                            }.getOrNull()?.let {
-                                throw it
-                            } ?: throw MicroBlogHttpException(response.code)
-                        } ?: throw MicroBlogHttpException(response.code)
-                    } else {
-                        response
-                    }
-                }
-                else -> null
-            }
-            retrofit(
-                clazz,
-                baseUrl,
-                authorization,
-                createHttpClientBuilder(),
-                interceptors
+  @OptIn(ExperimentalSerializationApi::class)
+  @Suppress("UNCHECKED_CAST")
+  override fun <T> createResources(
+    clazz: Class<T>,
+    baseUrl: String,
+    authorization: Authorization,
+    useCache: Boolean
+  ): T {
+    val cache = resourceCache[clazz]
+    val cacheIdentifier = CacheIdentifier(configProvider.provideConfig(), baseUrl)
+    val result: T = if (cache != null && cache.second == cacheIdentifier && useCache) {
+      cache.first as T
+    } else {
+      val interceptors = when (clazz) {
+        TwitterResources::class.java -> Interceptor { chain ->
+          val response = chain.proceed(chain.request())
+          if (!response.isSuccessful) {
+            response.body?.string()?.takeIf {
+              it.isNotEmpty()
+            }?.let { content ->
+              runCatching {
+                JSON.decodeFromString<TwitterApiException>(content)
+              }.getOrNull()?.takeIf {
+                !it.microBlogErrorMessage.isNullOrEmpty()
+              }.let {
+                it ?: runCatching {
+                  JSON.decodeFromString<TwitterApiExceptionV2>(content)
+                }.getOrNull()
+              }?.let {
+                throw it
+              } ?: throw MicroBlogHttpException(response.code)
+            } ?: throw MicroBlogHttpException(response.code)
+          } else {
+            response
+          }
+        }
+        MastodonResources::class.java -> Interceptor { chain ->
+          val response = chain.proceed(chain.request())
+          if (!response.isSuccessful) {
+            response.body?.string()?.takeIf {
+              it.isNotEmpty()
+            }?.let { content ->
+              runCatching {
+                JSON.decodeFromString<MastodonException>(content)
+              }.getOrNull()?.let {
+                throw it
+              } ?: throw MicroBlogHttpException(response.code)
+            } ?: throw MicroBlogHttpException(response.code)
+          } else {
+            response
+          }
+        }
+        else -> null
+      }
+      retrofit(
+        clazz,
+        baseUrl,
+        authorization,
+        createHttpClientBuilder(),
+        interceptors
+      )
+    }
+    if (useCache) {
+      resourceCache[clazz] = Pair(result, cacheIdentifier)
+    }
+    return result
+  }
+
+  override fun createHttpClientBuilder(): OkHttpClient.Builder {
+    val config = configProvider.provideConfig()
+    return proxy(OkHttpClient.Builder(), config.proxyConfig)
+  }
+
+  private fun proxy(
+    builder: OkHttpClient.Builder,
+    proxyConfig: ProxyConfig
+  ): OkHttpClient.Builder {
+    return if (proxyConfig.enable) {
+
+      when (proxyConfig.type) {
+        ProxyConfig.Type.HTTP -> {
+          proxyOkHttpBuilder(
+            builder,
+            proxyType = Proxy.Type.HTTP,
+            host = proxyConfig.server,
+            port = proxyConfig.port,
+            username = proxyConfig.userName,
+            password = proxyConfig.password,
+          )
+        }
+        ProxyConfig.Type.SOCKS -> {
+          proxyOkHttpBuilder(
+            builder,
+            proxyType = Proxy.Type.SOCKS,
+            host = proxyConfig.server,
+            port = proxyConfig.port,
+            username = proxyConfig.userName,
+            password = proxyConfig.password,
+          )
+        }
+        ProxyConfig.Type.REVERSE -> {
+          builder.addInterceptor(
+            ReverseProxyInterceptor(
+              proxyConfig.server,
+              proxyConfig.userName,
+              proxyConfig.password,
             )
+          )
         }
-        if (useCache) {
-            resourceCache[clazz] = Pair(result, cacheIdentifier)
+      }
+    } else {
+      builder
+    }
+  }
+
+  private fun proxyOkHttpBuilder(
+    builder: OkHttpClient.Builder,
+    proxyType: Proxy.Type,
+    host: String,
+    port: Int,
+    username: String,
+    password: String,
+  ): OkHttpClient.Builder {
+    if (port !in (0..65535)) return builder
+    val address = InetSocketAddress.createUnresolved(host, port)
+    return builder.proxy(Proxy(proxyType, address))
+      .proxyAuthenticator { _, response ->
+        val b = response.request.newBuilder()
+        if (response.code == 407) {
+          if (username.isNotEmpty() && password.isNotEmpty()) {
+            val credential = Credentials.basic(username, password)
+            b.header("Proxy-Authorization", credential)
+          }
         }
-        return result
-    }
+        b.build()
+      }
+  }
 
-    override fun createHttpClientBuilder(): OkHttpClient.Builder {
-        val config = configProvider.provideConfig()
-        return proxy(OkHttpClient.Builder(), config.proxyConfig)
-    }
-
-    private fun proxy(
-        builder: OkHttpClient.Builder,
-        proxyConfig: ProxyConfig
-    ): OkHttpClient.Builder {
-        return if (proxyConfig.enable) {
-
-            when (proxyConfig.type) {
-                ProxyConfig.Type.HTTP -> {
-                    proxyOkHttpBuilder(
-                        builder,
-                        proxyType = Proxy.Type.HTTP,
-                        host = proxyConfig.server,
-                        port = proxyConfig.port,
-                        username = proxyConfig.userName,
-                        password = proxyConfig.password,
-                    )
+  @OptIn(ExperimentalSerializationApi::class)
+  private fun <T> retrofit(
+    clazz: Class<T>,
+    baseUrl: String,
+    authorization: Authorization,
+    clientBuilder: OkHttpClient.Builder = OkHttpClient.Builder(),
+    vararg interceptors: Interceptor?
+  ): T {
+    return Retrofit
+      .Builder()
+      .baseUrl(baseUrl)
+      .client(
+        clientBuilder
+          .addInterceptor(AuthorizationInterceptor(authorization))
+          .apply {
+            if (DEBUG) {
+              addInterceptor(
+                HttpLoggingInterceptor().apply {
+                  setLevel(HttpLoggingInterceptor.Level.BODY)
                 }
-                ProxyConfig.Type.SOCKS -> {
-                    proxyOkHttpBuilder(
-                        builder,
-                        proxyType = Proxy.Type.SOCKS,
-                        host = proxyConfig.server,
-                        port = proxyConfig.port,
-                        username = proxyConfig.userName,
-                        password = proxyConfig.password,
-                    )
-                }
-                ProxyConfig.Type.REVERSE -> {
-                    builder.addInterceptor(
-                        ReverseProxyInterceptor(
-                            proxyConfig.server,
-                            proxyConfig.userName,
-                            proxyConfig.password,
-                        )
-                    )
-                }
+              )
             }
-        } else {
-            builder
-        }
-    }
-
-    private fun proxyOkHttpBuilder(
-        builder: OkHttpClient.Builder,
-        proxyType: Proxy.Type,
-        host: String,
-        port: Int,
-        username: String,
-        password: String,
-    ): OkHttpClient.Builder {
-        if (port !in (0..65535)) return builder
-        val address = InetSocketAddress.createUnresolved(host, port)
-        return builder.proxy(Proxy(proxyType, address))
-            .proxyAuthenticator { _, response ->
-                val b = response.request.newBuilder()
-                if (response.code == 407) {
-                    if (username.isNotEmpty() && password.isNotEmpty()) {
-                        val credential = Credentials.basic(username, password)
-                        b.header("Proxy-Authorization", credential)
-                    }
+            addInterceptor {
+              it.proceed(
+                it.request().let { request ->
+                  request.newBuilder()
+                    .url(request.url.toString().replace("%20", "+")).build()
                 }
-                b.build()
+              )
             }
+            interceptors.forEach {
+              it?.let { addInterceptor(it) }
+            }
+          }
+          .build()
+      )
+      .addConverterFactory(ScalarsConverterFactory.create())
+      .addConverterFactory(JSON.asConverterFactory("application/json".toMediaType()))
+      .addConverterFactory(DateQueryConverterFactory())
+      .build()
+      .create(clazz)
+  }
+
+  private data class CacheIdentifier(
+    val config: HttpConfig,
+    val baseUrl: String
+  ) {
+    override fun equals(other: Any?): Boolean {
+      if (other !is CacheIdentifier) return false
+      return config.toString() == other.config.toString() &&
+        baseUrl == other.baseUrl
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
-    private fun <T> retrofit(
-        clazz: Class<T>,
-        baseUrl: String,
-        authorization: Authorization,
-        clientBuilder: OkHttpClient.Builder = OkHttpClient.Builder(),
-        vararg interceptors: Interceptor?
-    ): T {
-        return Retrofit
-            .Builder()
-            .baseUrl(baseUrl)
-            .client(
-                clientBuilder
-                    .addInterceptor(AuthorizationInterceptor(authorization))
-                    .apply {
-                        if (DEBUG) {
-                            addInterceptor(
-                                HttpLoggingInterceptor().apply {
-                                    setLevel(HttpLoggingInterceptor.Level.BODY)
-                                }
-                            )
-                        }
-                        addInterceptor {
-                            it.proceed(
-                                it.request().let { request ->
-                                    request.newBuilder()
-                                        .url(request.url.toString().replace("%20", "+")).build()
-                                }
-                            )
-                        }
-                        interceptors.forEach {
-                            it?.let { addInterceptor(it) }
-                        }
-                    }
-                    .build()
-            )
-            .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(JSON.asConverterFactory("application/json".toMediaType()))
-            .addConverterFactory(DateQueryConverterFactory())
-            .build()
-            .create(clazz)
+    override fun hashCode(): Int {
+      var result = config.hashCode()
+      result = 31 * result + baseUrl.hashCode()
+      return result
     }
-
-    private data class CacheIdentifier(
-        val config: HttpConfig,
-        val baseUrl: String
-    ) {
-        override fun equals(other: Any?): Boolean {
-            if (other !is CacheIdentifier) return false
-            return config.toString() == other.config.toString() &&
-                baseUrl == other.baseUrl
-        }
-
-        override fun hashCode(): Int {
-            var result = config.hashCode()
-            result = 31 * result + baseUrl.hashCode()
-            return result
-        }
-    }
+  }
 }

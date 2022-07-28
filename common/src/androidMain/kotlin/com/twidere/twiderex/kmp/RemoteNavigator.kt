@@ -28,42 +28,42 @@ import com.twidere.twiderex.extensions.shareMedia
 import com.twidere.twiderex.extensions.shareText
 
 actual class RemoteNavigator(private val context: Context) {
-    actual fun openDeepLink(deeplink: String, fromBackground: Boolean) {
-        context.startActivity(
-            Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse(deeplink).normalizeScheme()
-            ).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-        )
-    }
+  actual fun openDeepLink(deeplink: String, fromBackground: Boolean) {
+    context.startActivity(
+      Intent(
+        Intent.ACTION_VIEW,
+        Uri.parse(deeplink).normalizeScheme()
+      ).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      }
+    )
+  }
 
-    actual fun shareMedia(
-        filePath: String,
-        mimeType: String,
-        fromBackground: Boolean,
-        extraText: String,
-    ) {
-        context.shareMedia(
-            uri = Uri.parse(filePath),
-            mimeType = mimeType,
-            extraText = extraText,
-        )
-    }
+  actual fun shareMedia(
+    filePath: String,
+    mimeType: String,
+    fromBackground: Boolean,
+    extraText: String,
+  ) {
+    context.shareMedia(
+      uri = Uri.parse(filePath),
+      mimeType = mimeType,
+      extraText = extraText,
+    )
+  }
 
-    actual fun shareText(content: String, fromBackground: Boolean) {
-        context.shareText(
-            content = content,
-        )
-    }
+  actual fun shareText(content: String, fromBackground: Boolean) {
+    context.shareText(
+      content = content,
+    )
+  }
 
-    actual fun launchOAuthUri(uri: String) {
-        CustomTabsIntent.Builder()
-            .setShareState(CustomTabsIntent.SHARE_STATE_OFF)
-            .build().run {
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                launchUrl(context, Uri.parse(uri))
-            }
-    }
+  actual fun launchOAuthUri(uri: String) {
+    CustomTabsIntent.Builder()
+      .setShareState(CustomTabsIntent.SHARE_STATE_OFF)
+      .build().run {
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        launchUrl(context, Uri.parse(uri))
+      }
+  }
 }

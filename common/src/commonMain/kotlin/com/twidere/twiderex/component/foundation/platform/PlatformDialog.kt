@@ -25,7 +25,7 @@ import com.twidere.twiderex.component.foundation.DialogProperties
 
 @Composable
 expect fun PlatformDialog(
-    onDismissRequest: () -> Unit,
-    properties: DialogProperties = DialogProperties(),
-    content: @Composable (() -> Unit)
+  onDismissRequest: () -> Unit,
+  properties: DialogProperties = DialogProperties(),
+  content: @Composable (() -> Unit)
 )

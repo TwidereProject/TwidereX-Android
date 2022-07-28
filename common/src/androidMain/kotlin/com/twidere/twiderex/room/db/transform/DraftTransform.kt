@@ -24,21 +24,21 @@ import com.twidere.twiderex.model.ui.UiDraft
 import com.twidere.twiderex.room.db.model.DbDraft
 
 internal fun DbDraft.toUiDraft() = UiDraft(
-    content = content,
-    draftId = _id,
-    media = media,
-    composeType = composeType,
-    createdAt = createdAt,
-    statusKey = statusKey,
-    excludedReplyUserIds = excludedReplyUserIds
+  content = content,
+  draftId = _id,
+  media = media,
+  composeType = composeType,
+  createdAt = createdAt,
+  statusKey = statusKey,
+  excludedReplyUserIds = excludedReplyUserIds
 )
 
 internal fun UiDraft.toDbDraft() = DbDraft(
-    content = content,
-    _id = draftId,
-    media = media,
-    composeType = composeType,
-    createdAt = createdAt,
-    statusKey = statusKey,
-    excludedReplyUserIds = excludedReplyUserIds
+  content = content,
+  _id = draftId,
+  media = media,
+  composeType = composeType,
+  createdAt = createdAt,
+  statusKey = statusKey,
+  excludedReplyUserIds = excludedReplyUserIds
 )

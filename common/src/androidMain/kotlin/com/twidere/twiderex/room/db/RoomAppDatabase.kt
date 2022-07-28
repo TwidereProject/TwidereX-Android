@@ -34,34 +34,34 @@ import com.twidere.twiderex.room.db.model.converter.MicroBlogKeyConverter
 import com.twidere.twiderex.room.db.model.converter.StringListConverter
 
 @Database(
-    entities = [
-        DbDraft::class,
-        DbSearch::class,
-    ],
-    version = 3,
+  entities = [
+    DbDraft::class,
+    DbSearch::class,
+  ],
+  version = 3,
 )
 @TypeConverters(
-    MicroBlogKeyConverter::class,
-    ComposeTypeConverter::class,
-    StringListConverter::class,
+  MicroBlogKeyConverter::class,
+  ComposeTypeConverter::class,
+  StringListConverter::class,
 )
 internal abstract class RoomAppDatabase : RoomDatabase() {
-    abstract fun draftDao(): RoomDraftDao
-    abstract fun searchDao(): RoomSearchDao
+  abstract fun draftDao(): RoomDraftDao
+  abstract fun searchDao(): RoomSearchDao
 }
 
 val AppDatabase_Migration_1_2 = object : Migration(1, 2) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("CREATE TABLE IF NOT EXISTS `search` (`_id` TEXT NOT NULL, `content` TEXT NOT NULL, `lastActive` INTEGER NOT NULL, PRIMARY KEY(`_id`))")
-        database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_content` ON `search` (`content`)")
-    }
+  override fun migrate(database: SupportSQLiteDatabase) {
+    database.execSQL("CREATE TABLE IF NOT EXISTS `search` (`_id` TEXT NOT NULL, `content` TEXT NOT NULL, `lastActive` INTEGER NOT NULL, PRIMARY KEY(`_id`))")
+    database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_content` ON `search` (`content`)")
+  }
 }
 
 val AppDatabase_Migration_2_3 = object : Migration(2, 3) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("ALTER TABLE `search` ADD COLUMN `saved` INTEGER DEFAULT 0 NOT NULL")
-        database.execSQL("ALTER TABLE `search` ADD COLUMN `accountKey` TEXT DEFAULT 'null' NOT NULL")
-        database.execSQL("DROP INDEX `index_search_content`")
-        database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_content_accountKey` ON `search` (`content`, `accountKey`)")
-    }
+  override fun migrate(database: SupportSQLiteDatabase) {
+    database.execSQL("ALTER TABLE `search` ADD COLUMN `saved` INTEGER DEFAULT 0 NOT NULL")
+    database.execSQL("ALTER TABLE `search` ADD COLUMN `accountKey` TEXT DEFAULT 'null' NOT NULL")
+    database.execSQL("DROP INDEX `index_search_content`")
+    database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_content_accountKey` ON `search` (`content`, `accountKey`)")
+  }
 }

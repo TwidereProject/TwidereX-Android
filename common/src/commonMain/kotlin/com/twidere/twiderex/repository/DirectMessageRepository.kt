@@ -42,183 +42,183 @@ import com.twidere.twiderex.paging.mediator.dm.DMEventMediator.Companion.toUi
 import kotlinx.coroutines.flow.Flow
 
 class DirectMessageRepository(
-    private val database: CacheDatabase
+  private val database: CacheDatabase
 ) {
-    private val userNotFound = mutableListOf<MicroBlogKey>()
-    fun dmConversation(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey
-    ): Flow<UiDMConversation?> {
-        return database.directMessageConversationDao()
-            .findWithConversationKeyFlow(
+  private val userNotFound = mutableListOf<MicroBlogKey>()
+  fun dmConversation(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey
+  ): Flow<UiDMConversation?> {
+    return database.directMessageConversationDao()
+      .findWithConversationKeyFlow(
+        accountKey = accountKey,
+        conversationKey = conversationKey
+      )
+  }
+
+  fun dmConversationListSource(
+    accountKey: MicroBlogKey,
+    service: DirectMessageService,
+    lookupService: LookupService
+  ): Flow<PagingData<UiDMConversationWithLatestMessage>> {
+    return DMConversationMediator(
+      database = database,
+      accountKey = accountKey,
+      realFetch = { key ->
+        fetchEventAndSaveToDataBase(key, accountKey, service, lookupService)
+      }
+    ).pager().toUi()
+  }
+
+  fun dmEventListSource(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey,
+    service: DirectMessageService,
+    lookupService: LookupService,
+  ): Flow<PagingData<UiDMEvent>> {
+    return DMEventMediator(
+      database = database,
+      conversationKey = conversationKey,
+      accountKey = accountKey,
+      realFetch = { key ->
+        fetchEventAndSaveToDataBase(key, accountKey, service, lookupService)
+      }
+    ).pager().toUi()
+  }
+
+  suspend fun createNewConversation(
+    receiver: UiUser,
+    accountKey: MicroBlogKey,
+    platformType: PlatformType
+  ): MicroBlogKey {
+    if (platformType != PlatformType.Twitter) throw Error()
+    val conversationId = "${accountKey.id}-${receiver.id}"
+    val conversationKey = MicroBlogKey.twitter(conversationId)
+
+    return database.withTransaction {
+      database.directMessageConversationDao()
+        .findWithConversationKey(accountKey, conversationKey)
+        ?.conversationKey
+        ?: let {
+          database.directMessageConversationDao().insertAll(
+            listOf(
+              UiDMConversation(
                 accountKey = accountKey,
-                conversationKey = conversationKey
+                conversationId = conversationId,
+                conversationKey = conversationKey,
+                conversationAvatar = receiver.profileImage.toString(),
+                conversationName = receiver.displayName,
+                conversationSubName = receiver.screenName,
+                conversationType = UiDMConversation.Type.ONE_TO_ONE,
+                recipientKey = receiver.userKey
+              )
             )
-    }
-
-    fun dmConversationListSource(
-        accountKey: MicroBlogKey,
-        service: DirectMessageService,
-        lookupService: LookupService
-    ): Flow<PagingData<UiDMConversationWithLatestMessage>> {
-        return DMConversationMediator(
-            database = database,
-            accountKey = accountKey,
-            realFetch = { key ->
-                fetchEventAndSaveToDataBase(key, accountKey, service, lookupService)
-            }
-        ).pager().toUi()
-    }
-
-    fun dmEventListSource(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey,
-        service: DirectMessageService,
-        lookupService: LookupService,
-    ): Flow<PagingData<UiDMEvent>> {
-        return DMEventMediator(
-            database = database,
-            conversationKey = conversationKey,
-            accountKey = accountKey,
-            realFetch = { key ->
-                fetchEventAndSaveToDataBase(key, accountKey, service, lookupService)
-            }
-        ).pager().toUi()
-    }
-
-    suspend fun createNewConversation(
-        receiver: UiUser,
-        accountKey: MicroBlogKey,
-        platformType: PlatformType
-    ): MicroBlogKey {
-        if (platformType != PlatformType.Twitter) throw Error()
-        val conversationId = "${accountKey.id}-${receiver.id}"
-        val conversationKey = MicroBlogKey.twitter(conversationId)
-
-        return database.withTransaction {
-            database.directMessageConversationDao()
-                .findWithConversationKey(accountKey, conversationKey)
-                ?.conversationKey
-                ?: let {
-                    database.directMessageConversationDao().insertAll(
-                        listOf(
-                            UiDMConversation(
-                                accountKey = accountKey,
-                                conversationId = conversationId,
-                                conversationKey = conversationKey,
-                                conversationAvatar = receiver.profileImage.toString(),
-                                conversationName = receiver.displayName,
-                                conversationSubName = receiver.screenName,
-                                conversationType = UiDMConversation.Type.ONE_TO_ONE,
-                                recipientKey = receiver.userKey
-                            )
-                        )
-                    )
-                    conversationKey
-                }
+          )
+          conversationKey
         }
     }
+  }
 
-    suspend fun checkNewMessages(accountKey: MicroBlogKey, service: DirectMessageService, lookupService: LookupService): List<UiDMConversationWithLatestMessage> {
-        return database.withTransaction {
-            val oldConversation = database.directMessageConversationDao().find(accountKey)
-            fetchEventAndSaveToDataBase(null, accountKey = accountKey, service = service, lookupService = lookupService)
-            val newConversation = database.directMessageConversationDao().find(accountKey).toMutableList()
-            newConversation.removeAll { con ->
-                val needDrop = con.latestMessage.sender.userKey == accountKey ||
-                    oldConversation.find {
-                        // self send message or same received message
-                        it.latestMessage.messageKey == con.latestMessage.messageKey
-                    }?.let { true } ?: false
-                needDrop
-            }
-            newConversation
+  suspend fun checkNewMessages(accountKey: MicroBlogKey, service: DirectMessageService, lookupService: LookupService): List<UiDMConversationWithLatestMessage> {
+    return database.withTransaction {
+      val oldConversation = database.directMessageConversationDao().find(accountKey)
+      fetchEventAndSaveToDataBase(null, accountKey = accountKey, service = service, lookupService = lookupService)
+      val newConversation = database.directMessageConversationDao().find(accountKey).toMutableList()
+      newConversation.removeAll { con ->
+        val needDrop = con.latestMessage.sender.userKey == accountKey ||
+          oldConversation.find {
+            // self send message or same received message
+            it.latestMessage.messageKey == con.latestMessage.messageKey
+          }?.let { true } ?: false
+        needDrop
+      }
+      newConversation
+    }
+  }
+
+  suspend fun deleteMessage(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey,
+    messageId: String,
+    messageKey: MicroBlogKey,
+    service: DirectMessageService
+  ) = database.withTransaction {
+    database.directMessageDao().findWithMessageKey(
+      accountKey,
+      conversationKey,
+      messageKey
+    )?.let {
+      database.directMessageDao().delete(it)
+      try {
+        service.destroyDirectMessage(messageId)
+      } catch (e: TwitterApiException) {
+        // code 34 means this message not exists on server, ignore this error, continue delete it form db
+        if (e.errors?.first()?.code != 34) throw e
+      }
+      // if conversation is empty, delete conversation too
+      if (database.directMessageDao().getMessageCount(accountKey, conversationKey) == 0L) {
+        val conversation =
+          database.directMessageConversationDao().findWithConversationKey(accountKey, conversationKey)
+        conversation?.let {
+          database.directMessageConversationDao().delete(it)
+        }
+      }
+    }
+  }
+
+  suspend fun fetchEventAndSaveToDataBase(key: String?, accountKey: MicroBlogKey, service: DirectMessageService, lookupService: LookupService): List<IDirectMessage> {
+    val result = service.getDirectMessages(key, 50)
+    val events = result.mapNotNull {
+      if (it is DirectMessageEvent) {
+        // check if sender and receiver is not null
+        lookupUser(
+          accountKey,
+          MicroBlogKey.twitter(it.messageCreate?.senderId ?: ""),
+          lookupService
+        )?.let { sender ->
+          it.toUi(accountKey, sender)
+        }?.let { event ->
+          if (lookupUser(accountKey, event.recipientAccountKey, lookupService) != null) event else null
+        }
+      } else null
+    }
+    // save message, media
+    database.withTransaction {
+      database.directMessageDao().insertAll(events)
+      events.groupBy { it.conversationKey }
+        .mapNotNull { entry ->
+          val msgWithData = entry.value.first()
+          lookupUser(accountKey, msgWithData.conversationUserKey, lookupService)?.let {
+            UiDMConversation(
+              accountKey = accountKey,
+              conversationId = msgWithData.conversationKey.id,
+              conversationKey = msgWithData.conversationKey,
+              conversationAvatar = it.profileImage.toString(),
+              conversationName = it.name,
+              conversationSubName = it.screenName,
+              conversationType = UiDMConversation.Type.ONE_TO_ONE,
+              recipientKey = msgWithData.conversationUserKey
+            )
+          }
+        }.let {
+          database.directMessageConversationDao().insertAll(it)
         }
     }
+    return result
+  }
 
-    suspend fun deleteMessage(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey,
-        messageId: String,
-        messageKey: MicroBlogKey,
-        service: DirectMessageService
-    ) = database.withTransaction {
-        database.directMessageDao().findWithMessageKey(
-            accountKey,
-            conversationKey,
-            messageKey
-        )?.let {
-            database.directMessageDao().delete(it)
-            try {
-                service.destroyDirectMessage(messageId)
-            } catch (e: TwitterApiException) {
-                // code 34 means this message not exists on server, ignore this error, continue delete it form db
-                if (e.errors?.first()?.code != 34) throw e
-            }
-            // if conversation is empty, delete conversation too
-            if (database.directMessageDao().getMessageCount(accountKey, conversationKey) == 0L) {
-                val conversation =
-                    database.directMessageConversationDao().findWithConversationKey(accountKey, conversationKey)
-                conversation?.let {
-                    database.directMessageConversationDao().delete(it)
-                }
-            }
-        }
+  private suspend fun lookupUser(accountKey: MicroBlogKey, userKey: MicroBlogKey, service: LookupService): UiUser? {
+    return database.userDao().findWithUserKey(userKey) ?: let {
+      try {
+        if (userNotFound.contains(userKey)) return null
+        val user = service.lookupUser(userKey.id)
+          .toUi(accountKey)
+        database.userDao().insertAll(listOf(user))
+        user
+      } catch (e: MicroBlogNotFoundException) {
+        userNotFound.add(userKey)
+        null
+      }
     }
-
-    suspend fun fetchEventAndSaveToDataBase(key: String?, accountKey: MicroBlogKey, service: DirectMessageService, lookupService: LookupService): List<IDirectMessage> {
-        val result = service.getDirectMessages(key, 50)
-        val events = result.mapNotNull {
-            if (it is DirectMessageEvent) {
-                // check if sender and receiver is not null
-                lookupUser(
-                    accountKey,
-                    MicroBlogKey.twitter(it.messageCreate?.senderId ?: ""),
-                    lookupService
-                )?.let { sender ->
-                    it.toUi(accountKey, sender)
-                }?.let { event ->
-                    if (lookupUser(accountKey, event.recipientAccountKey, lookupService) != null) event else null
-                }
-            } else null
-        }
-        // save message, media
-        database.withTransaction {
-            database.directMessageDao().insertAll(events)
-            events.groupBy { it.conversationKey }
-                .mapNotNull { entry ->
-                    val msgWithData = entry.value.first()
-                    lookupUser(accountKey, msgWithData.conversationUserKey, lookupService)?.let {
-                        UiDMConversation(
-                            accountKey = accountKey,
-                            conversationId = msgWithData.conversationKey.id,
-                            conversationKey = msgWithData.conversationKey,
-                            conversationAvatar = it.profileImage.toString(),
-                            conversationName = it.name,
-                            conversationSubName = it.screenName,
-                            conversationType = UiDMConversation.Type.ONE_TO_ONE,
-                            recipientKey = msgWithData.conversationUserKey
-                        )
-                    }
-                }.let {
-                    database.directMessageConversationDao().insertAll(it)
-                }
-        }
-        return result
-    }
-
-    private suspend fun lookupUser(accountKey: MicroBlogKey, userKey: MicroBlogKey, service: LookupService): UiUser? {
-        return database.userDao().findWithUserKey(userKey) ?: let {
-            try {
-                if (userNotFound.contains(userKey)) return null
-                val user = service.lookupUser(userKey.id)
-                    .toUi(accountKey)
-                database.userDao().insertAll(listOf(user))
-                user
-            } catch (e: MicroBlogNotFoundException) {
-                userNotFound.add(userKey)
-                null
-            }
-        }
-    }
+  }
 }

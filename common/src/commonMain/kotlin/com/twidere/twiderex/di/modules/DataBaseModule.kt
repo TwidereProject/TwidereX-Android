@@ -24,7 +24,7 @@ import com.twidere.twiderex.dataprovider.DataProvider
 import org.koin.dsl.module
 
 val dataBaseModule = module {
-    single { DataProvider.create() }
-    single { get<DataProvider>().appDatabase }
-    single { get<DataProvider>().cacheDatabase }
+  single { DataProvider.create() }
+  single { get<DataProvider>().appDatabase }
+  single { get<DataProvider>().cacheDatabase }
 }

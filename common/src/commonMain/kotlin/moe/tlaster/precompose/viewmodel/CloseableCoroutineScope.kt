@@ -37,21 +37,21 @@ private const val JOB_KEY = "moe.tlaster.precompose.viewmodel.ViewModelCoroutine
  * [Dispatchers.Main.immediate][kotlinx.coroutines.MainCoroutineDispatcher.immediate]
  */
 val ViewModel.viewModelScope: CoroutineScope
-    get() {
-        val scope: CoroutineScope? = getTag(JOB_KEY)
-        if (scope != null) {
-            return scope
-        }
-        return setTagIfAbsent(
-            JOB_KEY,
-            CloseableCoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-        )
+  get() {
+    val scope: CoroutineScope? = getTag(JOB_KEY)
+    if (scope != null) {
+      return scope
     }
+    return setTagIfAbsent(
+      JOB_KEY,
+      CloseableCoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    )
+  }
 
 internal class CloseableCoroutineScope(context: CoroutineContext) : Closeable, CoroutineScope {
-    override val coroutineContext: CoroutineContext = context
+  override val coroutineContext: CoroutineContext = context
 
-    override fun close() {
-        coroutineContext.cancel()
-    }
+  override fun close() {
+    coroutineContext.cancel()
+  }
 }

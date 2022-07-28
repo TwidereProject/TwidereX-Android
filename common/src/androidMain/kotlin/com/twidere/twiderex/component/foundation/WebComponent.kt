@@ -41,100 +41,100 @@ import androidx.compose.ui.zIndex
 import com.twidere.twiderex.view.LollipopFixWebView
 
 class WebContext {
-    fun goForward() {
-        webView?.goForward()
-    }
+  fun goForward() {
+    webView?.goForward()
+  }
 
-    fun goBack() {
-        webView?.goBack()
-    }
+  fun goBack() {
+    webView?.goBack()
+  }
 
-    fun canGoBack(): Boolean {
-        return webView?.canGoBack() ?: false
-    }
+  fun canGoBack(): Boolean {
+    return webView?.canGoBack() ?: false
+  }
 
-    internal var webView: WebView? = null
+  internal var webView: WebView? = null
 }
 
 private fun WebView.setRef(ref: (WebView) -> Unit) {
-    ref(this)
+  ref(this)
 }
 
 private fun WebView.setUrl(url: String) {
-    if (originalUrl != url) {
-        loadUrl(url)
-    }
+  if (originalUrl != url) {
+    loadUrl(url)
+  }
 }
 
 @Composable
 fun WebComponent(
-    url: String,
-    webContext: WebContext = WebContext(),
-    enableJavascript: Boolean = true,
-    javascriptInterface: Map<String, Any> = mapOf(),
-    onPageFinished: ((view: WebView, url: String) -> Unit)? = null,
-    onPageStarted: ((view: WebView, url: String) -> Unit)? = null,
-    config: (WebView) -> Unit = {},
+  url: String,
+  webContext: WebContext = WebContext(),
+  enableJavascript: Boolean = true,
+  javascriptInterface: Map<String, Any> = mapOf(),
+  onPageFinished: ((view: WebView, url: String) -> Unit)? = null,
+  onPageStarted: ((view: WebView, url: String) -> Unit)? = null,
+  config: (WebView) -> Unit = {},
 ) {
-    var progress by remember { mutableStateOf(0f) }
-    if (webContext.canGoBack()) {
-        BackHandler {
-            webContext.goBack()
-        }
+  var progress by remember { mutableStateOf(0f) }
+  if (webContext.canGoBack()) {
+    BackHandler {
+      webContext.goBack()
     }
-    Box {
-        if (progress != 1f) {
-            LinearProgressIndicator(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopStart)
-                    .zIndex(1f),
-                progress = progress
-            )
-        }
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { context ->
-                LollipopFixWebView(context).also {
-                    it.settings.apply {
-                        javaScriptEnabled = enableJavascript
-                    }
-                    it.webChromeClient = ComposeWebChromeClient(
-                        onProgress = {
-                            progress = it
-                        }
-                    )
-                    it.webViewClient = ComposeWebViewClient(onPageFinished, onPageStarted)
-                    javascriptInterface.forEach { item ->
-                        it.addJavascriptInterface(item.value, item.key)
-                    }
-                    it.setRef { view -> webContext.webView = view }
-                    config.invoke(it)
-                    it.setUrl(url)
-                }
-            },
-        )
+  }
+  Box {
+    if (progress != 1f) {
+      LinearProgressIndicator(
+        modifier = Modifier
+          .fillMaxWidth()
+          .align(Alignment.TopStart)
+          .zIndex(1f),
+        progress = progress
+      )
     }
+    AndroidView(
+      modifier = Modifier.fillMaxSize(),
+      factory = { context ->
+        LollipopFixWebView(context).also {
+          it.settings.apply {
+            javaScriptEnabled = enableJavascript
+          }
+          it.webChromeClient = ComposeWebChromeClient(
+            onProgress = {
+              progress = it
+            }
+          )
+          it.webViewClient = ComposeWebViewClient(onPageFinished, onPageStarted)
+          javascriptInterface.forEach { item ->
+            it.addJavascriptInterface(item.value, item.key)
+          }
+          it.setRef { view -> webContext.webView = view }
+          config.invoke(it)
+          it.setUrl(url)
+        }
+      },
+    )
+  }
 }
 
 private class ComposeWebChromeClient(
-    private val onProgress: (Float) -> Unit = {}
+  private val onProgress: (Float) -> Unit = {}
 ) : WebChromeClient() {
-    override fun onProgressChanged(view: WebView?, newProgress: Int) {
-        onProgress.invoke(newProgress.toFloat() / 100f)
-    }
+  override fun onProgressChanged(view: WebView?, newProgress: Int) {
+    onProgress.invoke(newProgress.toFloat() / 100f)
+  }
 }
 
 private class ComposeWebViewClient(
-    val pageFinished: ((view: WebView, url: String) -> Unit)? = null,
-    val pageStarted: ((view: WebView, url: String) -> Unit)? = null,
+  val pageFinished: ((view: WebView, url: String) -> Unit)? = null,
+  val pageStarted: ((view: WebView, url: String) -> Unit)? = null,
 ) : WebViewClient() {
 
-    override fun onPageFinished(view: WebView, url: String) {
-        pageFinished?.invoke(view, url)
-    }
+  override fun onPageFinished(view: WebView, url: String) {
+    pageFinished?.invoke(view, url)
+  }
 
-    override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-        pageStarted?.invoke(view, url)
-    }
+  override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+    pageStarted?.invoke(view, url)
+  }
 }

@@ -31,101 +31,101 @@ import com.twidere.twiderex.room.db.transform.toPagingTimeline
 import com.twidere.twiderex.room.db.transform.toUi
 
 internal fun RoomDirectMessageConversationDao.getPagingSource(
-    cacheDatabase: RoomCacheDatabase,
-    accountKey: MicroBlogKey
+  cacheDatabase: RoomCacheDatabase,
+  accountKey: MicroBlogKey
 ) = LimitOffsetTransformPagingSource(
-    db = cacheDatabase,
-    loadPagingList = { offset, limit ->
-        getPagingList(
-            accountKey = accountKey,
-            limit = limit,
-            offset = offset
-        ).map { it.toUi() }
-    },
-    queryItemCount = {
-        getPagingListCount(accountKey = accountKey)
-    },
-    tables = arrayOf(
-        "dm_conversation",
-        "dm_event"
-    )
+  db = cacheDatabase,
+  loadPagingList = { offset, limit ->
+    getPagingList(
+      accountKey = accountKey,
+      limit = limit,
+      offset = offset
+    ).map { it.toUi() }
+  },
+  queryItemCount = {
+    getPagingListCount(accountKey = accountKey)
+  },
+  tables = arrayOf(
+    "dm_conversation",
+    "dm_event"
+  )
 )
 
 internal fun RoomDirectMessageEventDao.getPagingSource(
-    cacheDatabase: RoomCacheDatabase,
-    accountKey: MicroBlogKey,
-    conversationKey: MicroBlogKey
+  cacheDatabase: RoomCacheDatabase,
+  accountKey: MicroBlogKey,
+  conversationKey: MicroBlogKey
 ) = LimitOffsetTransformPagingSource(
-    db = cacheDatabase,
-    loadPagingList = { offset, limit ->
-        getPagingList(
-            accountKey = accountKey,
-            conversationKey = conversationKey,
-            limit = limit,
-            offset = offset
-        ).map { it.toUi() }
-    },
-    queryItemCount = {
-        getPagingListCount(accountKey = accountKey, conversationKey = conversationKey)
-    },
-    tables = arrayOf("dm_event")
+  db = cacheDatabase,
+  loadPagingList = { offset, limit ->
+    getPagingList(
+      accountKey = accountKey,
+      conversationKey = conversationKey,
+      limit = limit,
+      offset = offset
+    ).map { it.toUi() }
+  },
+  queryItemCount = {
+    getPagingListCount(accountKey = accountKey, conversationKey = conversationKey)
+  },
+  tables = arrayOf("dm_event")
 )
 
 internal fun RoomListsDao.getPagingSource(
-    cacheDatabase: RoomCacheDatabase,
-    accountKey: MicroBlogKey,
+  cacheDatabase: RoomCacheDatabase,
+  accountKey: MicroBlogKey,
 ) = LimitOffsetTransformPagingSource(
-    db = cacheDatabase,
-    loadPagingList = { offset, limit ->
-        getPagingList(
-            accountKey = accountKey,
-            limit = limit,
-            offset = offset
-        ).map { it.toUi() }
-    },
-    queryItemCount = {
-        getPagingListCount(accountKey = accountKey)
-    },
-    tables = arrayOf("lists")
+  db = cacheDatabase,
+  loadPagingList = { offset, limit ->
+    getPagingList(
+      accountKey = accountKey,
+      limit = limit,
+      offset = offset
+    ).map { it.toUi() }
+  },
+  queryItemCount = {
+    getPagingListCount(accountKey = accountKey)
+  },
+  tables = arrayOf("lists")
 )
 
 internal fun RoomPagingTimelineDao.getPagingSource(
-    cacheDatabase: RoomCacheDatabase,
-    pagingKey: String,
-    accountKey: MicroBlogKey,
+  cacheDatabase: RoomCacheDatabase,
+  pagingKey: String,
+  accountKey: MicroBlogKey,
 ) = LimitOffsetTransformPagingSource(
-    db = cacheDatabase,
-    loadPagingList = { offset, limit ->
-        getPagingList(
-            pagingKey = pagingKey,
-            accountKey = accountKey,
-            offset = offset,
-            limit = limit
-        ).map { it.toPagingTimeline(accountKey = accountKey) }
-    },
-    queryItemCount = {
-        getPagingListCount(accountKey = accountKey, pagingKey = pagingKey)
-    },
-    tables = arrayOf("paging_timeline", "status")
+  db = cacheDatabase,
+  loadPagingList = { offset, limit ->
+    getPagingList(
+      pagingKey = pagingKey,
+      accountKey = accountKey,
+      offset = offset,
+      limit = limit
+    ).map { it.toPagingTimeline(accountKey = accountKey) }
+  },
+  queryItemCount = {
+    getPagingListCount(accountKey = accountKey, pagingKey = pagingKey)
+  },
+  tables = arrayOf("paging_timeline", "status")
 )
 
 internal fun RoomTrendDao.getPagingSource(
-    cacheDatabase: RoomCacheDatabase,
-    accountKey: MicroBlogKey,
+  cacheDatabase: RoomCacheDatabase,
+  accountKey: MicroBlogKey,
 ) = LimitOffsetTransformPagingSource(
-    db = cacheDatabase,
-    loadPagingList = { offset, limit ->
-        getPagingList(
-            accountKey = accountKey,
-            limit = limit,
-            offset = offset
-        ).map { it.toUi(accountKey = accountKey) }
-    },
-    queryItemCount = {
-        getPagingListCount(accountKey = accountKey)
-    },
-    tables = arrayOf(
-        "trends",
-        "trend_histories"
-    )
+  db = cacheDatabase,
+  loadPagingList = { offset, limit ->
+    getPagingList(
+      accountKey = accountKey,
+      limit = limit,
+      offset = offset
+    ).map { it.toUi(accountKey = accountKey) }
+  },
+  queryItemCount = {
+    getPagingListCount(accountKey = accountKey)
+  },
+  tables = arrayOf(
+    "trends",
+    "trend_histories"
+  )
 )

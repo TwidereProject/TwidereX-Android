@@ -21,5 +21,5 @@
 package com.twidere.services.microblog.model
 
 interface IPaging {
-    val nextPage: String?
+  val nextPage: String?
 }

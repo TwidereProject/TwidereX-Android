@@ -31,40 +31,40 @@ import java.util.UUID
 import kotlin.test.assertEquals
 
 internal class SqlDelightDraftDaoImplTest : BaseAppDatabaseTest() {
-    @Test
-    fun getAll_ReturnsFlowAndUpdateAfterDbUpdated() = runBlocking {
-        val draftDao = SqlDelightDraftDaoImpl(database.draftQueries)
-        val flow = draftDao.getAll()
-        assert(flow.firstOrNull()?.isEmpty() ?: false)
-        val draft = createUiDraft()
-        draftDao.insert(draft)
-        assert(flow.firstOrNull()?.isNotEmpty() ?: false)
-        draftDao.remove(draft)
-        assert(flow.firstOrNull()?.isEmpty() ?: true)
-    }
+  @Test
+  fun getAll_ReturnsFlowAndUpdateAfterDbUpdated() = runBlocking {
+    val draftDao = SqlDelightDraftDaoImpl(database.draftQueries)
+    val flow = draftDao.getAll()
+    assert(flow.firstOrNull()?.isEmpty() ?: false)
+    val draft = createUiDraft()
+    draftDao.insert(draft)
+    assert(flow.firstOrNull()?.isNotEmpty() ?: false)
+    draftDao.remove(draft)
+    assert(flow.firstOrNull()?.isEmpty() ?: true)
+  }
 
-    @Test
-    fun getDraftCount_ReturnsFlowAndUpdateAfterDbUpdated() = runBlocking {
-        val draftDao = SqlDelightDraftDaoImpl(database.draftQueries)
-        val flow = draftDao.getDraftCount()
-        assertEquals(0L, flow.firstOrNull() ?: false)
-        val draft = createUiDraft()
-        draftDao.insert(draft)
-        assertEquals(1L, flow.firstOrNull() ?: false)
-        draftDao.remove(draft)
-        assertEquals(0L, flow.firstOrNull() ?: false)
-    }
+  @Test
+  fun getDraftCount_ReturnsFlowAndUpdateAfterDbUpdated() = runBlocking {
+    val draftDao = SqlDelightDraftDaoImpl(database.draftQueries)
+    val flow = draftDao.getDraftCount()
+    assertEquals(0L, flow.firstOrNull() ?: false)
+    val draft = createUiDraft()
+    draftDao.insert(draft)
+    assertEquals(1L, flow.firstOrNull() ?: false)
+    draftDao.remove(draft)
+    assertEquals(0L, flow.firstOrNull() ?: false)
+  }
 
-    private fun createUiDraft(
-        id: String = UUID.randomUUID().toString(),
-        content: String = UUID.randomUUID().toString(),
-    ) = UiDraft(
-        draftId = id,
-        content = content,
-        media = emptyList(),
-        createdAt = System.currentTimeMillis(),
-        composeType = ComposeType.New,
-        statusKey = null,
-        excludedReplyUserIds = null
-    )
+  private fun createUiDraft(
+    id: String = UUID.randomUUID().toString(),
+    content: String = UUID.randomUUID().toString(),
+  ) = UiDraft(
+    draftId = id,
+    content = content,
+    media = emptyList(),
+    createdAt = System.currentTimeMillis(),
+    composeType = ComposeType.New,
+    statusKey = null,
+    excludedReplyUserIds = null
+  )
 }

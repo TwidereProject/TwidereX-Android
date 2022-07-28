@@ -25,7 +25,7 @@ import com.twidere.twiderex.model.ui.UiUser
 import kotlinx.coroutines.flow.Flow
 
 interface UserDao {
-    suspend fun findWithUserKey(userKey: MicroBlogKey): UiUser?
-    suspend fun insertAll(listOf: List<UiUser>)
-    fun findWithUserKeyFlow(userKey: MicroBlogKey): Flow<UiUser?>
+  suspend fun findWithUserKey(userKey: MicroBlogKey): UiUser?
+  suspend fun insertAll(listOf: List<UiUser>)
+  fun findWithUserKeyFlow(userKey: MicroBlogKey): Flow<UiUser?>
 }

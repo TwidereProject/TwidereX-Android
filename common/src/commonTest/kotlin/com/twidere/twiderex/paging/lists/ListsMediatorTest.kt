@@ -39,35 +39,35 @@ import kotlin.test.Test
  */
 
 class ListsMediatorTest {
-    private var mockDataBase = MockCacheDatabase()
+  private var mockDataBase = MockCacheDatabase()
 
-    @OptIn(ExperimentalPagingApi::class)
-    @Test
-    fun refresh_saveToDatabaseWhenSuccess() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("test")
-        assert(mockDataBase.listsDao().getPagingSource(accountKey).collectDataForTest().isEmpty())
-        val mediator = ListsMediator(mockDataBase, MockListsService(), accountKey = accountKey)
-        val pagingState = PagingState<Int, UiList>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
-        val result = mediator.load(LoadType.REFRESH, pagingState)
-        // when mediator get data from service, it store to database\
-        assert(mockDataBase.listsDao().getPagingSource(accountKey).collectDataForTest().isNotEmpty())
-        assert(result is RemoteMediator.MediatorResult.Success)
-        assert((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
-    }
+  @OptIn(ExperimentalPagingApi::class)
+  @Test
+  fun refresh_saveToDatabaseWhenSuccess() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("test")
+    assert(mockDataBase.listsDao().getPagingSource(accountKey).collectDataForTest().isEmpty())
+    val mediator = ListsMediator(mockDataBase, MockListsService(), accountKey = accountKey)
+    val pagingState = PagingState<Int, UiList>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
+    val result = mediator.load(LoadType.REFRESH, pagingState)
+    // when mediator get data from service, it store to database\
+    assert(mockDataBase.listsDao().getPagingSource(accountKey).collectDataForTest().isNotEmpty())
+    assert(result is RemoteMediator.MediatorResult.Success)
+    assert((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
+  }
 
-    @OptIn(ExperimentalPagingApi::class)
-    @Test
-    fun refresh_LoadReturnsErrorResultWhenErrorOccurs() = runBlocking {
-        val userKey = MicroBlogKey.twitter("test")
-        val mediator = ListsMediator(
-            mockDataBase,
-            MockListsService().apply {
-                errorMsg = "throw test errors"
-            },
-            accountKey = userKey
-        )
-        val pagingState = PagingState<Int, UiList>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
-        val result = mediator.load(LoadType.REFRESH, pagingState)
-        assert(result is RemoteMediator.MediatorResult.Error)
-    }
+  @OptIn(ExperimentalPagingApi::class)
+  @Test
+  fun refresh_LoadReturnsErrorResultWhenErrorOccurs() = runBlocking {
+    val userKey = MicroBlogKey.twitter("test")
+    val mediator = ListsMediator(
+      mockDataBase,
+      MockListsService().apply {
+        errorMsg = "throw test errors"
+      },
+      accountKey = userKey
+    )
+    val pagingState = PagingState<Int, UiList>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
+    val result = mediator.load(LoadType.REFRESH, pagingState)
+    assert(result is RemoteMediator.MediatorResult.Error)
+  }
 }

@@ -23,7 +23,7 @@ package com.twidere.twiderex.utils
 import moe.tlaster.kfilepicker.FilePicker
 
 class TwidereFilePicker {
-    suspend fun createFile(name: String): String? {
-        return FilePicker.createFile(name)?.path
-    }
+  suspend fun createFile(name: String): String? {
+    return FilePicker.createFile(name)?.path
+  }
 }

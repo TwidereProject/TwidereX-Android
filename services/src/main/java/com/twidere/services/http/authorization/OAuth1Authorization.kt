@@ -58,100 +58,100 @@ private const val OAUTH_VERSION = "oauth_version"
 private const val OAUTH_VERSION_VALUE = "1.0"
 
 class OAuth1Authorization(
-    private val consumerKey: String,
-    private val consumerSecret: String,
-    private val accessToken: String? = null,
-    private val accessSecret: String? = null,
-    private val random: Random = SecureRandom()
+  private val consumerKey: String,
+  private val consumerSecret: String,
+  private val accessToken: String? = null,
+  private val accessSecret: String? = null,
+  private val random: Random = SecureRandom()
 ) : Authorization {
-    private fun encodeUrl(value: String) =
-        URLEncoder.encode(value, "UTF-8")
+  private fun encodeUrl(value: String) =
+    URLEncoder.encode(value, "UTF-8")
 
-    override val hasAuthorization: Boolean
-        get() = true
+  override val hasAuthorization: Boolean
+    get() = true
 
-    override fun getAuthorizationHeader(request: Request): String {
-        val nonce = ByteArray(32)
-        random.nextBytes(nonce)
-        val oauthNonce: String = ByteString.of(*nonce).base64().replace("\\W".toRegex(), "")
-        val oauthTimestamp = Timestamp(System.currentTimeMillis()).time.toString().substring(0, 10)
-        val consumerKeyValue = encodeUrl(consumerKey)
-        val parameters = TreeMap<String, String>()
-        parameters[OAUTH_CONSUMER_KEY] = consumerKeyValue
-        accessToken?.let {
-            parameters[OAUTH_ACCESS_TOKEN] = encodeUrl(it)
-        }
-        parameters[OAUTH_NONCE] = oauthNonce
-        parameters[OAUTH_TIMESTAMP] = oauthTimestamp
-        parameters[OAUTH_SIGNATURE_METHOD] = OAUTH_SIGNATURE_METHOD_VALUE
-        parameters[OAUTH_VERSION] = OAUTH_VERSION_VALUE
-        val url = request.url
-        for (i in 0 until url.querySize) {
-            parameters[encodeUrl(url.queryParameterName(i))] = url.queryParameterValue(i)?.let {
-                encodeUrl(
-                    it
-                )
-            }.toString()
-        }
-        val requestBody = request.body
-        Buffer().use { body ->
-            requestBody?.writeTo(body)
-            if (requestBody != null && requestBody.contentLength() > 2) {
-                while (!body.exhausted()) {
-                    val keyEnd = body.indexOf('='.code.toByte())
-                    if (keyEnd == -1L) {
-                        break // throw new IllegalStateException("Key with no value: " + body.readUtf8());
-                    }
-                    val key = body.readUtf8(keyEnd)
-                    body.skip(1) // Equals.
-                    val valueEnd = body.indexOf('&'.code.toByte())
-                    val value = if (valueEnd == -1L) body.readUtf8() else body.readUtf8(valueEnd)
-                    if (valueEnd != -1L) {
-                        body.skip(1) // Ampersand.
-                    }
-                    parameters[key] = value
-                }
-            }
-        }
-        return Buffer().use { base ->
-            val method = request.method
-            base.writeUtf8(method)
-            base.writeByte('&'.code)
-            base.writeUtf8(encodeUrl(request.url.newBuilder().query(null).build().toString()))
-            base.writeByte('&'.code)
-            var first = true
-            for ((key, value) in parameters) {
-                if (!first) {
-                    base.writeUtf8(encodeUrl("&"))
-                }
-                first = false
-                base.writeUtf8(encodeUrl(key))
-                base.writeUtf8(encodeUrl("="))
-                base.writeUtf8(encodeUrl(value.replace("+", "%20")))
-            }
-            val signingKey = encodeUrl(consumerSecret) + "&" + encodeUrl(
-                accessSecret ?: ""
-            )
-            val keySpec = SecretKeySpec(signingKey.toByteArray(), "HmacSHA1")
-            val mac = Mac.getInstance("HmacSHA1")
-            mac.init(keySpec)
-            val result = mac.doFinal(base.readByteArray())
-            val signature: String = ByteString.of(*result).base64()
-            (
-                "OAuth $OAUTH_CONSUMER_KEY=\"$consumerKeyValue\", $OAUTH_NONCE=\"$oauthNonce\", $OAUTH_SIGNATURE=\"${
-                encodeUrl(
-                    signature
-                )
-                }\", $OAUTH_SIGNATURE_METHOD=\"$OAUTH_SIGNATURE_METHOD_VALUE\", $OAUTH_TIMESTAMP=\"$oauthTimestamp\", ${
-                (
-                    if (accessToken != null) "$OAUTH_ACCESS_TOKEN=\"${
-                    encodeUrl(
-                        accessToken
-                    )
-                    }\"," else ""
-                    )
-                } $OAUTH_VERSION=\"$OAUTH_VERSION_VALUE\""
-                )
-        }
+  override fun getAuthorizationHeader(request: Request): String {
+    val nonce = ByteArray(32)
+    random.nextBytes(nonce)
+    val oauthNonce: String = ByteString.of(*nonce).base64().replace("\\W".toRegex(), "")
+    val oauthTimestamp = Timestamp(System.currentTimeMillis()).time.toString().substring(0, 10)
+    val consumerKeyValue = encodeUrl(consumerKey)
+    val parameters = TreeMap<String, String>()
+    parameters[OAUTH_CONSUMER_KEY] = consumerKeyValue
+    accessToken?.let {
+      parameters[OAUTH_ACCESS_TOKEN] = encodeUrl(it)
     }
+    parameters[OAUTH_NONCE] = oauthNonce
+    parameters[OAUTH_TIMESTAMP] = oauthTimestamp
+    parameters[OAUTH_SIGNATURE_METHOD] = OAUTH_SIGNATURE_METHOD_VALUE
+    parameters[OAUTH_VERSION] = OAUTH_VERSION_VALUE
+    val url = request.url
+    for (i in 0 until url.querySize) {
+      parameters[encodeUrl(url.queryParameterName(i))] = url.queryParameterValue(i)?.let {
+        encodeUrl(
+          it
+        )
+      }.toString()
+    }
+    val requestBody = request.body
+    Buffer().use { body ->
+      requestBody?.writeTo(body)
+      if (requestBody != null && requestBody.contentLength() > 2) {
+        while (!body.exhausted()) {
+          val keyEnd = body.indexOf('='.code.toByte())
+          if (keyEnd == -1L) {
+            break // throw new IllegalStateException("Key with no value: " + body.readUtf8());
+          }
+          val key = body.readUtf8(keyEnd)
+          body.skip(1) // Equals.
+          val valueEnd = body.indexOf('&'.code.toByte())
+          val value = if (valueEnd == -1L) body.readUtf8() else body.readUtf8(valueEnd)
+          if (valueEnd != -1L) {
+            body.skip(1) // Ampersand.
+          }
+          parameters[key] = value
+        }
+      }
+    }
+    return Buffer().use { base ->
+      val method = request.method
+      base.writeUtf8(method)
+      base.writeByte('&'.code)
+      base.writeUtf8(encodeUrl(request.url.newBuilder().query(null).build().toString()))
+      base.writeByte('&'.code)
+      var first = true
+      for ((key, value) in parameters) {
+        if (!first) {
+          base.writeUtf8(encodeUrl("&"))
+        }
+        first = false
+        base.writeUtf8(encodeUrl(key))
+        base.writeUtf8(encodeUrl("="))
+        base.writeUtf8(encodeUrl(value.replace("+", "%20")))
+      }
+      val signingKey = encodeUrl(consumerSecret) + "&" + encodeUrl(
+        accessSecret ?: ""
+      )
+      val keySpec = SecretKeySpec(signingKey.toByteArray(), "HmacSHA1")
+      val mac = Mac.getInstance("HmacSHA1")
+      mac.init(keySpec)
+      val result = mac.doFinal(base.readByteArray())
+      val signature: String = ByteString.of(*result).base64()
+      (
+        "OAuth $OAUTH_CONSUMER_KEY=\"$consumerKeyValue\", $OAUTH_NONCE=\"$oauthNonce\", $OAUTH_SIGNATURE=\"${
+        encodeUrl(
+          signature
+        )
+        }\", $OAUTH_SIGNATURE_METHOD=\"$OAUTH_SIGNATURE_METHOD_VALUE\", $OAUTH_TIMESTAMP=\"$oauthTimestamp\", ${
+        (
+          if (accessToken != null) "$OAUTH_ACCESS_TOKEN=\"${
+          encodeUrl(
+            accessToken
+          )
+          }\"," else ""
+          )
+        } $OAUTH_VERSION=\"$OAUTH_VERSION_VALUE\""
+        )
+    }
+  }
 }

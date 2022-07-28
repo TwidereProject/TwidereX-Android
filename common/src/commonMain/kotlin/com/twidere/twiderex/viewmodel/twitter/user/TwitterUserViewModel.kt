@@ -31,31 +31,31 @@ import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
 
 class TwitterUserViewModel(
-    private val repository: UserRepository,
-    private val inAppNotification: InAppNotification,
-    private val accountRepository: AccountRepository,
-    private val screenName: String,
+  private val repository: UserRepository,
+  private val inAppNotification: InAppNotification,
+  private val accountRepository: AccountRepository,
+  private val screenName: String,
 ) : ViewModel() {
 
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    val error = MutableStateFlow<Throwable?>(null)
+  val error = MutableStateFlow<Throwable?>(null)
 
-    val user by lazy {
-        account.map {
-            try {
-                repository.lookupUserByName(
-                    screenName,
-                    accountKey = it.accountKey,
-                    lookupService = it.service as LookupService,
-                )
-            } catch (e: Throwable) {
-                inAppNotification.notifyError(e)
-                error.value = e
-                null
-            }
-        }
+  val user by lazy {
+    account.map {
+      try {
+        repository.lookupUserByName(
+          screenName,
+          accountKey = it.accountKey,
+          lookupService = it.service as LookupService,
+        )
+      } catch (e: Throwable) {
+        inAppNotification.notifyError(e)
+        error.value = e
+        null
+      }
     }
+  }
 }

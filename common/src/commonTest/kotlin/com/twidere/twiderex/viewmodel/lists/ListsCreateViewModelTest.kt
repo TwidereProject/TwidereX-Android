@@ -39,58 +39,58 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 internal class ListsCreateViewModelTest : AccountViewModelTestBase() {
-    override val mockService: MicroBlogService
-        get() = MockListsService()
+  override val mockService: MicroBlogService
+    get() = MockListsService()
 
-    private val mockRepository: ListsRepository = ListsRepository(MockCacheDatabase())
+  private val mockRepository: ListsRepository = ListsRepository(MockCacheDatabase())
 
-    @MockK
-    private lateinit var mockAppNotification: InAppNotification
+  @MockK
+  private lateinit var mockAppNotification: InAppNotification
 
-    private var errorNotification: NotificationEvent? = null
+  private var errorNotification: NotificationEvent? = null
 
-    private lateinit var createViewModel: ListsCreateViewModel
+  private lateinit var createViewModel: ListsCreateViewModel
 
-    override fun setUp() {
-        super.setUp()
-        createViewModel = ListsCreateViewModel(
-            mockAppNotification,
-            mockRepository,
-            mockAccountRepository
-        )
-        every { mockAppNotification.show(any()) }.answers {
-            errorNotification = arg(0)
-        }
-        errorNotification = null
+  override fun setUp() {
+    super.setUp()
+    createViewModel = ListsCreateViewModel(
+      mockAppNotification,
+      mockRepository,
+      mockAccountRepository
+    )
+    every { mockAppNotification.show(any()) }.answers {
+      errorNotification = arg(0)
     }
+    errorNotification = null
+  }
 
-    @Test
-    fun createList_successExpectTrue(): Unit = runBlocking {
-        assertNull(errorNotification)
-        createViewModel.loading.test {
-            assert(!awaitItem())
-            launch {
-                val result = createViewModel.createList(title = "title", private = false)
-                assertNotNull(result)
-            }
-            assert(awaitItem())
-            assert(!awaitItem())
-        }
-        assertNull(errorNotification)
+  @Test
+  fun createList_successExpectTrue(): Unit = runBlocking {
+    assertNull(errorNotification)
+    createViewModel.loading.test {
+      assert(!awaitItem())
+      launch {
+        val result = createViewModel.createList(title = "title", private = false)
+        assertNotNull(result)
+      }
+      assert(awaitItem())
+      assert(!awaitItem())
     }
+    assertNull(errorNotification)
+  }
 
-    @Test
-    fun createList_failedExpectFalseAndShowNotification(): Unit = runBlocking {
-        assertNull(errorNotification)
-        createViewModel.loading.test {
-            assert(!awaitItem())
-            launch {
-                val result = createViewModel.createList(title = "error", private = false)
-                assertNull(result)
-            }
-            assert(awaitItem())
-            assert(!awaitItem())
-        }
-        assertNotNull(errorNotification)
+  @Test
+  fun createList_failedExpectFalseAndShowNotification(): Unit = runBlocking {
+    assertNull(errorNotification)
+    createViewModel.loading.test {
+      assert(!awaitItem())
+      launch {
+        val result = createViewModel.createList(title = "error", private = false)
+        assertNull(result)
+      }
+      assert(awaitItem())
+      assert(!awaitItem())
     }
+    assertNotNull(errorNotification)
+  }
 }

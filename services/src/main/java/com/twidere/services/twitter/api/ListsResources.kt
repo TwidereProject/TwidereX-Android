@@ -27,113 +27,113 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface ListsResources {
-    @GET("/1.1/lists/list.json")
-    suspend fun lists(
-        @Query("user_id") user_id: String? = null,
-        @Query("screen_name") screen_name: String? = null,
-        @Query("reverse") reverse: Boolean = true,
-    ): List<TwitterList>
+  @GET("/1.1/lists/list.json")
+  suspend fun lists(
+    @Query("user_id") user_id: String? = null,
+    @Query("screen_name") screen_name: String? = null,
+    @Query("reverse") reverse: Boolean = true,
+  ): List<TwitterList>
 
-    /**
-     *You can identify a list by its slug instead of its numerical id.
-     * If you decide to do so, note that you'll also have to specify
-     * the list owner using the owner_id or owner_screen_name parameters.
-     */
-    @GET("/1.1/lists/subscribers.json")
-    suspend fun listSubscribers(
-        @Query("list_id") list_id: String,
-        @Query("slug") slug: String? = null,
-        @Query("owner_screen_name") owner_screen_name: String? = null,
-        @Query("owner_id") owner_id: String? = null,
-        @Query("count") count: Int = 20,
-        @Query("cursor") cursor: String? = null,
-        @Query("include_entities") include_entities: Boolean? = null,
-        @Query("skip_status") skip_status: Boolean? = null,
-    ): ListUserResponse
+  /**
+   *You can identify a list by its slug instead of its numerical id.
+   * If you decide to do so, note that you'll also have to specify
+   * the list owner using the owner_id or owner_screen_name parameters.
+   */
+  @GET("/1.1/lists/subscribers.json")
+  suspend fun listSubscribers(
+    @Query("list_id") list_id: String,
+    @Query("slug") slug: String? = null,
+    @Query("owner_screen_name") owner_screen_name: String? = null,
+    @Query("owner_id") owner_id: String? = null,
+    @Query("count") count: Int = 20,
+    @Query("cursor") cursor: String? = null,
+    @Query("include_entities") include_entities: Boolean? = null,
+    @Query("skip_status") skip_status: Boolean? = null,
+  ): ListUserResponse
 
-    /**
-     * slug => same as @listSubscribers
-     */
-    @GET("/1.1/lists/members.json")
-    suspend fun listMembers(
-        @Query("list_id") list_id: String,
-        @Query("slug") slug: String? = null,
-        @Query("owner_screen_name") owner_screen_name: String? = null,
-        @Query("owner_id") owner_id: String? = null,
-        @Query("count") count: Int = 20,
-        @Query("cursor") cursor: String? = null,
-        @Query("include_entities") include_entities: Boolean? = null,
-        @Query("skip_status") skip_status: Boolean? = null,
-    ): ListUserResponse
+  /**
+   * slug => same as @listSubscribers
+   */
+  @GET("/1.1/lists/members.json")
+  suspend fun listMembers(
+    @Query("list_id") list_id: String,
+    @Query("slug") slug: String? = null,
+    @Query("owner_screen_name") owner_screen_name: String? = null,
+    @Query("owner_id") owner_id: String? = null,
+    @Query("count") count: Int = 20,
+    @Query("cursor") cursor: String? = null,
+    @Query("include_entities") include_entities: Boolean? = null,
+    @Query("skip_status") skip_status: Boolean? = null,
+  ): ListUserResponse
 
-    @POST("/1.1/lists/create.json")
-    suspend fun createList(
-        @Query("name") name: String,
-        @Query("mode") mode: String? = null,
-        @Query("description") description: String? = null,
-    ): TwitterList
+  @POST("/1.1/lists/create.json")
+  suspend fun createList(
+    @Query("name") name: String,
+    @Query("mode") mode: String? = null,
+    @Query("description") description: String? = null,
+  ): TwitterList
 
-    /**
-     * slug => same as @listSubscribers
-     */
-    @POST("/1.1/lists/update.json")
-    suspend fun updateList(
-        @Query("name") name: String? = null,
-        @Query("mode") mode: String? = null,
-        @Query("description") description: String? = null,
-        @Query("list_id") list_id: String,
-        @Query("slug") slug: String? = null,
-        @Query("owner_id") owner_id: String? = null,
-        @Query("owner_screen_name") owner_screen_name: String? = null,
-    ): TwitterList
+  /**
+   * slug => same as @listSubscribers
+   */
+  @POST("/1.1/lists/update.json")
+  suspend fun updateList(
+    @Query("name") name: String? = null,
+    @Query("mode") mode: String? = null,
+    @Query("description") description: String? = null,
+    @Query("list_id") list_id: String,
+    @Query("slug") slug: String? = null,
+    @Query("owner_id") owner_id: String? = null,
+    @Query("owner_screen_name") owner_screen_name: String? = null,
+  ): TwitterList
 
-    /**
-     * slug => same as @listSubscribers
-     */
-    @POST("/1.1/lists/destroy.json")
-    suspend fun destroyList(
-        @Query("list_id") list_id: String,
-        @Query("slug") slug: String? = null,
-        @Query("owner_id") owner_id: String? = null,
-        @Query("owner_screen_name") owner_screen_name: String? = null,
-    ): TwitterList
+  /**
+   * slug => same as @listSubscribers
+   */
+  @POST("/1.1/lists/destroy.json")
+  suspend fun destroyList(
+    @Query("list_id") list_id: String,
+    @Query("slug") slug: String? = null,
+    @Query("owner_id") owner_id: String? = null,
+    @Query("owner_screen_name") owner_screen_name: String? = null,
+  ): TwitterList
 
-    /**
-     * slug => same as @listSubscribers
-     */
-    @POST("/1.1/lists/members/create.json")
-    suspend fun addMember(
-        @Query("list_id") list_id: String,
-        @Query("user_id") user_id: String,
-        @Query("screen_name") screen_name: String,
-        @Query("slug") slug: String? = null,
-        @Query("owner_id") owner_id: String? = null,
-        @Query("owner_screen_name") owner_screen_name: String? = null,
-    ): TwitterList
+  /**
+   * slug => same as @listSubscribers
+   */
+  @POST("/1.1/lists/members/create.json")
+  suspend fun addMember(
+    @Query("list_id") list_id: String,
+    @Query("user_id") user_id: String,
+    @Query("screen_name") screen_name: String,
+    @Query("slug") slug: String? = null,
+    @Query("owner_id") owner_id: String? = null,
+    @Query("owner_screen_name") owner_screen_name: String? = null,
+  ): TwitterList
 
-    @POST("/1.1/lists/members/destroy.json")
-    suspend fun removeMember(
-        @Query("list_id") list_id: String,
-        @Query("user_id") user_id: String,
-        @Query("screen_name") screen_name: String,
-        @Query("slug") slug: String? = null,
-        @Query("owner_id") owner_id: String? = null,
-        @Query("owner_screen_name") owner_screen_name: String? = null,
-    ): TwitterList
+  @POST("/1.1/lists/members/destroy.json")
+  suspend fun removeMember(
+    @Query("list_id") list_id: String,
+    @Query("user_id") user_id: String,
+    @Query("screen_name") screen_name: String,
+    @Query("slug") slug: String? = null,
+    @Query("owner_id") owner_id: String? = null,
+    @Query("owner_screen_name") owner_screen_name: String? = null,
+  ): TwitterList
 
-    @POST("/1.1/lists/subscribers/destroy.json")
-    suspend fun unsubscribeLists(
-        @Query("list_id") list_id: String,
-        @Query("slug") slug: String? = null,
-        @Query("owner_id") owner_id: String? = null,
-        @Query("owner_screen_name") owner_screen_name: String? = null,
-    ): TwitterList
+  @POST("/1.1/lists/subscribers/destroy.json")
+  suspend fun unsubscribeLists(
+    @Query("list_id") list_id: String,
+    @Query("slug") slug: String? = null,
+    @Query("owner_id") owner_id: String? = null,
+    @Query("owner_screen_name") owner_screen_name: String? = null,
+  ): TwitterList
 
-    @POST("/1.1/lists/subscribers/create.json")
-    suspend fun subscribeLists(
-        @Query("list_id") list_id: String,
-        @Query("slug") slug: String? = null,
-        @Query("owner_id") owner_id: String? = null,
-        @Query("owner_screen_name") owner_screen_name: String? = null,
-    ): TwitterList
+  @POST("/1.1/lists/subscribers/create.json")
+  suspend fun subscribeLists(
+    @Query("list_id") list_id: String,
+    @Query("slug") slug: String? = null,
+    @Query("owner_id") owner_id: String? = null,
+    @Query("owner_screen_name") owner_screen_name: String? = null,
+  ): TwitterList
 }

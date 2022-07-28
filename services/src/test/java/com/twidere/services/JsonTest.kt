@@ -27,29 +27,29 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class JsonTest {
-    @Test
-    fun decodeNonJson() {
-        assertThrows<MicroBlogException> {
-            "Rate limit exceeded".decodeJson<MicroBlogException>()
-        }
+  @Test
+  fun decodeNonJson() {
+    assertThrows<MicroBlogException> {
+      "Rate limit exceeded".decodeJson<MicroBlogException>()
     }
+  }
 
-    @Test
-    fun decodeEmptyString() {
-        assertThrows<MicroBlogException> {
-            "".decodeJson<MicroBlogException>()
-        }
+  @Test
+  fun decodeEmptyString() {
+    assertThrows<MicroBlogException> {
+      "".decodeJson<MicroBlogException>()
     }
+  }
 
-    @Test
-    fun decodeMismatchType() {
-        assertThrows<MicroBlogException> {
-            "{\"a\": {  }}".decodeJson<DataClass>()
-        }
+  @Test
+  fun decodeMismatchType() {
+    assertThrows<MicroBlogException> {
+      "{\"a\": {  }}".decodeJson<DataClass>()
     }
+  }
 }
 
 @Serializable
 data class DataClass(
-    val a: List<String>,
+  val a: List<String>,
 )

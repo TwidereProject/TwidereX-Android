@@ -31,15 +31,15 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface RoomUserDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(user: List<DbUser>)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertAll(user: List<DbUser>)
 
-    @Query("SELECT * FROM user WHERE userKey == :userKey")
-    fun findWithUserKeyFlow(userKey: MicroBlogKey): Flow<DbUser?>
+  @Query("SELECT * FROM user WHERE userKey == :userKey")
+  fun findWithUserKeyFlow(userKey: MicroBlogKey): Flow<DbUser?>
 
-    @Query("SELECT * FROM user WHERE userKey == :userKey")
-    suspend fun findWithUserKey(userKey: MicroBlogKey): DbUser?
+  @Query("SELECT * FROM user WHERE userKey == :userKey")
+  suspend fun findWithUserKey(userKey: MicroBlogKey): DbUser?
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(user: List<DbUser>)
+  @Update(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun update(user: List<DbUser>)
 }

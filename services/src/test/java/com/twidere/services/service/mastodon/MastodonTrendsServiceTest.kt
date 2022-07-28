@@ -29,16 +29,16 @@ import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MastodonTrendsServiceTest {
-    private lateinit var trendsService: TrendService
+  private lateinit var trendsService: TrendService
 
-    @BeforeAll
-    fun setUp() {
-        trendsService = mockMastodonService()
-    }
+  @BeforeAll
+  fun setUp() {
+    trendsService = mockMastodonService()
+  }
 
-    @Test
-    fun trends(): Unit = runBlocking {
-        val result = trendsService.trends("1")
-        assert(result.isNotEmpty())
-    }
+  @Test
+  fun trends(): Unit = runBlocking {
+    val result = trendsService.trends("1")
+    assert(result.isNotEmpty())
+  }
 }

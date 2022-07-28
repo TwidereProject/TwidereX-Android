@@ -31,24 +31,24 @@ import com.twidere.twiderex.component.foundation.ColoredSwitch
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
 fun ColumnScope.switchItem(
-    value: Boolean,
-    onChanged: (Boolean) -> Unit,
-    describe: @Composable (() -> Unit)? = null,
-    title: @Composable () -> Unit,
+  value: Boolean,
+  onChanged: (Boolean) -> Unit,
+  describe: @Composable (() -> Unit)? = null,
+  title: @Composable () -> Unit,
 ) {
-    ListItem(
-        modifier = Modifier.clickable(onClick = { onChanged.invoke(!value) }),
-        text = {
-            title.invoke()
+  ListItem(
+    modifier = Modifier.clickable(onClick = { onChanged.invoke(!value) }),
+    text = {
+      title.invoke()
+    },
+    trailing = {
+      ColoredSwitch(
+        checked = value,
+        onCheckedChange = {
+          onChanged.invoke(it)
         },
-        trailing = {
-            ColoredSwitch(
-                checked = value,
-                onCheckedChange = {
-                    onChanged.invoke(it)
-                },
-            )
-        },
-        secondaryText = describe
-    )
+      )
+    },
+    secondaryText = describe
+  )
 }

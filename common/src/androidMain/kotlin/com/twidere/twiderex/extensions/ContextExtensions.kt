@@ -29,54 +29,54 @@ import android.provider.Settings
 import androidx.core.content.ContextCompat
 
 fun Context.checkAllSelfPermissionsGranted(vararg permissions: String): Boolean {
-    return permissions.none { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
+  return permissions.none { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
 }
 
 fun Context.checkAnySelfPermissionsGranted(vararg permissions: String): Boolean {
-    return permissions.any { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
+  return permissions.any { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
 }
 
 fun Context.shareText(content: String) {
-    startActivity(
-        Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, content)
-            type = "text/plain"
-        }.let {
-            Intent.createChooser(it, null).apply {
-                if (this@shareText !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-        }
-    )
+  startActivity(
+    Intent().apply {
+      action = Intent.ACTION_SEND
+      putExtra(Intent.EXTRA_TEXT, content)
+      type = "text/plain"
+    }.let {
+      Intent.createChooser(it, null).apply {
+        if (this@shareText !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      }
+    }
+  )
 }
 
 fun Context.shareMedia(uri: Uri, mimeType: String, extraText: String) {
-    startActivity(
-        Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_STREAM, uri)
-            type = mimeType
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            if (extraText.isNotEmpty()) {
-                putExtra(Intent.EXTRA_TEXT, extraText)
-            }
-        }.let {
-            Intent.createChooser(it, null).apply {
-                if (this@shareMedia !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-        }
-    )
+  startActivity(
+    Intent().apply {
+      action = Intent.ACTION_SEND
+      putExtra(Intent.EXTRA_STREAM, uri)
+      type = mimeType
+      addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+      if (extraText.isNotEmpty()) {
+        putExtra(Intent.EXTRA_TEXT, extraText)
+      }
+    }.let {
+      Intent.createChooser(it, null).apply {
+        if (this@shareMedia !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      }
+    }
+  )
 }
 
 fun Context.launchAppSetting() {
-    startActivity(
-        Intent(
-            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-            Uri.fromParts(
-                "package",
-                packageName,
-                null
-            )
-        )
+  startActivity(
+    Intent(
+      Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+      Uri.fromParts(
+        "package",
+        packageName,
+        null
+      )
     )
+  )
 }

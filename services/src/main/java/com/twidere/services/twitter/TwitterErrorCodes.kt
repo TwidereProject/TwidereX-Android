@@ -21,8 +21,8 @@
 package com.twidere.services.twitter
 
 object TwitterErrorCodes {
-    const val AlreadyFavorited = 139
-    const val TemporarilyLocked = 326
-    const val AlreadyRetweeted = 327
-    const val RateLimitExceeded = 88
+  const val AlreadyFavorited = 139
+  const val TemporarilyLocked = 326
+  const val AlreadyRetweeted = 327
+  const val RateLimitExceeded = 88
 }

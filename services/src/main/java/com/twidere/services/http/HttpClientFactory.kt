@@ -24,6 +24,6 @@ import com.twidere.services.http.authorization.Authorization
 import okhttp3.OkHttpClient
 
 interface HttpClientFactory {
-    fun <T> createResources(clazz: Class<T>, baseUrl: String, authorization: Authorization, useCache: Boolean = false): T
-    fun createHttpClientBuilder(): OkHttpClient.Builder
+  fun <T> createResources(clazz: Class<T>, baseUrl: String, authorization: Authorization, useCache: Boolean = false): T
+  fun createHttpClientBuilder(): OkHttpClient.Builder
 }

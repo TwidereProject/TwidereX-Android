@@ -22,15 +22,15 @@ package com.twidere.twiderex.kmp
 
 import android.text.format.DateUtils
 actual object TimeUtils {
-    actual fun humanizedTimestamp(time: Long): String {
-        return DateUtils.getRelativeTimeSpanString(
-            time, System.currentTimeMillis(),
-            DateUtils.MINUTE_IN_MILLIS,
-            DateUtils.FORMAT_ABBREV_ALL
-        ).toString()
-    }
+  actual fun humanizedTimestamp(time: Long): String {
+    return DateUtils.getRelativeTimeSpanString(
+      time, System.currentTimeMillis(),
+      DateUtils.MINUTE_IN_MILLIS,
+      DateUtils.FORMAT_ABBREV_ALL
+    ).toString()
+  }
 
-    actual fun humanizedDateTime(time: Long): String {
-        return humanizedTimestamp(time)
-    }
+  actual fun humanizedDateTime(time: Long): String {
+    return humanizedTimestamp(time)
+  }
 }

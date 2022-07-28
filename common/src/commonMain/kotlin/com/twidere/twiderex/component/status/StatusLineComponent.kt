@@ -37,64 +37,64 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun StatusLineComponent(
-    modifier: Modifier = Modifier,
-    lineColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
-    lineWidth: Dp = StatusLineDefaults.lineWidth,
-    startPadding: Dp = StatusLineDefaults.startPadding(lineWidth = lineWidth),
-    topPoint: Dp = StatusLineDefaults.TopPoint,
-    lineDown: Boolean = false,
-    lineUp: Boolean = false,
-    child: @Composable () -> Unit
+  modifier: Modifier = Modifier,
+  lineColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
+  lineWidth: Dp = StatusLineDefaults.lineWidth,
+  startPadding: Dp = StatusLineDefaults.startPadding(lineWidth = lineWidth),
+  topPoint: Dp = StatusLineDefaults.TopPoint,
+  lineDown: Boolean = false,
+  lineUp: Boolean = false,
+  child: @Composable () -> Unit
 ) {
-    Box(
-        modifier = modifier,
-    ) {
-        if (lineDown) {
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .padding(
-                        start = startPadding,
-                        top = topPoint,
-                    )
-            ) {
-                Box(
-                    modifier = Modifier
-                        .width(lineWidth)
-                        .fillMaxHeight()
-                        .align(Alignment.BottomStart)
-                        .background(lineColor)
+  Box(
+    modifier = modifier,
+  ) {
+    if (lineDown) {
+      Box(
+        modifier = Modifier
+          .matchParentSize()
+          .padding(
+            start = startPadding,
+            top = topPoint,
+          )
+      ) {
+        Box(
+          modifier = Modifier
+            .width(lineWidth)
+            .fillMaxHeight()
+            .align(Alignment.BottomStart)
+            .background(lineColor)
 
-                )
-            }
-        }
-
-        if (lineUp) {
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .offset(y = (-1).dp)
-                    .padding(
-                        start = startPadding,
-                    )
-            ) {
-                Box(
-                    modifier = Modifier
-                        .width(lineWidth)
-                        .height(topPoint + 1.dp)
-                        .align(Alignment.TopStart)
-                        .background(lineColor)
-
-                )
-            }
-        }
-        child.invoke()
+        )
+      }
     }
+
+    if (lineUp) {
+      Box(
+        modifier = Modifier
+          .matchParentSize()
+          .offset(y = (-1).dp)
+          .padding(
+            start = startPadding,
+          )
+      ) {
+        Box(
+          modifier = Modifier
+            .width(lineWidth)
+            .height(topPoint + 1.dp)
+            .align(Alignment.TopStart)
+            .background(lineColor)
+
+        )
+      }
+    }
+    child.invoke()
+  }
 }
 
 object StatusLineDefaults {
-    val lineWidth = 2.dp
-    val TopPoint = 16.dp + UserAvatarDefaults.AvatarSize / 2
-    @Composable
-    fun startPadding(lineWidth: Dp) = 16.dp + UserAvatarDefaults.AvatarSize / 2 - lineWidth / 2
+  val lineWidth = 2.dp
+  val TopPoint = 16.dp + UserAvatarDefaults.AvatarSize / 2
+  @Composable
+  fun startPadding(lineWidth: Dp) = 16.dp + UserAvatarDefaults.AvatarSize / 2 - lineWidth / 2
 }

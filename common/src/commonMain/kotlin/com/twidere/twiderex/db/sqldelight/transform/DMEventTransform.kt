@@ -26,40 +26,40 @@ import com.twidere.twiderex.sqldelight.table.DbDMEvent
 import java.util.UUID
 
 internal fun UiDMEvent.toDbEventWithAttachments(dbId: String = UUID.randomUUID().toString()) = DbDMEventWithAttachments(
-    event = DbDMEvent(
-        id = dbId,
-        accountKey = accountKey,
-        sortId = sortId,
-        conversationKey = conversationKey,
-        messageId = messageId,
-        messageKey = messageKey,
-        htmlText = htmlText,
-        originText = originText,
-        createdTimestamp = createdTimestamp,
-        messageType = messageType,
-        senderAccountKey = senderAccountKey,
-        recipientAccountKey = recipientAccountKey,
-        sendStatus = sendStatus
-    ),
-    media = media.map { it.toDbMedia() },
-    url = urlEntity.map { it.toDbUrlEntity(messageKey) },
-    sender = sender.toDbUser()
+  event = DbDMEvent(
+    id = dbId,
+    accountKey = accountKey,
+    sortId = sortId,
+    conversationKey = conversationKey,
+    messageId = messageId,
+    messageKey = messageKey,
+    htmlText = htmlText,
+    originText = originText,
+    createdTimestamp = createdTimestamp,
+    messageType = messageType,
+    senderAccountKey = senderAccountKey,
+    recipientAccountKey = recipientAccountKey,
+    sendStatus = sendStatus
+  ),
+  media = media.map { it.toDbMedia() },
+  url = urlEntity.map { it.toDbUrlEntity(messageKey) },
+  sender = sender.toDbUser()
 )
 
 internal fun DbDMEventWithAttachments.toUi() = UiDMEvent(
-    accountKey = event.accountKey,
-    sortId = event.sortId,
-    conversationKey = event.conversationKey,
-    messageId = event.messageId,
-    messageKey = event.messageKey,
-    htmlText = event.htmlText,
-    originText = event.originText,
-    createdTimestamp = event.createdTimestamp,
-    messageType = event.messageType,
-    senderAccountKey = event.senderAccountKey,
-    recipientAccountKey = event.recipientAccountKey,
-    sendStatus = event.sendStatus,
-    media = media.map { it.toUi() },
-    urlEntity = url.map { it.toUi() },
-    sender = sender.toUi()
+  accountKey = event.accountKey,
+  sortId = event.sortId,
+  conversationKey = event.conversationKey,
+  messageId = event.messageId,
+  messageKey = event.messageKey,
+  htmlText = event.htmlText,
+  originText = event.originText,
+  createdTimestamp = event.createdTimestamp,
+  messageType = event.messageType,
+  senderAccountKey = event.senderAccountKey,
+  recipientAccountKey = event.recipientAccountKey,
+  sendStatus = event.sendStatus,
+  media = media.map { it.toUi() },
+  urlEntity = url.map { it.toUi() },
+  sender = sender.toUi()
 )

@@ -33,27 +33,27 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 actual fun PlatformAlertDialog(
-    onDismissRequest: () -> Unit,
-    confirmButton: @Composable () -> Unit,
-    modifier: Modifier,
-    dismissButton: @Composable (() -> Unit)?,
-    title: @Composable (() -> Unit)?,
-    text: @Composable (() -> Unit)?,
-    shape: Shape?,
-    backgroundColor: Color?,
-    contentColor: Color?,
+  onDismissRequest: () -> Unit,
+  confirmButton: @Composable () -> Unit,
+  modifier: Modifier,
+  dismissButton: @Composable (() -> Unit)?,
+  title: @Composable (() -> Unit)?,
+  text: @Composable (() -> Unit)?,
+  shape: Shape?,
+  backgroundColor: Color?,
+  contentColor: Color?,
 ) {
-    androidx.compose.material.AlertDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = confirmButton,
-        modifier = modifier.width(320.dp),
-        dismissButton = dismissButton,
-        title = title,
-        text = text,
-        shape = shape ?: MaterialTheme.shapes.medium,
-        backgroundColor = backgroundColor ?: MaterialTheme.colors.surface,
-        contentColor = contentColor ?: contentColorFor(
-            backgroundColor ?: MaterialTheme.colors.surface
-        ),
-    )
+  androidx.compose.material.AlertDialog(
+    onDismissRequest = onDismissRequest,
+    confirmButton = confirmButton,
+    modifier = modifier.width(320.dp),
+    dismissButton = dismissButton,
+    title = title,
+    text = text,
+    shape = shape ?: MaterialTheme.shapes.medium,
+    backgroundColor = backgroundColor ?: MaterialTheme.colors.surface,
+    contentColor = contentColor ?: contentColorFor(
+      backgroundColor ?: MaterialTheme.colors.surface
+    ),
+  )
 }

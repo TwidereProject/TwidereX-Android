@@ -59,231 +59,231 @@ import kotlinx.coroutines.launch
 
 @Stable
 private class TopBarState(
-    @IntRange(from = 0) private val initialOffset: Int = 0
+  @IntRange(from = 0) private val initialOffset: Int = 0
 ) {
-    private var _offset by mutableStateOf(initialOffset)
-    var size = 0
-    var offset: Int
-        get() = _offset
-        set(value) {
-            _offset = value.coerceIn(minimumValue = -size, maximumValue = 0)
-        }
-
-    fun scroll(delta: Float) {
-        offset += delta.toInt()
+  private var _offset by mutableStateOf(initialOffset)
+  var size = 0
+  var offset: Int
+    get() = _offset
+    set(value) {
+      _offset = value.coerceIn(minimumValue = -size, maximumValue = 0)
     }
 
-    suspend fun fixOffset() {
-        val show = offset > -size / 2
-        animate(
-            initialValue = offset.toFloat(),
-            targetValue = if (show) 0f else -size.toFloat(),
-            initialVelocity = 0f
-        ) { v, _ ->
-            offset = v.toInt()
-        }
-    }
+  fun scroll(delta: Float) {
+    offset += delta.toInt()
+  }
 
-    companion object {
-        val Saver: Saver<TopBarState, *> = listSaver(
-            save = {
-                listOf(
-                    it.offset,
-                )
-            },
-            restore = {
-                TopBarState(
-                    initialOffset = it[0],
-                )
-            }
+  suspend fun fixOffset() {
+    val show = offset > -size / 2
+    animate(
+      initialValue = offset.toFloat(),
+      targetValue = if (show) 0f else -size.toFloat(),
+      initialVelocity = 0f
+    ) { v, _ ->
+      offset = v.toInt()
+    }
+  }
+
+  companion object {
+    val Saver: Saver<TopBarState, *> = listSaver(
+      save = {
+        listOf(
+          it.offset,
         )
-    }
+      },
+      restore = {
+        TopBarState(
+          initialOffset = it[0],
+        )
+      }
+    )
+  }
 }
 
 @Stable
 private class BottomBarState(
-    @IntRange(from = 0) private val initialOffset: Int = 0
+  @IntRange(from = 0) private val initialOffset: Int = 0
 ) {
-    private var _offset by mutableStateOf(initialOffset)
-    var size = 0
-    var offset: Int
-        get() = _offset
-        set(value) {
-            _offset = value.coerceIn(maximumValue = size, minimumValue = 0)
-        }
-
-    fun scroll(delta: Float) {
-        offset -= delta.toInt()
+  private var _offset by mutableStateOf(initialOffset)
+  var size = 0
+  var offset: Int
+    get() = _offset
+    set(value) {
+      _offset = value.coerceIn(maximumValue = size, minimumValue = 0)
     }
 
-    suspend fun fixOffset() {
-        val show = offset < size / 2
-        animate(
-            initialValue = offset.toFloat(),
-            targetValue = if (show) 0f else size.toFloat(),
-            initialVelocity = 0f
-        ) { v, _ ->
-            offset = v.toInt()
-        }
-    }
+  fun scroll(delta: Float) {
+    offset -= delta.toInt()
+  }
 
-    companion object {
-        val Saver: Saver<BottomBarState, *> = listSaver(
-            save = {
-                listOf(
-                    it.offset,
-                )
-            },
-            restore = {
-                BottomBarState(
-                    initialOffset = it[0],
-                )
-            }
+  suspend fun fixOffset() {
+    val show = offset < size / 2
+    animate(
+      initialValue = offset.toFloat(),
+      targetValue = if (show) 0f else size.toFloat(),
+      initialVelocity = 0f
+    ) { v, _ ->
+      offset = v.toInt()
+    }
+  }
+
+  companion object {
+    val Saver: Saver<BottomBarState, *> = listSaver(
+      save = {
+        listOf(
+          it.offset,
         )
-    }
+      },
+      restore = {
+        BottomBarState(
+          initialOffset = it[0],
+        )
+      }
+    )
+  }
 }
 
 @Composable
 fun NestedScrollScaffold(
-    modifier: Modifier = Modifier,
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
-    topBar: @Composable () -> Unit = {},
-    enableTopBarNestedScroll: Boolean = true,
-    bottomBar: @Composable () -> Unit = {},
-    enableBottomBarNestedScroll: Boolean = true,
-    snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
-    floatingActionButton: @Composable () -> Unit = {},
-    enableFloatingActionButtonNestedScroll: Boolean = true,
-    floatingActionButtonPosition: FabPosition = FabPosition.End,
-    isFloatingActionButtonDocked: Boolean = false,
-    drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
-    drawerGesturesEnabled: Boolean = true,
-    drawerShape: Shape = MaterialTheme.shapes.large,
-    drawerElevation: Dp = DrawerDefaults.Elevation,
-    drawerBackgroundColor: Color = MaterialTheme.colors.surface,
-    drawerContentColor: Color = contentColorFor(drawerBackgroundColor),
-    drawerScrimColor: Color = DrawerDefaults.scrimColor,
-    backgroundColor: Color = MaterialTheme.colors.background,
-    contentColor: Color = contentColorFor(backgroundColor),
-    content: @Composable (PaddingValues) -> Unit
+  modifier: Modifier = Modifier,
+  scaffoldState: ScaffoldState = rememberScaffoldState(),
+  topBar: @Composable () -> Unit = {},
+  enableTopBarNestedScroll: Boolean = true,
+  bottomBar: @Composable () -> Unit = {},
+  enableBottomBarNestedScroll: Boolean = true,
+  snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
+  floatingActionButton: @Composable () -> Unit = {},
+  enableFloatingActionButtonNestedScroll: Boolean = true,
+  floatingActionButtonPosition: FabPosition = FabPosition.End,
+  isFloatingActionButtonDocked: Boolean = false,
+  drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
+  drawerGesturesEnabled: Boolean = true,
+  drawerShape: Shape = MaterialTheme.shapes.large,
+  drawerElevation: Dp = DrawerDefaults.Elevation,
+  drawerBackgroundColor: Color = MaterialTheme.colors.surface,
+  drawerContentColor: Color = contentColorFor(drawerBackgroundColor),
+  drawerScrimColor: Color = DrawerDefaults.scrimColor,
+  backgroundColor: Color = MaterialTheme.colors.background,
+  contentColor: Color = contentColorFor(backgroundColor),
+  content: @Composable (PaddingValues) -> Unit
 ) {
-    val topBarState = rememberSaveable(saver = TopBarState.Saver) {
-        TopBarState()
-    }
-    val bottomBarState = rememberSaveable(saver = BottomBarState.Saver) {
-        BottomBarState()
-    }
-    val fabState = rememberSaveable(saver = BottomBarState.Saver) {
-        BottomBarState()
-    }
-    val enableTopBarNestedScrollState = rememberUpdatedState(newValue = enableTopBarNestedScroll)
-    val enableBottomBarNestedScrollState =
-        rememberUpdatedState(newValue = enableBottomBarNestedScroll)
-    val enableFloatingActionButtonNestedScrollState =
-        rememberUpdatedState(newValue = enableFloatingActionButtonNestedScroll)
+  val topBarState = rememberSaveable(saver = TopBarState.Saver) {
+    TopBarState()
+  }
+  val bottomBarState = rememberSaveable(saver = BottomBarState.Saver) {
+    BottomBarState()
+  }
+  val fabState = rememberSaveable(saver = BottomBarState.Saver) {
+    BottomBarState()
+  }
+  val enableTopBarNestedScrollState = rememberUpdatedState(newValue = enableTopBarNestedScroll)
+  val enableBottomBarNestedScrollState =
+    rememberUpdatedState(newValue = enableBottomBarNestedScroll)
+  val enableFloatingActionButtonNestedScrollState =
+    rememberUpdatedState(newValue = enableFloatingActionButtonNestedScroll)
 
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val delta = available.y
-                if (enableTopBarNestedScrollState.value) {
-                    topBarState.scroll(delta)
-                }
-                if (enableBottomBarNestedScrollState.value) {
-                    bottomBarState.scroll(delta)
-                }
-                if (enableFloatingActionButtonNestedScrollState.value) {
-                    fabState.scroll(delta)
-                }
-                return Offset.Zero
-            }
-
-            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-                coroutineScope {
-                    if (enableTopBarNestedScrollState.value) {
-                        launch {
-                            topBarState.fixOffset()
-                        }
-                    }
-                    if (enableBottomBarNestedScrollState.value) {
-                        launch {
-                            bottomBarState.fixOffset()
-                        }
-                    }
-                    if (enableFloatingActionButtonNestedScrollState.value) {
-                        launch {
-                            fabState.fixOffset()
-                        }
-                    }
-                }
-                return super.onPostFling(consumed, available)
-            }
+  val nestedScrollConnection = remember {
+    object : NestedScrollConnection {
+      override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+        val delta = available.y
+        if (enableTopBarNestedScrollState.value) {
+          topBarState.scroll(delta)
         }
-    }
+        if (enableBottomBarNestedScrollState.value) {
+          bottomBarState.scroll(delta)
+        }
+        if (enableFloatingActionButtonNestedScrollState.value) {
+          fabState.scroll(delta)
+        }
+        return Offset.Zero
+      }
 
-    Scaffold(
-        modifier = modifier.nestedScroll(nestedScrollConnection),
-        scaffoldState = scaffoldState,
-        topBar = {
-            Box(
-                modifier = Modifier.layout { measurable, constraints ->
-                    val placeable = measurable.measure(constraints)
-                    topBarState.size = placeable.height
-                    layout(
-                        width = placeable.width,
-                        height = placeable.height + topBarState.offset,
-                    ) {
-                        placeable.placeRelative(0, topBarState.offset)
-                    }
-                }
-            ) {
-                topBar.invoke()
+      override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+        coroutineScope {
+          if (enableTopBarNestedScrollState.value) {
+            launch {
+              topBarState.fixOffset()
             }
-        },
-        bottomBar = {
-            Box(
-                modifier = Modifier.layout { measurable, constraints ->
-                    val placeable = measurable.measure(constraints)
-                    bottomBarState.size = placeable.height
-                    layout(
-                        width = placeable.width,
-                        height = placeable.height - bottomBarState.offset
-                    ) {
-                        placeable.placeRelative(0, bottomBarState.offset)
-                    }
-                }
-            ) {
-                bottomBar.invoke()
+          }
+          if (enableBottomBarNestedScrollState.value) {
+            launch {
+              bottomBarState.fixOffset()
             }
-        },
-        snackbarHost = snackbarHost,
-        floatingActionButton = {
-            Box(
-                modifier = Modifier.layout { measurable, constraints ->
-                    val placeable = measurable.measure(constraints)
-                    fabState.size = placeable.height
-                    layout(
-                        width = placeable.width,
-                        height = placeable.height - fabState.offset
-                    ) {
-                        placeable.placeRelative(0, fabState.offset)
-                    }
-                }
-            ) {
-                floatingActionButton.invoke()
+          }
+          if (enableFloatingActionButtonNestedScrollState.value) {
+            launch {
+              fabState.fixOffset()
             }
-        },
-        floatingActionButtonPosition = floatingActionButtonPosition,
-        isFloatingActionButtonDocked = isFloatingActionButtonDocked,
-        drawerContent = drawerContent,
-        drawerGesturesEnabled = drawerGesturesEnabled,
-        drawerShape = drawerShape,
-        drawerElevation = drawerElevation,
-        drawerBackgroundColor = drawerBackgroundColor,
-        drawerContentColor = drawerContentColor,
-        drawerScrimColor = drawerScrimColor,
-        backgroundColor = backgroundColor,
-        contentColor = contentColor,
-        content = content,
-    )
+          }
+        }
+        return super.onPostFling(consumed, available)
+      }
+    }
+  }
+
+  Scaffold(
+    modifier = modifier.nestedScroll(nestedScrollConnection),
+    scaffoldState = scaffoldState,
+    topBar = {
+      Box(
+        modifier = Modifier.layout { measurable, constraints ->
+          val placeable = measurable.measure(constraints)
+          topBarState.size = placeable.height
+          layout(
+            width = placeable.width,
+            height = placeable.height + topBarState.offset,
+          ) {
+            placeable.placeRelative(0, topBarState.offset)
+          }
+        }
+      ) {
+        topBar.invoke()
+      }
+    },
+    bottomBar = {
+      Box(
+        modifier = Modifier.layout { measurable, constraints ->
+          val placeable = measurable.measure(constraints)
+          bottomBarState.size = placeable.height
+          layout(
+            width = placeable.width,
+            height = placeable.height - bottomBarState.offset
+          ) {
+            placeable.placeRelative(0, bottomBarState.offset)
+          }
+        }
+      ) {
+        bottomBar.invoke()
+      }
+    },
+    snackbarHost = snackbarHost,
+    floatingActionButton = {
+      Box(
+        modifier = Modifier.layout { measurable, constraints ->
+          val placeable = measurable.measure(constraints)
+          fabState.size = placeable.height
+          layout(
+            width = placeable.width,
+            height = placeable.height - fabState.offset
+          ) {
+            placeable.placeRelative(0, fabState.offset)
+          }
+        }
+      ) {
+        floatingActionButton.invoke()
+      }
+    },
+    floatingActionButtonPosition = floatingActionButtonPosition,
+    isFloatingActionButtonDocked = isFloatingActionButtonDocked,
+    drawerContent = drawerContent,
+    drawerGesturesEnabled = drawerGesturesEnabled,
+    drawerShape = drawerShape,
+    drawerElevation = drawerElevation,
+    drawerBackgroundColor = drawerBackgroundColor,
+    drawerContentColor = drawerContentColor,
+    drawerScrimColor = drawerScrimColor,
+    backgroundColor = backgroundColor,
+    contentColor = contentColor,
+    content = content,
+  )
 }

@@ -29,32 +29,32 @@ import com.twidere.twiderex.jobs.database.DeleteDbStatusJob
 import com.twidere.twiderex.model.MicroBlogKey
 
 class DeleteDbStatusWorker(
-    appContext: Context,
-    params: WorkerParameters,
-    private val deleteDbStatusJob: DeleteDbStatusJob,
+  appContext: Context,
+  params: WorkerParameters,
+  private val deleteDbStatusJob: DeleteDbStatusJob,
 ) : CoroutineWorker(appContext, params) {
 
-    companion object {
-        fun create(
-            statusKey: MicroBlogKey
-        ) = OneTimeWorkRequestBuilder<DeleteDbStatusWorker>()
-            .setInputData(
-                workDataOf(
-                    "statusKey" to statusKey.toString(),
-                )
-            ).build()
-    }
+  companion object {
+    fun create(
+      statusKey: MicroBlogKey
+    ) = OneTimeWorkRequestBuilder<DeleteDbStatusWorker>()
+      .setInputData(
+        workDataOf(
+          "statusKey" to statusKey.toString(),
+        )
+      ).build()
+  }
 
-    override suspend fun doWork(): Result {
-        val statusKey = inputData.getString("statusKey")?.let {
-            MicroBlogKey.valueOf(it)
-        } ?: return Result.failure()
-        return try {
-            deleteDbStatusJob.execute(statusKey)
-            Result.success()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            Result.failure()
-        }
+  override suspend fun doWork(): Result {
+    val statusKey = inputData.getString("statusKey")?.let {
+      MicroBlogKey.valueOf(it)
+    } ?: return Result.failure()
+    return try {
+      deleteDbStatusJob.execute(statusKey)
+      Result.success()
+    } catch (e: Throwable) {
+      e.printStackTrace()
+      Result.failure()
     }
+  }
 }

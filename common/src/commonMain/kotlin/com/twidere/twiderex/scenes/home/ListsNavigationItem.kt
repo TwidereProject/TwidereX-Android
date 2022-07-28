@@ -31,29 +31,29 @@ import com.twidere.twiderex.scenes.lists.ListsSceneContent
 import com.twidere.twiderex.scenes.lists.ListsSceneFab
 
 class ListsNavigationItem : HomeNavigationItem() {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_title)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_title)
+  }
 
-    override val route: String
-        get() = Root.Lists.Home
+  override val route: String
+    get() = Root.Lists.Home
 
-    @Composable
-    override fun icon(): Painter {
-        return painterResource(res = com.twidere.twiderex.MR.files.ic_lists)
-    }
+  @Composable
+  override fun icon(): Painter {
+    return painterResource(res = com.twidere.twiderex.MR.files.ic_lists)
+  }
 
-    @Composable
-    override fun Fab() {
-        ListsSceneFab()
-    }
+  @Composable
+  override fun Fab() {
+    ListsSceneFab()
+  }
 
-    override val floatingActionButtonPosition: FabPosition
-        get() = FabPosition.Center
+  override val floatingActionButtonPosition: FabPosition
+    get() = FabPosition.Center
 
-    @Composable
-    override fun Content() {
-        ListsSceneContent()
-    }
+  @Composable
+  override fun Content() {
+    ListsSceneContent()
+  }
 }

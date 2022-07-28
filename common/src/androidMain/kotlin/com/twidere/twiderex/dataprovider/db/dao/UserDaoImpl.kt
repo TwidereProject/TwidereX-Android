@@ -30,15 +30,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 internal class UserDaoImpl(private val database: RoomCacheDatabase) : UserDao {
-    override suspend fun findWithUserKey(userKey: MicroBlogKey): UiUser? {
-        return database.userDao().findWithUserKey(userKey)?.toUi()
-    }
+  override suspend fun findWithUserKey(userKey: MicroBlogKey): UiUser? {
+    return database.userDao().findWithUserKey(userKey)?.toUi()
+  }
 
-    override suspend fun insertAll(listOf: List<UiUser>) {
-        database.userDao().insertAll(listOf.map { it.toDbUser() })
-    }
+  override suspend fun insertAll(listOf: List<UiUser>) {
+    database.userDao().insertAll(listOf.map { it.toDbUser() })
+  }
 
-    override fun findWithUserKeyFlow(userKey: MicroBlogKey): Flow<UiUser?> {
-        return database.userDao().findWithUserKeyFlow(userKey).map { it?.toUi() }
-    }
+  override fun findWithUserKeyFlow(userKey: MicroBlogKey): Flow<UiUser?> {
+    return database.userDao().findWithUserKeyFlow(userKey).map { it?.toUi() }
+  }
 }

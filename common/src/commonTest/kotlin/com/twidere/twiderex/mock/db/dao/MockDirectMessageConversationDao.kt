@@ -32,56 +32,56 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.annotations.TestOnly
 
 internal class MockDirectMessageConversationDao @TestOnly constructor(private val eventDao: MockDirectMessageEventDao) : DirectMessageConversationDao {
-    private val fakeDb = mutableMapOf<MicroBlogKey, MutableList<UiDMConversation>>()
-    override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiDMConversationWithLatestMessage> {
-        return runBlocking {
-            MockPagingSource(
-                data = find(accountKey)
-            )
+  private val fakeDb = mutableMapOf<MicroBlogKey, MutableList<UiDMConversation>>()
+  override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiDMConversationWithLatestMessage> {
+    return runBlocking {
+      MockPagingSource(
+        data = find(accountKey)
+      )
+    }
+  }
+
+  override fun findWithConversationKeyFlow(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey
+  ): Flow<UiDMConversation?> {
+    return flow {
+      emit(findWithConversationKey(accountKey, conversationKey))
+    }
+  }
+
+  override suspend fun findWithConversationKey(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey
+  ): UiDMConversation? {
+    return fakeDb[accountKey]?.find { it.conversationKey == conversationKey }
+  }
+
+  override suspend fun insertAll(listOf: List<UiDMConversation>) {
+    listOf.forEach { con ->
+      fakeDb[con.accountKey].let {
+        if (it.isNullOrEmpty()) {
+          fakeDb[con.accountKey] = mutableListOf(con)
+        } else {
+          it.removeAll { it.conversationKey == con.conversationKey }
+          it.add(con)
         }
+      }
     }
+  }
 
-    override fun findWithConversationKeyFlow(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey
-    ): Flow<UiDMConversation?> {
-        return flow {
-            emit(findWithConversationKey(accountKey, conversationKey))
-        }
-    }
+  override suspend fun find(accountKey: MicroBlogKey): List<UiDMConversationWithLatestMessage> {
+    return fakeDb[accountKey]?.mapNotNull {
+      eventDao.getLatestMessage(accountKey, it.conversationKey)?.let { event ->
+        UiDMConversationWithLatestMessage(
+          conversation = it,
+          latestMessage = event
+        )
+      }
+    } ?: emptyList()
+  }
 
-    override suspend fun findWithConversationKey(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey
-    ): UiDMConversation? {
-        return fakeDb[accountKey]?.find { it.conversationKey == conversationKey }
-    }
-
-    override suspend fun insertAll(listOf: List<UiDMConversation>) {
-        listOf.forEach { con ->
-            fakeDb[con.accountKey].let {
-                if (it.isNullOrEmpty()) {
-                    fakeDb[con.accountKey] = mutableListOf(con)
-                } else {
-                    it.removeAll { it.conversationKey == con.conversationKey }
-                    it.add(con)
-                }
-            }
-        }
-    }
-
-    override suspend fun find(accountKey: MicroBlogKey): List<UiDMConversationWithLatestMessage> {
-        return fakeDb[accountKey]?.mapNotNull {
-            eventDao.getLatestMessage(accountKey, it.conversationKey)?.let { event ->
-                UiDMConversationWithLatestMessage(
-                    conversation = it,
-                    latestMessage = event
-                )
-            }
-        } ?: emptyList()
-    }
-
-    override suspend fun delete(conversation: UiDMConversation) {
-        fakeDb[conversation.accountKey]?.removeAll { it.conversationKey == conversation.conversationKey }
-    }
+  override suspend fun delete(conversation: UiDMConversation) {
+    fakeDb[conversation.accountKey]?.removeAll { it.conversationKey == conversation.conversationKey }
+  }
 }

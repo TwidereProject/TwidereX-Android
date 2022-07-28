@@ -41,104 +41,104 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 internal class UserViewModelTest : AccountViewModelTestBase() {
-    override val mockService: MicroBlogService
-        get() = MockRelationshipService()
+  override val mockService: MicroBlogService
+    get() = MockRelationshipService()
 
-    @MockK(relaxed = true)
-    private lateinit var repository: UserRepository
+  @MockK(relaxed = true)
+  private lateinit var repository: UserRepository
 
-    @MockK
-    private lateinit var inAppNotification: InAppNotification
+  @MockK
+  private lateinit var inAppNotification: InAppNotification
 
-    @Test
-    fun user_information(): Unit = runBlocking {
-        every { repository.getUserFlow(any()) }.returns(
-            flowOf(
-                mockk {
-                    every { userKey }.returns(mockAccount.accountKey)
-                }
-            )
-        )
-        coEvery { repository.lookupUserById(any(), any(), any()) }.returns(
-            mockk {
-                every { userKey }.returns(mockAccount.accountKey)
-            }
-        )
-        val viewModel = UserViewModel(
-            repository,
-            mockAccountRepository,
-            inAppNotification,
-            mockAccount.accountKey
-        )
-        viewModel.user.test {
-            val it = awaitItem()
-            assertNotNull(it)
-            assertEquals(mockAccount.accountKey, it.userKey)
-            cancelAndIgnoreRemainingEvents()
+  @Test
+  fun user_information(): Unit = runBlocking {
+    every { repository.getUserFlow(any()) }.returns(
+      flowOf(
+        mockk {
+          every { userKey }.returns(mockAccount.accountKey)
         }
+      )
+    )
+    coEvery { repository.lookupUserById(any(), any(), any()) }.returns(
+      mockk {
+        every { userKey }.returns(mockAccount.accountKey)
+      }
+    )
+    val viewModel = UserViewModel(
+      repository,
+      mockAccountRepository,
+      inAppNotification,
+      mockAccount.accountKey
+    )
+    viewModel.user.test {
+      val it = awaitItem()
+      assertNotNull(it)
+      assertEquals(mockAccount.accountKey, it.userKey)
+      cancelAndIgnoreRemainingEvents()
     }
+  }
 
-    @Test
-    fun is_me(): Unit = runBlocking {
-        every { repository.getUserFlow(any()) }.returns(
-            flowOf(
-                mockk {
-                    every { userKey }.returns(mockAccount.accountKey)
-                }
-            )
-        )
-        val viewModel = UserViewModel(
-            repository,
-            mockAccountRepository,
-            inAppNotification,
-            mockAccount.accountKey
-        )
-        viewModel.isMe.test {
-            assert(awaitItem())
-            cancelAndIgnoreRemainingEvents()
+  @Test
+  fun is_me(): Unit = runBlocking {
+    every { repository.getUserFlow(any()) }.returns(
+      flowOf(
+        mockk {
+          every { userKey }.returns(mockAccount.accountKey)
         }
+      )
+    )
+    val viewModel = UserViewModel(
+      repository,
+      mockAccountRepository,
+      inAppNotification,
+      mockAccount.accountKey
+    )
+    viewModel.isMe.test {
+      assert(awaitItem())
+      cancelAndIgnoreRemainingEvents()
     }
+  }
 
-    @Test
-    fun is_not_me(): Unit = runBlocking {
-        every { repository.getUserFlow(any()) }.returns(
-            flowOf(
-                mockk {
-                    every { userKey }.returns(MicroBlogKey.twitter("321"))
-                }
-            )
-        )
-        val viewModel = UserViewModel(
-            repository,
-            mockAccountRepository,
-            inAppNotification,
-            MicroBlogKey.twitter("321")
-        )
-        viewModel.isMe.firstOrNull().let {
-            assertNotNull(it)
-            assert(!it)
+  @Test
+  fun is_not_me(): Unit = runBlocking {
+    every { repository.getUserFlow(any()) }.returns(
+      flowOf(
+        mockk {
+          every { userKey }.returns(MicroBlogKey.twitter("321"))
         }
+      )
+    )
+    val viewModel = UserViewModel(
+      repository,
+      mockAccountRepository,
+      inAppNotification,
+      MicroBlogKey.twitter("321")
+    )
+    viewModel.isMe.firstOrNull().let {
+      assertNotNull(it)
+      assert(!it)
     }
+  }
 
-    @Test
-    fun follow_success(): Unit = runBlocking {
-        val viewModel = UserViewModel(
-            repository,
-            mockAccountRepository,
-            inAppNotification,
-            MicroBlogKey.twitter("321")
-        )
-        viewModel.loadingRelationship.test {
-            assert(!awaitItem())
-            viewModel.follow()
-            assert(awaitItem())
-            assert(!awaitItem())
-        }
-        viewModel.relationship.test {
-            val item = awaitItem()
-            assertNotNull(item)
-            assert(item.following)
-            cancelAndIgnoreRemainingEvents()
-        }
+  @Test
+  fun follow_success(): Unit = runBlocking {
+    val viewModel = UserViewModel(
+      repository,
+      mockAccountRepository,
+      inAppNotification,
+      MicroBlogKey.twitter("321")
+    )
+    viewModel.loadingRelationship.test {
+      assert(!awaitItem())
+      viewModel.follow()
+      assert(awaitItem())
+      assert(!awaitItem())
     }
+    viewModel.relationship.test {
+      val item = awaitItem()
+      assertNotNull(item)
+      assert(item.following)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
 }

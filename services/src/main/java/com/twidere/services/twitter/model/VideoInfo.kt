@@ -25,8 +25,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class VideoInfo(
-    @SerialName("aspect_ratio")
-    val aspectRatio: List<Long>? = null,
+  @SerialName("aspect_ratio")
+  val aspectRatio: List<Long>? = null,
 
-    val variants: List<Variant>? = null
+  val variants: List<Variant>? = null
 )

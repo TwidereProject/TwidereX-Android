@@ -33,18 +33,18 @@ class DirectMessageInitializerHolder
 private const val DirectMessageWorkName = "twiderex_direct_message"
 
 class DirectMessageInitializer : Initializer<DirectMessageInitializerHolder>, KoinComponent {
-    private val workManager: WorkManager by inject()
+  private val workManager: WorkManager by inject()
 
-    override fun create(context: Context): DirectMessageInitializerHolder {
-        workManager.enqueueUniquePeriodicWork(
-            DirectMessageWorkName,
-            ExistingPeriodicWorkPolicy.KEEP,
-            DirectMessageFetchWorker.createRepeatableWorker()
-        )
-        return DirectMessageInitializerHolder()
-    }
+  override fun create(context: Context): DirectMessageInitializerHolder {
+    workManager.enqueueUniquePeriodicWork(
+      DirectMessageWorkName,
+      ExistingPeriodicWorkPolicy.KEEP,
+      DirectMessageFetchWorker.createRepeatableWorker()
+    )
+    return DirectMessageInitializerHolder()
+  }
 
-    override fun dependencies(): MutableList<Class<out Initializer<*>>> {
-        return mutableListOf()
-    }
+  override fun dependencies(): MutableList<Class<out Initializer<*>>> {
+    return mutableListOf()
+  }
 }

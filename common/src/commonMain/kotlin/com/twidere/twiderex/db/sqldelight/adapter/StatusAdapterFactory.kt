@@ -29,16 +29,16 @@ import com.twidere.twiderex.db.sqldelight.model.DbStatusReferenceList
 import com.twidere.twiderex.sqldelight.table.DbStatus
 
 internal object StatusAdapterFactory {
-    fun create() = MicroBlogKeyColumnAdapter().let {
-        DbStatus.Adapter(
-            platformTypeAdapter = EnumColumnAdapter(),
-            statusKeyAdapter = it,
-            userKeyAdapter = it,
-            metricsAdapter = JsonColumnAdapter(DbStatusMetrics.serializer()),
-            geoAdapter = JsonColumnAdapter(DbGeo.serializer()),
-            cardAdapter = JsonColumnAdapter(DbCard.serializer()),
-            pollAdapter = JsonColumnAdapter(DbPoll.serializer()),
-            refrenceStatusAdapter = JsonColumnAdapter(DbStatusReferenceList.serializer())
-        )
-    }
+  fun create() = MicroBlogKeyColumnAdapter().let {
+    DbStatus.Adapter(
+      platformTypeAdapter = EnumColumnAdapter(),
+      statusKeyAdapter = it,
+      userKeyAdapter = it,
+      metricsAdapter = JsonColumnAdapter(DbStatusMetrics.serializer()),
+      geoAdapter = JsonColumnAdapter(DbGeo.serializer()),
+      cardAdapter = JsonColumnAdapter(DbCard.serializer()),
+      pollAdapter = JsonColumnAdapter(DbPoll.serializer()),
+      refrenceStatusAdapter = JsonColumnAdapter(DbStatusReferenceList.serializer())
+    )
+  }
 }

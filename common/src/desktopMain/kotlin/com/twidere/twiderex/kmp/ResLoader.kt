@@ -28,20 +28,20 @@ import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.StringResource
 
 actual class ResLoader {
-    actual fun getString(
-        res: StringResource,
-        vararg args: Any
-    ): String {
-        return res.localized(args = args)
-    }
+  actual fun getString(
+    res: StringResource,
+    vararg args: Any
+  ): String {
+    return res.localized(args = args)
+  }
 
-    @Composable
-    actual fun getSvg(res: FileResource): Painter {
-        return painterResource(res.filePath)
-    }
+  @Composable
+  actual fun getSvg(res: FileResource): Painter {
+    return painterResource(res.filePath)
+  }
 
-    @Composable
-    actual fun getImage(res: ImageResource): Painter {
-        return painterResource(res.filePath)
-    }
+  @Composable
+  actual fun getImage(res: ImageResource): Painter {
+    return painterResource(res.filePath)
+  }
 }

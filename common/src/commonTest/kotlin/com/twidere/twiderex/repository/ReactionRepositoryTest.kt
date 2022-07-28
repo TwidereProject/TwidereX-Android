@@ -29,23 +29,23 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class ReactionRepositoryTest {
-    @Test
-    fun updateStatusAfterSuccess() = runBlocking {
-        val database = MockCacheDatabase()
-        val accountKey = MicroBlogKey.twitter("test")
-        val repo = ReactionRepository(database)
-        val status = mockIStatus().toUi(accountKey = accountKey)
-        database.statusDao().insertAll(listOf(status), accountKey)
-        assert(!status.liked)
-        assert(!status.retweeted)
-        repo.updateReaction(
-            accountKey = accountKey,
-            statusKey = status.statusKey,
-            liked = true,
-            retweet = true
-        )
-        val updateStatus = database.statusDao().findWithStatusKey(status.statusKey, accountKey)
-        assertEquals(true, updateStatus?.liked)
-        assertEquals(true, updateStatus?.retweeted)
-    }
+  @Test
+  fun updateStatusAfterSuccess() = runBlocking {
+    val database = MockCacheDatabase()
+    val accountKey = MicroBlogKey.twitter("test")
+    val repo = ReactionRepository(database)
+    val status = mockIStatus().toUi(accountKey = accountKey)
+    database.statusDao().insertAll(listOf(status), accountKey)
+    assert(!status.liked)
+    assert(!status.retweeted)
+    repo.updateReaction(
+      accountKey = accountKey,
+      statusKey = status.statusKey,
+      liked = true,
+      retweet = true
+    )
+    val updateStatus = database.statusDao().findWithStatusKey(status.statusKey, accountKey)
+    assertEquals(true, updateStatus?.liked)
+    assertEquals(true, updateStatus?.retweeted)
+  }
 }

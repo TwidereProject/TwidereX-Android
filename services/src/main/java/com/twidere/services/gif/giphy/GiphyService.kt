@@ -30,74 +30,74 @@ import java.io.InputStream
 
 private const val GIPHY_BASE_URL = "https://api.giphy.com/"
 class GiphyService(
-    private val apiKey: String,
-    private val httpClientFactory: HttpClientFactory,
+  private val apiKey: String,
+  private val httpClientFactory: HttpClientFactory,
 ) : GifService {
-    private val resource: GiphyResource
-        get() = httpClientFactory.createResources(
-            clazz = GiphyResource::class.java,
-            baseUrl = GIPHY_BASE_URL,
-            useCache = true,
-            authorization = EmptyAuthorization()
-        )
+  private val resource: GiphyResource
+    get() = httpClientFactory.createResources(
+      clazz = GiphyResource::class.java,
+      baseUrl = GIPHY_BASE_URL,
+      useCache = true,
+      authorization = EmptyAuthorization()
+    )
 
-    override suspend fun trending(nextPage: String?, limit: Int) = resource.getTrending(
-        apiKey = apiKey,
-        limit = limit,
-        offset = nextPage?.toInt() ?: 0
-    ).let {
-        GifPaging(
-            data = it.data ?: emptyList(),
-            nextPage = generateNextPage(it.pagination)
-        )
-    }
+  override suspend fun trending(nextPage: String?, limit: Int) = resource.getTrending(
+    apiKey = apiKey,
+    limit = limit,
+    offset = nextPage?.toInt() ?: 0
+  ).let {
+    GifPaging(
+      data = it.data ?: emptyList(),
+      nextPage = generateNextPage(it.pagination)
+    )
+  }
 
-    private fun generateNextPage(pagination: GiphyPagingResponse.Pagination?): String? {
-        return pagination?.let {
-            if (it.count != null && it.offset != null && it.totalCount != null) {
-                val nextOffset = it.count + it.offset
-                if (nextOffset < it.totalCount)
-                    nextOffset.toString()
-                else null
-            } else null
-        }
+  private fun generateNextPage(pagination: GiphyPagingResponse.Pagination?): String? {
+    return pagination?.let {
+      if (it.count != null && it.offset != null && it.totalCount != null) {
+        val nextOffset = it.count + it.offset
+        if (nextOffset < it.totalCount)
+          nextOffset.toString()
+        else null
+      } else null
     }
+  }
 
-    override suspend fun search(
-        query: String,
-        lang: String,
-        nextPage: String?,
-        limit: Int
-    ) = resource.search(
-        apiKey = apiKey,
-        limit = limit,
-        offset = nextPage?.toInt() ?: 0,
-        query = query,
-        lang = lang
-    ).let {
-        GifPaging(
-            data = it.data ?: emptyList(),
-            nextPage = generateNextPage(it.pagination)
-        )
-    }
+  override suspend fun search(
+    query: String,
+    lang: String,
+    nextPage: String?,
+    limit: Int
+  ) = resource.search(
+    apiKey = apiKey,
+    limit = limit,
+    offset = nextPage?.toInt() ?: 0,
+    query = query,
+    lang = lang
+  ).let {
+    GifPaging(
+      data = it.data ?: emptyList(),
+      nextPage = generateNextPage(it.pagination)
+    )
+  }
 
-    override suspend fun download(target: String): InputStream {
-        return httpClientFactory.createHttpClientBuilder()
-            .build()
-            .newCall(
-                Request
-                    .Builder()
-                    .url(target)
-                    .get()
-                    .build()
-            )
-            .await()
-            .body
-            ?.byteStream() ?: throw IllegalArgumentException()
-    }
+  override suspend fun download(target: String): InputStream {
+    return httpClientFactory.createHttpClientBuilder()
+      .build()
+      .newCall(
+        Request
+          .Builder()
+          .url(target)
+          .get()
+          .build()
+      )
+      .await()
+      .body
+      ?.byteStream() ?: throw IllegalArgumentException()
+  }
 
-    class EmptyAuthorization : Authorization {
-        override val hasAuthorization: Boolean
-            get() = false
-    }
+  class EmptyAuthorization : Authorization {
+    override val hasAuthorization: Boolean
+      get() = false
+  }
 }

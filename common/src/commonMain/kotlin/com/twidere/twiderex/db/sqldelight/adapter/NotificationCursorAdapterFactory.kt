@@ -24,10 +24,10 @@ import com.squareup.sqldelight.EnumColumnAdapter
 import com.twidere.twiderex.sqldelight.table.DbNotificationCursor
 
 object NotificationCursorAdapterFactory {
-    fun create() = MicroBlogKeyColumnAdapter().let {
-        DbNotificationCursor.Adapter(
-            accountKeyAdapter = it,
-            typeAdapter = EnumColumnAdapter()
-        )
-    }
+  fun create() = MicroBlogKeyColumnAdapter().let {
+    DbNotificationCursor.Adapter(
+      accountKeyAdapter = it,
+      typeAdapter = EnumColumnAdapter()
+    )
+  }
 }

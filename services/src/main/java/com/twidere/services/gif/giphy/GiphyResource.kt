@@ -24,23 +24,23 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 internal interface GiphyResource {
-    @GET("/v1/gifs/trending")
-    suspend fun getTrending(
-        @Query("api_key") apiKey: String,
-        @Query("offset") offset: Int,
-        @Query("limit") limit: Int,
-        @Query("rating") rating: String? = null,
-        @Query("random_id") random_id: String? = null,
-    ): GiphyPagingResponse
+  @GET("/v1/gifs/trending")
+  suspend fun getTrending(
+    @Query("api_key") apiKey: String,
+    @Query("offset") offset: Int,
+    @Query("limit") limit: Int,
+    @Query("rating") rating: String? = null,
+    @Query("random_id") random_id: String? = null,
+  ): GiphyPagingResponse
 
-    @GET("/v1/gifs/search")
-    suspend fun search(
-        @Query("q") query: String,
-        @Query("api_key") apiKey: String,
-        @Query("offset") offset: Int,
-        @Query("limit") limit: Int,
-        @Query("lang") lang: String,
-        @Query("rating") rating: String? = null,
-        @Query("random_id") random_id: String? = null,
-    ): GiphyPagingResponse
+  @GET("/v1/gifs/search")
+  suspend fun search(
+    @Query("q") query: String,
+    @Query("api_key") apiKey: String,
+    @Query("offset") offset: Int,
+    @Query("limit") limit: Int,
+    @Query("lang") lang: String,
+    @Query("rating") rating: String? = null,
+    @Query("random_id") random_id: String? = null,
+  ): GiphyPagingResponse
 }

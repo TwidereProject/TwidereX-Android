@@ -26,13 +26,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TwitterSearchResponseV2(
-    val meta: Meta? = null,
-    val data: List<StatusV2>? = null,
-    val errors: List<TwitterErrorV2>? = null,
-    val includes: IncludesV2? = null
+  val meta: Meta? = null,
+  val data: List<StatusV2>? = null,
+  val errors: List<TwitterErrorV2>? = null,
+  val includes: IncludesV2? = null
 ) : ISearchResponse {
-    override val nextPage: String?
-        get() = meta?.nextToken
-    override val status: List<IStatus>
-        get() = data ?: emptyList()
+  override val nextPage: String?
+    get() = meta?.nextToken
+  override val status: List<IStatus>
+    get() = data ?: emptyList()
 }

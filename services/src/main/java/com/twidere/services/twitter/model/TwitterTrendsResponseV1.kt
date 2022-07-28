@@ -26,34 +26,34 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TwitterTrendsResponseV1(
-    @SerialName("as_of")
-    val asOf: String? = null,
-    @SerialName("created_at")
-    val createdAt: String? = null,
-    @SerialName("locations")
-    val locations: List<Location>? = null,
-    @SerialName("trends")
-    val trends: List<Trend>? = null
+  @SerialName("as_of")
+  val asOf: String? = null,
+  @SerialName("created_at")
+  val createdAt: String? = null,
+  @SerialName("locations")
+  val locations: List<Location>? = null,
+  @SerialName("trends")
+  val trends: List<Trend>? = null
 )
 
 @Serializable
 data class Trend(
-    @SerialName("name")
-    val name: String? = null,
-    @SerialName("promoted_content")
-    val promotedContent: String? = null,
-    @SerialName("query")
-    val query: String? = null,
-    @SerialName("tweet_volume")
-    val tweetVolume: Long? = null,
-    @SerialName("url")
-    val url: String? = null
+  @SerialName("name")
+  val name: String? = null,
+  @SerialName("promoted_content")
+  val promotedContent: String? = null,
+  @SerialName("query")
+  val query: String? = null,
+  @SerialName("tweet_volume")
+  val tweetVolume: Long? = null,
+  @SerialName("url")
+  val url: String? = null
 ) : ITrend
 
 @Serializable
 data class Location(
-    @SerialName("name")
-    val name: String? = null,
-    @SerialName("woeid")
-    val woeid: Int? = null
+  @SerialName("name")
+  val name: String? = null,
+  @SerialName("woeid")
+  val woeid: Int? = null
 )

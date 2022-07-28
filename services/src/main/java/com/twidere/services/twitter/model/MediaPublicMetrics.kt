@@ -25,6 +25,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MediaPublicMetrics(
-    @SerialName("view_count")
-    val viewCount: Long? = null
+  @SerialName("view_count")
+  val viewCount: Long? = null
 )
