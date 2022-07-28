@@ -39,7 +39,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -55,19 +54,6 @@ import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 import org.koin.core.parameter.parametersOf
-
-val fadeCreateTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
-  alpha = factor
-}
-val fadeDestroyTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
-  alpha = factor
-}
-val fadePauseTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
-  alpha = factor
-}
-val fadeResumeTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
-  alpha = factor
-}
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable

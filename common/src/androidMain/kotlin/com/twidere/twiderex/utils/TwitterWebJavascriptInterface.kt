@@ -21,10 +21,10 @@
 package com.twidere.twiderex.utils
 
 import android.webkit.JavascriptInterface
-import moe.tlaster.precompose.navigation.NavController
+import moe.tlaster.precompose.navigation.Navigator
 
 class TwitterWebJavascriptInterface(
-  val navController: NavController,
+  val navController: Navigator,
 ) {
   @JavascriptInterface
   fun tryPinCode(content: String?) {

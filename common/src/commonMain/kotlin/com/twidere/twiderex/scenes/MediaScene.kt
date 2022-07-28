@@ -110,7 +110,7 @@ import com.twidere.twiderex.utils.video.CustomVideoControl
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
-import moe.tlaster.precompose.navigation.NavController
+import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.swiper.Swiper
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
@@ -244,7 +244,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
 private fun StatusMediaCloseButton(
   visible: Boolean,
   backgroundColor: Color,
-  navController: NavController
+  navController: Navigator
 ) {
   AnimatedVisibility(
     visible = visible,
