@@ -34,12 +34,14 @@ class DirectMessageDeleteJob(
     val accountDetails = accountKey.let {
       accountRepository.findByAccountKey(accountKey = it)
     } ?: throw Error("Can't find any account matches:$$accountKey")
-    repository.deleteMessage(
-      accountKey = deleteData.accountKey,
-      conversationKey = deleteData.conversationKey,
-      messageId = deleteData.messageId,
-      messageKey = deleteData.messageKey,
-      service = accountDetails.service as DirectMessageService
-    )
+    (accountDetails.service as? DirectMessageService)?.let {
+      repository.deleteMessage(
+        accountKey = deleteData.accountKey,
+        conversationKey = deleteData.conversationKey,
+        messageId = deleteData.messageId,
+        messageKey = deleteData.messageKey,
+        service = it
+      )
+    }
   }
 }
