@@ -45,13 +45,15 @@ class DirectMessageFetchJob(
     accountRepository.activeAccount.firstOrNull()?.takeIf {
       accountRepository.getAccountPreferences(it.accountKey).isNotificationEnabled.first()
     }?.let { account ->
-      val result = repository.checkNewMessages(
-        accountKey = account.accountKey,
-        service = account.service as DirectMessageService,
-        lookupService = account.service as LookupService
-      )
-      result.forEach {
-        notification(account = account, message = it)
+      (account.service as? DirectMessageService)?.let { directMessageService ->
+        val result = repository.checkNewMessages(
+          accountKey = account.accountKey,
+          service = directMessageService,
+          lookupService = account.service as LookupService
+        )
+        result.forEach {
+          notification(account = account, message = it)
+        }
       }
     }
   }

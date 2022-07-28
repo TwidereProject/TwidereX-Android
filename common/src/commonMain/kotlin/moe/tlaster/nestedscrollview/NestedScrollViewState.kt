@@ -36,6 +36,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.unit.Velocity
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 import kotlin.math.withSign
@@ -98,8 +99,13 @@ class NestedScrollViewState(
   val offset: Float
     get() = _offset.value
 
+  var lastPreScroll: Float = 0f
+
+  var shouldFling = true
+
   internal val nestedScrollConnectionHolder = object : NestedScrollConnection {
     override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+      lastPreScroll = available.y
       return takeIf {
         available.y < 0 && source == NestedScrollSource.Drag
       }?.let {
@@ -119,7 +125,19 @@ class NestedScrollViewState(
       } ?: Offset.Zero
     }
 
+    private fun delayFling() {
+      shouldFling = false
+      scope.launch {
+        delay(100)
+        shouldFling = true
+      }
+    }
+
     override suspend fun onPreFling(available: Velocity): Velocity {
+      // FIXME: 2021/4/1 Temp workaround for https://github.com/TwidereProject/TwidereX-Android/issues/468
+      if (lastPreScroll < 0 && available.y > 0) {
+        delayFling()
+      }
       return Velocity(0f, fling(available.y))
     }
 
@@ -137,6 +155,9 @@ class NestedScrollViewState(
   }
 
   internal suspend fun fling(velocity: Float): Float {
+    if (!shouldFling) {
+      return velocity
+    }
     if (velocity == 0f || velocity > 0 && offset == 0f) {
       return velocity
     }
