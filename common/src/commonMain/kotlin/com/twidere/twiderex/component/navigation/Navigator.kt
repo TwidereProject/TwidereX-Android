@@ -63,8 +63,8 @@ interface INavigator {
 }
 
 class Navigator(
-    private val navController: moe.tlaster.precompose.navigation.Navigator,
-    private val remoteNavigator: RemoteNavigator,
+  private val navController: moe.tlaster.precompose.navigation.Navigator,
+  private val remoteNavigator: RemoteNavigator,
 ) : INavigator {
   override fun user(user: UiUser, navOptions: NavOptions?) {
     navController.navigate(Root.User(user.userKey), navOptions)

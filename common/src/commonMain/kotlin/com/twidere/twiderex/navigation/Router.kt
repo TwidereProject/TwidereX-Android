@@ -31,19 +31,19 @@ import moe.tlaster.precompose.navigation.rememberNavigator
 
 @Composable
 fun Router(
-    navController: Navigator = rememberNavigator(),
-    isDebug: Boolean = false
+  navController: Navigator = rememberNavigator(),
+  isDebug: Boolean = false
 ) {
-    val remoteNavigator = LocalRemoteNavigator.current
-    CompositionLocalProvider(
-        LocalNavController provides navController,
-        LocalNavigator provides com.twidere.twiderex.component.navigation.Navigator(navController, remoteNavigator),
-    ) {
-        NavHost(navigator = navController, initialRoute = initialRoute) {
-            route()
-        }
-        if (isDebug) {
-            ComposeDebugTool(navController)
-        }
+  val remoteNavigator = LocalRemoteNavigator.current
+  CompositionLocalProvider(
+    LocalNavController provides navController,
+    LocalNavigator provides com.twidere.twiderex.component.navigation.Navigator(navController, remoteNavigator),
+  ) {
+    NavHost(navigator = navController, initialRoute = initialRoute) {
+      route()
     }
+    if (isDebug) {
+      ComposeDebugTool(navController)
+    }
+  }
 }

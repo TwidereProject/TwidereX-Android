@@ -86,9 +86,9 @@ import org.koin.core.component.inject
 
 class TwidereXActivity : PreComposeActivity(), KoinComponent {
 
-    private val navController by lazy {
-        Navigator()
-    }
+  private val navController by lazy {
+    Navigator()
+  }
 
   private val statusActions: StatusActions by inject()
 

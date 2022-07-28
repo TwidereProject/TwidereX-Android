@@ -125,9 +125,9 @@ fun MastodonSignInScene() {
 }
 
 private fun signin(
-    viewModel: MastodonSignInViewModel,
-    host: TextFieldValue,
-    navController: Navigator,
+  viewModel: MastodonSignInViewModel,
+  host: TextFieldValue,
+  navController: Navigator,
 ) {
   viewModel.beginOAuth(
     host.text,

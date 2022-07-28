@@ -24,7 +24,7 @@ import android.webkit.JavascriptInterface
 import moe.tlaster.precompose.navigation.Navigator
 
 class TwitterWebJavascriptInterface(
-    val navController: Navigator,
+  val navController: Navigator,
 ) {
   @JavascriptInterface
   fun tryPinCode(content: String?) {

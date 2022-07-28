@@ -727,8 +727,8 @@ private object UserRelationshipDefaults {
 
 @Composable
 private fun UserBanner(
-    navController: Navigator,
-    bannerUrl: String
+  navController: Navigator,
+  bannerUrl: String
 ) {
   Box(
     modifier = Modifier

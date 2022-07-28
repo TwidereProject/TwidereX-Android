@@ -211,12 +211,12 @@ fun RequirePlatformAccount(
  */
 @OptIn(ExperimentalAnimationApi::class)
 fun RouteBuilder.route() {
-    authorizedScene(
-        Root.Home,
-        deepLinks = twitterHosts.map { "$it/*" }
-    ) {
-        HomeScene()
-    }
+  authorizedScene(
+    Root.Home,
+    deepLinks = twitterHosts.map { "$it/*" }
+  ) {
+    HomeScene()
+  }
 
   authorizedScene(Root.Mastodon.Notification) {
     MastodonNotificationScene()
@@ -409,65 +409,65 @@ fun RouteBuilder.route() {
     com.twidere.twiderex.scenes.home.SearchScene()
   }
 
-    authorizedScene(
-        Root.Search.Input,
-        navTransition = NavTransition(
-            createTransition = fadeIn(),
-            destroyTransition = fadeOut(),
-            pauseTransition = fadeOut(),
-            resumeTransition = fadeIn(),
-        ),
-    ) { backStackEntry ->
-        SearchInputScene(
-            backStackEntry.query<String>("keyword")?.let { URLDecoder.decode(it, "UTF-8") }
-        )
-    }
+  authorizedScene(
+    Root.Search.Input,
+    navTransition = NavTransition(
+      createTransition = fadeIn(),
+      destroyTransition = fadeOut(),
+      pauseTransition = fadeOut(),
+      resumeTransition = fadeIn(),
+    ),
+  ) { backStackEntry ->
+    SearchInputScene(
+      backStackEntry.query<String>("keyword")?.let { URLDecoder.decode(it, "UTF-8") }
+    )
+  }
 
-    authorizedScene(
-        Root.Search.Result,
-        deepLinks = twitterHosts.map {
-            "$it/search?q={keyword}"
-        } + RootDeepLinks.Search,
-        navTransition = NavTransition(
-            createTransition = fadeIn(),
-            destroyTransition = fadeOut(),
-            pauseTransition = fadeOut(),
-            resumeTransition = fadeIn(),
-        ),
-    ) { backStackEntry ->
-        backStackEntry.path<String>("keyword")?.takeIf { it.isNotEmpty() }?.let {
-            SearchScene(keyword = URLDecoder.decode(it, "UTF-8"))
-        }
+  authorizedScene(
+    Root.Search.Result,
+    deepLinks = twitterHosts.map {
+      "$it/search?q={keyword}"
+    } + RootDeepLinks.Search,
+    navTransition = NavTransition(
+      createTransition = fadeIn(),
+      destroyTransition = fadeOut(),
+      pauseTransition = fadeOut(),
+      resumeTransition = fadeIn(),
+    ),
+  ) { backStackEntry ->
+    backStackEntry.path<String>("keyword")?.takeIf { it.isNotEmpty() }?.let {
+      SearchScene(keyword = URLDecoder.decode(it, "UTF-8"))
     }
+  }
 
-    authorizedScene(
-        Root.Compose.Home,
-        navTransition = NavTransition(
-            createTransition = slideInVertically(initialOffsetY = { it }),
-            destroyTransition = slideOutVertically(targetOffsetY = { it }),
-            pauseTransition = scaleOut(targetScale = 0.9f),
-            resumeTransition = scaleIn(initialScale = 0.9f),
-        ),
-        deepLinks = listOf(
-            RootDeepLinks.Compose
-        )
-    ) { backStackEntry ->
-        val type = backStackEntry.query<String>("composeType")?.let {
-            enumValueOf(it)
-        } ?: ComposeType.New
-        val statusKey = backStackEntry.query<String>("statusKey")
-            ?.takeIf { it.isNotEmpty() }
-            ?.let { MicroBlogKey.valueOf(it) }
-        if (statusKey != null) {
-            ProvideStatusPlatform(statusKey = statusKey) { platformType ->
-                RequirePlatformAccount(platformType = platformType) {
-                    ComposeScene(statusKey, type)
-                }
-            }
-        } else {
-            ComposeScene(statusKey, type)
+  authorizedScene(
+    Root.Compose.Home,
+    navTransition = NavTransition(
+      createTransition = slideInVertically(initialOffsetY = { it }),
+      destroyTransition = slideOutVertically(targetOffsetY = { it }),
+      pauseTransition = scaleOut(targetScale = 0.9f),
+      resumeTransition = scaleIn(initialScale = 0.9f),
+    ),
+    deepLinks = listOf(
+      RootDeepLinks.Compose
+    )
+  ) { backStackEntry ->
+    val type = backStackEntry.query<String>("composeType")?.let {
+      enumValueOf(it)
+    } ?: ComposeType.New
+    val statusKey = backStackEntry.query<String>("statusKey")
+      ?.takeIf { it.isNotEmpty() }
+      ?.let { MicroBlogKey.valueOf(it) }
+    if (statusKey != null) {
+      ProvideStatusPlatform(statusKey = statusKey) { platformType ->
+        RequirePlatformAccount(platformType = platformType) {
+          ComposeScene(statusKey, type)
         }
+      }
+    } else {
+      ComposeScene(statusKey, type)
     }
+  }
 
   authorizedScene(
     Root.Followers,

@@ -49,7 +49,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ComposeDebugTool(
-    rootNavController: Navigator,
+  rootNavController: Navigator,
 ) {
 
   var showDebug by remember {
@@ -61,13 +61,13 @@ fun ComposeDebugTool(
     showDebug = true
   }
 
-    if (!showDebug) {
-        return
-    }
-    val state by rootNavController.currentEntry.collectAsState(null)
-    var debugOpen by remember {
-        mutableStateOf(false)
-    }
+  if (!showDebug) {
+    return
+  }
+  val state by rootNavController.currentEntry.collectAsState(null)
+  var debugOpen by remember {
+    mutableStateOf(false)
+  }
 
   Box(modifier = Modifier.fillMaxSize()) {
     var offsetX by remember { mutableStateOf(0f) }

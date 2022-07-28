@@ -242,9 +242,9 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun StatusMediaCloseButton(
-    visible: Boolean,
-    backgroundColor: Color,
-    navController: Navigator
+  visible: Boolean,
+  backgroundColor: Color,
+  navController: Navigator
 ) {
   AnimatedVisibility(
     visible = visible,
