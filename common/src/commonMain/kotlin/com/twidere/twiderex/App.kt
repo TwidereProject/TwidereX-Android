@@ -33,11 +33,11 @@ import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.utils.LocalPlatformResolver
-import moe.tlaster.precompose.navigation.NavController
+import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 @Composable
-fun App(navController: NavController = NavController()) {
+fun App(navController: Navigator = Navigator()) {
   val accountViewModel =
     com.twidere.twiderex.di.ext.getViewModel<com.twidere.twiderex.viewmodel.ActiveAccountViewModel>()
   val account by accountViewModel.account.observeAsState(null, accountViewModel.viewModelScope.coroutineContext)

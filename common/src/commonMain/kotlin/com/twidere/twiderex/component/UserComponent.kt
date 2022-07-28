@@ -112,7 +112,7 @@ import kotlinx.coroutines.launch
 import moe.tlaster.nestedscrollview.VerticalNestedScrollView
 import moe.tlaster.nestedscrollview.rememberNestedScrollViewState
 import moe.tlaster.placeholder.Placeholder
-import moe.tlaster.precompose.navigation.NavController
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalPagerApi::class)
@@ -727,7 +727,7 @@ private object UserRelationshipDefaults {
 
 @Composable
 private fun UserBanner(
-  navController: NavController,
+  navController: Navigator,
   bannerUrl: String
 ) {
   Box(

@@ -32,6 +32,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,14 +43,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import moe.tlaster.precompose.navigation.NavController
-import moe.tlaster.precompose.navigation.currentBackStackEntryAsState
+import moe.tlaster.precompose.navigation.Navigator
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ComposeDebugTool(
-  rootNavController: NavController,
+  rootNavController: Navigator,
 ) {
 
   var showDebug by remember {
@@ -64,7 +64,7 @@ fun ComposeDebugTool(
   if (!showDebug) {
     return
   }
-  val state by rootNavController.currentBackStackEntryAsState()!!
+  val state by rootNavController.currentEntry.collectAsState(null)
   var debugOpen by remember {
     mutableStateOf(false)
   }

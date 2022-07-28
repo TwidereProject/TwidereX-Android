@@ -33,7 +33,6 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.twitterHosts
-import moe.tlaster.precompose.navigation.NavController
 import moe.tlaster.precompose.navigation.NavOptions
 
 val LocalNavigator = staticCompositionLocalOf<INavigator> { error("No Navigator") }
@@ -64,7 +63,7 @@ interface INavigator {
 }
 
 class Navigator(
-  private val navController: NavController,
+  private val navController: moe.tlaster.precompose.navigation.Navigator,
   private val remoteNavigator: RemoteNavigator,
 ) : INavigator {
   override fun user(user: UiUser, navOptions: NavOptions?) {

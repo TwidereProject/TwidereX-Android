@@ -80,14 +80,14 @@ import kotlinx.coroutines.flow.onEach
 import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.precompose.lifecycle.PreComposeActivity
 import moe.tlaster.precompose.lifecycle.setContent
-import moe.tlaster.precompose.navigation.NavController
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class TwidereXActivity : PreComposeActivity(), KoinComponent {
 
   private val navController by lazy {
-    NavController()
+    Navigator()
   }
 
   private val statusActions: StatusActions by inject()

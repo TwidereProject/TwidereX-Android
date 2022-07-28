@@ -25,9 +25,9 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.preferences.model.DisplayPreferences
-import moe.tlaster.precompose.navigation.NavController
+import moe.tlaster.precompose.navigation.Navigator
 
-val LocalNavController = staticCompositionLocalOf<NavController> { error("No NavController") }
+val LocalNavController = staticCompositionLocalOf<Navigator> { error("No NavController") }
 val LocalActiveAccount = compositionLocalOf<AccountDetails?> { null }
 val LocalActiveAccountViewModel =
   compositionLocalOf<com.twidere.twiderex.viewmodel.ActiveAccountViewModel> { error("No ActiveAccountViewModel") }
