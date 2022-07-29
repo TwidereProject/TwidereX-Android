@@ -42,7 +42,7 @@ fun CurrentAccountPresenter(
   return state
 }
 
-sealed interface CurrentAccountState {
+interface CurrentAccountState {
   data class Account(val account: AccountDetails) : CurrentAccountState
   object Empty : CurrentAccountState
 }

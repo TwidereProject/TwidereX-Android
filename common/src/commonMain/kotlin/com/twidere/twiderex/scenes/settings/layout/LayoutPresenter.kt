@@ -137,7 +137,7 @@ private suspend fun updateMenu(
   }
 }
 
-sealed interface LayoutState {
+interface LayoutState {
   object NoAccount : LayoutState
   data class Data(
     val user: UiUser,
@@ -145,7 +145,7 @@ sealed interface LayoutState {
   ) : LayoutState
 }
 
-sealed interface LayoutEvent {
+interface LayoutEvent {
   data class UpdateMenuOrder(val oldIndex: Int, val newIndex: Int) : LayoutEvent
   data class AddMenu(val index: Int) : LayoutEvent
   data class RemoveMenu(val index: Int) : LayoutEvent

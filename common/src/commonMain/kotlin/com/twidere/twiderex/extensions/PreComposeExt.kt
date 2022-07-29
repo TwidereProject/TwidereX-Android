@@ -21,10 +21,12 @@
 package com.twidere.twiderex.extensions
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import app.cash.molecule.RecompositionClock
 import app.cash.molecule.launchMolecule
 import kotlinx.coroutines.CoroutineScope
@@ -95,4 +97,25 @@ fun <T, E> rememberPresenterState(
   val presenter = rememberPresenter { body(event) }
   val state by presenter.collectAsState()
   return state to channel
+}
+
+@Composable
+fun <T, E> rememberNestedPresenter(
+  body: @Composable (flow: Flow<E>) -> T
+): Pair<T, Channel<E>> {
+  val channel = remember { Channel<E>(capacity = Channel.BUFFERED) }
+  val flow = remember { channel.consumeAsFlow() }
+  val presenter = body(flow)
+  return presenter to channel
+}
+
+@Composable
+fun <T> Flow<T>.collectEvent(
+  body: suspend T.() -> Unit,
+) {
+  LaunchedEffect(Unit) {
+    collect {
+      body(it)
+    }
+  }
 }

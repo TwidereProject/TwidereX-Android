@@ -57,6 +57,6 @@ data class NotificationState(
   val enabled: Boolean,
 )
 
-sealed interface NotificationEvent {
+interface NotificationEvent {
   data class SetEnabled(val enabled: Boolean) : NotificationEvent
 }

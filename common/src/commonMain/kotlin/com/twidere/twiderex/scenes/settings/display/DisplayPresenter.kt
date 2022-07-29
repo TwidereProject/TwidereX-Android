@@ -80,7 +80,7 @@ data class DisplayState(
   val fontScale: Float,
 )
 
-sealed interface DisplayEvent {
+interface DisplayEvent {
   data class SetUseSystemFontSize(val useSystemFont: Boolean) : DisplayEvent
   data class SetFontScale(val fontScale: Float) : DisplayEvent
   object CommitFontScale : DisplayEvent

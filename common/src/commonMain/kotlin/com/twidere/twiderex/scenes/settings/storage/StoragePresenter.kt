@@ -69,7 +69,7 @@ data class StorageState(
   val loading: Boolean,
 )
 
-sealed interface StorageEvent {
+interface StorageEvent {
   object ClearImageCache : StorageEvent
   object ClearSearchHistory : StorageEvent
   object ClearAllCaches : StorageEvent

@@ -66,6 +66,6 @@ data class AccountNotificationState(
   val isNotificationEnabled: Boolean,
 )
 
-sealed interface AccountNotificationEvent {
+interface AccountNotificationEvent {
   data class SetIsNotificationEnabled(val value: Boolean) : AccountNotificationEvent
 }

@@ -83,7 +83,7 @@ data class AppearanceState(
   val appearance: AppearancePreferences,
 )
 
-sealed interface AppearanceEvent {
+interface AppearanceEvent {
   object ShowPrimaryColorDialog : AppearanceEvent
   object HidePrimaryColorDialog : AppearanceEvent
   data class SelectPrimaryColor(val color: Int) : AppearanceEvent

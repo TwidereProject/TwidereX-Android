@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
@@ -48,10 +49,7 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -59,6 +57,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.MR
@@ -136,42 +135,144 @@ fun MiscScene() {
               channel.trySend(MiscEvent.Proxy(ProxyEvent.ProxyEnabledChanged(it)))
             },
             onShowProxyTypeDialog = {
-              channel.trySend(MiscEvent.Proxy(ProxyEvent.ShowProxyTypeDialog(true)))
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ProxyType(ProxyTypeEvent.ShowDialog(true))))
             },
             onShowProxyServerDialog = {
-              channel.trySend(MiscEvent.Proxy(ProxyEvent.ShowProxyHostDialog(true)))
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ProxyHost(ProxyHostEvent.ShowDialog(true))))
             },
             onShowProxyPortDialog = {
-              channel.trySend(MiscEvent.Proxy(ProxyEvent.ShowProxyPortDialog(true)))
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ProxyPort(ProxyPortEvent.ShowDialog(true))))
             },
             onShowProxyUserNameDialog = {
-              channel.trySend(MiscEvent.Proxy(ProxyEvent.ShowProxyUserNameDialog(true)))
+              channel.trySend(
+                MiscEvent.Proxy(
+                  ProxyEvent.ProxyUserName(
+                    ProxyUserNameEvent.ShowDialog(
+                      true
+                    )
+                  )
+                )
+              )
             },
             onShowProxyPasswordDialog = {
-              channel.trySend(MiscEvent.Proxy(ProxyEvent.ShowProxyPasswordDialog(true)))
+              channel.trySend(
+                MiscEvent.Proxy(
+                  ProxyEvent.ProxyPassword(
+                    ProxyPasswordEvent.ShowDialog(
+                      true
+                    )
+                  )
+                )
+              )
             },
           )
         }
 
-        // if (showProxyTypeDialog.value) {
-        //   ProxyTypeSelectDialog(
-        //     onDismissRequest = { showProxyTypeDialog.value = false },
-        //     onSelect = {
-        //       viewModel.setProxyType(it.name)
-        //     },
-        //     value = proxyTypeValue
-        //   )
-        // }
-        // if (showProxyInputDialog.value) {
-        //   ProxyInputDialog(
-        //     title = inputTitle.value,
-        //     value = inputValue.value,
-        //     onValueChanged = inputChanged.value,
-        //     onDismissRequest = {
-        //       showProxyInputDialog.value = false
-        //     }
-        //   )
-        // }
+        if (state.proxyState.proxyTypeState.showDialog) {
+          ProxyTypeSelectDialog(
+            onDismissRequest = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ProxyType(ProxyTypeEvent.ShowDialog(false))))
+            },
+            onSelect = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ProxyType(ProxyTypeEvent.TypeChanged(it))))
+            },
+            value = state.proxyState.proxyType,
+          )
+        }
+        if (state.proxyState.proxyHostState.showDialog) {
+          ProxyInputDialog(
+            onDismissRequest = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ProxyHost(ProxyHostEvent.ShowDialog(false))))
+            },
+            value = state.proxyState.proxyHostState.host,
+            onValueChanged = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ProxyHost(ProxyHostEvent.HostChanged(it))))
+            },
+            title = stringResource(res = MR.strings.scene_settings_misc_proxy_server),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            onConfirm = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ProxyHost(ProxyHostEvent.Save)))
+            }
+          )
+        }
+        if (state.proxyState.proxyPortState.showDialog) {
+          ProxyInputDialog(
+            onDismissRequest = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ProxyPort(ProxyPortEvent.ShowDialog(false))))
+            },
+            value = state.proxyState.proxyPortState.port,
+            onValueChanged = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ProxyPort(ProxyPortEvent.PortChanged(it))))
+            },
+            title = stringResource(res = MR.strings.scene_settings_misc_proxy_type_title),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            onConfirm = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ProxyPort(ProxyPortEvent.Save)))
+            }
+          )
+        }
+        if (state.proxyState.proxyUserNameState.showDialog) {
+          ProxyInputDialog(
+            onDismissRequest = {
+              channel.trySend(
+                MiscEvent.Proxy(
+                  ProxyEvent.ProxyUserName(
+                    ProxyUserNameEvent.ShowDialog(
+                      false
+                    )
+                  )
+                )
+              )
+            },
+            value = state.proxyState.proxyUserNameState.userName,
+            onValueChanged = {
+              channel.trySend(
+                MiscEvent.Proxy(
+                  ProxyEvent.ProxyUserName(
+                    ProxyUserNameEvent.UserNameChanged(
+                      it
+                    )
+                  )
+                )
+              )
+            },
+            title = stringResource(res = MR.strings.scene_settings_misc_proxy_username),
+            onConfirm = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ProxyUserName(ProxyUserNameEvent.Save)))
+            }
+          )
+        }
+        if (state.proxyState.proxyPasswordState.showDialog) {
+          ProxyInputDialog(
+            onDismissRequest = {
+              channel.trySend(
+                MiscEvent.Proxy(
+                  ProxyEvent.ProxyPassword(
+                    ProxyPasswordEvent.ShowDialog(
+                      false
+                    )
+                  )
+                )
+              )
+            },
+            value = state.proxyState.proxyPasswordState.password,
+            onValueChanged = {
+              channel.trySend(
+                MiscEvent.Proxy(
+                  ProxyEvent.ProxyPassword(
+                    ProxyPasswordEvent.PasswordChanged(
+                      it
+                    )
+                  )
+                )
+              )
+            },
+            title = stringResource(res = MR.strings.scene_settings_misc_proxy_password),
+            onConfirm = {
+              channel.trySend(MiscEvent.Proxy(ProxyEvent.ProxyPassword(ProxyPasswordEvent.Save)))
+            }
+          )
+        }
       }
     }
   }
@@ -506,9 +607,6 @@ fun ProxyTypeSelectDialog(
   onSelect: (value: MiscPreferences.ProxyType) -> Unit,
   value: MiscPreferences.ProxyType
 ) {
-  var selected by remember {
-    mutableStateOf(value)
-  }
   AlertDialog(
     onDismissRequest = onDismissRequest,
     title = {
@@ -517,14 +615,16 @@ fun ProxyTypeSelectDialog(
     text = {
       Column {
         RadioItem(
-          options = listOf(
-            MiscPreferences.ProxyType.HTTP,
-            MiscPreferences.ProxyType.SOCKS,
-            MiscPreferences.ProxyType.REVERSE,
-          ),
-          value = selected,
+          options = remember {
+            listOf(
+              MiscPreferences.ProxyType.HTTP,
+              MiscPreferences.ProxyType.SOCKS,
+              MiscPreferences.ProxyType.REVERSE,
+            )
+          },
+          value = value,
           onChanged = {
-            selected = it
+            onSelect.invoke(it)
           },
           title = {},
           itemContent = {
@@ -538,7 +638,6 @@ fun ProxyTypeSelectDialog(
     confirmButton = {
       TextButton(
         onClick = {
-          onSelect.invoke(selected)
           onDismissRequest.invoke()
         }
       ) {
@@ -552,13 +651,12 @@ fun ProxyTypeSelectDialog(
 @Composable
 fun ProxyInputDialog(
   title: String,
-  value: String,
-  onValueChanged: (value: String) -> Unit,
+  value: TextFieldValue,
+  onValueChanged: (value: TextFieldValue) -> Unit,
   onDismissRequest: () -> Unit,
+  keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+  onConfirm: () -> Unit,
 ) {
-  var input by remember {
-    mutableStateOf(value)
-  }
   val focusRequester = remember { FocusRequester() }
   val keyboardController = LocalSoftwareKeyboardController.current
   LaunchedEffect(Unit) {
@@ -572,21 +670,21 @@ fun ProxyInputDialog(
     },
     text = {
       TextField(
-        value = input,
-        onValueChange = { input = it },
+        value = value,
+        onValueChange = { onValueChanged.invoke(it) },
         modifier = Modifier
           .focusRequester(focusRequester)
           .fillMaxWidth(),
         colors = TextFieldDefaults.textFieldColors(
           backgroundColor = Color.Transparent
         ),
+        keyboardOptions = keyboardOptions,
       )
     },
     confirmButton = {
       TextButton(
         onClick = {
-          onValueChanged(input)
-          onDismissRequest.invoke()
+          onConfirm.invoke()
         }
       ) {
         Text(text = stringResource(res = MR.strings.common_controls_actions_ok))
