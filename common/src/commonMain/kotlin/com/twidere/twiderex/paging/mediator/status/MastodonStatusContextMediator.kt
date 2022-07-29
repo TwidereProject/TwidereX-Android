@@ -50,7 +50,7 @@ class MastodonStatusContextMediator(
 
   override val pagingKey: String = "status:$statusKey"
 
-  override fun hasMore(result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
+  override fun hasMore(raw: List<IStatus>, result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
     return false
   }
 }

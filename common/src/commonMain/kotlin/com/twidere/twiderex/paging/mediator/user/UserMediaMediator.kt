@@ -24,6 +24,7 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingState
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
+import com.twidere.twiderex.dataprovider.mapper.toPagingTimeline
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ReferenceType
@@ -47,7 +48,7 @@ class UserMediaMediator(
   override suspend fun load(pageSize: Int, paging: SinceMaxPagination?): List<IStatus> {
     return service.userTimeline(
       user_id = userKey.id,
-      count = pageSize,
+      count = pageSize * 3,
       max_id = paging?.maxId,
       exclude_replies = false
     )
@@ -57,10 +58,21 @@ class UserMediaMediator(
     raw: List<IStatus>,
     result: List<PagingTimeLineWithStatus>
   ): SinceMaxPagination {
+    if (raw.size > result.size) {
+      return SinceMaxPagination(
+        maxId = raw.lastOrNull()?.toPagingTimeline(accountKey, pagingKey)?.status?.statusId
+      )
+    }
+
     if (result is PagingList<*, *>) {
       return result.nextPage as SinceMaxPagination
     }
+
     return super.provideNextPage(raw, result)
+  }
+
+  override fun hasMore(raw: List<IStatus>, result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
+    return raw.isNotEmpty()
   }
 
   override fun transform(

@@ -64,6 +64,7 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
       }
       val pageSize = state.config.pageSize
       val last = state.lastItemOrNull()
+      var hasMore = true
       val result = load(pageSize, key).let { list ->
         list.map { status ->
           status.toPagingTimeline(accountKey, pagingKey)
@@ -78,6 +79,7 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
           } else {
             provideNextPage(list, it)
           }
+          hasMore = hasMore(list, it, pageSize)
         }
       }
       database.withTransaction {
@@ -88,7 +90,7 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
       }
 
       return MediatorResult.Success(
-        endOfPaginationReached = !hasMore(result, pageSize)
+        endOfPaginationReached = !hasMore
       )
     } catch (e: Throwable) {
       return MediatorResult.Error(e)
@@ -109,6 +111,7 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
   }
 
   protected open fun hasMore(
+    raw: List<IStatus>,
     result: List<PagingTimeLineWithStatus>,
     pageSize: Int
   ) = result.isNotEmpty()
