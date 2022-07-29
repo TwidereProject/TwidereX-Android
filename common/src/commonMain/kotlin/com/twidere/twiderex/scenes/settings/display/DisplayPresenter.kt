@@ -31,6 +31,7 @@ import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 
 @Composable
 fun DisplayPresenter(
@@ -38,7 +39,13 @@ fun DisplayPresenter(
   preferencesHolder: PreferencesHolder = get(),
 ): DisplayState {
   val display by preferencesHolder.displayPreferences.data.collectAsState(DisplayPreferences())
-  var fontScale by remember { mutableStateOf(display.fontScale) }
+  var fontScale by remember { mutableStateOf(1f) }
+
+  LaunchedEffect(Unit) {
+    preferencesHolder.displayPreferences.data.firstOrNull()?.let {
+      fontScale = it.fontScale
+    }
+  }
 
   LaunchedEffect(Unit) {
     event.collect { event ->
