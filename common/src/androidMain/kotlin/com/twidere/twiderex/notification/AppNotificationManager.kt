@@ -25,6 +25,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.text.Html
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -64,9 +65,16 @@ actual class AppNotificationManager(
           appNotification.progress,
           appNotification.progressIndeterminate
         )
+
       appNotification.content?.let {
-        builder.setContentText(it)
-          .setStyle(NotificationCompat.BigTextStyle().bigText(it))
+        val text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+          Html.fromHtml(it.toString(), Html.FROM_HTML_MODE_COMPACT)
+        } else {
+          @Suppress("DEPRECATION")
+          Html.fromHtml(it.toString())
+        }
+        builder.setContentText(text)
+          .setStyle(NotificationCompat.BigTextStyle().bigText(text))
       }
       appNotification.deepLink?.let {
         builder.setContentIntent(
