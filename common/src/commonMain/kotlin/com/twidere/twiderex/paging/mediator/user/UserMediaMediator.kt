@@ -45,7 +45,6 @@ class UserMediaMediator(
   override val pagingKey: String
     get() = UserTimelineType.Media.pagingKey(userKey)
 
-  var rawHasMore = true
   override suspend fun load(pageSize: Int, paging: SinceMaxPagination?): List<IStatus> {
     return service.userTimeline(
       user_id = userKey.id,
@@ -59,7 +58,6 @@ class UserMediaMediator(
     raw: List<IStatus>,
     result: List<PagingTimeLineWithStatus>
   ): SinceMaxPagination {
-    rawHasMore = raw.isNotEmpty()
     if (raw.size > result.size) {
       return SinceMaxPagination(
         maxId = raw.lastOrNull()?.toPagingTimeline(accountKey, pagingKey)?.status?.statusId
@@ -73,8 +71,8 @@ class UserMediaMediator(
     return super.provideNextPage(raw, result)
   }
 
-  override fun hasMore(result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
-    return rawHasMore
+  override fun hasMore(raw: List<IStatus>, result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
+    return raw.isNotEmpty()
   }
 
   override fun transform(

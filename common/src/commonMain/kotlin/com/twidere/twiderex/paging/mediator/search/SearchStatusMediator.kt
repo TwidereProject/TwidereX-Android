@@ -41,7 +41,7 @@ class SearchStatusMediator(
     return CursorPagingResult(result.status, result.nextPage)
   }
 
-  override fun hasMore(result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
+  override fun hasMore(raw: List<IStatus>, result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
     return result.size == pageSize
   }
 }

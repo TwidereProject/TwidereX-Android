@@ -65,11 +65,11 @@ class UserFavouriteMediator(
     }
   }
 
-  override fun hasMore(result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
+  override fun hasMore(raw: List<IStatus>, result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
     return if (platformType == PlatformType.Mastodon) {
       result.size == pageSize
     } else {
-      super.hasMore(result, pageSize)
+      super.hasMore(raw, result, pageSize)
     }
   }
 }
