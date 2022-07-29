@@ -18,16 +18,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.settings
+package com.twidere.twiderex.scenes
 
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
-import com.twidere.twiderex.model.MicroBlogKey
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.repository.AccountRepository
+import kotlinx.coroutines.flow.map
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-actual fun AccountNotificationChannelDetail(
-  enabled: Boolean,
-  accountKey: MicroBlogKey,
-) {
+fun CurrentAccountPresenter(
+  accountRepository: AccountRepository = get(),
+): CurrentAccountState {
+  val state by accountRepository.activeAccount.map {
+    if (it == null) {
+      CurrentAccountState.Empty
+    } else {
+      CurrentAccountState.Account(it)
+    }
+  }.collectAsState(CurrentAccountState.Empty)
+  return state
+}
+
+interface CurrentAccountState {
+  data class Account(val account: AccountDetails) : CurrentAccountState
+  object Empty : CurrentAccountState
 }

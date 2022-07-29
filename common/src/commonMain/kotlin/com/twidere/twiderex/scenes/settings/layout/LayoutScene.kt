@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.settings
+package com.twidere.twiderex.scenes.settings.layout
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -40,9 +40,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -56,44 +54,19 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.HomeMenus
 import com.twidere.twiderex.scenes.home.item
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.settings.LayoutViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LayoutScene() {
-  val account = LocalActiveAccount.current ?: return
-  val viewModel: LayoutViewModel = getViewModel()
-  val user by viewModel.user.observeAsState(initial = null)
-  val menuOrder by account.preferences.homeMenuOrder.collectAsState(
-    initial = HomeMenus.values().map { it to it.showDefault }
-  )
-  val menus =
-    menuOrder.filter { it.first.supportedPlatformType.contains(account.type) }.groupBy {
-      it.second
-    }.map {
-      listOf(
-        it.key
-      ) + it.value.map { it.first }
-    }.flatten().let {
-      if (it.firstOrNull() != true) {
-        listOf(true) + it
-      } else {
-        it
-      }
-    }.let {
-      if (!it.contains(false)) {
-        it + false
-      } else {
-        it
-      }
-    } as List<Any>
-  val menuState = rememberUpdatedState(newValue = menus)
+  val (state, channel) = rememberPresenterState { LayoutPresenter(it) }
+  if (state !is LayoutState.Data) {
+    // TODO: Show other states
+    return
+  }
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -111,19 +84,17 @@ fun LayoutScene() {
         modifier = Modifier
           .verticalScroll(rememberScrollState()),
       ) {
-        user?.let { user ->
-          Surface(
-            color = MaterialTheme.colors.primary,
-          ) {
-            ListItem(
-              text = {
-                Row {
-                  UserName(user = user)
-                  UserScreenName(user = user)
-                }
+        Surface(
+          color = MaterialTheme.colors.primary,
+        ) {
+          ListItem(
+            text = {
+              Row {
+                UserName(user = state.user)
+                UserScreenName(user = state.user)
               }
-            )
-          }
+            }
+          )
         }
         ListItem(
           text = {
@@ -134,21 +105,56 @@ fun LayoutScene() {
           }
         )
         ReorderableColumn(
-          data = menus,
+          data = state.menus,
           state = rememberReorderableColumnState { oldIndex, newIndex ->
-            viewModel.updateHomeMenu(
-              oldIndex,
-              newIndex,
-              menuState.value,
+            channel.trySend(
+              LayoutEvent.UpdateMenuOrder(
+                oldIndex = oldIndex,
+                newIndex = newIndex
+              )
             )
           },
           dragingContent = {
             Card {
-              LayoutItemContent(it = it, viewModel = viewModel, menus = menus)
+              LayoutItemContent(
+                it = it,
+                menus = state.menus,
+                addMenu = {
+                  channel.trySend(
+                    LayoutEvent.AddMenu(
+                      index = it
+                    )
+                  )
+                },
+                removeMenu = {
+                  channel.trySend(
+                    LayoutEvent.RemoveMenu(
+                      index = it
+                    )
+                  )
+                }
+              )
             }
           }
         ) {
-          LayoutItemContent(it = it, viewModel = viewModel, menus = menus)
+          LayoutItemContent(
+            it = it,
+            menus = state.menus,
+            addMenu = {
+              channel.trySend(
+                LayoutEvent.AddMenu(
+                  index = it
+                )
+              )
+            },
+            removeMenu = {
+              channel.trySend(
+                LayoutEvent.RemoveMenu(
+                  index = it
+                )
+              )
+            }
+          )
         }
       }
     }
@@ -159,12 +165,13 @@ fun LayoutScene() {
 @Composable
 private fun LayoutItemContent(
   it: Any,
-  viewModel: LayoutViewModel,
   menus: List<Any>,
+  removeMenu: (Int) -> Unit,
+  addMenu: (Int) -> Unit,
 ) {
-  val current = menus.indexOf(it)
-  val falseIndex = menus.indexOf(false)
-  val visible = current < falseIndex
+  val current = remember(menus, it) { menus.indexOf(it) }
+  val falseIndex = remember(menus) { menus.indexOf(false) }
+  val visible = remember(current, falseIndex) { current < falseIndex }
   when (it) {
     is Boolean -> {
       ItemHeader {
@@ -189,14 +196,12 @@ private fun LayoutItemContent(
             IconButton(
               onClick = {
                 if (visible) {
-                  viewModel.removeMenu(
+                  removeMenu(
                     current,
-                    menus
                   )
                 } else {
-                  viewModel.addMenu(
+                  addMenu(
                     current,
-                    menus
                   )
                 }
               }

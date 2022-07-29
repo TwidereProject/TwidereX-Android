@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.settings
+package com.twidere.twiderex.scenes.settings.notification
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -35,6 +35,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -45,21 +46,19 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.settings.NotificationViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NotificationScene() {
   val activeAccountViewModel = LocalActiveAccountViewModel.current
   val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
-  val viewModel: NotificationViewModel = getViewModel()
-  val notificationEnabled by viewModel.enabled.observeAsState(initial = true)
+  val (state, channel) = rememberPresenterState { NotificationPresenter(it) }
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -79,16 +78,16 @@ fun NotificationScene() {
         ) {
           ListItem(
             modifier = Modifier.clickable {
-              viewModel.setEnabled(!notificationEnabled)
+              channel.trySend(NotificationEvent.SetEnabled(!state.enabled))
             },
             text = {
               Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_notification_notification_switch))
             },
             trailing = {
               ColoredSwitch(
-                checked = notificationEnabled,
+                checked = state.enabled,
                 onCheckedChange = {
-                  viewModel.setEnabled(it)
+                  channel.trySend(NotificationEvent.SetEnabled(it))
                 },
                 colors = SwitchDefaults.colors(
                   checkedThumbColor = MaterialTheme.colors.onPrimary,
@@ -103,17 +102,19 @@ fun NotificationScene() {
         val navController = LocalNavController.current
         LazyColumn {
           items(accounts) {
-            val user = it.toUi()
+            val user = remember {
+              it.toUi()
+            }
             ListItem(
               modifier = Modifier.clickable(
                 onClick = {
                   navController.navigate(Root.Settings.AccountNotification(it.accountKey))
                 },
-                enabled = notificationEnabled,
+                enabled = state.enabled,
               ),
               icon = {
                 CompositionLocalProvider(
-                  *if (!notificationEnabled) {
+                  *if (!state.enabled) {
                     arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
                   } else {
                     emptyArray()
@@ -127,7 +128,7 @@ fun NotificationScene() {
               },
               text = {
                 CompositionLocalProvider(
-                  *if (!notificationEnabled) {
+                  *if (!state.enabled) {
                     arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
                   } else {
                     emptyArray()
@@ -138,7 +139,7 @@ fun NotificationScene() {
               },
               secondaryText = {
                 CompositionLocalProvider(
-                  *if (!notificationEnabled) {
+                  *if (!state.enabled) {
                     arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
                   } else {
                     emptyArray()

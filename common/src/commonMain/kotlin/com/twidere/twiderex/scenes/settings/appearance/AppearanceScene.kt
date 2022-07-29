@@ -18,10 +18,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.settings
+package com.twidere.twiderex.scenes.settings.appearance
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -44,10 +43,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,20 +59,16 @@ import com.twidere.twiderex.component.settings.RadioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.preferences.LocalAppearancePreferences
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.isDarkTheme
 import com.twidere.twiderex.ui.primaryColors
-import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AppearanceScene() {
-  var showPrimaryColorDialog by remember { mutableStateOf(false) }
-  val appearance = LocalAppearancePreferences.current
-  val viewModel: AppearanceViewModel = getViewModel()
+  val (state, channel) = rememberPresenterState { AppearancePresenter(it) }
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -90,11 +82,14 @@ fun AppearanceScene() {
         )
       }
     ) {
-      if (showPrimaryColorDialog) {
+      if (state.showPrimaryColorDialog) {
         PrimaryColorDialog(
-          viewModel = viewModel,
+          selectedItem = state.appearance.primaryColorIndex,
+          onSelected = {
+            channel.trySend(AppearanceEvent.SelectPrimaryColor(it))
+          },
           onDismiss = {
-            showPrimaryColorDialog = false
+            channel.trySend(AppearanceEvent.HidePrimaryColorDialog)
           }
         )
       }
@@ -107,7 +102,7 @@ fun AppearanceScene() {
         ListItem(
           modifier = Modifier.clickable(
             onClick = {
-              showPrimaryColorDialog = true
+              channel.trySend(AppearanceEvent.ShowPrimaryColorDialog)
             }
           ),
           text = {
@@ -127,13 +122,15 @@ fun AppearanceScene() {
         )
         ItemDivider()
         RadioItem(
-          options = listOf(
-            AppearancePreferences.TabPosition.Top,
-            AppearancePreferences.TabPosition.Bottom,
-          ),
-          value = appearance.tabPosition,
+          options = remember {
+            listOf(
+              AppearancePreferences.TabPosition.Top,
+              AppearancePreferences.TabPosition.Bottom,
+            )
+          },
+          value = state.appearance.tabPosition,
           onChanged = {
-            viewModel.setTabPosition(it)
+            channel.trySend(AppearanceEvent.SetTabPosition(it))
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_section_header_tab_position))
@@ -155,27 +152,27 @@ fun AppearanceScene() {
           Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_section_header_scrolling_timeline))
         }
         switchItem(
-          value = appearance.hideTabBarWhenScroll,
+          value = state.appearance.hideTabBarWhenScroll,
           onChanged = {
-            viewModel.setHideTabBarWhenScrolling(it)
+            channel.trySend(AppearanceEvent.SetHideTabBarWhenScrolling(it))
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_scrolling_timeline_tab_bar))
           },
         )
         switchItem(
-          value = appearance.hideAppBarWhenScroll,
+          value = state.appearance.hideAppBarWhenScroll,
           onChanged = {
-            viewModel.setHideAppBarWhenScrolling(it)
+            channel.trySend(AppearanceEvent.SetHideAppBarWhenScrolling(it))
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_scrolling_timeline_app_bar))
           },
         )
         switchItem(
-          value = appearance.hideFabWhenScroll,
+          value = state.appearance.hideFabWhenScroll,
           onChanged = {
-            viewModel.setHideFabWhenScrolling(it)
+            channel.trySend(AppearanceEvent.SetHideFabWhenScrolling(it))
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_scrolling_timeline_fab))
@@ -183,14 +180,16 @@ fun AppearanceScene() {
         )
         ItemDivider()
         RadioItem(
-          options = listOf(
-            AppearancePreferences.Theme.Auto,
-            AppearancePreferences.Theme.Light,
-            AppearancePreferences.Theme.Dark,
-          ),
-          value = appearance.theme,
+          options = remember {
+            listOf(
+              AppearancePreferences.Theme.Auto,
+              AppearancePreferences.Theme.Light,
+              AppearancePreferences.Theme.Dark,
+            )
+          },
+          value = state.appearance.theme,
           onChanged = {
-            viewModel.setTheme(it)
+            channel.trySend(AppearanceEvent.SetTheme(it))
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_section_header_theme))
@@ -198,21 +197,25 @@ fun AppearanceScene() {
           itemContent = {
             Text(
               text = stringResource(
-                arrayOf(
-                  com.twidere.twiderex.MR.strings.scene_settings_appearance_theme_auto,
-                  com.twidere.twiderex.MR.strings.scene_settings_appearance_theme_light,
-                  com.twidere.twiderex.MR.strings.scene_settings_appearance_theme_dark,
-                )[it.ordinal]
+                remember {
+                  arrayOf(
+                    com.twidere.twiderex.MR.strings.scene_settings_appearance_theme_auto,
+                    com.twidere.twiderex.MR.strings.scene_settings_appearance_theme_light,
+                    com.twidere.twiderex.MR.strings.scene_settings_appearance_theme_dark,
+                  )
+                }[it.ordinal]
               )
             )
           }
         )
-        val isLightTheme = appearance.theme == AppearancePreferences.Theme.Light
+        val isLightTheme = remember(state.appearance.theme) {
+          state.appearance.theme == AppearancePreferences.Theme.Light
+        }
         AnimatedVisibility(visible = !isLightTheme) {
           switchItem(
-            value = appearance.isDarkModePureBlack,
+            value = state.appearance.isDarkModePureBlack,
             onChanged = {
-              viewModel.setIsDarkModePureBlack(it)
+              channel.trySend(AppearanceEvent.SetIsDarkModePureBlack(it))
             },
           ) {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_AMOLED_optimized_mode))
@@ -225,11 +228,10 @@ fun AppearanceScene() {
 
 @Composable
 fun PrimaryColorDialog(
-  viewModel: AppearanceViewModel,
+  selectedItem: Int,
+  onSelected: (Int) -> Unit,
   onDismiss: () -> Unit,
 ) {
-  val appearance = LocalAppearancePreferences.current
-  val colorIndex = appearance.primaryColorIndex
   val colors = if (isDarkTheme()) {
     primaryColors.map { it.second }
   } else {
@@ -256,12 +258,12 @@ fun PrimaryColorDialog(
                 .background(it)
                 .clickable(
                   onClick = {
-                    viewModel.setPrimaryColorIndex(index)
+                    onSelected.invoke(index)
                   }
                 ),
               contentAlignment = Alignment.Center,
             ) {
-              if (colorIndex == index) {
+              if (selectedItem == index) {
                 Checkbox(
                   checked = true,
                   onCheckedChange = {},

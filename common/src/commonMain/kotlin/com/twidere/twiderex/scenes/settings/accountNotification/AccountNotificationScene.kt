@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.settings
+package com.twidere.twiderex.scenes.settings.accountNotification
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -28,7 +28,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -37,23 +36,16 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.settings.AccountNotificationViewModel
-import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AccountNotificationScene(
   accountKey: MicroBlogKey,
 ) {
-  val viewModel: AccountNotificationViewModel = getViewModel {
-    parametersOf(accountKey)
-  }
-  val account by viewModel.account.observeAsState(initial = null)
-  val enabled by viewModel.isNotificationEnabled.observeAsState(initial = true)
+  val (state, channel) = rememberPresenterState { AccountNotificationPresenter(accountKey, it) }
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -70,29 +62,29 @@ fun AccountNotificationScene(
       Column(
         modifier = Modifier.verticalScroll(rememberScrollState())
       ) {
-        account?.let {
+        state.user?.let {
           ListItem(
             modifier = Modifier.clickable {
-              viewModel.setIsNotificationEnabled(!enabled)
+              channel.trySend(AccountNotificationEvent.SetIsNotificationEnabled(!state.isNotificationEnabled))
             },
             text = {
-              UserName(user = it.toUi())
+              UserName(user = it)
             },
             secondaryText = {
-              UserScreenName(user = it.toUi())
+              UserScreenName(user = it)
             },
             trailing = {
               ColoredSwitch(
-                checked = enabled,
+                checked = state.isNotificationEnabled,
                 onCheckedChange = {
-                  viewModel.setIsNotificationEnabled(it)
+                  channel.trySend(AccountNotificationEvent.SetIsNotificationEnabled(it))
                 },
               )
             }
           )
         }
         AccountNotificationChannelDetail(
-          enabled = enabled,
+          enabled = state.isNotificationEnabled,
           accountKey = accountKey,
         )
       }

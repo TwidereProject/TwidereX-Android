@@ -18,25 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.settings
+package com.twidere.twiderex.scenes.settings.accountNotification
 
-import androidx.datastore.core.DataStore
-import com.twidere.twiderex.preferences.model.NotificationPreferences
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
+import androidx.compose.runtime.Composable
+import com.twidere.twiderex.model.MicroBlogKey
 
-class NotificationViewModel(
-  val notification: DataStore<NotificationPreferences>,
-) : ViewModel() {
-  val enabled = notification.data.map {
-    it.enableNotification
-  }
-
-  fun setEnabled(value: Boolean) = viewModelScope.launch {
-    notification.updateData {
-      it.copy(enableNotification = value)
-    }
-  }
+@Composable
+actual fun AccountNotificationChannelDetail(
+  enabled: Boolean,
+  accountKey: MicroBlogKey,
+) {
 }

@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.settings
+package com.twidere.twiderex.scenes.settings.display
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
@@ -33,10 +33,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.action.FakeStatusActions
@@ -52,20 +49,17 @@ import com.twidere.twiderex.component.settings.RadioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.settings.DisplayViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DisplayScene() {
-  val viewModel: DisplayViewModel = getViewModel()
-  val display = LocalDisplayPreferences.current
+  val (state, channel) = rememberPresenterState { DisplayPresenter(it) }
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -85,7 +79,7 @@ fun DisplayScene() {
             rememberScrollState()
           )
       ) {
-        ItemHeader() {
+        ItemHeader {
           Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_section_header_preview))
         }
         CompositionLocalProvider(
@@ -99,15 +93,15 @@ fun DisplayScene() {
           Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_section_header_text))
         }
         switchItem(
-          value = display.useSystemFontSize,
+          value = state.display.useSystemFontSize,
           onChanged = {
-            viewModel.setUseSystemFontSize(it)
+            channel.trySend(DisplayEvent.SetUseSystemFontSize(it))
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_text_use_the_system_font_size))
           },
         )
-        if (!display.useSystemFontSize) {
+        if (!state.display.useSystemFontSize) {
           ListItem(
             icon = {
               Icon(
@@ -117,15 +111,16 @@ fun DisplayScene() {
               )
             },
             text = {
-              var fontSize by remember {
-                mutableStateOf(display.fontScale)
-              }
               Slider(
                 steps = ((1.4f - 0.8f) * 10).toInt(),
-                value = fontSize,
-                onValueChange = { fontSize = it },
+                value = state.fontScale,
+                onValueChange = {
+                  channel.trySend(DisplayEvent.SetFontScale(it))
+                },
                 valueRange = 0.8f..1.4f,
-                onValueChangeFinished = { viewModel.commitFontScale(fontSize) }
+                onValueChangeFinished = {
+                  channel.trySend(DisplayEvent.CommitFontScale)
+                }
               )
             },
             trailing = {
@@ -138,13 +133,15 @@ fun DisplayScene() {
         }
         ItemDivider()
         RadioItem(
-          options = listOf(
-            DisplayPreferences.AvatarStyle.Round,
-            DisplayPreferences.AvatarStyle.Square,
-          ),
-          value = display.avatarStyle,
+          options = remember {
+            listOf(
+              DisplayPreferences.AvatarStyle.Round,
+              DisplayPreferences.AvatarStyle.Square,
+            )
+          },
+          value = state.display.avatarStyle,
           onChanged = {
-            viewModel.setAvatarStyle(it)
+            channel.trySend(DisplayEvent.SetAvatarStyle(it))
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_text_avatar_style))
@@ -152,55 +149,59 @@ fun DisplayScene() {
           itemContent = {
             Text(
               text = stringResource(
-                arrayOf(
-                  com.twidere.twiderex.MR.strings.scene_settings_display_text_circle,
-                  com.twidere.twiderex.MR.strings.scene_settings_display_text_rounded_square,
-                )[it.ordinal]
+                remember {
+                  arrayOf(
+                    com.twidere.twiderex.MR.strings.scene_settings_display_text_circle,
+                    com.twidere.twiderex.MR.strings.scene_settings_display_text_rounded_square,
+                  )
+                }[it.ordinal]
               )
             )
           }
         )
         ItemDivider()
-        ItemHeader() {
+        ItemHeader {
           Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_section_header_media))
         }
         switchItem(
-          value = display.urlPreview,
+          value = state.display.urlPreview,
           onChanged = {
-            viewModel.setUrlPreview(it)
+            channel.trySend(DisplayEvent.SetUrlPreview(it))
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_url_preview))
           }
         )
         switchItem(
-          value = display.mediaPreview,
+          value = state.display.mediaPreview,
           onChanged = {
-            viewModel.setMediaPreview(it)
+            channel.trySend(DisplayEvent.SetMediaPreview(it))
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_media_media_previews))
           }
         )
         switchItem(
-          value = display.muteByDefault,
+          value = state.display.muteByDefault,
           onChanged = {
-            viewModel.setMuteByDefault(it)
+            channel.trySend(DisplayEvent.SetMuteByDefault(it))
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_media_mute_by_default))
           }
         )
-        if (display.mediaPreview && currentPlatform != Platform.JVM) {
+        if (state.display.mediaPreview && currentPlatform != Platform.JVM) {
           RadioItem(
-            options = listOf(
-              DisplayPreferences.AutoPlayback.Auto,
-              DisplayPreferences.AutoPlayback.Always,
-              DisplayPreferences.AutoPlayback.Off,
-            ),
-            value = display.autoPlayback,
+            options = remember {
+              listOf(
+                DisplayPreferences.AutoPlayback.Auto,
+                DisplayPreferences.AutoPlayback.Always,
+                DisplayPreferences.AutoPlayback.Off,
+              )
+            },
+            value = state.display.autoPlayback,
             onChanged = {
-              viewModel.setAutoPlayback(it)
+              channel.trySend(DisplayEvent.SetAutoPlayback(it))
             },
             title = {
               Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_media_auto_playback))
@@ -208,11 +209,13 @@ fun DisplayScene() {
             itemContent = {
               Text(
                 text = stringResource(
-                  arrayOf(
-                    com.twidere.twiderex.MR.strings.scene_settings_display_media_automatic,
-                    com.twidere.twiderex.MR.strings.scene_settings_display_media_always,
-                    com.twidere.twiderex.MR.strings.scene_settings_display_media_off,
-                  )[it.ordinal]
+                  remember {
+                    arrayOf(
+                      com.twidere.twiderex.MR.strings.scene_settings_display_media_automatic,
+                      com.twidere.twiderex.MR.strings.scene_settings_display_media_always,
+                      com.twidere.twiderex.MR.strings.scene_settings_display_media_off,
+                    )
+                  }[it.ordinal]
                 )
               )
             }

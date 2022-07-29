@@ -24,7 +24,6 @@ import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.ui.UiDraft
-import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import com.twidere.twiderex.viewmodel.DraftViewModel
 import com.twidere.twiderex.viewmodel.MediaViewModel
@@ -53,13 +52,6 @@ import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 import com.twidere.twiderex.viewmodel.search.SearchSaveViewModel
 import com.twidere.twiderex.viewmodel.search.SearchTweetsViewModel
 import com.twidere.twiderex.viewmodel.search.SearchUserViewModel
-import com.twidere.twiderex.viewmodel.settings.AccountNotificationViewModel
-import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
-import com.twidere.twiderex.viewmodel.settings.DisplayViewModel
-import com.twidere.twiderex.viewmodel.settings.LayoutViewModel
-import com.twidere.twiderex.viewmodel.settings.MiscViewModel
-import com.twidere.twiderex.viewmodel.settings.NotificationViewModel
-import com.twidere.twiderex.viewmodel.settings.StorageViewModel
 import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
 import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
 import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineViewModel
@@ -89,7 +81,6 @@ val viewModelModule = module {
   twitter()
   trend()
   timeline()
-  settings()
   search()
   mastodon()
   lists()
@@ -179,16 +170,6 @@ private fun Module.search() {
   viewModel { (content: String) -> SearchSaveViewModel(get(), get(), content) }
   viewModel { (keyword: String) -> SearchTweetsViewModel(get(), get(), keyword) }
   viewModel { (keyword: String) -> SearchUserViewModel(get(), keyword) }
-}
-
-private fun Module.settings() {
-  viewModel { AccountNotificationViewModel(get()) }
-  viewModel { AppearanceViewModel(get<PreferencesHolder>().appearancePreferences) }
-  viewModel { DisplayViewModel(get<PreferencesHolder>().displayPreferences) }
-  viewModel { LayoutViewModel(get()) }
-  viewModel { MiscViewModel(get<PreferencesHolder>().miscPreferences, get(), get()) }
-  viewModel { NotificationViewModel(get<PreferencesHolder>().notificationPreferences) }
-  viewModel { StorageViewModel(get()) }
 }
 
 private fun Module.timeline() {

@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.settings
+package com.twidere.twiderex.scenes.settings.storage
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -29,7 +29,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.twidere.twiderex.component.foundation.AppBar
@@ -38,18 +37,14 @@ import com.twidere.twiderex.component.foundation.Dialog
 import com.twidere.twiderex.component.foundation.DialogProperties
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.settings.StorageViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun StorageScene() {
-  val viewModel: StorageViewModel = getViewModel()
-  val loading by viewModel.loading.observeAsState(initial = false)
-
-  if (loading) {
+  val (state, channel) = rememberPresenterState { StoragePresenter(it) }
+  if (state.loading) {
     Dialog(
       onDismissRequest = { },
       properties = DialogProperties(
@@ -80,7 +75,7 @@ fun StorageScene() {
         ListItem(
           modifier = Modifier
             .clickable {
-              viewModel.clearSearchHistory()
+              channel.trySend(StorageEvent.ClearSearchHistory)
             },
         ) {
           Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_search_title))
@@ -88,7 +83,7 @@ fun StorageScene() {
         ListItem(
           modifier = Modifier
             .clickable {
-              viewModel.clearImageCache()
+              channel.trySend(StorageEvent.ClearImageCache)
             },
           text = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_media_title))
@@ -100,7 +95,7 @@ fun StorageScene() {
         ListItem(
           modifier = Modifier
             .clickable {
-              viewModel.clearAllCaches()
+              channel.trySend(StorageEvent.ClearAllCaches)
             },
           text = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_all_title), color = Color.Red)
