@@ -70,8 +70,8 @@ import com.twidere.twiderex.scenes.lists.ListsSubscribersScene
 import com.twidere.twiderex.scenes.lists.platform.MastodonListsCreateDialog
 import com.twidere.twiderex.scenes.lists.platform.TwitterListsCreateScene
 import com.twidere.twiderex.scenes.lists.platform.TwitterListsEditScene
-import com.twidere.twiderex.scenes.mastodon.MastodonHashtagScene
-import com.twidere.twiderex.scenes.mastodon.MastodonSignInScene
+import com.twidere.twiderex.scenes.mastodon.hashtag.MastodonHashtagScene
+import com.twidere.twiderex.scenes.mastodon.signin.MastodonSignInScene
 import com.twidere.twiderex.scenes.search.SearchInputScene
 import com.twidere.twiderex.scenes.search.SearchScene
 import com.twidere.twiderex.scenes.settings.AboutScene

@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.mastodon
+package com.twidere.twiderex.scenes.mastodon.signin
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,34 +36,37 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.ui.LocalNavController
-import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
-import moe.tlaster.precompose.navigation.Navigator
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MastodonSignInScene() {
-  val viewModel: MastodonSignInViewModel = getViewModel()
-  val host by viewModel.host.observeAsState(initial = TextFieldValue())
-  val loading by viewModel.loading.observeAsState(initial = false)
   val navController = LocalNavController.current
+  val (state, channel) = rememberPresenterState {
+    MastodonSignInPresenter(
+      it,
+      {
+        if (it) {
+          navController.goBackWith(it)
+        }
+      }
+    )
+  }
+
   SignInScaffold {
-    if (loading) {
+    if (state.loading) {
       CircularProgressIndicator()
     } else {
       val focusRequester = remember { FocusRequester() }
@@ -74,8 +77,8 @@ fun MastodonSignInScene() {
         modifier = Modifier
           .focusRequester(focusRequester)
           .fillMaxWidth(),
-        value = host,
-        onValueChange = { viewModel.setHost(it) },
+        value = state.host,
+        onValueChange = { channel.trySend(MastodonSignInEvent.InputHost(it)) },
         keyboardOptions = KeyboardOptions(
           autoCorrect = false,
           keyboardType = KeyboardType.Uri,
@@ -83,14 +86,14 @@ fun MastodonSignInScene() {
         ),
         keyboardActions = KeyboardActions(
           onGo = {
-            signin(viewModel, host, navController)
+            channel.trySend(MastodonSignInEvent.SignIn)
           }
         )
       )
       Spacer(modifier = Modifier.height(16.dp))
       SignInButton(
         onClick = {
-          signin(viewModel, host, navController)
+          channel.trySend(MastodonSignInEvent.SignIn)
         }
       ) {
         ListItem(
@@ -122,19 +125,4 @@ fun MastodonSignInScene() {
       }
     }
   }
-}
-
-private fun signin(
-  viewModel: MastodonSignInViewModel,
-  host: TextFieldValue,
-  navController: Navigator,
-) {
-  viewModel.beginOAuth(
-    host.text,
-    { success ->
-      if (success) {
-        navController.goBackWith(success)
-      }
-    },
-  )
 }

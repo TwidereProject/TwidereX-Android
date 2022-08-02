@@ -18,29 +18,26 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.mastodon
+package com.twidere.twiderex.scenes.mastodon.hashtag
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
-import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.refreshOrRetry
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.mastodon.MastodonHashtagViewModel
-import org.koin.core.parameter.parametersOf
 
 @Composable
 fun MastodonHashtagScene(keyword: String) {
-  val viewModel: MastodonHashtagViewModel = getViewModel {
-    parametersOf(keyword)
+  val (state, channel) = rememberPresenterState { MastodonHashtagPresenter(it, keyword) }
+  if (state !is MastodonHashtagState.Data) {
+    // TODO: show other states
+    return
   }
-  val source = viewModel.source.collectAsLazyPagingItems()
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -49,18 +46,18 @@ fun MastodonHashtagScene(keyword: String) {
             AppBarNavigationButton()
           },
           title = {
-            Text(text = keyword)
+            Text(text = state.keyword)
           }
         )
       }
     ) {
       SwipeToRefreshLayout(
-        refreshingState = source.loadState.refresh is LoadState.Loading,
+        refreshingState = state.source.loadState.refresh is LoadState.Loading,
         onRefresh = {
-          source.refreshOrRetry()
+          channel.trySend(MastodonHashtagEvent.Refresh)
         },
       ) {
-        LazyUiStatusList(items = source)
+        LazyUiStatusList(items = state.source)
       }
     }
   }

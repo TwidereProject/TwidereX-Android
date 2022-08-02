@@ -26,17 +26,27 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.paging.LoadState
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
+import com.twidere.services.mastodon.MastodonService
+import com.twidere.services.mastodon.model.Hashtag
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
+import com.twidere.twiderex.defaultLoadCount
+import com.twidere.twiderex.extensions.collectEvent
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.viewmodel.mastodon.MastodonSearchHashtagViewModel
-import org.koin.core.parameter.parametersOf
+import com.twidere.twiderex.extensions.rememberPresenterState
+import com.twidere.twiderex.paging.source.MastodonSearchHashtagPagingSource
+import com.twidere.twiderex.scenes.CurrentAccountPresenter
+import com.twidere.twiderex.scenes.CurrentAccountState
+import kotlinx.coroutines.flow.Flow
 
 class MastodonSearchHashtagItem : SearchSceneItem {
   @Composable
@@ -47,20 +57,20 @@ class MastodonSearchHashtagItem : SearchSceneItem {
   @OptIn(ExperimentalMaterialApi::class)
   @Composable
   override fun Content(keyword: String) {
-    val viewModel: MastodonSearchHashtagViewModel = getViewModel {
-      parametersOf(keyword)
+    val (state, channel) = rememberPresenterState { MastodonSearchHashtagPresenter(it, keyword) }
+    if (state !is MastodonSearchHashtagState.Data) {
+      return
     }
-    val source = viewModel.source.collectAsLazyPagingItems()
     val navigator = LocalNavigator.current
     SwipeToRefreshLayout(
-      refreshingState = source.loadState.refresh is LoadState.Loading,
+      refreshingState = state.source.loadState.refresh is LoadState.Loading,
       onRefresh = {
-        source.refreshOrRetry()
+        channel.trySend(MastodonSearchHashtagEvent.Refresh)
       }
     ) {
-      if (source.itemCount > 0) {
+      if (state.source.itemCount > 0) {
         LazyColumn {
-          items(source) {
+          items(state.source) {
             it?.name?.let { name ->
               ListItem(
                 modifier = Modifier
@@ -76,4 +86,45 @@ class MastodonSearchHashtagItem : SearchSceneItem {
       }
     }
   }
+}
+
+@Composable
+fun MastodonSearchHashtagPresenter(
+  flow: Flow<MastodonSearchHashtagEvent>,
+  keyword: String,
+): MastodonSearchHashtagState {
+  val account = CurrentAccountPresenter()
+  if (account !is CurrentAccountState.Account) {
+    return MastodonSearchHashtagState.NoAccount
+  }
+  val scope = rememberCoroutineScope()
+  val source = androidx.paging.Pager(
+    config = PagingConfig(
+      pageSize = defaultLoadCount,
+      enablePlaceholders = false,
+    )
+  ) {
+    MastodonSearchHashtagPagingSource(
+      keyword,
+      // TODO: check if accountState.account.service is MastodonService
+      account.account.service as MastodonService
+    )
+  }.flow.cachedIn(scope).collectAsLazyPagingItems()
+  flow.collectEvent {
+    when (this) {
+      is MastodonSearchHashtagEvent.Refresh -> {
+        source.refreshOrRetry()
+      }
+    }
+  }
+  return MastodonSearchHashtagState.Data(source)
+}
+
+interface MastodonSearchHashtagState {
+  object NoAccount : MastodonSearchHashtagState
+  data class Data(val source: LazyPagingItems<Hashtag>) : MastodonSearchHashtagState
+}
+
+interface MastodonSearchHashtagEvent {
+  object Refresh : MastodonSearchHashtagEvent
 }

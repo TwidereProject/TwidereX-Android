@@ -45,9 +45,6 @@ import com.twidere.twiderex.viewmodel.lists.ListsSearchUserViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsTimelineViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsUserViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsViewModel
-import com.twidere.twiderex.viewmodel.mastodon.MastodonHashtagViewModel
-import com.twidere.twiderex.viewmodel.mastodon.MastodonSearchHashtagViewModel
-import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 import com.twidere.twiderex.viewmodel.search.SearchSaveViewModel
 import com.twidere.twiderex.viewmodel.search.SearchTweetsViewModel
@@ -82,7 +79,6 @@ val viewModelModule = module {
   trend()
   timeline()
   search()
-  mastodon()
   lists()
   dm()
   compose()
@@ -157,12 +153,6 @@ private fun Module.lists() {
     )
   }
   viewModel { (listKey: MicroBlogKey) -> ListsModifyViewModel(get(), get(), get(), listKey) }
-}
-
-private fun Module.mastodon() {
-  viewModel { (keyword: String) -> MastodonHashtagViewModel(get(), get(), keyword) }
-  viewModel { (keyword: String) -> MastodonSearchHashtagViewModel(get(), keyword) }
-  viewModel { MastodonSignInViewModel(get(), get(), get()) }
 }
 
 private fun Module.search() {
