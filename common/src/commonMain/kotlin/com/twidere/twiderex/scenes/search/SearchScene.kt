@@ -41,7 +41,6 @@ import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -57,19 +56,19 @@ import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.scenes.search.presenter.SearchSaveEvent
+import com.twidere.twiderex.scenes.search.presenter.SearchSavePresenter
+import com.twidere.twiderex.scenes.search.presenter.SearchSaveState
 import com.twidere.twiderex.scenes.search.tabs.MastodonSearchHashtagItem
 import com.twidere.twiderex.scenes.search.tabs.SearchTweetsItem
 import com.twidere.twiderex.scenes.search.tabs.SearchUserItem
 import com.twidere.twiderex.scenes.search.tabs.TwitterSearchMediaItem
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.search.SearchSaveViewModel
 import kotlinx.coroutines.launch
-import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -77,8 +76,8 @@ fun SearchScene(keyword: String) {
   val account = LocalActiveAccount.current ?: return
   val navigator = LocalNavigator.current
 
-  val viewModel: SearchSaveViewModel = getViewModel {
-    parametersOf(keyword)
+  val (state, channel) = rememberPresenterState<SearchSaveState, SearchSaveEvent> {
+    SearchSavePresenter(it, content = keyword)
   }
 
   val tabs = remember {
@@ -97,8 +96,6 @@ fun SearchScene(keyword: String) {
   }
   val pagerState = rememberPagerState(pageCount = tabs.size)
   val scope = rememberCoroutineScope()
-  val isSaved by viewModel.isSaved.observeAsState(false)
-  val loading by viewModel.loading.observeAsState(initial = false)
   TwidereScene {
     InAppNotificationScaffold {
       Column {
@@ -129,7 +126,7 @@ fun SearchScene(keyword: String) {
                       maxLines = 1,
                       textAlign = TextAlign.Start,
                     )
-                    if (loading) {
+                    if (state.loading) {
                       CircularProgressIndicator(
                         modifier = Modifier
                           .size(SearchSceneDefaults.Loading.size)
@@ -137,10 +134,10 @@ fun SearchScene(keyword: String) {
                         strokeWidth = SearchSceneDefaults.Loading.width,
                         color = MaterialTheme.colors.onSurface.copy(0.08f)
                       )
-                    } else if (!isSaved) {
+                    } else if (!state.isSaved) {
                       IconButton(
                         onClick = {
-                          if (!loading && !isSaved) viewModel.save()
+                          channel.trySend(SearchSaveEvent.Save)
                         }
                       ) {
                         Icon(

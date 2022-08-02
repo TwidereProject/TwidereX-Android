@@ -18,31 +18,43 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.twitter.search
+package com.twidere.twiderex.scenes.search.tabs.presenter
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.paging.cachedIn
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.services.microblog.SearchService
+import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.model.ui.UiMedia
+import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.SearchRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class TwitterSearchMediaViewModel(
-  private val repository: SearchRepository,
-  private val accountRepository: AccountRepository,
-  keyword: String,
-) : ViewModel() {
-  private val account by lazy {
-    accountRepository.activeAccount.mapNotNull { it }
-  }
+@Composable
+fun TwitterSearchMediaPresenter(
+  repository: SearchRepository = get(),
+  accountRepository: AccountRepository = get(),
+  keyword: String
+): TwitterSearchMediaState {
+
+  val scope = rememberCoroutineScope()
 
   @OptIn(ExperimentalCoroutinesApi::class)
-  val source by lazy {
-    account.flatMapLatest {
+  val data = remember {
+    accountRepository.activeAccount.mapNotNull { it }.flatMapLatest {
       repository.media(keyword, it.accountKey, it.service as SearchService)
-    }.cachedIn(viewModelScope)
+    }.cachedIn(scope)
   }
+
+  return TwitterSearchMediaState(data = data.collectAsLazyPagingItems())
 }
+
+data class TwitterSearchMediaState(
+  val data: LazyPagingItems<Pair<UiMedia, UiStatus>>
+)

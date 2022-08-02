@@ -18,33 +18,37 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.search
+package com.twidere.twiderex.scenes.search.tabs.presenter
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.defaultLoadCount
+import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.paging.source.SearchUserPagingSource
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class SearchUserViewModel(
-  private val accountRepository: AccountRepository,
+@Composable
+fun SearchUserPresenter(
+  accountRepository: AccountRepository = get(),
   keyword: String,
   following: Boolean = false,
-) : ViewModel() {
-  private val account by lazy {
-    accountRepository.activeAccount.mapNotNull { it }
-  }
+): SearchUserState {
 
+  val scope = rememberCoroutineScope()
   @OptIn(ExperimentalCoroutinesApi::class)
-  val source by lazy {
-    account.flatMapLatest { account ->
+  val data = remember {
+    accountRepository.activeAccount.mapNotNull { it }.flatMapLatest { account ->
       Pager(
         config = PagingConfig(
           pageSize = defaultLoadCount,
@@ -58,6 +62,10 @@ class SearchUserViewModel(
           following = following
         )
       }.flow
-    }.cachedIn(viewModelScope)
+    }.cachedIn(scope)
   }
+
+  return SearchUserState(data = data.collectAsLazyPagingItems())
 }
+
+data class SearchUserState(val data: LazyPagingItems<UiUser>)

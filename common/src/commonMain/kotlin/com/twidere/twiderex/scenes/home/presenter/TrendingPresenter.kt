@@ -18,33 +18,42 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.trend
+package com.twidere.twiderex.scenes.home.presenter
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.paging.cachedIn
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.services.microblog.TrendService
+import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.model.ui.UiTrend
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TrendRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class TrendViewModel(
-  private val repository: TrendRepository,
-  private val accountRepository: AccountRepository,
-) : ViewModel() {
-  private val account by lazy {
-    accountRepository.activeAccount.mapNotNull { it }
-  }
+@OptIn(ExperimentalCoroutinesApi::class)
+@Composable
+fun TrendingPresenter(
+  repository: TrendRepository = get(),
+  accountRepository: AccountRepository = get(),
+): SearchItemState {
 
-  @OptIn(ExperimentalCoroutinesApi::class)
-  val source by lazy {
-    account.flatMapLatest {
+  val scope = rememberCoroutineScope()
+
+  val pagingData = remember {
+    accountRepository.activeAccount.mapNotNull { it }.flatMapLatest {
       repository.trendsSource(
         accountKey = it.accountKey,
         service = it.service as TrendService
       )
-    }.cachedIn(viewModelScope)
+    }.cachedIn(scope)
   }
+
+  return SearchItemState(data = pagingData.collectAsLazyPagingItems())
 }
+
+data class SearchItemState(val data: LazyPagingItems<UiTrend>)

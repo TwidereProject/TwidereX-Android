@@ -46,20 +46,13 @@ import com.twidere.twiderex.viewmodel.lists.ListsTimelineViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsUserViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsViewModel
 import com.twidere.twiderex.viewmodel.mastodon.MastodonHashtagViewModel
-import com.twidere.twiderex.viewmodel.mastodon.MastodonSearchHashtagViewModel
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
-import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
-import com.twidere.twiderex.viewmodel.search.SearchSaveViewModel
-import com.twidere.twiderex.viewmodel.search.SearchTweetsViewModel
-import com.twidere.twiderex.viewmodel.search.SearchUserViewModel
 import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
 import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
 import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineViewModel
 import com.twidere.twiderex.viewmodel.timeline.mastodon.FederatedTimelineViewModel
 import com.twidere.twiderex.viewmodel.timeline.mastodon.LocalTimelineViewModel
-import com.twidere.twiderex.viewmodel.trend.TrendViewModel
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
-import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
 import com.twidere.twiderex.viewmodel.twitter.user.TwitterUserViewModel
 import com.twidere.twiderex.viewmodel.user.FollowersViewModel
 import com.twidere.twiderex.viewmodel.user.FollowingViewModel
@@ -79,9 +72,7 @@ val viewModelModule = module {
 
   user()
   twitter()
-  trend()
   timeline()
-  search()
   mastodon()
   lists()
   dm()
@@ -161,15 +152,7 @@ private fun Module.lists() {
 
 private fun Module.mastodon() {
   viewModel { (keyword: String) -> MastodonHashtagViewModel(get(), get(), keyword) }
-  viewModel { (keyword: String) -> MastodonSearchHashtagViewModel(get(), keyword) }
   viewModel { MastodonSignInViewModel(get(), get(), get()) }
-}
-
-private fun Module.search() {
-  viewModel { (keyword: String) -> SearchInputViewModel(get(), get(), keyword) }
-  viewModel { (content: String) -> SearchSaveViewModel(get(), get(), content) }
-  viewModel { (keyword: String) -> SearchTweetsViewModel(get(), get(), keyword) }
-  viewModel { (keyword: String) -> SearchUserViewModel(get(), keyword) }
 }
 
 private fun Module.timeline() {
@@ -178,10 +161,6 @@ private fun Module.timeline() {
   viewModel { HomeTimelineViewModel(get(), get(), get()) }
   viewModel { LocalTimelineViewModel(get(), get(), get()) }
   viewModel { FederatedTimelineViewModel(get(), get(), get()) }
-}
-
-private fun Module.trend() {
-  viewModel { TrendViewModel(get(), get()) }
 }
 
 private fun Module.twitter() {
@@ -202,7 +181,6 @@ private fun Module.twitter() {
     )
   }
   viewModel { (screenName: String) -> TwitterUserViewModel(get(), get(), get(), screenName) }
-  viewModel { (keyword: String) -> TwitterSearchMediaViewModel(get(), get(), keyword) }
 }
 
 private fun Module.user() {

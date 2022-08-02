@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.scenes.search
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,7 +35,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
@@ -49,21 +47,19 @@ import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.extensions.rememberPresenterState
+import com.twidere.twiderex.scenes.search.presenter.SearchInputEvent
+import com.twidere.twiderex.scenes.search.presenter.SearchInputPresenter
+import com.twidere.twiderex.scenes.search.presenter.SearchInputState
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
-import org.koin.core.parameter.parametersOf
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchInputScene(initial: String? = null) {
 
-  val viewModel: SearchInputViewModel = getViewModel {
-    parametersOf(initial ?: "")
+  val (state, channel) = rememberPresenterState<SearchInputState, SearchInputEvent> {
+    SearchInputPresenter(it, keyword = initial ?: "")
   }
-  val source by viewModel.source.observeAsState(initial = emptyList())
-  val textFieldValue by viewModel.searchInput.observeAsState(TextFieldValue())
   val navigator = LocalNavigator.current
   TwidereScene {
     InAppNotificationScaffold(
@@ -75,9 +71,9 @@ fun SearchInputScene(initial: String? = null) {
           title = {
             ProvideTextStyle(value = MaterialTheme.typography.body1) {
               TextInput(
-                value = textFieldValue,
+                value = state.searchInput,
                 onValueChange = {
-                  viewModel.updateSearchInput(it)
+                  channel.trySend(SearchInputEvent.UpdateSearchInput(it))
                 },
                 maxLines = 1,
                 placeholder = {
@@ -90,9 +86,9 @@ fun SearchInputScene(initial: String? = null) {
                 ),
                 keyboardActions = KeyboardActions(
                   onSearch = {
-                    if (textFieldValue.text.isNotEmpty()) {
-                      viewModel.addOrUpgrade(textFieldValue.text)
-                      navigator.search(textFieldValue.text)
+                    if (state.searchInput.text.isNotEmpty()) {
+                      channel.trySend(SearchInputEvent.AddOrUpgradeEvent(state.searchInput.text))
+                      navigator.search(state.searchInput.text)
                     }
                   }
                 )
@@ -102,9 +98,9 @@ fun SearchInputScene(initial: String? = null) {
           actions = {
             IconButton(
               onClick = {
-                if (textFieldValue.text.isNotEmpty()) {
-                  viewModel.addOrUpgrade(textFieldValue.text)
-                  navigator.search(textFieldValue.text)
+                if (state.searchInput.text.isNotEmpty()) {
+                  channel.trySend(SearchInputEvent.AddOrUpgradeEvent(state.searchInput.text))
+                  navigator.search(state.searchInput.text)
                 }
               }
             ) {
@@ -120,12 +116,12 @@ fun SearchInputScene(initial: String? = null) {
       }
     ) {
       LazyColumn {
-        items(items = source) {
+        items(items = state.source) {
           ListItem(
             modifier = Modifier.clickable(
               onClick = {
-                viewModel.addOrUpgrade(it.content)
-                viewModel.updateSearchInput(TextFieldValue(it.content, TextRange(it.content.length)))
+                channel.trySend(SearchInputEvent.AddOrUpgradeEvent(it.content))
+                channel.trySend(SearchInputEvent.UpdateSearchInput(TextFieldValue(it.content, TextRange(it.content.length))))
                 navigator.search(it.content)
               }
             ),
@@ -140,7 +136,7 @@ fun SearchInputScene(initial: String? = null) {
             trailing = {
               IconButton(
                 onClick = {
-                  viewModel.remove(it)
+                  channel.trySend(SearchInputEvent.RemoveEvent(it))
                 }
               ) {
                 Icon(

@@ -18,32 +18,37 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.mastodon
+package com.twidere.twiderex.scenes.search.tabs.presenter
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.services.mastodon.MastodonService
+import com.twidere.services.mastodon.model.Hashtag
 import com.twidere.twiderex.defaultLoadCount
+import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.paging.source.MastodonSearchHashtagPagingSource
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class MastodonSearchHashtagViewModel(
-  private val accountRepository: AccountRepository,
+@Composable
+fun MastodonSearchHashtagPresenter(
+  accountRepository: AccountRepository = get(),
   keyword: String,
-) : ViewModel() {
-  private val account by lazy {
-    accountRepository.activeAccount.mapNotNull { it }
-  }
+): MastodonSearchHashtagState {
+
+  val scope = rememberCoroutineScope()
 
   @OptIn(ExperimentalCoroutinesApi::class)
-  val source by lazy {
-    account.flatMapLatest {
+  val data = remember {
+    accountRepository.activeAccount.mapNotNull { it }.flatMapLatest {
       Pager(
         config = PagingConfig(
           pageSize = defaultLoadCount,
@@ -55,6 +60,12 @@ class MastodonSearchHashtagViewModel(
           it.service as MastodonService
         )
       }.flow
-    }.cachedIn(viewModelScope)
+    }.cachedIn(scope)
   }
+
+  return MastodonSearchHashtagState(data = data.collectAsLazyPagingItems())
 }
+
+data class MastodonSearchHashtagState(
+  val data: LazyPagingItems<Hashtag>
+)

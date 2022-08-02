@@ -21,16 +21,16 @@
 package com.twidere.twiderex.scenes.search.tabs
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.viewmodel.search.SearchUserViewModel
-import org.koin.core.parameter.parametersOf
+import com.twidere.twiderex.extensions.rememberPresenter
+import com.twidere.twiderex.scenes.search.tabs.presenter.SearchUserPresenter
 
 class SearchUserItem : SearchSceneItem {
   @Composable
@@ -40,19 +40,18 @@ class SearchUserItem : SearchSceneItem {
 
   @Composable
   override fun Content(keyword: String) {
-    val viewModel: SearchUserViewModel = getViewModel {
-      parametersOf(keyword)
-    }
-    val source = viewModel.source.collectAsLazyPagingItems()
+    val state by rememberPresenter {
+      SearchUserPresenter(keyword = keyword)
+    }.collectAsState()
     val navigator = LocalNavigator.current
     SwipeToRefreshLayout(
-      refreshingState = source.loadState.refresh is LoadState.Loading,
+      refreshingState = state.data.loadState.refresh is LoadState.Loading,
       onRefresh = {
-        source.refreshOrRetry()
+        state.data.refreshOrRetry()
       }
     ) {
       LazyUiUserList(
-        items = source,
+        items = state.data,
         onItemClicked = { navigator.user(it) },
       )
     }
