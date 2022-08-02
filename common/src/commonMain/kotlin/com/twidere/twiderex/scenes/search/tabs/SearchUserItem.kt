@@ -31,6 +31,7 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.rememberPresenter
 import com.twidere.twiderex.scenes.search.tabs.presenter.SearchUserPresenter
+import com.twidere.twiderex.scenes.search.tabs.presenter.SearchUserState
 
 class SearchUserItem : SearchSceneItem {
   @Composable
@@ -40,20 +41,25 @@ class SearchUserItem : SearchSceneItem {
 
   @Composable
   override fun Content(keyword: String) {
+
     val state by rememberPresenter {
       SearchUserPresenter(keyword = keyword)
     }.collectAsState()
-    val navigator = LocalNavigator.current
-    SwipeToRefreshLayout(
-      refreshingState = state.data.loadState.refresh is LoadState.Loading,
-      onRefresh = {
-        state.data.refreshOrRetry()
+
+    (state as? SearchUserState.Data)?.let {
+      val navigator = LocalNavigator.current
+
+      SwipeToRefreshLayout(
+        refreshingState = it.data.loadState.refresh is LoadState.Loading,
+        onRefresh = {
+          it.data.refreshOrRetry()
+        }
+      ) {
+        LazyUiUserList(
+          items = it.data,
+          onItemClicked = { navigator.user(it) },
+        )
       }
-    ) {
-      LazyUiUserList(
-        items = state.data,
-        onItemClicked = { navigator.user(it) },
-      )
     }
   }
 }

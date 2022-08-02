@@ -22,50 +22,54 @@ package com.twidere.twiderex.scenes.search.tabs.presenter
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.defaultLoadCount
-import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.paging.source.SearchUserPagingSource
-import com.twidere.twiderex.repository.AccountRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.mapNotNull
+import com.twidere.twiderex.scenes.CurrentAccountPresenter
+import com.twidere.twiderex.scenes.CurrentAccountState
 
 @Composable
 fun SearchUserPresenter(
-  accountRepository: AccountRepository = get(),
   keyword: String,
   following: Boolean = false,
 ): SearchUserState {
 
-  val scope = rememberCoroutineScope()
-  @OptIn(ExperimentalCoroutinesApi::class)
-  val data = remember {
-    accountRepository.activeAccount.mapNotNull { it }.flatMapLatest { account ->
-      Pager(
-        config = PagingConfig(
-          pageSize = defaultLoadCount,
-          enablePlaceholders = false,
-        )
-      ) {
-        SearchUserPagingSource(
-          accountKey = account.accountKey,
-          keyword,
-          account.service as SearchService,
-          following = following
-        )
-      }.flow
-    }.cachedIn(scope)
+  val accountState = CurrentAccountPresenter()
+
+  if (accountState !is CurrentAccountState.Account) {
+    return SearchUserState.NoAccount
   }
 
-  return SearchUserState(data = data.collectAsLazyPagingItems())
+  val data = remember(accountState) {
+    Pager(
+      config = PagingConfig(
+        pageSize = defaultLoadCount,
+        enablePlaceholders = false,
+      )
+    ) {
+      SearchUserPagingSource(
+        accountKey = accountState.account.accountKey,
+        keyword,
+        accountState.account.service as SearchService,
+        following = following
+      )
+    }.flow
+  }
+
+  return SearchUserState.Data(
+    data = data.collectAsLazyPagingItems()
+  )
 }
 
-data class SearchUserState(val data: LazyPagingItems<UiUser>)
+interface SearchUserState {
+  data class Data(
+    val data: LazyPagingItems<UiUser>
+  ) : SearchUserState
+
+  object NoAccount : SearchUserState
+}

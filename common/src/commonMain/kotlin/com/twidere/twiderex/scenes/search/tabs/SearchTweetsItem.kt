@@ -30,6 +30,7 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.rememberPresenter
 import com.twidere.twiderex.scenes.search.tabs.presenter.SearchTweetsPresenter
+import com.twidere.twiderex.scenes.search.tabs.presenter.SearchTweetsState
 
 class SearchTweetsItem : SearchSceneItem {
   @Composable
@@ -44,15 +45,17 @@ class SearchTweetsItem : SearchSceneItem {
       SearchTweetsPresenter(keyword = keyword)
     }.collectAsState()
 
-    SwipeToRefreshLayout(
-      refreshingState = state.data.loadState.refresh is LoadState.Loading,
-      onRefresh = {
-        state.data.refreshOrRetry()
+    (state as? SearchTweetsState.Data)?.let {
+      SwipeToRefreshLayout(
+        refreshingState = it.data.loadState.refresh is LoadState.Loading,
+        onRefresh = {
+          it.data.refreshOrRetry()
+        }
+      ) {
+        LazyUiStatusList(
+          items = it.data,
+        )
       }
-    ) {
-      LazyUiStatusList(
-        items = state.data,
-      )
     }
   }
 }

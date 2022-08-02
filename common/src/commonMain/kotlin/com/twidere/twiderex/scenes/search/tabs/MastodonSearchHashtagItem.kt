@@ -37,6 +37,7 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.rememberPresenter
 import com.twidere.twiderex.scenes.search.tabs.presenter.MastodonSearchHashtagPresenter
+import com.twidere.twiderex.scenes.search.tabs.presenter.MastodonSearchHashtagState
 
 class MastodonSearchHashtagItem : SearchSceneItem {
   @Composable
@@ -47,27 +48,31 @@ class MastodonSearchHashtagItem : SearchSceneItem {
   @OptIn(ExperimentalMaterialApi::class)
   @Composable
   override fun Content(keyword: String) {
+
     val state by rememberPresenter {
       MastodonSearchHashtagPresenter(keyword = keyword)
     }.collectAsState()
-    val navigator = LocalNavigator.current
-    SwipeToRefreshLayout(
-      refreshingState = state.data.loadState.refresh is LoadState.Loading,
-      onRefresh = {
-        state.data.refreshOrRetry()
-      }
-    ) {
-      if (state.data.itemCount > 0) {
-        LazyColumn {
-          items(state.data) {
-            it?.name?.let { name ->
-              ListItem(
-                modifier = Modifier
-                  .clickable {
-                    navigator.hashtag(name)
-                  }
-              ) {
-                Text(text = name)
+
+    (state as? MastodonSearchHashtagState.Data)?.let {
+      val navigator = LocalNavigator.current
+      SwipeToRefreshLayout(
+        refreshingState = it.data.loadState.refresh is LoadState.Loading,
+        onRefresh = {
+          it.data.refreshOrRetry()
+        }
+      ) {
+        if (it.data.itemCount > 0) {
+          LazyColumn {
+            items(it.data) {
+              it?.name?.let { name ->
+                ListItem(
+                  modifier = Modifier
+                    .clickable {
+                      navigator.hashtag(name)
+                    }
+                ) {
+                  Text(text = name)
+                }
               }
             }
           }

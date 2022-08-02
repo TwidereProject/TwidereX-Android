@@ -23,34 +23,31 @@ package com.twidere.twiderex.scenes.home.presenter
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.paging.cachedIn
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.services.microblog.TrendService
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.extensions.rememberNestedPresenter
 import com.twidere.twiderex.model.ui.UiTrend
-import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TrendRepository
+import com.twidere.twiderex.scenes.CurrentAccountPresenter
+import com.twidere.twiderex.scenes.CurrentAccountState
 import com.twidere.twiderex.scenes.search.presenter.SearchInputEvent
 import com.twidere.twiderex.scenes.search.presenter.SearchInputPresenter
 import com.twidere.twiderex.scenes.search.presenter.SearchInputState
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.mapNotNull
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun TrendingPresenter(
   events: Flow<SearchInputEvent>,
   repository: TrendRepository = get(),
-  accountRepository: AccountRepository = get(),
 ): SearchItemState {
 
-  val scope = rememberCoroutineScope()
+  val accountState = CurrentAccountPresenter()
+
+  if (accountState !is CurrentAccountState.Account) {
+    return SearchItemState.NoAccount
+  }
 
   val (state, channel) = rememberNestedPresenter <SearchInputState, SearchInputEvent> {
     SearchInputPresenter(it, keyword = "")
@@ -63,21 +60,22 @@ fun TrendingPresenter(
   }
 
   val pagingData = remember {
-    accountRepository.activeAccount.mapNotNull { it }.flatMapLatest {
-      repository.trendsSource(
-        accountKey = it.accountKey,
-        service = it.service as TrendService
-      )
-    }.cachedIn(scope)
+    repository.trendsSource(
+      accountKey = accountState.account.accountKey,
+      service = accountState.account.service as TrendService
+    )
   }
 
-  return SearchItemState(
+  return SearchItemState.Data(
     data = pagingData.collectAsLazyPagingItems(),
     searchInputState = state
   )
 }
 
-data class SearchItemState(
-  val data: LazyPagingItems<UiTrend>,
-  val searchInputState: SearchInputState
-)
+interface SearchItemState {
+  data class Data(
+    val data: LazyPagingItems<UiTrend>,
+    val searchInputState: SearchInputState
+  ) : SearchItemState
+  object NoAccount : SearchItemState
+}

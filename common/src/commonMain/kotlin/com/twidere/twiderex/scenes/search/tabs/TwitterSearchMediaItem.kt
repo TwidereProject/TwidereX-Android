@@ -32,6 +32,7 @@ import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.rememberPresenter
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.scenes.search.tabs.presenter.TwitterSearchMediaPresenter
+import com.twidere.twiderex.scenes.search.tabs.presenter.TwitterSearchMediaState
 import com.twidere.twiderex.ui.LocalVideoPlayback
 
 class TwitterSearchMediaItem : SearchSceneItem {
@@ -47,16 +48,18 @@ class TwitterSearchMediaItem : SearchSceneItem {
       TwitterSearchMediaPresenter(keyword = keyword)
     }.collectAsState()
 
-    CompositionLocalProvider(
-      LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
-    ) {
-      SwipeToRefreshLayout(
-        refreshingState = state.data.loadState.refresh is LoadState.Loading,
-        onRefresh = {
-          state.data.refreshOrRetry()
-        }
+    (state as? TwitterSearchMediaState.Data)?.let {
+      CompositionLocalProvider(
+        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
       ) {
-        LazyUiStatusImageList(items = state.data)
+        SwipeToRefreshLayout(
+          refreshingState = it.data.loadState.refresh is LoadState.Loading,
+          onRefresh = {
+            it.data.refreshOrRetry()
+          }
+        ) {
+          LazyUiStatusImageList(items = it.data)
+        }
       }
     }
   }

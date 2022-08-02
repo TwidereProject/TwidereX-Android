@@ -60,6 +60,9 @@ fun SearchInputScene(initial: String? = null) {
   val (state, channel) = rememberPresenterState<SearchInputState, SearchInputEvent> {
     SearchInputPresenter(it, keyword = initial ?: "")
   }
+  if (state !is SearchInputState.Data) {
+    return
+  }
   val navigator = LocalNavigator.current
   TwidereScene {
     InAppNotificationScaffold(

@@ -27,21 +27,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.twidere.twiderex.di.ext.get
-import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.SearchRepository
+import com.twidere.twiderex.scenes.CurrentAccountPresenter
+import com.twidere.twiderex.scenes.CurrentAccountState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.mapNotNull
 
 @Composable
 fun SearchSavePresenter(
   event: Flow<SearchSaveEvent>,
   repository: SearchRepository = get(),
-  accountRepository: AccountRepository = get(),
   content: String,
 ): SearchSaveState {
 
-  val account = accountRepository.activeAccount.mapNotNull { it }
+  val accountState = CurrentAccountPresenter()
+
+  if (accountState !is CurrentAccountState.Account) {
+    return SearchSaveState.NoAccount
+  }
 
   var loading by remember {
     mutableStateOf(false)
@@ -52,9 +54,7 @@ fun SearchSavePresenter(
   }
 
   LaunchedEffect(Unit) {
-    account.firstOrNull()?.let {
-      isSaved = repository.get(content, it.accountKey)?.saved ?: false
-    }
+    isSaved = repository.get(content, accountState.account.accountKey)?.saved ?: false
   }
 
   LaunchedEffect(Unit) {
@@ -62,17 +62,15 @@ fun SearchSavePresenter(
       when (it) {
         is SearchSaveEvent.Save -> {
           loading = true
-          try {
-            account.firstOrNull()?.let {
-              repository.addOrUpgrade(
-                content = content,
-                accountKey = it.accountKey,
-                saved = true
-              )
-              isSaved = true
-            }
+          isSaved = try {
+            repository.addOrUpgrade(
+              content = content,
+              accountKey = accountState.account.accountKey,
+              saved = true
+            )
+            true
           } catch (e: Exception) {
-            isSaved = false
+            false
           } finally {
             loading = false
           }
@@ -81,7 +79,7 @@ fun SearchSavePresenter(
     }
   }
 
-  return SearchSaveState(
+  return SearchSaveState.Data(
     loading = loading,
     isSaved = isSaved
   )
@@ -91,7 +89,10 @@ interface SearchSaveEvent {
   object Save : SearchSaveEvent
 }
 
-data class SearchSaveState(
-  val loading: Boolean,
-  val isSaved: Boolean,
-)
+interface SearchSaveState {
+  data class Data(
+    val loading: Boolean,
+    val isSaved: Boolean,
+  ) : SearchSaveState
+  object NoAccount : SearchSaveState
+}

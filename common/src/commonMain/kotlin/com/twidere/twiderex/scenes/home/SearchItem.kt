@@ -56,8 +56,10 @@ import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.scenes.home.presenter.SearchItemState
 import com.twidere.twiderex.scenes.home.presenter.TrendingPresenter
 import com.twidere.twiderex.scenes.search.presenter.SearchInputEvent
+import com.twidere.twiderex.scenes.search.presenter.SearchInputState
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 
@@ -105,8 +107,10 @@ fun SearchScene() {
 fun SearchSceneContent() {
   val account = LocalActiveAccount.current ?: return
   val (state, channel) = rememberPresenterState { TrendingPresenter(it) }
+  if (state !is SearchItemState.Data) {
+    return
+  }
   val navigator = LocalNavigator.current
-  val searchCount = 3
   Scaffold(
     topBar = {
       AppBar(
@@ -150,67 +154,66 @@ fun SearchSceneContent() {
     }
   ) {
     LazyColumn {
-      item {
-        if (state.searchInputState.savedSource.isNotEmpty()) ListItem {
-          Text(
-            text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_saved_search),
-            style = MaterialTheme.typography.button
-          )
-        }
-      }
-      items(
-        items = state.searchInputState.savedSource.filterIndexed {
-            index, _ ->
-          index < searchCount ||
-            state.searchInputState.expandSearch
-        }
-      ) {
-        ListItem(
-          modifier = Modifier.clickable(
-            onClick = {
-              channel.trySend(SearchInputEvent.AddOrUpgradeEvent(it.content))
-              navigator.search(it.content)
-            }
-
-          ),
-          trailing = {
-            IconButton(
-              onClick = {
-                channel.trySend(SearchInputEvent.RemoveEvent(it))
-              }
-            ) {
-              Icon(
-                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_trash_can),
-                contentDescription = stringResource(
-                  res = com.twidere.twiderex.MR.strings.common_controls_actions_remove
-                )
-              )
-            }
-          },
-          text = {
+      if (state.searchInputState is SearchInputState.Data) {
+        item {
+          if (state.searchInputState.savedSource.isNotEmpty()) ListItem {
             Text(
-              text = it.content,
-              style = MaterialTheme.typography.subtitle1
+              text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_saved_search),
+              style = MaterialTheme.typography.button
             )
-          },
-        )
-      }
-      item {
-        if (state.searchInputState.savedSource.size > searchCount) ListItem(
-          modifier = Modifier.clickable {
-            channel.trySend(SearchInputEvent.ChangeExpand(!state.searchInputState.expandSearch))
           }
+        }
+        items(
+          items = state.searchInputState.savedSource
         ) {
-          Text(
-            text = if (state.searchInputState.expandSearch)
-              stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_less)
-            else
-              stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_more),
-            style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.primary
+          ListItem(
+            modifier = Modifier.clickable(
+              onClick = {
+                channel.trySend(SearchInputEvent.AddOrUpgradeEvent(it.content))
+                navigator.search(it.content)
+              }
+
+            ),
+            trailing = {
+              IconButton(
+                onClick = {
+                  channel.trySend(SearchInputEvent.RemoveEvent(it))
+                }
+              ) {
+                Icon(
+                  painter = painterResource(res = com.twidere.twiderex.MR.files.ic_trash_can),
+                  contentDescription = stringResource(
+                    res = com.twidere.twiderex.MR.strings.common_controls_actions_remove
+                  )
+                )
+              }
+            },
+            text = {
+              Text(
+                text = it.content,
+                style = MaterialTheme.typography.subtitle1
+              )
+            },
           )
         }
+        item {
+          if (state.searchInputState.showExpand) ListItem(
+            modifier = Modifier.clickable {
+              channel.trySend(SearchInputEvent.ChangeExpand(!state.searchInputState.expandSearch))
+            }
+          ) {
+            Text(
+              text = if (state.searchInputState.expandSearch)
+                stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_less)
+              else
+                stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_more),
+              style = MaterialTheme.typography.subtitle1,
+              color = MaterialTheme.colors.primary
+            )
+          }
+        }
       }
+
       if (state.data.itemCount > 0) {
         item {
           Column {

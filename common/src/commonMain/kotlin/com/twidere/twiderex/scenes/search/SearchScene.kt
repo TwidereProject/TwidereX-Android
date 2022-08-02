@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.scenes.search
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -70,7 +69,6 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SearchScene(keyword: String) {
   val account = LocalActiveAccount.current ?: return
@@ -126,26 +124,28 @@ fun SearchScene(keyword: String) {
                       maxLines = 1,
                       textAlign = TextAlign.Start,
                     )
-                    if (state.loading) {
-                      CircularProgressIndicator(
-                        modifier = Modifier
-                          .size(SearchSceneDefaults.Loading.size)
-                          .padding(SearchSceneDefaults.Loading.padding),
-                        strokeWidth = SearchSceneDefaults.Loading.width,
-                        color = MaterialTheme.colors.onSurface.copy(0.08f)
-                      )
-                    } else if (!state.isSaved) {
-                      IconButton(
-                        onClick = {
-                          channel.trySend(SearchSaveEvent.Save)
-                        }
-                      ) {
-                        Icon(
-                          painter = painterResource(res = com.twidere.twiderex.MR.files.ic_device_floppy),
-                          contentDescription = stringResource(
-                            res = com.twidere.twiderex.MR.strings.accessibility_scene_search_save
-                          )
+                    if (state is SearchSaveState.Data) {
+                      if (state.loading) {
+                        CircularProgressIndicator(
+                          modifier = Modifier
+                            .size(SearchSceneDefaults.Loading.size)
+                            .padding(SearchSceneDefaults.Loading.padding),
+                          strokeWidth = SearchSceneDefaults.Loading.width,
+                          color = MaterialTheme.colors.onSurface.copy(0.08f)
                         )
+                      } else if (!state.isSaved) {
+                        IconButton(
+                          onClick = {
+                            channel.trySend(SearchSaveEvent.Save)
+                          }
+                        ) {
+                          Icon(
+                            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_device_floppy),
+                            contentDescription = stringResource(
+                              res = com.twidere.twiderex.MR.strings.accessibility_scene_search_save
+                            )
+                          )
+                        }
                       }
                     }
                   }

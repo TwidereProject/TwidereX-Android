@@ -33,33 +33,36 @@ import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.search.SearchStatusMediator
-import com.twidere.twiderex.repository.AccountRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flatMapLatest
+import com.twidere.twiderex.scenes.CurrentAccountPresenter
+import com.twidere.twiderex.scenes.CurrentAccountState
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 
 @Composable
 fun SearchTweetsPresenter(
   database: CacheDatabase = get(),
-  accountRepository: AccountRepository = get(),
   keyword: String,
 ): SearchTweetsState {
   val scope = rememberCoroutineScope()
-  @OptIn(ExperimentalCoroutinesApi::class)
-  val data = remember {
-    accountRepository.activeAccount.mapNotNull { it }.flatMapLatest { account ->
-      SearchStatusMediator(
-        keyword,
-        database,
-        account.accountKey,
-        account.service as SearchService
-      ).pager().flow.map { it.map { it.status } }.cachedIn(scope)
-    }.cachedIn(scope)
+  val accountState = CurrentAccountPresenter()
+  if (accountState !is CurrentAccountState.Account) {
+    return SearchTweetsState.NoAccount
   }
-  return SearchTweetsState(data = data.collectAsLazyPagingItems())
+  val data = remember(accountState) {
+    SearchStatusMediator(
+      keyword,
+      database,
+      accountState.account.accountKey,
+      accountState.account.service as SearchService
+    ).pager().flow.map { it.map { it.status } }.cachedIn(scope)
+  }
+  return SearchTweetsState.Data(
+    data = data.collectAsLazyPagingItems()
+  )
 }
 
-data class SearchTweetsState(
-  val data: LazyPagingItems<UiStatus>
-)
+interface SearchTweetsState {
+  data class Data(
+    val data: LazyPagingItems<UiStatus>
+  ) : SearchTweetsState
+  object NoAccount : SearchTweetsState
+}

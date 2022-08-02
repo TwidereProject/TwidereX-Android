@@ -22,39 +22,44 @@ package com.twidere.twiderex.scenes.search.tabs.presenter
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.paging.cachedIn
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.SearchRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.mapNotNull
+import com.twidere.twiderex.scenes.CurrentAccountPresenter
+import com.twidere.twiderex.scenes.CurrentAccountState
 
 @Composable
 fun TwitterSearchMediaPresenter(
   repository: SearchRepository = get(),
-  accountRepository: AccountRepository = get(),
   keyword: String
 ): TwitterSearchMediaState {
 
-  val scope = rememberCoroutineScope()
+  val accountState = CurrentAccountPresenter()
 
-  @OptIn(ExperimentalCoroutinesApi::class)
-  val data = remember {
-    accountRepository.activeAccount.mapNotNull { it }.flatMapLatest {
-      repository.media(keyword, it.accountKey, it.service as SearchService)
-    }.cachedIn(scope)
+  if (accountState !is CurrentAccountState.Account) {
+    return TwitterSearchMediaState.NoAccount
   }
 
-  return TwitterSearchMediaState(data = data.collectAsLazyPagingItems())
+  val data = remember {
+    repository.media(
+      keyword, accountState.account.accountKey,
+      accountState.account.service as SearchService
+    )
+  }
+
+  return TwitterSearchMediaState.Data(
+    data = data.collectAsLazyPagingItems()
+  )
 }
 
-data class TwitterSearchMediaState(
-  val data: LazyPagingItems<Pair<UiMedia, UiStatus>>
-)
+interface TwitterSearchMediaState {
+  data class Data(
+    val data: LazyPagingItems<Pair<UiMedia, UiStatus>>
+  ) : TwitterSearchMediaState
+
+  object NoAccount : TwitterSearchMediaState
+}

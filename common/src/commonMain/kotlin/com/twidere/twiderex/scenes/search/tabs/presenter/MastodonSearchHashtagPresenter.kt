@@ -22,50 +22,50 @@ package com.twidere.twiderex.scenes.search.tabs.presenter
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.mastodon.model.Hashtag
 import com.twidere.twiderex.defaultLoadCount
-import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.paging.source.MastodonSearchHashtagPagingSource
-import com.twidere.twiderex.repository.AccountRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.mapNotNull
+import com.twidere.twiderex.scenes.CurrentAccountPresenter
+import com.twidere.twiderex.scenes.CurrentAccountState
 
 @Composable
 fun MastodonSearchHashtagPresenter(
-  accountRepository: AccountRepository = get(),
   keyword: String,
 ): MastodonSearchHashtagState {
 
-  val scope = rememberCoroutineScope()
+  val accountState = CurrentAccountPresenter()
 
-  @OptIn(ExperimentalCoroutinesApi::class)
-  val data = remember {
-    accountRepository.activeAccount.mapNotNull { it }.flatMapLatest {
-      Pager(
-        config = PagingConfig(
-          pageSize = defaultLoadCount,
-          enablePlaceholders = false,
-        )
-      ) {
-        MastodonSearchHashtagPagingSource(
-          keyword,
-          it.service as MastodonService
-        )
-      }.flow
-    }.cachedIn(scope)
+  if (accountState !is CurrentAccountState.Account) {
+    return MastodonSearchHashtagState.NoAccount
   }
 
-  return MastodonSearchHashtagState(data = data.collectAsLazyPagingItems())
+  val data = remember(accountState) {
+    Pager(
+      config = PagingConfig(
+        pageSize = defaultLoadCount,
+        enablePlaceholders = false,
+      )
+    ) {
+      MastodonSearchHashtagPagingSource(
+        keyword,
+        accountState.account.service as MastodonService
+      )
+    }.flow
+  }
+
+  return MastodonSearchHashtagState.Data(
+    data = data.collectAsLazyPagingItems()
+  )
 }
 
-data class MastodonSearchHashtagState(
-  val data: LazyPagingItems<Hashtag>
-)
+interface MastodonSearchHashtagState {
+  data class Data(
+    val data: LazyPagingItems<Hashtag>
+  ) : MastodonSearchHashtagState
+  object NoAccount : MastodonSearchHashtagState
+}

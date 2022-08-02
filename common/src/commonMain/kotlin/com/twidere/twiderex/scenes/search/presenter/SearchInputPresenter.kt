@@ -23,6 +23,7 @@ package com.twidere.twiderex.scenes.search.presenter
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,40 +32,50 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.model.ui.UiSearch
-import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.SearchRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.twidere.twiderex.scenes.CurrentAccountPresenter
+import com.twidere.twiderex.scenes.CurrentAccountState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.mapNotNull
+
+private const val searchCount = 3
 
 @Composable
 fun SearchInputPresenter(
   events: Flow<SearchInputEvent>,
   repository: SearchRepository = get(),
-  accountRepository: AccountRepository = get(),
   keyword: String
 ): SearchInputState {
 
-  val account = accountRepository.activeAccount.mapNotNull { it }
+  val accountState = CurrentAccountPresenter()
 
-  @OptIn(ExperimentalCoroutinesApi::class)
-  val source by account.flatMapLatest {
-    repository.searchHistory(it.accountKey)
+  if (accountState !is CurrentAccountState.Account) {
+    return SearchInputState.NoAccount
+  }
+
+  var expandSearch by remember {
+    mutableStateOf(false)
+  }
+
+  val source by remember(accountState) {
+    repository.searchHistory(accountState.account.accountKey)
   }.collectAsState(emptyList())
 
-  @OptIn(ExperimentalCoroutinesApi::class)
-  val savedSource by account.flatMapLatest {
-    repository.savedSearch(it.accountKey)
+  val savedSource by remember(accountState, expandSearch) {
+    repository.savedSearch(accountState.account.accountKey)
   }.collectAsState(emptyList())
+
+  val filteredSavedSource by derivedStateOf {
+    savedSource.filterIndexed { index, _ ->
+      index < searchCount || expandSearch
+    }
+  }
 
   var searchInput by remember {
     mutableStateOf(TextFieldValue(keyword, TextRange(keyword.length)))
   }
 
-  var expandSearch by remember {
-    mutableStateOf(false)
+  val showExpand by derivedStateOf {
+    savedSource.size > searchCount
   }
 
   LaunchedEffect(Unit) {
@@ -80,7 +91,7 @@ fun SearchInputPresenter(
           searchInput = it.searchInput
         }
         is SearchInputEvent.AddOrUpgradeEvent -> {
-          account.firstOrNull()?.let { account ->
+          accountState.account.let { account ->
             repository.addOrUpgrade(it.content, account.accountKey)
           }
         }
@@ -88,20 +99,26 @@ fun SearchInputPresenter(
     }
   }
 
-  return SearchInputState(
+  return SearchInputState.Data(
     expandSearch = expandSearch,
     searchInput = searchInput,
     source = source,
-    savedSource = savedSource
+    savedSource = filteredSavedSource,
+    showExpand = showExpand
   )
 }
 
-data class SearchInputState(
-  val expandSearch: Boolean,
-  val searchInput: TextFieldValue,
-  val source: List<UiSearch>,
-  val savedSource: List<UiSearch>
-)
+interface SearchInputState {
+  data class Data(
+    val expandSearch: Boolean,
+    val searchInput: TextFieldValue,
+    val source: List<UiSearch>,
+    val savedSource: List<UiSearch>,
+    val showExpand: Boolean
+  ) : SearchInputState
+
+  object NoAccount : SearchInputState
+}
 
 interface SearchInputEvent {
   data class RemoveEvent(val item: UiSearch) : SearchInputEvent
