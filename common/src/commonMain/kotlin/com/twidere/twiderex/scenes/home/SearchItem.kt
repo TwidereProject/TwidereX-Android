@@ -39,8 +39,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,15 +52,12 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.component.trend.MastodonTrendItem
 import com.twidere.twiderex.component.trend.TwitterTrendItem
-import com.twidere.twiderex.extensions.rememberNestedPresenter
-import com.twidere.twiderex.extensions.rememberPresenter
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.scenes.home.presenter.TrendingPresenter
 import com.twidere.twiderex.scenes.search.presenter.SearchInputEvent
-import com.twidere.twiderex.scenes.search.presenter.SearchInputPresenter
-import com.twidere.twiderex.scenes.search.presenter.SearchInputState
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 
@@ -109,10 +104,7 @@ fun SearchScene() {
 @Composable
 fun SearchSceneContent() {
   val account = LocalActiveAccount.current ?: return
-  val (state, channel) = rememberNestedPresenter<SearchInputState, SearchInputEvent> {
-    SearchInputPresenter(it, keyword = "")
-  }
-  val trends by rememberPresenter { TrendingPresenter() }.collectAsState()
+  val (state, channel) = rememberPresenterState { TrendingPresenter(it) }
   val navigator = LocalNavigator.current
   val searchCount = 3
   Scaffold(
@@ -159,7 +151,7 @@ fun SearchSceneContent() {
   ) {
     LazyColumn {
       item {
-        if (state.savedSource.isNotEmpty()) ListItem {
+        if (state.searchInputState.savedSource.isNotEmpty()) ListItem {
           Text(
             text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_saved_search),
             style = MaterialTheme.typography.button
@@ -167,10 +159,10 @@ fun SearchSceneContent() {
         }
       }
       items(
-        items = state.savedSource.filterIndexed {
+        items = state.searchInputState.savedSource.filterIndexed {
             index, _ ->
           index < searchCount ||
-            state.expandSearch
+            state.searchInputState.expandSearch
         }
       ) {
         ListItem(
@@ -204,13 +196,13 @@ fun SearchSceneContent() {
         )
       }
       item {
-        if (state.savedSource.size > searchCount) ListItem(
+        if (state.searchInputState.savedSource.size > searchCount) ListItem(
           modifier = Modifier.clickable {
-            channel.trySend(SearchInputEvent.ChangeExpand(!state.expandSearch))
+            channel.trySend(SearchInputEvent.ChangeExpand(!state.searchInputState.expandSearch))
           }
         ) {
           Text(
-            text = if (state.expandSearch)
+            text = if (state.searchInputState.expandSearch)
               stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_less)
             else
               stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_more),
@@ -219,7 +211,7 @@ fun SearchSceneContent() {
           )
         }
       }
-      if (trends.data.itemCount > 0) {
+      if (state.data.itemCount > 0) {
         item {
           Column {
             Divider()
@@ -242,7 +234,7 @@ fun SearchSceneContent() {
           }
         }
       }
-      items(trends.data) {
+      items(state.data) {
         it?.let { trend ->
           when (account.type) {
             PlatformType.Twitter -> TwitterTrendItem(

@@ -21,6 +21,7 @@
 package com.twidere.twiderex.scenes.home.presenter
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.paging.cachedIn
@@ -28,21 +29,38 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.services.microblog.TrendService
 import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.extensions.rememberNestedPresenter
 import com.twidere.twiderex.model.ui.UiTrend
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TrendRepository
+import com.twidere.twiderex.scenes.search.presenter.SearchInputEvent
+import com.twidere.twiderex.scenes.search.presenter.SearchInputPresenter
+import com.twidere.twiderex.scenes.search.presenter.SearchInputState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun TrendingPresenter(
+  events: Flow<SearchInputEvent>,
   repository: TrendRepository = get(),
   accountRepository: AccountRepository = get(),
 ): SearchItemState {
 
   val scope = rememberCoroutineScope()
+
+  val (state, channel) = rememberNestedPresenter <SearchInputState, SearchInputEvent> {
+    SearchInputPresenter(it, keyword = "")
+  }
+
+  LaunchedEffect(Unit) {
+    events.collect {
+      channel.trySend(it)
+    }
+  }
 
   val pagingData = remember {
     accountRepository.activeAccount.mapNotNull { it }.flatMapLatest {
@@ -53,7 +71,13 @@ fun TrendingPresenter(
     }.cachedIn(scope)
   }
 
-  return SearchItemState(data = pagingData.collectAsLazyPagingItems())
+  return SearchItemState(
+    data = pagingData.collectAsLazyPagingItems(),
+    searchInputState = state
+  )
 }
 
-data class SearchItemState(val data: LazyPagingItems<UiTrend>)
+data class SearchItemState(
+  val data: LazyPagingItems<UiTrend>,
+  val searchInputState: SearchInputState
+)
