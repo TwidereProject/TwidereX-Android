@@ -22,17 +22,18 @@ package com.twidere.twiderex.scenes.search.tabs
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusImageList
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
+import com.twidere.twiderex.extensions.rememberPresenter
 import com.twidere.twiderex.preferences.model.DisplayPreferences
+import com.twidere.twiderex.scenes.search.tabs.presenter.TwitterSearchMediaPresenter
+import com.twidere.twiderex.scenes.search.tabs.presenter.TwitterSearchMediaState
 import com.twidere.twiderex.ui.LocalVideoPlayback
-import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
-import org.koin.core.parameter.parametersOf
 
 class TwitterSearchMediaItem : SearchSceneItem {
   @Composable
@@ -42,20 +43,23 @@ class TwitterSearchMediaItem : SearchSceneItem {
 
   @Composable
   override fun Content(keyword: String) {
-    val viewModel: TwitterSearchMediaViewModel = getViewModel {
-      parametersOf(keyword)
-    }
-    val source = viewModel.source.collectAsLazyPagingItems()
-    CompositionLocalProvider(
-      LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
-    ) {
-      SwipeToRefreshLayout(
-        refreshingState = source.loadState.refresh is LoadState.Loading,
-        onRefresh = {
-          source.refreshOrRetry()
-        }
+
+    val state by rememberPresenter {
+      TwitterSearchMediaPresenter(keyword = keyword)
+    }.collectAsState()
+
+    (state as? TwitterSearchMediaState.Data)?.let {
+      CompositionLocalProvider(
+        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
       ) {
-        LazyUiStatusImageList(items = source)
+        SwipeToRefreshLayout(
+          refreshingState = it.data.loadState.refresh is LoadState.Loading,
+          onRefresh = {
+            it.data.refreshOrRetry()
+          }
+        ) {
+          LazyUiStatusImageList(items = it.data)
+        }
       }
     }
   }

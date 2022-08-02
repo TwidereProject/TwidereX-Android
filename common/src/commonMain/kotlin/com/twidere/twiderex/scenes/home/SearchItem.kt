@@ -39,12 +39,10 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -54,16 +52,16 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.component.trend.MastodonTrendItem
 import com.twidere.twiderex.component.trend.TwitterTrendItem
-import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.scenes.home.presenter.SearchItemState
+import com.twidere.twiderex.scenes.home.presenter.TrendingPresenter
+import com.twidere.twiderex.scenes.search.presenter.SearchInputEvent
+import com.twidere.twiderex.scenes.search.presenter.SearchInputState
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
-import com.twidere.twiderex.viewmodel.trend.TrendViewModel
-import org.koin.core.parameter.parametersOf
 
 class SearchItem : HomeNavigationItem() {
 
@@ -108,15 +106,11 @@ fun SearchScene() {
 @Composable
 fun SearchSceneContent() {
   val account = LocalActiveAccount.current ?: return
-  val viewModel: SearchInputViewModel = getViewModel {
-    parametersOf("")
+  val (state, channel) = rememberPresenterState { TrendingPresenter(it) }
+  if (state !is SearchItemState.Data) {
+    return
   }
-  val trendViewModel: TrendViewModel = getViewModel()
-  val source by viewModel.savedSource.observeAsState(initial = emptyList())
-  val trends = trendViewModel.source.collectAsLazyPagingItems()
   val navigator = LocalNavigator.current
-  val searchCount = 3
-  val expandSearch by viewModel.expandSearch.observeAsState(false)
   Scaffold(
     topBar = {
       AppBar(
@@ -160,58 +154,67 @@ fun SearchSceneContent() {
     }
   ) {
     LazyColumn {
-      item {
-        if (source.isNotEmpty()) ListItem {
-          Text(
-            text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_saved_search),
-            style = MaterialTheme.typography.button
-          )
-        }
-      }
-      items(items = source.filterIndexed { index, _ -> index < searchCount || expandSearch }) {
-        ListItem(
-          modifier = Modifier.clickable(
-            onClick = {
-              viewModel.addOrUpgrade(it.content)
-              navigator.search(it.content)
-            }
-          ),
-          trailing = {
-            IconButton(
-              onClick = {
-                viewModel.remove(it)
-              }
-            ) {
-              Icon(
-                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_trash_can),
-                contentDescription = stringResource(
-                  res = com.twidere.twiderex.MR.strings.common_controls_actions_remove
-                )
-              )
-            }
-          },
-          text = {
+      if (state.searchInputState is SearchInputState.Data) {
+        item {
+          if (state.searchInputState.savedSource.isNotEmpty()) ListItem {
             Text(
-              text = it.content,
-              style = MaterialTheme.typography.subtitle1
+              text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_saved_search),
+              style = MaterialTheme.typography.button
             )
-          },
-        )
-      }
-      item {
-        if (source.size > searchCount) ListItem(
-          modifier = Modifier.clickable {
-            viewModel.expandSearch.value = !expandSearch
           }
+        }
+        items(
+          items = state.searchInputState.savedSource
         ) {
-          Text(
-            text = if (expandSearch) stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_less) else stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_more),
-            style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.primary
+          ListItem(
+            modifier = Modifier.clickable(
+              onClick = {
+                channel.trySend(SearchInputEvent.AddOrUpgradeEvent(it.content))
+                navigator.search(it.content)
+              }
+
+            ),
+            trailing = {
+              IconButton(
+                onClick = {
+                  channel.trySend(SearchInputEvent.RemoveEvent(it))
+                }
+              ) {
+                Icon(
+                  painter = painterResource(res = com.twidere.twiderex.MR.files.ic_trash_can),
+                  contentDescription = stringResource(
+                    res = com.twidere.twiderex.MR.strings.common_controls_actions_remove
+                  )
+                )
+              }
+            },
+            text = {
+              Text(
+                text = it.content,
+                style = MaterialTheme.typography.subtitle1
+              )
+            },
           )
         }
+        item {
+          if (state.searchInputState.showExpand) ListItem(
+            modifier = Modifier.clickable {
+              channel.trySend(SearchInputEvent.ChangeExpand(!state.searchInputState.expandSearch))
+            }
+          ) {
+            Text(
+              text = if (state.searchInputState.expandSearch)
+                stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_less)
+              else
+                stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_more),
+              style = MaterialTheme.typography.subtitle1,
+              color = MaterialTheme.colors.primary
+            )
+          }
+        }
       }
-      if (trends.itemCount > 0) {
+
+      if (state.data.itemCount > 0) {
         item {
           Column {
             Divider()
@@ -234,13 +237,13 @@ fun SearchSceneContent() {
           }
         }
       }
-      items(trends) {
+      items(state.data) {
         it?.let { trend ->
           when (account.type) {
             PlatformType.Twitter -> TwitterTrendItem(
               trend = it,
               onClick = {
-                viewModel.addOrUpgrade(trend.query)
+                channel.trySend(SearchInputEvent.AddOrUpgradeEvent(trend.query))
                 navigator.search(trend.query)
               }
             )
