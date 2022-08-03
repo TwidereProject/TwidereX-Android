@@ -32,47 +32,39 @@ import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.currentPlatform
-import com.twidere.twiderex.viewmodel.timeline.HomeTimelinePresenter
-import com.twidere.twiderex.viewmodel.timeline.HomeTimelineState
 import com.twidere.twiderex.viewmodel.timeline.TimeLineEvent
 import com.twidere.twiderex.viewmodel.timeline.TimelineScrollState
-import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
+import com.twidere.twiderex.viewmodel.timeline.TimelineState
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 
 @Composable
 fun TimelineComponent(
-  viewModel: TimelineViewModel,
+  state: TimelineState,
+  channel: Channel<TimeLineEvent>,
   contentPadding: PaddingValues = PaddingValues(0.dp),
   lazyListController: LazyListController? = null,
 ) {
-
-  val (state, channel) = rememberPresenterState<HomeTimelineState, TimeLineEvent> {
-    HomeTimelinePresenter(it)
-  }
-  if (state !is HomeTimelineState.Data) {
-    return
-  }
   SwipeToRefreshLayout(
-    refreshingState = state.state.source.loadState.refresh is LoadState.Loading,
+    refreshingState = state.source.loadState.refresh is LoadState.Loading,
     onRefresh = {
-      state.state.source.refreshOrRetry()
+      state.source.refreshOrRetry()
     },
     refreshIndicatorPadding = contentPadding
   ) {
     val listState = rememberLazyListState()
     LaunchedEffect(Unit) {
-      state.state.timelineScrollState?.let {
+      state.timelineScrollState?.let {
         listState.scrollToItem(
           it.firstVisibleItemIndex,
           it.firstVisibleItemScrollOffset
         )
       }
     }
-    if (state.state.source.itemCount > 0) {
+    if (state.source.itemCount > 0) {
       LaunchedEffect(lazyListController) {
         lazyListController?.listState = listState
       }
@@ -110,10 +102,10 @@ fun TimelineComponent(
       }
     }
     LazyUiStatusList(
-      items = state.state.source,
+      items = state.source,
       state = listState,
       contentPadding = contentPadding,
-      loadingBetween = state.state.loadingBetween,
+      loadingBetween = state.loadingBetween,
       onLoadBetweenClicked = { current, next ->
         channel.trySend(TimeLineEvent.LoadBetween(current, next))
       },

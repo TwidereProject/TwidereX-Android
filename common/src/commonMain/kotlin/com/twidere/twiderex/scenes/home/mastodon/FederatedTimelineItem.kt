@@ -31,12 +31,14 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.timeline.mastodon.FederatedTimelineViewModel
+import com.twidere.twiderex.viewmodel.timeline.TimeLineEvent
+import com.twidere.twiderex.viewmodel.timeline.mastodon.FederatedTimelinePresenter
+import com.twidere.twiderex.viewmodel.timeline.mastodon.FederatedTimelineState
 
 class FederatedTimelineItem : HomeNavigationItem() {
   @Composable
@@ -88,6 +90,15 @@ fun FederatedTimelineContent(
   if (account.service !is MastodonService) {
     return
   }
-  val viewModel: FederatedTimelineViewModel = getViewModel()
-  TimelineComponent(viewModel = viewModel, lazyListController = lazyListController)
+  val (state, channel) = rememberPresenterState<FederatedTimelineState, TimeLineEvent> {
+    FederatedTimelinePresenter(it)
+  }
+  if (state !is FederatedTimelineState.Data) {
+    return
+  }
+  TimelineComponent(
+    state = state.state,
+    channel = channel,
+    lazyListController = lazyListController
+  )
 }

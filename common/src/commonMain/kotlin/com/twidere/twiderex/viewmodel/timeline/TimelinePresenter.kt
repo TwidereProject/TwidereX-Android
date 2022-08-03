@@ -24,7 +24,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -41,10 +43,18 @@ import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.paging.toUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 
 private const val timelinePageSize = 20
 private const val timelineInitialLoadSize = 40
+
+data class TimelineScrollState(
+  val firstVisibleItemIndex: Int = 0,
+  val firstVisibleItemScrollOffset: Int = 0,
+) {
+  companion object {
+    val Zero = TimelineScrollState(0, 0)
+  }
+}
 
 @OptIn(ExperimentalPagingApi::class)
 @Composable
@@ -70,23 +80,27 @@ fun TimelinePresenter(
     emptyList()
   )
 
-  val timeLineScrollState by remember {
-    flow<TimelineScrollState?> {
-      savedStateKey?.let {
-        val firstVisibleItemIndexKey = intPreferencesKey("${it}_firstVisibleItemIndex")
-        val firstVisibleItemScrollOffsetKey =
-          intPreferencesKey("${it}_firstVisibleItemScrollOffset")
-        dataStore.data.firstOrNull()?.let {
-          val firstVisibleItemIndex = it[firstVisibleItemIndexKey] ?: 0
-          val firstVisibleItemScrollOffset = it[firstVisibleItemScrollOffsetKey] ?: 0
-          TimelineScrollState(
-            firstVisibleItemIndex = firstVisibleItemIndex,
-            firstVisibleItemScrollOffset = firstVisibleItemScrollOffset,
-          )
-        }
+  var timeLineScrollState by remember {
+    mutableStateOf(TimelineScrollState.Zero)
+  }
+
+  LaunchedEffect(Unit) {
+    savedStateKey?.let {
+      val firstVisibleItemIndexKey = intPreferencesKey("${it}_firstVisibleItemIndex")
+      val firstVisibleItemScrollOffsetKey =
+        intPreferencesKey("${it}_firstVisibleItemScrollOffset")
+      dataStore.data.firstOrNull()?.let {
+        val firstVisibleItemIndex = it[firstVisibleItemIndexKey] ?: 0
+        val firstVisibleItemScrollOffset = it[firstVisibleItemScrollOffsetKey] ?: 0
+        TimelineScrollState(
+          firstVisibleItemIndex = firstVisibleItemIndex,
+          firstVisibleItemScrollOffset = firstVisibleItemScrollOffset,
+        )
       }
+    }?.let {
+      timeLineScrollState = it
     }
-  }.collectAsState(null)
+  }
 
   LaunchedEffect(Unit) {
     event.collect {

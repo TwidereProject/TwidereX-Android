@@ -31,11 +31,13 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineViewModel
+import com.twidere.twiderex.viewmodel.timeline.NotificationTimelinePresenter
+import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineState
+import com.twidere.twiderex.viewmodel.timeline.TimeLineEvent
 
 class AllNotificationItem : HomeNavigationItem() {
   @Composable
@@ -85,9 +87,15 @@ fun AllNotificationScene() {
 fun AllNotificationSceneContent(
   lazyListController: LazyListController? = null,
 ) {
-  val viewModel: NotificationTimelineViewModel = getViewModel()
+  val (state, channel) = rememberPresenterState<NotificationTimelineState, TimeLineEvent> {
+    NotificationTimelinePresenter(it)
+  }
+  if (state !is NotificationTimelineState.Data) {
+    return
+  }
   TimelineComponent(
-    viewModel = viewModel,
+    state = state.state,
+    channel = channel,
     lazyListController = lazyListController,
   )
 }
