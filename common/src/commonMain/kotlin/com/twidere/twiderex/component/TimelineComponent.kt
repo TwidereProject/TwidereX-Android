@@ -25,26 +25,23 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
-import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.refreshOrRetry
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.currentPlatform
+import com.twidere.twiderex.viewmodel.timeline.HomeTimelinePresenter
+import com.twidere.twiderex.viewmodel.timeline.HomeTimelineState
+import com.twidere.twiderex.viewmodel.timeline.TimeLineEvent
 import com.twidere.twiderex.viewmodel.timeline.TimelineScrollState
 import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 @Composable
 fun TimelineComponent(
@@ -52,27 +49,30 @@ fun TimelineComponent(
   contentPadding: PaddingValues = PaddingValues(0.dp),
   lazyListController: LazyListController? = null,
 ) {
-  val items = viewModel.source.collectAsLazyPagingItems()
-  val loadingBetween by viewModel.loadingBetween.observeAsState(initial = listOf())
+
+  val (state, channel) = rememberPresenterState<HomeTimelineState, TimeLineEvent> {
+    HomeTimelinePresenter(it)
+  }
+  if (state !is HomeTimelineState.Data) {
+    return
+  }
   SwipeToRefreshLayout(
-    refreshingState = items.loadState.refresh is LoadState.Loading,
+    refreshingState = state.state.source.loadState.refresh is LoadState.Loading,
     onRefresh = {
-      items.refreshOrRetry()
+      state.state.source.refreshOrRetry()
     },
     refreshIndicatorPadding = contentPadding
   ) {
     val listState = rememberLazyListState()
     LaunchedEffect(Unit) {
-      viewModel.provideScrollState()
-        .filterNotNull()
-        .collectLatest {
-          listState.scrollToItem(
-            it.firstVisibleItemIndex,
-            it.firstVisibleItemScrollOffset
-          )
-        }
+      state.state.timelineScrollState?.let {
+        listState.scrollToItem(
+          it.firstVisibleItemIndex,
+          it.firstVisibleItemScrollOffset
+        )
+      }
     }
-    if (items.itemCount > 0) {
+    if (state.state.source.itemCount > 0) {
       LaunchedEffect(lazyListController) {
         lazyListController?.listState = listState
       }
@@ -84,10 +84,12 @@ fun TimelineComponent(
         .filter { !it }
         .filter { listState.layoutInfo.totalItemsCount != 0 }
         .collect {
-          viewModel.saveScrollState(
-            TimelineScrollState(
-              firstVisibleItemIndex = listState.firstVisibleItemIndex,
-              firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
+          channel.trySend(
+            TimeLineEvent.SaveScrollState(
+              TimelineScrollState(
+                firstVisibleItemIndex = listState.firstVisibleItemIndex,
+                firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
+              )
             )
           )
         }
@@ -96,24 +98,24 @@ fun TimelineComponent(
     if (currentPlatform == Platform.JVM) {
       DisposableEffect(Unit) {
         onDispose {
-          viewModel.viewModelScope.launch {
-            viewModel.saveScrollState(
+          channel.trySend(
+            TimeLineEvent.SaveScrollState(
               TimelineScrollState(
                 firstVisibleItemIndex = listState.firstVisibleItemIndex,
                 firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
               )
             )
-          }
+          )
         }
       }
     }
     LazyUiStatusList(
-      items = items,
+      items = state.state.source,
       state = listState,
       contentPadding = contentPadding,
-      loadingBetween = loadingBetween,
+      loadingBetween = state.state.loadingBetween,
       onLoadBetweenClicked = { current, next ->
-        viewModel.loadBetween(current, next)
+        channel.trySend(TimeLineEvent.LoadBetween(current, next))
       },
     )
   }

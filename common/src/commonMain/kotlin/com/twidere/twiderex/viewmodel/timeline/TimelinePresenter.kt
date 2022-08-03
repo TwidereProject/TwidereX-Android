@@ -39,52 +39,40 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.paging.toUi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.mapNotNull
 
 private const val timelinePageSize = 20
 private const val timelineInitialLoadSize = 40
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalPagingApi::class)
+@OptIn(ExperimentalPagingApi::class)
 @Composable
 fun TimelinePresenter(
   event: Flow<TimeLineEvent>,
   dataStore: DataStore<Preferences> = get(),
-  pagingMediator: Flow<PagingWithGapMediator?>,
-  savedStateKey: Flow<String?>,
+  pagingMediator: PagingWithGapMediator,
+  savedStateKey: String?,
 ): TimelineState {
 
   val source = remember {
-    pagingMediator.mapNotNull {
-      it
-    }.flatMapLatest {
-      it.pager(
-        config = PagingConfig(
-          pageSize = timelinePageSize,
-          initialLoadSize = timelineInitialLoadSize
-        )
-      ).toUi()
-    }
+    pagingMediator.pager(
+      config = PagingConfig(
+        pageSize = timelinePageSize,
+        initialLoadSize = timelineInitialLoadSize
+      )
+    ).toUi()
   }.collectAsLazyPagingItems()
 
   val loadingBetween by remember {
-    pagingMediator.mapNotNull {
-      it
-    }.flatMapLatest {
-      it.loadingBetween
-    }
+    pagingMediator.loadingBetween
   }.collectAsState(
     emptyList()
   )
 
   val timeLineScrollState by remember {
     flow<TimelineScrollState?> {
-      savedStateKey.mapLatest {
+      savedStateKey?.let {
         val firstVisibleItemIndexKey = intPreferencesKey("${it}_firstVisibleItemIndex")
         val firstVisibleItemScrollOffsetKey =
           intPreferencesKey("${it}_firstVisibleItemScrollOffset")
@@ -104,7 +92,7 @@ fun TimelinePresenter(
     event.collect {
       when (it) {
         is TimeLineEvent.LoadBetween -> {
-          pagingMediator.firstOrNull()?.loadBetween(
+          pagingMediator.loadBetween(
             pageSize = timelinePageSize,
             maxStatusKey = it.maxStatusKey,
             sinceStatusKey = it.sinceStatueKey
@@ -112,7 +100,7 @@ fun TimelinePresenter(
         }
         is TimeLineEvent.SaveScrollState -> {
           dataStore.edit { preferences ->
-            savedStateKey.firstOrNull()?.let { key ->
+            savedStateKey?.let { key ->
               val firstVisibleItemIndexKey = intPreferencesKey("${key}_firstVisibleItemIndex")
               val firstVisibleItemScrollOffsetKey =
                 intPreferencesKey("${key}_firstVisibleItemScrollOffset")
