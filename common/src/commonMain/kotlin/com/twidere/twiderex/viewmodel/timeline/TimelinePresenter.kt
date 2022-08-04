@@ -104,18 +104,6 @@ fun TimelinePresenter(
     }
   }
 
-  suspend fun saveState(it: TimelineScrollState) {
-    dataStore.edit { preferences ->
-      savedStateKey?.let { key ->
-        val firstVisibleItemIndexKey = intPreferencesKey("$key$FIRST_VISIBLE_KEY_SUFFIX")
-        val firstVisibleItemScrollOffsetKey =
-          intPreferencesKey("$key$FIRST_OFFSET_KEY_SUFFIX")
-        preferences[firstVisibleItemIndexKey] = it.firstVisibleItemIndex
-        preferences[firstVisibleItemScrollOffsetKey] = it.firstVisibleItemScrollOffset
-      }
-    }
-  }
-
   LaunchedEffect(Unit) {
     // TODO FIXME #listState 20211119: listState.isScrollInProgress is always false on desktop
     //  - https://github.com/JetBrains/compose-jb/issues/1423
@@ -124,12 +112,15 @@ fun TimelinePresenter(
       .filter { !it }
       .filter { listState.layoutInfo.totalItemsCount != 0 }
       .collect {
-        saveState(
-          TimelineScrollState(
-            firstVisibleItemIndex = listState.firstVisibleItemIndex,
-            firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
-          )
-        )
+        dataStore.edit { preferences ->
+          savedStateKey?.let { key ->
+            val firstVisibleItemIndexKey = intPreferencesKey("$key$FIRST_VISIBLE_KEY_SUFFIX")
+            val firstVisibleItemScrollOffsetKey =
+              intPreferencesKey("$key$FIRST_OFFSET_KEY_SUFFIX")
+            preferences[firstVisibleItemIndexKey] = listState.firstVisibleItemIndex
+            preferences[firstVisibleItemScrollOffsetKey] = listState.firstVisibleItemScrollOffset
+          }
+        }
       }
   }
 
