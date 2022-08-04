@@ -21,25 +21,17 @@
 package com.twidere.twiderex.component
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.kmp.Platform
-import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.viewmodel.timeline.TimeLineEvent
-import com.twidere.twiderex.viewmodel.timeline.TimelineScrollState
 import com.twidere.twiderex.viewmodel.timeline.TimelineState
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 
 @Composable
 fun TimelineComponent(
@@ -55,55 +47,16 @@ fun TimelineComponent(
     },
     refreshIndicatorPadding = contentPadding
   ) {
-    val listState = rememberLazyListState()
-    LaunchedEffect(Unit) {
-      state.timelineScrollState?.let {
-        listState.scrollToItem(
-          it.firstVisibleItemIndex,
-          it.firstVisibleItemScrollOffset
-        )
-      }
-    }
+
     if (state.source.itemCount > 0) {
       LaunchedEffect(lazyListController) {
-        lazyListController?.listState = listState
+        lazyListController?.listState = state.listState
       }
     }
-    LaunchedEffect(Unit) {
-      // TODO FIXME #listState 20211119: listState.isScrollInProgress is always false on desktop - https://github.com/JetBrains/compose-jb/issues/1423
-      snapshotFlow { listState.isScrollInProgress }
-        .distinctUntilChanged()
-        .filter { !it }
-        .filter { listState.layoutInfo.totalItemsCount != 0 }
-        .collect {
-          channel.trySend(
-            TimeLineEvent.SaveScrollState(
-              TimelineScrollState(
-                firstVisibleItemIndex = listState.firstVisibleItemIndex,
-                firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
-              )
-            )
-          )
-        }
-    }
-    // TODO: Temporary solution， remove after [FIXME #listState] is fixed
-    if (currentPlatform == Platform.JVM) {
-      DisposableEffect(Unit) {
-        onDispose {
-          channel.trySend(
-            TimeLineEvent.SaveScrollState(
-              TimelineScrollState(
-                firstVisibleItemIndex = listState.firstVisibleItemIndex,
-                firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
-              )
-            )
-          )
-        }
-      }
-    }
+
     LazyUiStatusList(
       items = state.source,
-      state = listState,
+      state = state.listState,
       contentPadding = contentPadding,
       loadingBetween = state.loadingBetween,
       onLoadBetweenClicked = { current, next ->
