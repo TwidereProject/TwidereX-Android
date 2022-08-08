@@ -23,7 +23,6 @@ package com.twidere.twiderex.scenes.home
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
-import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.component.TimelineComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -33,11 +32,11 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.HomeNavigationItem
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.timeline.NotificationTimelinePresenter
-import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineState
+import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
 import com.twidere.twiderex.viewmodel.timeline.TimeLineEvent
+import com.twidere.twiderex.viewmodel.timeline.TimelinePresenter
+import com.twidere.twiderex.viewmodel.timeline.TimelineState
 
 class AllNotificationItem : HomeNavigationItem() {
   @Composable
@@ -53,10 +52,6 @@ class AllNotificationItem : HomeNavigationItem() {
 
   @Composable
   override fun Content() {
-    val account = LocalActiveAccount.current ?: return
-    if (account.service !is NotificationService) {
-      return
-    }
     AllNotificationSceneContent(
       lazyListController = lazyListController,
     )
@@ -87,14 +82,11 @@ fun AllNotificationScene() {
 fun AllNotificationSceneContent(
   lazyListController: LazyListController? = null,
 ) {
-  val (state, channel) = rememberPresenterState<NotificationTimelineState, TimeLineEvent> {
-    NotificationTimelinePresenter(it)
-  }
-  if (state !is NotificationTimelineState.Data) {
-    return
+  val (state, channel) = rememberPresenterState<TimelineState, TimeLineEvent> {
+    TimelinePresenter(it, savedStateKeyType = SavedStateKeyType.NOTIFICATION)
   }
   TimelineComponent(
-    state = state.state,
+    state = state,
     channel = channel,
     lazyListController = lazyListController,
   )

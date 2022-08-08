@@ -40,6 +40,9 @@ fun TimelineComponent(
   contentPadding: PaddingValues = PaddingValues(0.dp),
   lazyListController: LazyListController? = null,
 ) {
+  if (state !is TimelineState.Data) {
+    return
+  }
   SwipeToRefreshLayout(
     refreshingState = state.source.loadState.refresh is LoadState.Loading,
     onRefresh = {

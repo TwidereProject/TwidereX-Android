@@ -40,9 +40,10 @@ import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.timeline.HomeTimelinePresenter
-import com.twidere.twiderex.viewmodel.timeline.HomeTimelineState
+import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
 import com.twidere.twiderex.viewmodel.timeline.TimeLineEvent
+import com.twidere.twiderex.viewmodel.timeline.TimelinePresenter
+import com.twidere.twiderex.viewmodel.timeline.TimelineState
 
 class HomeTimelineItem : HomeNavigationItem() {
 
@@ -114,14 +115,11 @@ private fun HomeTimelineFab() {
 fun HomeTimelineSceneContent(
   lazyListController: LazyListController? = null
 ) {
-  val (state, channel) = rememberPresenterState<HomeTimelineState, TimeLineEvent> {
-    HomeTimelinePresenter(it)
-  }
-  if (state !is HomeTimelineState.Data) {
-    return
+  val (state, channel) = rememberPresenterState<TimelineState, TimeLineEvent> {
+    TimelinePresenter(it, savedStateKeyType = SavedStateKeyType.HOME)
   }
   TimelineComponent(
-    state = state.state,
+    state = state,
     channel = channel,
     lazyListController = lazyListController,
   )

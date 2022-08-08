@@ -25,7 +25,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.datastore.core.DataStore
@@ -36,13 +38,27 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingConfig
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.twidere.services.mastodon.MastodonService
+import com.twidere.services.microblog.NotificationService
+import com.twidere.services.microblog.TimelineService
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.NotificationCursorType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.paging.toUi
+import com.twidere.twiderex.paging.mediator.timeline.HomeTimelineMediator
+import com.twidere.twiderex.paging.mediator.timeline.MentionTimelineMediator
+import com.twidere.twiderex.paging.mediator.timeline.NotificationTimelineMediator
+import com.twidere.twiderex.paging.mediator.timeline.mastodon.FederatedTimelineMediator
+import com.twidere.twiderex.paging.mediator.timeline.mastodon.LocalTimelineMediator
+import com.twidere.twiderex.repository.NotificationRepository
+import com.twidere.twiderex.scenes.CurrentAccountPresenter
+import com.twidere.twiderex.scenes.CurrentAccountState
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
@@ -57,45 +73,131 @@ data class TimelineScrollState(
   val firstVisibleItemScrollOffset: Int = 0,
 )
 
+enum class SavedStateKeyType(val key: String) {
+  MENTIONS("_mentions"),
+  HOME("_home"),
+  NOTIFICATION("_notification"),
+  FEDERATED("_federated"),
+  LOCAL("_local")
+}
+
 @OptIn(ExperimentalPagingApi::class)
 @Composable
 fun TimelinePresenter(
   event: Flow<TimeLineEvent>,
   dataStore: DataStore<Preferences> = get(),
-  pagingMediator: PagingWithGapMediator,
-  savedStateKey: String?,
+  database: CacheDatabase = get(),
+  notificationRepository: NotificationRepository = get(),
+  savedStateKeyType: SavedStateKeyType,
 ): TimelineState {
 
-  val source = remember {
+  val accountState = CurrentAccountPresenter()
+
+  if (accountState !is CurrentAccountState.Account) {
+    return TimelineState.NoAccount
+  }
+
+  if (
+    accountState.account.type == PlatformType.Twitter &&
+    (
+      savedStateKeyType == SavedStateKeyType.FEDERATED ||
+        savedStateKeyType == SavedStateKeyType.LOCAL ||
+        savedStateKeyType == SavedStateKeyType.NOTIFICATION
+      )
+  ) {
+    return TimelineState.NoAccount
+  }
+
+  val pagingMediator by derivedStateOf {
+    when (savedStateKeyType) {
+      SavedStateKeyType.MENTIONS -> {
+        MentionTimelineMediator(
+          service = accountState.account.service as TimelineService,
+          accountKey = accountState.account.accountKey,
+          database = database,
+          addCursorIfNeed = { data, accountKey ->
+            notificationRepository.addCursorIfNeeded(
+              accountKey,
+              NotificationCursorType.Mentions,
+              data.status.statusId,
+              data.status.timestamp,
+            )
+          }
+        )
+      }
+      SavedStateKeyType.HOME -> {
+        HomeTimelineMediator(
+          accountState.account.service as TimelineService,
+          accountState.account.accountKey,
+          database,
+        )
+      }
+      SavedStateKeyType.NOTIFICATION -> {
+        NotificationTimelineMediator(
+          service = (accountState.account.service as NotificationService),
+          accountKey = accountState.account.accountKey,
+          database = database,
+          addCursorIfNeed = { data, accountKey ->
+            notificationRepository.addCursorIfNeeded(
+              accountKey,
+              NotificationCursorType.General,
+              data.status.statusId,
+              data.status.timestamp
+            )
+          }
+        )
+      }
+      SavedStateKeyType.FEDERATED -> {
+        FederatedTimelineMediator(
+          (accountState.account.service as MastodonService),
+          accountState.account.accountKey,
+          database,
+        )
+      }
+      SavedStateKeyType.LOCAL -> {
+        LocalTimelineMediator(
+          (accountState.account.service as MastodonService),
+          accountState.account.accountKey,
+          database,
+        )
+      }
+    }
+  }
+
+  val savedStateKey by derivedStateOf {
+    "${accountState.account.accountKey}${savedStateKeyType.key}"
+  }
+
+  val source by derivedStateOf {
     pagingMediator.pager(
       config = PagingConfig(
         pageSize = timelinePageSize,
         initialLoadSize = timelineInitialLoadSize
       )
     ).toUi()
-  }.collectAsLazyPagingItems()
+  }
 
-  val loadingBetween by remember {
+  val loadingBetween by remember(pagingMediator) {
     pagingMediator.loadingBetween
   }.collectAsState(
     emptyList()
   )
 
-  val listState = rememberLazyListState()
+  val listState = key(accountState) {
+    rememberLazyListState()
+  }
 
-  LaunchedEffect(Unit) {
-    savedStateKey?.let {
-      val firstVisibleItemIndexKey = intPreferencesKey("$it$FIRST_VISIBLE_KEY_SUFFIX")
-      val firstVisibleItemScrollOffsetKey =
-        intPreferencesKey("$it$FIRST_OFFSET_KEY_SUFFIX")
-      dataStore.data.firstOrNull()?.let {
-        val firstVisibleItemIndex = it[firstVisibleItemIndexKey] ?: 0
-        val firstVisibleItemScrollOffset = it[firstVisibleItemScrollOffsetKey] ?: 0
-        TimelineScrollState(
-          firstVisibleItemIndex = firstVisibleItemIndex,
-          firstVisibleItemScrollOffset = firstVisibleItemScrollOffset,
-        )
-      }
+  LaunchedEffect(accountState) {
+    val firstVisibleItemIndexKey = intPreferencesKey("$savedStateKey$FIRST_VISIBLE_KEY_SUFFIX")
+    val firstVisibleItemScrollOffsetKey =
+      intPreferencesKey("$savedStateKey$FIRST_OFFSET_KEY_SUFFIX")
+    dataStore.data.firstOrNull()?.let {
+      val firstVisibleItemIndex = it[firstVisibleItemIndexKey] ?: 0
+      val firstVisibleItemScrollOffset = it[firstVisibleItemScrollOffsetKey] ?: 0
+      TimelineScrollState(
+        firstVisibleItemIndex = firstVisibleItemIndex,
+        firstVisibleItemScrollOffset = firstVisibleItemScrollOffset,
+      )
     }?.let {
       listState.scrollToItem(
         it.firstVisibleItemIndex,
@@ -104,7 +206,7 @@ fun TimelinePresenter(
     }
   }
 
-  LaunchedEffect(Unit) {
+  LaunchedEffect(accountState) {
     // TODO FIXME #listState 20211119: listState.isScrollInProgress is always false on desktop
     //  - https://github.com/JetBrains/compose-jb/issues/1423
     snapshotFlow { listState.isScrollInProgress }
@@ -113,19 +215,17 @@ fun TimelinePresenter(
       .filter { listState.layoutInfo.totalItemsCount != 0 }
       .collect {
         dataStore.edit { preferences ->
-          savedStateKey?.let { key ->
-            val firstVisibleItemIndexKey = intPreferencesKey("$key$FIRST_VISIBLE_KEY_SUFFIX")
-            val firstVisibleItemScrollOffsetKey =
-              intPreferencesKey("$key$FIRST_OFFSET_KEY_SUFFIX")
-            preferences[firstVisibleItemIndexKey] = listState.firstVisibleItemIndex
-            preferences[firstVisibleItemScrollOffsetKey] = listState.firstVisibleItemScrollOffset
-          }
+          val firstVisibleItemIndexKey = intPreferencesKey("$savedStateKey$FIRST_VISIBLE_KEY_SUFFIX")
+          val firstVisibleItemScrollOffsetKey =
+            intPreferencesKey("$savedStateKey$FIRST_OFFSET_KEY_SUFFIX")
+          preferences[firstVisibleItemIndexKey] = listState.firstVisibleItemIndex
+          preferences[firstVisibleItemScrollOffsetKey] = listState.firstVisibleItemScrollOffset
         }
       }
   }
 
   LaunchedEffect(Unit) {
-    event.collect {
+    event.catch {}.collect {
       when (it) {
         is TimeLineEvent.LoadBetween -> {
           pagingMediator.loadBetween(
@@ -138,8 +238,8 @@ fun TimelinePresenter(
     }
   }
 
-  return TimelineState(
-    source = source,
+  return TimelineState.Data(
+    source = source.collectAsLazyPagingItems(),
     loadingBetween = loadingBetween,
     listState = listState
   )
@@ -152,8 +252,11 @@ interface TimeLineEvent {
   ) : TimeLineEvent
 }
 
-data class TimelineState(
-  val source: LazyPagingItems<UiStatus>,
-  val loadingBetween: List<MicroBlogKey>,
-  val listState: LazyListState
-)
+interface TimelineState {
+  data class Data(
+    val source: LazyPagingItems<UiStatus>,
+    val loadingBetween: List<MicroBlogKey>,
+    val listState: LazyListState
+  ) : TimelineState
+  object NoAccount : TimelineState
+}
