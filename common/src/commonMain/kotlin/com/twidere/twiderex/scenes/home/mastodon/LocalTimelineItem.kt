@@ -31,15 +31,11 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
-import com.twidere.twiderex.viewmodel.timeline.TimeLineEvent
-import com.twidere.twiderex.viewmodel.timeline.TimelinePresenter
-import com.twidere.twiderex.viewmodel.timeline.TimelineState
 
 class LocalTimelineItem : HomeNavigationItem() {
   @Composable
@@ -91,13 +87,9 @@ fun LocalTimelineContent(
   if (account.service !is MastodonService) {
     return
   }
-  val (state, channel) = rememberPresenterState<TimelineState, TimeLineEvent> {
-    TimelinePresenter(it, savedStateKeyType = SavedStateKeyType.LOCAL)
-  }
 
   TimelineComponent(
-    state = state,
-    channel = channel,
-    lazyListController = lazyListController
+    lazyListController = lazyListController,
+    savedStateKeyType = SavedStateKeyType.LOCAL
   )
 }
