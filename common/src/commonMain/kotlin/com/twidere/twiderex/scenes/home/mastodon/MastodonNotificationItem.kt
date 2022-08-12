@@ -27,7 +27,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.painter.Painter
-import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -96,13 +95,10 @@ fun MastodonNotificationSceneContent(
   setLazyListController: ((lazyListController: LazyListController) -> Unit)? = null,
 ) {
   val account = LocalActiveAccount.current ?: return
-  if (account.service !is NotificationService) {
-    return
-  }
-  val tabs = remember {
+  val tabs = remember(account) {
     listOf(
       AllNotificationItem(),
-      MentionItem(),
+      MentionItem()
     )
   }
   val pagerState = rememberPagerState(pageCount = tabs.size)
