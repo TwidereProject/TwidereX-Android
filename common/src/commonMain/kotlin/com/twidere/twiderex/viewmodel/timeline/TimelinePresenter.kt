@@ -108,73 +108,79 @@ fun TimelinePresenter(
     return TimelineState.NoAccount
   }
 
-  val pagingMediator by derivedStateOf {
-    when (savedStateKeyType) {
-      SavedStateKeyType.MENTIONS -> {
-        MentionTimelineMediator(
-          service = accountState.account.service as TimelineService,
-          accountKey = accountState.account.accountKey,
-          database = database,
-          addCursorIfNeed = { data, accountKey ->
-            notificationRepository.addCursorIfNeeded(
-              accountKey,
-              NotificationCursorType.Mentions,
-              data.status.statusId,
-              data.status.timestamp,
-            )
-          }
-        )
-      }
-      SavedStateKeyType.HOME -> {
-        HomeTimelineMediator(
-          accountState.account.service as TimelineService,
-          accountState.account.accountKey,
-          database,
-        )
-      }
-      SavedStateKeyType.NOTIFICATION -> {
-        NotificationTimelineMediator(
-          service = (accountState.account.service as NotificationService),
-          accountKey = accountState.account.accountKey,
-          database = database,
-          addCursorIfNeed = { data, accountKey ->
-            notificationRepository.addCursorIfNeeded(
-              accountKey,
-              NotificationCursorType.General,
-              data.status.statusId,
-              data.status.timestamp
-            )
-          }
-        )
-      }
-      SavedStateKeyType.FEDERATED -> {
-        FederatedTimelineMediator(
-          (accountState.account.service as MastodonService),
-          accountState.account.accountKey,
-          database,
-        )
-      }
-      SavedStateKeyType.LOCAL -> {
-        LocalTimelineMediator(
-          (accountState.account.service as MastodonService),
-          accountState.account.accountKey,
-          database,
-        )
+  val pagingMediator by remember(accountState) {
+    derivedStateOf {
+      when (savedStateKeyType) {
+        SavedStateKeyType.MENTIONS -> {
+          MentionTimelineMediator(
+            service = accountState.account.service as TimelineService,
+            accountKey = accountState.account.accountKey,
+            database = database,
+            addCursorIfNeed = { data, accountKey ->
+              notificationRepository.addCursorIfNeeded(
+                accountKey,
+                NotificationCursorType.Mentions,
+                data.status.statusId,
+                data.status.timestamp,
+              )
+            }
+          )
+        }
+        SavedStateKeyType.HOME -> {
+          HomeTimelineMediator(
+            accountState.account.service as TimelineService,
+            accountState.account.accountKey,
+            database,
+          )
+        }
+        SavedStateKeyType.NOTIFICATION -> {
+          NotificationTimelineMediator(
+            service = (accountState.account.service as NotificationService),
+            accountKey = accountState.account.accountKey,
+            database = database,
+            addCursorIfNeed = { data, accountKey ->
+              notificationRepository.addCursorIfNeeded(
+                accountKey,
+                NotificationCursorType.General,
+                data.status.statusId,
+                data.status.timestamp
+              )
+            }
+          )
+        }
+        SavedStateKeyType.FEDERATED -> {
+          FederatedTimelineMediator(
+            (accountState.account.service as MastodonService),
+            accountState.account.accountKey,
+            database,
+          )
+        }
+        SavedStateKeyType.LOCAL -> {
+          LocalTimelineMediator(
+            (accountState.account.service as MastodonService),
+            accountState.account.accountKey,
+            database,
+          )
+        }
       }
     }
   }
 
-  val savedStateKey by derivedStateOf {
-    "${accountState.account.accountKey}${savedStateKeyType.key}"
+  val savedStateKey by remember(accountState) {
+    derivedStateOf {
+      "${accountState.account.accountKey}${savedStateKeyType.key}"
+    }
   }
 
-  val source by derivedStateOf {
-    pagingMediator.pager(
-      config = PagingConfig(
-        pageSize = timelinePageSize,
-        initialLoadSize = timelineInitialLoadSize
-      )
-    ).toUi()
+  val source by remember(pagingMediator) {
+    derivedStateOf {
+      pagingMediator.pager(
+        config = PagingConfig(
+          pageSize = timelinePageSize,
+          initialLoadSize = timelineInitialLoadSize
+        )
+      ).toUi()
+    }
   }
 
   val loadingBetween by remember(pagingMediator) {
