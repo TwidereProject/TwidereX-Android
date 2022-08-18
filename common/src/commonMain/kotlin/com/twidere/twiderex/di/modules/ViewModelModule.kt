@@ -47,11 +47,6 @@ import com.twidere.twiderex.viewmodel.lists.ListsUserViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsViewModel
 import com.twidere.twiderex.viewmodel.mastodon.MastodonHashtagViewModel
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
-import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
-import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
-import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineViewModel
-import com.twidere.twiderex.viewmodel.timeline.mastodon.FederatedTimelineViewModel
-import com.twidere.twiderex.viewmodel.timeline.mastodon.LocalTimelineViewModel
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
 import com.twidere.twiderex.viewmodel.twitter.user.TwitterUserViewModel
 import com.twidere.twiderex.viewmodel.user.FollowersViewModel
@@ -72,7 +67,6 @@ val viewModelModule = module {
 
   user()
   twitter()
-  timeline()
   mastodon()
   lists()
   dm()
@@ -153,14 +147,6 @@ private fun Module.lists() {
 private fun Module.mastodon() {
   viewModel { (keyword: String) -> MastodonHashtagViewModel(get(), get(), keyword) }
   viewModel { MastodonSignInViewModel(get(), get(), get()) }
-}
-
-private fun Module.timeline() {
-  viewModel { NotificationTimelineViewModel(get(), get(), get(), get()) }
-  viewModel { MentionsTimelineViewModel(get(), get(), get(), get()) }
-  viewModel { HomeTimelineViewModel(get(), get(), get()) }
-  viewModel { LocalTimelineViewModel(get(), get(), get()) }
-  viewModel { FederatedTimelineViewModel(get(), get(), get()) }
 }
 
 private fun Module.twitter() {

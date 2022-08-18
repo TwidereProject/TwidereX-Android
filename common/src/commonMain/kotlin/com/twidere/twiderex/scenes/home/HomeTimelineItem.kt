@@ -35,12 +35,11 @@ import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
+import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
 
 class HomeTimelineItem : HomeNavigationItem() {
 
@@ -112,10 +111,9 @@ private fun HomeTimelineFab() {
 fun HomeTimelineSceneContent(
   lazyListController: LazyListController? = null
 ) {
-  val viewModel: HomeTimelineViewModel = getViewModel()
   TimelineComponent(
-    viewModel = viewModel,
     lazyListController = lazyListController,
+    savedStateKeyType = SavedStateKeyType.HOME
   )
 }
 

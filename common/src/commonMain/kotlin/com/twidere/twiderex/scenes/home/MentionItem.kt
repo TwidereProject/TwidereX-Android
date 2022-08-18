@@ -30,11 +30,10 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
+import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
 
 class MentionItem : HomeNavigationItem() {
   @Composable
@@ -47,11 +46,7 @@ class MentionItem : HomeNavigationItem() {
 
   @Composable
   override fun Content() {
-    val viewModel: MentionsTimelineViewModel = getViewModel()
-    TimelineComponent(
-      viewModel = viewModel,
-      lazyListController = lazyListController,
-    )
+    MentionSceneContent(lazyListController)
   }
 }
 
@@ -79,9 +74,8 @@ fun MentionScene() {
 fun MentionSceneContent(
   lazyListController: LazyListController? = null
 ) {
-  val viewModel: MentionsTimelineViewModel = getViewModel()
   TimelineComponent(
-    viewModel = viewModel,
     lazyListController = lazyListController,
+    savedStateKeyType = SavedStateKeyType.MENTIONS
   )
 }

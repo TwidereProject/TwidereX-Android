@@ -61,6 +61,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -116,9 +117,14 @@ fun HomeScene() {
   val menuOrder by account.preferences.homeMenuOrder.observeAsState(
     initial = HomeMenus.values().map { it to it.showDefault }
   )
-  val menus = remember(menuOrder) {
-    menuOrder.filter { it.second && it.first.supportedPlatformType.contains(account.type) }
-      .map { it.first }
+  val menus by remember(account) {
+    derivedStateOf {
+      menuOrder.filter {
+        it.second && it.first.supportedPlatformType.contains(account.type)
+      }.map {
+        it.first
+      }
+    }
   }
   val pagerState = rememberPagerState(
     pageCount = menus.size,

@@ -31,12 +31,11 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineViewModel
+import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
 
 class NotificationItem : HomeNavigationItem() {
   @Composable
@@ -83,9 +82,8 @@ fun NotificationContent(
   if (account.service !is NotificationService) {
     return
   }
-  val viewModel: NotificationTimelineViewModel = getViewModel()
   TimelineComponent(
-    viewModel = viewModel,
     lazyListController = lazyListController,
+    savedStateKeyType = SavedStateKeyType.NOTIFICATION
   )
 }
