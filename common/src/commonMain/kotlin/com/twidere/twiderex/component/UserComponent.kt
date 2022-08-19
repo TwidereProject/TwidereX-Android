@@ -59,6 +59,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -95,6 +97,7 @@ import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.status.withAvatarClip
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.extensions.rememberPresenter
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
@@ -104,7 +107,8 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.ui.LocalNavController
-import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
+import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelinePresenter
+import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineState
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
@@ -217,6 +221,7 @@ fun UserComponent(
   }
 }
 
+@Immutable
 data class UserTabComponent(
   val icon: Painter,
   val title: String,
@@ -401,16 +406,14 @@ fun UserMediaTimeline(
 fun UserFavouriteTimeline(
   userKey: MicroBlogKey,
 ) {
-  val timelineViewModel: UserFavouriteTimelineViewModel = getViewModel {
-    parametersOf(userKey)
+  val state by rememberPresenter {
+    UserFavouriteTimelinePresenter(userKey = userKey)
+  }.collectAsState()
+  (state as? UserFavouriteTimelineState.Data)?.let {
+    LazyUiStatusList(
+      items = it.source,
+    )
   }
-  val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
-  // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
-  @Suppress("UNUSED_VARIABLE")
-  timelineSource.loadState
-  LazyUiStatusList(
-    items = timelineSource,
-  )
 }
 
 val maxBannerSize = 200.dp

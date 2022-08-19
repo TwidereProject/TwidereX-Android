@@ -27,33 +27,42 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.lists.ListsUserViewModel
-import org.koin.core.parameter.parametersOf
+import com.twidere.twiderex.viewmodel.user.UserListEvent
+import com.twidere.twiderex.viewmodel.user.UserListPresenter
+import com.twidere.twiderex.viewmodel.user.UserListState
+import com.twidere.twiderex.viewmodel.user.UserListType
 
 @Composable
 fun ListsSubscribersScene(
   listKey: MicroBlogKey,
 ) {
-  val viewModel: ListsUserViewModel = getViewModel {
-    parametersOf(listKey.id, false)
+  val (state) =  rememberPresenterState<UserListState, UserListEvent> {
+    UserListPresenter(
+      it,
+      userType = UserListType.Followers(
+        listKey
+      )
+    )
   }
-  TwidereScene {
-    InAppNotificationScaffold(
-      topBar = {
-        AppBar(
-          navigationIcon = {
-            AppBarNavigationButton()
-          },
-          title = {
-            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_tabs_subscriber))
-          }
-        )
-      },
-    ) {
-      UserListComponent(viewModel = viewModel)
+  (state as? UserListState.Data)?.let { data ->
+    TwidereScene {
+      InAppNotificationScaffold(
+        topBar = {
+          AppBar(
+            navigationIcon = {
+              AppBarNavigationButton()
+            },
+            title = {
+              Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_tabs_subscriber))
+            }
+          )
+        },
+      ) {
+        UserListComponent(data.source)
+      }
     }
   }
 }

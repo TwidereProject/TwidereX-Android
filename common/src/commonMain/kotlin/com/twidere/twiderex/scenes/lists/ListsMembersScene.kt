@@ -41,7 +41,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.DropdownMenu
@@ -52,15 +51,17 @@ import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.lists.ListsUserViewModel
+import com.twidere.twiderex.viewmodel.user.UserListEvent
+import com.twidere.twiderex.viewmodel.user.UserListPresenter
+import com.twidere.twiderex.viewmodel.user.UserListState
+import com.twidere.twiderex.viewmodel.user.UserListType
 import kotlinx.coroutines.launch
-import org.koin.core.parameter.parametersOf
 import java.util.Locale
 
 @Composable
@@ -68,11 +69,13 @@ fun ListsMembersScene(
   listKey: MicroBlogKey,
   owned: Boolean,
 ) {
-  val navController = LocalNavController.current
-  val viewModel: ListsUserViewModel = getViewModel {
-    parametersOf(listKey.id, true)
+  val (state, channel) = rememberPresenterState<UserListState, UserListEvent> {
+    UserListPresenter(it, userType = UserListType.ListUsers(listId = listKey.id))
   }
-  val source = viewModel.source.collectAsLazyPagingItems()
+  if (state !is UserListState.Data) {
+    return
+  }
+  val navController = LocalNavController.current
   val navigator = LocalNavigator.current
   val scope = rememberCoroutineScope()
   TwidereScene {
@@ -93,7 +96,7 @@ fun ListsMembersScene(
             scope.launch {
               val result =
                 navController.navigateForResult(Root.Lists.AddMembers(listKey = listKey)) as? List<*>?
-              if (result != null && result.isNotEmpty()) source.refresh()
+              if (result != null && result.isNotEmpty()) state.source.refresh()
             }
           }
         ) {
@@ -119,13 +122,13 @@ fun ListsMembersScene(
       floatingActionButtonPosition = FabPosition.Center
     ) {
       SwipeToRefreshLayout(
-        refreshingState = source.loadState.refresh is LoadState.Loading,
+        refreshingState = state.source.loadState.refresh is LoadState.Loading,
         onRefresh = {
-          source.refreshOrRetry()
+          state.source.refreshOrRetry()
         }
       ) {
         LazyUiUserList(
-          items = source, onItemClicked = { navigator.user(it) },
+          items = state.source, onItemClicked = { navigator.user(it) },
           action = {
             if (!owned) return@LazyUiUserList
             var menuExpand by remember {
@@ -145,7 +148,7 @@ fun ListsMembersScene(
             ) {
               DropdownMenuItem(
                 onClick = {
-                  viewModel.removeMember(it)
+                  channel.trySend(UserListEvent.RemoveMember(it))
                 }
               ) {
                 Text(

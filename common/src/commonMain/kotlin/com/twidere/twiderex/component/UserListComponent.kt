@@ -23,21 +23,19 @@ package com.twidere.twiderex.component
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.LazyPagingItems
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.viewmodel.user.UserListViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun UserListComponent(
-  viewModel: UserListViewModel,
+  source: LazyPagingItems<UiUser>,
   action: @Composable (user: UiUser) -> Unit = {}
 ) {
-  val source = viewModel.source.collectAsLazyPagingItems()
   val navigator = LocalNavigator.current
   SwipeToRefreshLayout(
     refreshingState = source.loadState.refresh is LoadState.Loading,
