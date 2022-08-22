@@ -48,8 +48,6 @@ import com.twidere.twiderex.viewmodel.mastodon.MastodonHashtagViewModel
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
 import com.twidere.twiderex.viewmodel.twitter.user.TwitterUserViewModel
-import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -159,8 +157,6 @@ private fun Module.twitter() {
 
 private fun Module.user() {
   viewModel { (userKey: MicroBlogKey) -> UserViewModel(get(), get(), get(), userKey) }
-  viewModel { (userKey: MicroBlogKey) -> UserTimelineViewModel(get(), get(), userKey) }
-  viewModel { (userKey: MicroBlogKey) -> UserMediaTimelineViewModel(get(), get(), userKey) }
 }
 
 private fun Module.gif() {

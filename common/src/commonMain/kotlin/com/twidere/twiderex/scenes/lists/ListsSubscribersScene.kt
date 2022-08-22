@@ -39,7 +39,7 @@ import com.twidere.twiderex.viewmodel.user.UserListType
 fun ListsSubscribersScene(
   listKey: MicroBlogKey,
 ) {
-  val (state) =  rememberPresenterState<UserListState, UserListEvent> {
+  val (state) = rememberPresenterState<UserListState, UserListEvent> {
     UserListPresenter(
       it,
       userType = UserListType.Followers(

@@ -65,7 +65,7 @@ fun UserListPresenter(
   if (userType is UserListType.ListUsers) {
     LaunchedEffect(Unit) {
       event.collect {
-        when(it) {
+        when (it) {
           is UserListEvent.RemoveMember -> {
             listsUsersRepository.removeMember(
               service = currentAccount.account.service as ListsService,
@@ -117,7 +117,7 @@ fun UserListPresenter(
 interface UserListEvent {
   data class RemoveMember(
     val user: UiUser
-  ): UserListEvent
+  ) : UserListEvent
 }
 
 interface UserListState {

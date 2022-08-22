@@ -21,7 +21,11 @@
 package com.twidere.twiderex.viewmodel.user
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.services.microblog.TimelineService
@@ -31,33 +35,60 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.repository.TimelineRepository
 import com.twidere.twiderex.scenes.CurrentAccountPresenter
 import com.twidere.twiderex.scenes.CurrentAccountState
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun UserFavouriteTimelinePresenter(
+fun UserTimelinePresenter(
+  event: Flow<UserTimelineEvent>,
   repository: TimelineRepository = get(),
-  userKey: MicroBlogKey
-): UserFavouriteTimelineState {
-  val currentAccount = CurrentAccountPresenter()
+  userKey: MicroBlogKey,
+): UserTimelineState {
 
+  val currentAccount = CurrentAccountPresenter()
   if (currentAccount !is CurrentAccountState.Account) {
-    return UserFavouriteTimelineState.NoAccount
+    return UserTimelineState.NoAccount
   }
 
-  val source = remember(currentAccount) {
-    repository.favouriteTimeline(
+  var excludeReplies by remember {
+    mutableStateOf(false)
+  }
+
+  LaunchedEffect(Unit) {
+    event.collectLatest {
+      when (it) {
+        is UserTimelineEvent.ExcludeReplies -> {
+          excludeReplies = it.exclude
+        }
+      }
+    }
+  }
+
+  val source = remember(currentAccount, excludeReplies) {
+    repository.userTimeline(
       userKey = userKey,
       accountKey = currentAccount.account.accountKey,
-      platformType = currentAccount.account.type,
-      service = currentAccount.account.service as TimelineService
+      service = currentAccount.account.service as TimelineService,
+      exclude_replies = excludeReplies,
     )
   }.collectAsLazyPagingItems()
-  return UserFavouriteTimelineState.Data(source = source)
+
+  return UserTimelineState.Data(
+    source = source,
+    excludeReplies = excludeReplies,
+  )
 }
 
-interface UserFavouriteTimelineState {
-  data class Data(
-    val source: LazyPagingItems<UiStatus>
-  ) : UserFavouriteTimelineState
+interface UserTimelineEvent {
+  data class ExcludeReplies(
+    val exclude: Boolean
+  ) : UserTimelineEvent
+}
 
-  object NoAccount : UserFavouriteTimelineState
+interface UserTimelineState {
+  data class Data(
+    val source: LazyPagingItems<UiStatus>,
+    val excludeReplies: Boolean,
+  ) : UserTimelineState
+  object NoAccount : UserTimelineState
 }

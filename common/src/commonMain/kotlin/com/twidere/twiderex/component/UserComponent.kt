@@ -77,7 +77,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
@@ -98,6 +97,7 @@ import com.twidere.twiderex.component.status.withAvatarClip
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.rememberPresenter
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
@@ -109,8 +109,11 @@ import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelinePresenter
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineState
-import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
+import com.twidere.twiderex.viewmodel.user.UserMediaTimelinePresenter
+import com.twidere.twiderex.viewmodel.user.UserMediaTimelineState
+import com.twidere.twiderex.viewmodel.user.UserTimelineEvent
+import com.twidere.twiderex.viewmodel.user.UserTimelinePresenter
+import com.twidere.twiderex.viewmodel.user.UserTimelineState
 import com.twidere.twiderex.viewmodel.user.UserViewModel
 import kotlinx.coroutines.launch
 import moe.tlaster.nestedscrollview.VerticalNestedScrollView
@@ -273,26 +276,25 @@ fun UserStatusTimeline(
   viewModel: UserViewModel,
 ) {
   val user by viewModel.user.observeAsState(initial = null)
-  val timelineViewModel: UserTimelineViewModel = getViewModel {
-    parametersOf(userKey)
+
+  val (state, channel) = rememberPresenterState<UserTimelineState, UserTimelineEvent> {
+    UserTimelinePresenter(it, userKey = userKey)
   }
-  val excludeReplies by timelineViewModel.excludeReplies.observeAsState(initial = false)
-  val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
-  // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
-  @Suppress("UNUSED_VARIABLE")
-  timelineSource.loadState
-  LazyUiStatusList(
-    items = timelineSource,
-    header = {
-      user?.let { user ->
-        item {
-          UserStatusTimelineFilter(user, excludeReplies) {
-            timelineViewModel.setExcludeReplies(it)
+
+  (state as? UserTimelineState.Data)?.let {
+    LazyUiStatusList(
+      items = it.source,
+      header = {
+        user?.let { user ->
+          item {
+            UserStatusTimelineFilter(user, it.excludeReplies) {
+              channel.trySend(UserTimelineEvent.ExcludeReplies(exclude = it))
+            }
           }
         }
-      }
-    },
-  )
+      },
+    )
+  }
 }
 
 @ExperimentalMaterialApi
@@ -392,14 +394,12 @@ private object UserStatusTimelineFilterDefaults {
 fun UserMediaTimeline(
   userKey: MicroBlogKey,
 ) {
-  val mediaViewModel: UserMediaTimelineViewModel = getViewModel {
-    parametersOf(userKey)
+  val state by rememberPresenter {
+    UserMediaTimelinePresenter(userKey = userKey)
+  }.collectAsState()
+  (state as? UserMediaTimelineState.Data)?.let {
+    LazyUiStatusImageList(it.source)
   }
-  val mediaSource = mediaViewModel.source.collectAsLazyPagingItems()
-  // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
-  @Suppress("UNUSED_VARIABLE")
-  mediaSource.loadState
-  LazyUiStatusImageList(mediaSource)
 }
 
 @Composable
