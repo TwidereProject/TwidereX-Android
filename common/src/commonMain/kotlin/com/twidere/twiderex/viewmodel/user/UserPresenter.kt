@@ -56,6 +56,10 @@ fun UserPresenter(
     return UserState.NoAccount
   }
 
+  val account by remember(currentAccount) {
+    derivedStateOf { currentAccount.account }
+  }
+
   var refreshing by remember {
     mutableStateOf(false)
   }
@@ -76,13 +80,14 @@ fun UserPresenter(
     mutableStateOf<IRelationship?>(null)
   }
 
-  val isMe by remember(currentAccount) {
-    derivedStateOf { currentAccount.account.accountKey == userKey }
+  val isMe by remember(account) {
+    derivedStateOf { account.accountKey == userKey }
   }
 
-  LaunchedEffect(currentAccount, refreshFlow) {
+  LaunchedEffect(account, refreshFlow) {
     loadingRelationship = true
-    val relationshipService = currentAccount.account.service as RelationshipService
+    val relationshipService =
+      account.service as RelationshipService
     relationship = runCatching {
       relationshipService.showRelationship(userKey.id)
     }.onSuccess {
@@ -92,13 +97,13 @@ fun UserPresenter(
     }.getOrNull()
   }
 
-  LaunchedEffect(currentAccount, refreshFlow) {
+  LaunchedEffect(account, refreshFlow) {
     refreshing = true
     runCatching {
       repository.lookupUserById(
         userKey.id,
-        accountKey = currentAccount.account.accountKey,
-        lookupService = currentAccount.account.service as LookupService,
+        accountKey = account.accountKey,
+        lookupService = account.service as LookupService,
       )
     }.onFailure {
       inAppNotification.notifyError(it)
@@ -106,56 +111,43 @@ fun UserPresenter(
     refreshing = false
   }
 
+  suspend fun consumeUserEvent(
+    block: suspend (RelationshipService) -> Unit
+  ) {
+    val relationshipService =
+      account.service as? RelationshipService ?: return
+    loadingRelationship = true
+    try {
+      block.invoke(relationshipService)
+      refreshFlow = UUID.randomUUID()
+    } catch (e: Throwable) {
+      inAppNotification.notifyError(e)
+    } finally {
+      loadingRelationship = false
+    }
+  }
+
   LaunchedEffect(Unit) {
     event.collectLatest {
       when (it) {
         UserEvent.Follow -> {
-          loadingRelationship = true
-          val relationshipService =
-            currentAccount.account.service as? RelationshipService ?: return@collectLatest
-          try {
-            relationshipService.follow(userKey.id)
-            refreshFlow = UUID.randomUUID()
-          } catch (e: Throwable) {
-            inAppNotification.notifyError(e)
-          } finally {
-            loadingRelationship = false
+          consumeUserEvent {
+            it.follow(userKey.id)
           }
         }
         UserEvent.UnFollow -> {
-          loadingRelationship = true
-          val relationshipService = currentAccount.account.service as? RelationshipService ?: return@collectLatest
-          try {
-            relationshipService.unfollow(userKey.id)
-            refreshFlow = UUID.randomUUID()
-          } catch (e: Throwable) {
-            inAppNotification.notifyError(e)
-          } finally {
-            loadingRelationship = false
+          consumeUserEvent {
+            it.unfollow(userKey.id)
           }
         }
         UserEvent.Block -> {
-          val relationshipService = currentAccount.account.service as? RelationshipService ?: return@collectLatest
-          loadingRelationship = true
-          try {
-            relationshipService.block(id = userKey.id)
-            refreshFlow = UUID.randomUUID()
-          } catch (e: Throwable) {
-            inAppNotification.notifyError(e)
-          } finally {
-            loadingRelationship = false
+          consumeUserEvent {
+            it.block(id = userKey.id)
           }
         }
         UserEvent.UnBlock -> {
-          val relationshipService = currentAccount.account.service as? RelationshipService ?: return@collectLatest
-          loadingRelationship = true
-          try {
-            relationshipService.unblock(id = userKey.id)
-            refreshFlow = UUID.randomUUID()
-          } catch (e: Throwable) {
-            inAppNotification.notifyError(e)
-          } finally {
-            loadingRelationship = false
+          consumeUserEvent {
+            it.unblock(id = userKey.id)
           }
         }
         UserEvent.Refresh -> {
