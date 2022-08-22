@@ -46,7 +46,7 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
@@ -55,24 +55,25 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMNewConversationViewModel
-import com.twidere.twiderex.viewmodel.user.UserViewModel
-import org.koin.core.parameter.parametersOf
+import com.twidere.twiderex.viewmodel.user.UserEvent
+import com.twidere.twiderex.viewmodel.user.UserPresenter
+import com.twidere.twiderex.viewmodel.user.UserState
 
 @Composable
 fun UserScene(
   userKey: MicroBlogKey,
 ) {
   val account = LocalActiveAccount.current ?: return
-  val viewModel: UserViewModel = getViewModel {
-    parametersOf(userKey)
+  val (state, channel) = rememberPresenterState<UserState, UserEvent> {
+    UserPresenter(it, userKey = userKey)
+  }
+  if (state !is UserState.Data) {
+    return
   }
   val conversationViewModel: DMNewConversationViewModel = getViewModel()
-  val user by viewModel.user.observeAsState(initial = null)
   val navController = LocalNavController.current
   var expanded by remember { mutableStateOf(false) }
   var showBlockAlert by remember { mutableStateOf(false) }
-  val relationship by viewModel.relationship.observeAsState(initial = null)
-  val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
   TwidereScene {
     InAppNotificationScaffold(
       // TODO: Show top bar with actions
@@ -83,8 +84,8 @@ fun UserScene(
             AppBarNavigationButton()
           },
           actions = {
-            if (account.type == PlatformType.Twitter && user?.platformType == PlatformType.Twitter) {
-              user?.let {
+            if (account.type == PlatformType.Twitter && state.user?.platformType == PlatformType.Twitter) {
+              state.user.let {
                 if (userKey != account.accountKey) {
                   IconButton(
                     onClick = {
@@ -130,12 +131,12 @@ fun UserScene(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
               ) {
-                relationship.takeIf { !loadingRelationship }
+                state.relationship.takeIf { !state.loadingRelationship }
                   ?.blocking?.let { blocking ->
                     DropdownMenuItem(
                       onClick = {
                         if (blocking)
-                          viewModel.unblock()
+                          channel.trySend(UserEvent.UnBlock)
                         else
                           showBlockAlert = true
                         expanded = false
@@ -154,7 +155,7 @@ fun UserScene(
           },
           elevation = 0.dp,
           title = {
-            user?.let {
+            state.user?.let {
               UserName(user = it)
             }
           }
@@ -164,12 +165,12 @@ fun UserScene(
       Box {
         UserComponent(userKey)
         if (showBlockAlert) {
-          user?.let {
+          state.user?.let {
             BlockAlert(
               screenName = it.getDisplayScreenName(it.userKey.host),
               onDismissRequest = { showBlockAlert = false },
               onConfirm = {
-                viewModel.block()
+                channel.trySend(UserEvent.Block)
               }
             )
           }

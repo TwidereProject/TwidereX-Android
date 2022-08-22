@@ -48,7 +48,6 @@ import com.twidere.twiderex.viewmodel.mastodon.MastodonHashtagViewModel
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
 import com.twidere.twiderex.viewmodel.twitter.user.TwitterUserViewModel
-import com.twidere.twiderex.viewmodel.user.UserViewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -59,7 +58,6 @@ val viewModelModule = module {
   viewModel { DraftViewModel(get(), get()) }
   viewModel { ActiveAccountViewModel(get()) }
 
-  user()
   twitter()
   mastodon()
   lists()
@@ -153,10 +151,6 @@ private fun Module.twitter() {
     )
   }
   viewModel { (screenName: String) -> TwitterUserViewModel(get(), get(), get(), screenName) }
-}
-
-private fun Module.user() {
-  viewModel { (userKey: MicroBlogKey) -> UserViewModel(get(), get(), get(), userKey) }
 }
 
 private fun Module.gif() {
