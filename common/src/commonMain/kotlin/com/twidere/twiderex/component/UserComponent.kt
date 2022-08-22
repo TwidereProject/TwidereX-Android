@@ -78,6 +78,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.twidere.services.microblog.model.IRelationship
 import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.HorizontalDivider
@@ -94,8 +95,6 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.status.withAvatarClip
-import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.rememberPresenter
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.extensions.withElevation
@@ -107,36 +106,40 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.viewmodel.user.UserEvent
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelinePresenter
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineState
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelinePresenter
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineState
+import com.twidere.twiderex.viewmodel.user.UserPresenter
+import com.twidere.twiderex.viewmodel.user.UserState
 import com.twidere.twiderex.viewmodel.user.UserTimelineEvent
 import com.twidere.twiderex.viewmodel.user.UserTimelinePresenter
 import com.twidere.twiderex.viewmodel.user.UserTimelineState
-import com.twidere.twiderex.viewmodel.user.UserViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import moe.tlaster.nestedscrollview.VerticalNestedScrollView
 import moe.tlaster.nestedscrollview.rememberNestedScrollViewState
 import moe.tlaster.placeholder.Placeholder
 import moe.tlaster.precompose.navigation.Navigator
-import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun UserComponent(
   userKey: MicroBlogKey,
 ) {
-  val viewModel: UserViewModel = getViewModel {
-    parametersOf(userKey)
+  val (state, channel) = rememberPresenterState<UserState, UserEvent> {
+    UserPresenter(it, userKey = userKey)
   }
-  val isMe by viewModel.isMe.observeAsState(initial = false)
+  if (state !is UserState.Data) {
+    return
+  }
   val tabs = listOf(
     UserTabComponent(
       painterResource(res = com.twidere.twiderex.MR.files.ic_float_left),
       stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_status)
     ) {
-      UserStatusTimeline(userKey = userKey, viewModel = viewModel)
+      UserStatusTimeline(userKey = userKey, user = state.user)
     },
     UserTabComponent(
       painterResource(res = com.twidere.twiderex.MR.files.ic_photo),
@@ -145,7 +148,7 @@ fun UserComponent(
       UserMediaTimeline(userKey = userKey)
     },
   ).let {
-    if (isMe || userKey.host == MicroBlogKey.TwitterHost) {
+    if (state.isMe || userKey.host == MicroBlogKey.TwitterHost) {
       it + UserTabComponent(
         painterResource(res = com.twidere.twiderex.MR.files.ic_heart),
         stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_favourite)
@@ -156,18 +159,27 @@ fun UserComponent(
       it
     }
   }
-  val refreshing by viewModel.refreshing.observeAsState(initial = false)
   SwipeToRefreshLayout(
-    refreshingState = refreshing,
+    refreshingState = state.refreshing,
     onRefresh = {
-      viewModel.refresh()
+      channel.trySend(UserEvent.Refresh)
     },
   ) {
     val nestedScrollViewState = rememberNestedScrollViewState()
     VerticalNestedScrollView(
       state = nestedScrollViewState,
       header = {
-        UserInfo(viewModel = viewModel)
+        UserInfo(
+          user = state.user,
+          isMe = state.isMe,
+          userRelationship = {
+            UserRelationship(
+              relationship = state.relationship,
+              loadingRelationship = state.loadingRelationship,
+              channel = channel,
+            )
+          },
+        )
       },
       content = {
         val pagerState = rememberPagerState(pageCount = tabs.size)
@@ -213,7 +225,10 @@ fun UserComponent(
               modifier = Modifier.fillMaxSize(),
               contentAlignment = Alignment.TopCenter,
             ) {
-              UserTimeline(viewModel = viewModel) {
+              UserTimeline(
+                relationship = state.relationship,
+                loadingRelationship = state.loadingRelationship
+              ) {
                 tabs[page].compose.invoke()
               }
             }
@@ -232,9 +247,11 @@ data class UserTabComponent(
 )
 
 @Composable
-private fun UserTimeline(viewModel: UserViewModel, content: @Composable () -> Unit) {
-  val relationship by viewModel.relationship.observeAsState(initial = null)
-  val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
+private fun UserTimeline(
+  relationship: IRelationship?,
+  loadingRelationship: Boolean,
+  content: @Composable () -> Unit
+) {
   relationship.takeIf { !loadingRelationship }?.let {
     when {
       it.blockedBy -> PermissionDeniedInfo(
@@ -273,10 +290,8 @@ private object PermissionDeniedInfoDefaults {
 @Composable
 fun UserStatusTimeline(
   userKey: MicroBlogKey,
-  viewModel: UserViewModel,
+  user: UiUser?,
 ) {
-  val user by viewModel.user.observeAsState(initial = null)
-
   val (state, channel) = rememberPresenterState<UserTimelineState, UserTimelineEvent> {
     UserTimelinePresenter(it, userKey = userKey)
   }
@@ -420,11 +435,11 @@ val maxBannerSize = 200.dp
 
 @Composable
 fun UserInfo(
-  viewModel: UserViewModel,
+  user: UiUser?,
+  isMe: Boolean,
+  userRelationship: @Composable () -> Unit
 ) {
-  val user by viewModel.user.observeAsState(initial = null)
   val navController = LocalNavController.current
-  val isMe by viewModel.isMe.observeAsState(initial = false)
   Box(
     modifier = Modifier
       .background(MaterialTheme.colors.surface.withElevation())
@@ -473,7 +488,7 @@ fun UserInfo(
       }
       if (!isMe) {
         Spacer(modifier = Modifier.height(UserInfoDefaults.RelationshipSpacing))
-        UserRelationship(viewModel)
+        userRelationship.invoke()
       }
       user?.let { user ->
         UserDescText(
@@ -649,9 +664,11 @@ private object ProfileItemDefaults {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun UserRelationship(viewModel: UserViewModel) {
-  val relationship by viewModel.relationship.observeAsState(initial = null)
-  val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
+private fun UserRelationship(
+  relationship: IRelationship?,
+  loadingRelationship: Boolean,
+  channel: Channel<UserEvent>,
+) {
   val shape = RoundedCornerShape(percent = 50)
   val blockingBackgroundColor = Color(0xFFFF2D55)
   relationship?.takeIf { !loadingRelationship }
@@ -674,13 +691,13 @@ private fun UserRelationship(viewModel: UserViewModel) {
           .clickable {
             when {
               relationshipResult.blocking -> {
-                viewModel.unblock()
+                channel.trySend(UserEvent.Block)
               }
               relationshipResult.followedBy -> {
-                viewModel.unfollow()
+                channel.trySend(UserEvent.UnFollow)
               }
               else -> {
-                viewModel.follow()
+                channel.trySend(UserEvent.Follow)
               }
             }
           },
