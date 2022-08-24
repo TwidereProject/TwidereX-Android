@@ -128,8 +128,10 @@ import moe.tlaster.precompose.navigation.Navigator
 fun UserComponent(
   userKey: MicroBlogKey,
 ) {
-  val (state, channel) = rememberPresenterState<UserState, UserEvent> {
-    UserPresenter(it, userKey = userKey)
+  val (state, channel) = key(userKey) {
+    rememberPresenterState<UserState, UserEvent> {
+      UserPresenter(it, userKey = userKey)
+    }
   }
   if (state !is UserState.Data) {
     return
@@ -292,8 +294,10 @@ fun UserStatusTimeline(
   userKey: MicroBlogKey,
   user: UiUser?,
 ) {
-  val (state, channel) = rememberPresenterState<UserTimelineState, UserTimelineEvent> {
-    UserTimelinePresenter(it, userKey = userKey)
+  val (state, channel) = key(userKey) {
+    rememberPresenterState<UserTimelineState, UserTimelineEvent> {
+      UserTimelinePresenter(it, userKey = userKey)
+    }
   }
 
   (state as? UserTimelineState.Data)?.let {
@@ -409,9 +413,11 @@ private object UserStatusTimelineFilterDefaults {
 fun UserMediaTimeline(
   userKey: MicroBlogKey,
 ) {
-  val state by rememberPresenter {
-    UserMediaTimelinePresenter(userKey = userKey)
-  }.collectAsState()
+  val state by key(userKey) {
+    rememberPresenter {
+      UserMediaTimelinePresenter(userKey = userKey)
+    }.collectAsState()
+  }
   (state as? UserMediaTimelineState.Data)?.let {
     LazyUiStatusImageList(it.source)
   }
@@ -421,9 +427,11 @@ fun UserMediaTimeline(
 fun UserFavouriteTimeline(
   userKey: MicroBlogKey,
 ) {
-  val state by rememberPresenter {
-    UserFavouriteTimelinePresenter(userKey = userKey)
-  }.collectAsState()
+  val state by key(userKey) {
+    rememberPresenter {
+      UserFavouriteTimelinePresenter(userKey = userKey)
+    }.collectAsState()
+  }
   (state as? UserFavouriteTimelineState.Data)?.let {
     LazyUiStatusList(
       items = it.source,
