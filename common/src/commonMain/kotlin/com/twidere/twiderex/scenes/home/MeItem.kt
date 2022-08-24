@@ -22,6 +22,7 @@ package com.twidere.twiderex.scenes.home
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.graphics.painter.Painter
 import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.component.foundation.AppBar
@@ -29,10 +30,14 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
+import com.twidere.twiderex.viewmodel.user.UserEvent
+import com.twidere.twiderex.viewmodel.user.UserPresenter
+import com.twidere.twiderex.viewmodel.user.UserState
 
 class MeItem : HomeNavigationItem() {
 
@@ -77,6 +82,15 @@ fun MeScene() {
 fun MeSceneContent() {
   val account = LocalActiveAccount.current
   account?.toUi()?.let { user ->
-    UserComponent(userKey = user.userKey)
+    val (state, channel) = key(user.userKey) {
+      rememberPresenterState<UserState, UserEvent> {
+        UserPresenter(it, userKey = user.userKey)
+      }
+    }
+    UserComponent(
+      userKey = user.userKey,
+      state = state,
+      channel = channel,
+    )
   }
 }

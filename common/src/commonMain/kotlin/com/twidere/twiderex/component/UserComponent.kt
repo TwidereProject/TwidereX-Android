@@ -60,7 +60,6 @@ import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -95,8 +94,6 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.status.withAvatarClip
-import com.twidere.twiderex.extensions.rememberPresenter
-import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
@@ -107,14 +104,9 @@ import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.user.UserEvent
-import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelinePresenter
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineState
-import com.twidere.twiderex.viewmodel.user.UserMediaTimelinePresenter
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineState
-import com.twidere.twiderex.viewmodel.user.UserPresenter
 import com.twidere.twiderex.viewmodel.user.UserState
-import com.twidere.twiderex.viewmodel.user.UserTimelineEvent
-import com.twidere.twiderex.viewmodel.user.UserTimelinePresenter
 import com.twidere.twiderex.viewmodel.user.UserTimelineState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -127,12 +119,9 @@ import moe.tlaster.precompose.navigation.Navigator
 @Composable
 fun UserComponent(
   userKey: MicroBlogKey,
+  state: UserState,
+  channel: Channel<UserEvent>
 ) {
-  val (state, channel) = key(userKey) {
-    rememberPresenterState<UserState, UserEvent> {
-      UserPresenter(it, userKey = userKey)
-    }
-  }
   if (state !is UserState.Data) {
     return
   }
@@ -141,13 +130,15 @@ fun UserComponent(
       painterResource(res = com.twidere.twiderex.MR.files.ic_float_left),
       stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_status)
     ) {
-      UserStatusTimeline(userKey = userKey, user = state.user)
+      UserStatusTimeline(user = state.user, state = state.userTimelineState) {
+        channel.trySend(UserEvent.ExcludeReplies(it))
+      }
     },
     UserTabComponent(
       painterResource(res = com.twidere.twiderex.MR.files.ic_photo),
       stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_media)
     ) {
-      UserMediaTimeline(userKey = userKey)
+      UserMediaTimeline(state = state.userMediaTimelineState)
     },
   ).let {
     if (state.isMe || userKey.host == MicroBlogKey.TwitterHost) {
@@ -155,7 +146,7 @@ fun UserComponent(
         painterResource(res = com.twidere.twiderex.MR.files.ic_heart),
         stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_favourite)
       ) {
-        UserFavouriteTimeline(userKey = userKey)
+        UserFavouriteTimeline(state = state.userFavouriteTimelineState)
       }
     } else {
       it
@@ -291,15 +282,10 @@ private object PermissionDeniedInfoDefaults {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun UserStatusTimeline(
-  userKey: MicroBlogKey,
   user: UiUser?,
+  state: UserTimelineState,
+  excludeReplies: (Boolean) -> Unit,
 ) {
-  val (state, channel) = key(userKey) {
-    rememberPresenterState<UserTimelineState, UserTimelineEvent> {
-      UserTimelinePresenter(it, userKey = userKey)
-    }
-  }
-
   (state as? UserTimelineState.Data)?.let {
     LazyUiStatusList(
       items = it.source,
@@ -307,7 +293,7 @@ fun UserStatusTimeline(
         user?.let { user ->
           item {
             UserStatusTimelineFilter(user, it.excludeReplies) {
-              channel.trySend(UserTimelineEvent.ExcludeReplies(exclude = it))
+              excludeReplies.invoke(it)
             }
           }
         }
@@ -411,13 +397,8 @@ private object UserStatusTimelineFilterDefaults {
 
 @Composable
 fun UserMediaTimeline(
-  userKey: MicroBlogKey,
+  state: UserMediaTimelineState
 ) {
-  val state by key(userKey) {
-    rememberPresenter {
-      UserMediaTimelinePresenter(userKey = userKey)
-    }.collectAsState()
-  }
   (state as? UserMediaTimelineState.Data)?.let {
     LazyUiStatusImageList(it.source)
   }
@@ -425,13 +406,8 @@ fun UserMediaTimeline(
 
 @Composable
 fun UserFavouriteTimeline(
-  userKey: MicroBlogKey,
+  state: UserFavouriteTimelineState
 ) {
-  val state by key(userKey) {
-    rememberPresenter {
-      UserFavouriteTimelinePresenter(userKey = userKey)
-    }.collectAsState()
-  }
   (state as? UserFavouriteTimelineState.Data)?.let {
     LazyUiStatusList(
       items = it.source,

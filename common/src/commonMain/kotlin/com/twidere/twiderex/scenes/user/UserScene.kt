@@ -163,7 +163,11 @@ fun UserScene(
       }
     ) {
       Box {
-        UserComponent(userKey)
+        UserComponent(
+          userKey = userKey,
+          state = state,
+          channel = channel,
+        )
         if (showBlockAlert) {
           state.user?.let {
             BlockAlert(

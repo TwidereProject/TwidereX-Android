@@ -25,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,6 +33,7 @@ import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IRelationship
 import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.extensions.rememberNestedPresenter
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
@@ -127,6 +129,20 @@ fun UserPresenter(
     }
   }
 
+  val (userTimelineState, userTimelineEvent) = key(account) {
+    rememberNestedPresenter<UserTimelineState, UserTimelineEvent> {
+      UserTimelinePresenter(it, userKey = userKey)
+    }
+  }
+
+  val userMediaTimelineState = key(account) {
+    UserMediaTimelinePresenter(userKey = userKey)
+  }
+
+  val userFavouriteTimelineState = key(account) {
+    UserFavouriteTimelinePresenter(userKey = userKey)
+  }
+
   LaunchedEffect(Unit) {
     event.collectLatest {
       when (it) {
@@ -153,6 +169,11 @@ fun UserPresenter(
         UserEvent.Refresh -> {
           refreshFlow = UUID.randomUUID()
         }
+        is UserEvent.ExcludeReplies -> {
+          userTimelineEvent.trySend(
+            UserTimelineEvent.ExcludeReplies(it.exclude)
+          )
+        }
       }
     }
   }
@@ -162,7 +183,10 @@ fun UserPresenter(
     loadingRelationship = loadingRelationship,
     user = user,
     relationship = relationship,
-    isMe = isMe
+    isMe = isMe,
+    userTimelineState = userTimelineState,
+    userFavouriteTimelineState = userFavouriteTimelineState,
+    userMediaTimelineState = userMediaTimelineState,
   )
 }
 
@@ -172,6 +196,9 @@ interface UserEvent {
   object Block : UserEvent
   object UnBlock : UserEvent
   object Refresh : UserEvent
+  data class ExcludeReplies(
+    val exclude: Boolean
+  ) : UserEvent
 }
 
 interface UserState {
@@ -181,6 +208,9 @@ interface UserState {
     val user: UiUser?,
     val relationship: IRelationship?,
     val isMe: Boolean,
+    val userTimelineState: UserTimelineState,
+    val userFavouriteTimelineState: UserFavouriteTimelineState,
+    val userMediaTimelineState: UserMediaTimelineState,
   ) : UserState
 
   object NoAccount : UserState
