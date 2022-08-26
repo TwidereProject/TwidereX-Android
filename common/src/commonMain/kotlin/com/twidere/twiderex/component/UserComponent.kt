@@ -59,6 +59,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -75,8 +76,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.twidere.services.microblog.model.IRelationship
 import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.HorizontalDivider
@@ -93,8 +94,6 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.status.withAvatarClip
-import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
@@ -104,63 +103,76 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.ui.LocalNavController
-import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserViewModel
+import com.twidere.twiderex.viewmodel.user.UserEvent
+import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineState
+import com.twidere.twiderex.viewmodel.user.UserMediaTimelineState
+import com.twidere.twiderex.viewmodel.user.UserState
+import com.twidere.twiderex.viewmodel.user.UserTimelineState
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import moe.tlaster.nestedscrollview.VerticalNestedScrollView
 import moe.tlaster.nestedscrollview.rememberNestedScrollViewState
 import moe.tlaster.placeholder.Placeholder
 import moe.tlaster.precompose.navigation.Navigator
-import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun UserComponent(
   userKey: MicroBlogKey,
+  state: UserState,
+  channel: Channel<UserEvent>
 ) {
-  val viewModel: UserViewModel = getViewModel {
-    parametersOf(userKey)
+  if (state !is UserState.Data) {
+    return
   }
-  val isMe by viewModel.isMe.observeAsState(initial = false)
   val tabs = listOf(
     UserTabComponent(
       painterResource(res = com.twidere.twiderex.MR.files.ic_float_left),
       stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_status)
     ) {
-      UserStatusTimeline(userKey = userKey, viewModel = viewModel)
+      UserStatusTimeline(user = state.user, state = state.userTimelineState) {
+        channel.trySend(UserEvent.ExcludeReplies(it))
+      }
     },
     UserTabComponent(
       painterResource(res = com.twidere.twiderex.MR.files.ic_photo),
       stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_media)
     ) {
-      UserMediaTimeline(userKey = userKey)
+      UserMediaTimeline(state = state.userMediaTimelineState)
     },
   ).let {
-    if (isMe || userKey.host == MicroBlogKey.TwitterHost) {
+    if (state.isMe || userKey.host == MicroBlogKey.TwitterHost) {
       it + UserTabComponent(
         painterResource(res = com.twidere.twiderex.MR.files.ic_heart),
         stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_favourite)
       ) {
-        UserFavouriteTimeline(userKey = userKey)
+        UserFavouriteTimeline(state = state.userFavouriteTimelineState)
       }
     } else {
       it
     }
   }
-  val refreshing by viewModel.refreshing.observeAsState(initial = false)
   SwipeToRefreshLayout(
-    refreshingState = refreshing,
+    refreshingState = state.refreshing,
     onRefresh = {
-      viewModel.refresh()
+      channel.trySend(UserEvent.Refresh)
     },
   ) {
     val nestedScrollViewState = rememberNestedScrollViewState()
     VerticalNestedScrollView(
       state = nestedScrollViewState,
       header = {
-        UserInfo(viewModel = viewModel)
+        UserInfo(
+          user = state.user,
+          isMe = state.isMe,
+          userRelationship = {
+            UserRelationship(
+              relationship = state.relationship,
+              loadingRelationship = state.loadingRelationship,
+              channel = channel,
+            )
+          },
+        )
       },
       content = {
         val pagerState = rememberPagerState(pageCount = tabs.size)
@@ -206,7 +218,10 @@ fun UserComponent(
               modifier = Modifier.fillMaxSize(),
               contentAlignment = Alignment.TopCenter,
             ) {
-              UserTimeline(viewModel = viewModel) {
+              UserTimeline(
+                relationship = state.relationship,
+                loadingRelationship = state.loadingRelationship
+              ) {
                 tabs[page].compose.invoke()
               }
             }
@@ -217,6 +232,7 @@ fun UserComponent(
   }
 }
 
+@Immutable
 data class UserTabComponent(
   val icon: Painter,
   val title: String,
@@ -224,9 +240,11 @@ data class UserTabComponent(
 )
 
 @Composable
-private fun UserTimeline(viewModel: UserViewModel, content: @Composable () -> Unit) {
-  val relationship by viewModel.relationship.observeAsState(initial = null)
-  val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
+private fun UserTimeline(
+  relationship: IRelationship?,
+  loadingRelationship: Boolean,
+  content: @Composable () -> Unit
+) {
   relationship.takeIf { !loadingRelationship }?.let {
     when {
       it.blockedBy -> PermissionDeniedInfo(
@@ -264,30 +282,24 @@ private object PermissionDeniedInfoDefaults {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun UserStatusTimeline(
-  userKey: MicroBlogKey,
-  viewModel: UserViewModel,
+  user: UiUser?,
+  state: UserTimelineState,
+  excludeReplies: (Boolean) -> Unit,
 ) {
-  val user by viewModel.user.observeAsState(initial = null)
-  val timelineViewModel: UserTimelineViewModel = getViewModel {
-    parametersOf(userKey)
-  }
-  val excludeReplies by timelineViewModel.excludeReplies.observeAsState(initial = false)
-  val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
-  // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
-  @Suppress("UNUSED_VARIABLE")
-  timelineSource.loadState
-  LazyUiStatusList(
-    items = timelineSource,
-    header = {
-      user?.let { user ->
-        item {
-          UserStatusTimelineFilter(user, excludeReplies) {
-            timelineViewModel.setExcludeReplies(it)
+  (state as? UserTimelineState.Data)?.let {
+    LazyUiStatusList(
+      items = it.source,
+      header = {
+        user?.let { user ->
+          item {
+            UserStatusTimelineFilter(user, it.excludeReplies) {
+              excludeReplies.invoke(it)
+            }
           }
         }
-      }
-    },
-  )
+      },
+    )
+  }
 }
 
 @ExperimentalMaterialApi
@@ -385,43 +397,33 @@ private object UserStatusTimelineFilterDefaults {
 
 @Composable
 fun UserMediaTimeline(
-  userKey: MicroBlogKey,
+  state: UserMediaTimelineState
 ) {
-  val mediaViewModel: UserMediaTimelineViewModel = getViewModel {
-    parametersOf(userKey)
+  (state as? UserMediaTimelineState.Data)?.let {
+    LazyUiStatusImageList(it.source)
   }
-  val mediaSource = mediaViewModel.source.collectAsLazyPagingItems()
-  // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
-  @Suppress("UNUSED_VARIABLE")
-  mediaSource.loadState
-  LazyUiStatusImageList(mediaSource)
 }
 
 @Composable
 fun UserFavouriteTimeline(
-  userKey: MicroBlogKey,
+  state: UserFavouriteTimelineState
 ) {
-  val timelineViewModel: UserFavouriteTimelineViewModel = getViewModel {
-    parametersOf(userKey)
+  (state as? UserFavouriteTimelineState.Data)?.let {
+    LazyUiStatusList(
+      items = it.source,
+    )
   }
-  val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
-  // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
-  @Suppress("UNUSED_VARIABLE")
-  timelineSource.loadState
-  LazyUiStatusList(
-    items = timelineSource,
-  )
 }
 
 val maxBannerSize = 200.dp
 
 @Composable
 fun UserInfo(
-  viewModel: UserViewModel,
+  user: UiUser?,
+  isMe: Boolean,
+  userRelationship: @Composable () -> Unit
 ) {
-  val user by viewModel.user.observeAsState(initial = null)
   val navController = LocalNavController.current
-  val isMe by viewModel.isMe.observeAsState(initial = false)
   Box(
     modifier = Modifier
       .background(MaterialTheme.colors.surface.withElevation())
@@ -470,7 +472,7 @@ fun UserInfo(
       }
       if (!isMe) {
         Spacer(modifier = Modifier.height(UserInfoDefaults.RelationshipSpacing))
-        UserRelationship(viewModel)
+        userRelationship.invoke()
       }
       user?.let { user ->
         UserDescText(
@@ -646,9 +648,11 @@ private object ProfileItemDefaults {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun UserRelationship(viewModel: UserViewModel) {
-  val relationship by viewModel.relationship.observeAsState(initial = null)
-  val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
+private fun UserRelationship(
+  relationship: IRelationship?,
+  loadingRelationship: Boolean,
+  channel: Channel<UserEvent>,
+) {
   val shape = RoundedCornerShape(percent = 50)
   val blockingBackgroundColor = Color(0xFFFF2D55)
   relationship?.takeIf { !loadingRelationship }
@@ -671,13 +675,13 @@ private fun UserRelationship(viewModel: UserViewModel) {
           .clickable {
             when {
               relationshipResult.blocking -> {
-                viewModel.unblock()
+                channel.trySend(UserEvent.Block)
               }
               relationshipResult.followedBy -> {
-                viewModel.unfollow()
+                channel.trySend(UserEvent.UnFollow)
               }
               else -> {
-                viewModel.follow()
+                channel.trySend(UserEvent.Follow)
               }
             }
           },

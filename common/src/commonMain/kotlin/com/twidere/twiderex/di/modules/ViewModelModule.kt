@@ -43,18 +43,11 @@ import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsModifyViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsSearchUserViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsTimelineViewModel
-import com.twidere.twiderex.viewmodel.lists.ListsUserViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsViewModel
 import com.twidere.twiderex.viewmodel.mastodon.MastodonHashtagViewModel
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
 import com.twidere.twiderex.viewmodel.twitter.user.TwitterUserViewModel
-import com.twidere.twiderex.viewmodel.user.FollowersViewModel
-import com.twidere.twiderex.viewmodel.user.FollowingViewModel
-import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserViewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -65,7 +58,6 @@ val viewModelModule = module {
   viewModel { DraftViewModel(get(), get()) }
   viewModel { ActiveAccountViewModel(get()) }
 
-  user()
   twitter()
   mastodon()
   lists()
@@ -125,14 +117,6 @@ private fun Module.lists() {
   viewModel { (following: Boolean) -> ListsSearchUserViewModel(get(), following) }
   viewModel { (listKey: MicroBlogKey) -> ListsTimelineViewModel(get(), get(), listKey) }
   viewModel { (listId: String) -> ListsAddMemberViewModel(get(), get(), get(), listId) }
-  viewModel { (listId: String, viewMembers: Boolean) ->
-    ListsUserViewModel(
-      get(),
-      get(),
-      listId,
-      viewMembers
-    )
-  }
   viewModel { ListsViewModel(get(), get()) }
   viewModel {
     ListsCreateViewModel(
@@ -167,15 +151,6 @@ private fun Module.twitter() {
     )
   }
   viewModel { (screenName: String) -> TwitterUserViewModel(get(), get(), get(), screenName) }
-}
-
-private fun Module.user() {
-  viewModel { (userKey: MicroBlogKey) -> UserViewModel(get(), get(), get(), userKey) }
-  viewModel { (userKey: MicroBlogKey) -> UserTimelineViewModel(get(), get(), userKey) }
-  viewModel { (userKey: MicroBlogKey) -> UserMediaTimelineViewModel(get(), get(), userKey) }
-  viewModel { (userKey: MicroBlogKey) -> UserFavouriteTimelineViewModel(get(), get(), userKey) }
-  viewModel { (userKey: MicroBlogKey) -> FollowingViewModel(get(), get(), userKey) }
-  viewModel { (userKey: MicroBlogKey) -> FollowersViewModel(get(), get(), userKey) }
 }
 
 private fun Module.gif() {

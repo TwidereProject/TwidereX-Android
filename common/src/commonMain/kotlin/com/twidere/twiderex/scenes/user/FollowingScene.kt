@@ -27,33 +27,37 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.user.FollowingViewModel
-import org.koin.core.parameter.parametersOf
+import com.twidere.twiderex.viewmodel.user.UserListEvent
+import com.twidere.twiderex.viewmodel.user.UserListPresenter
+import com.twidere.twiderex.viewmodel.user.UserListState
+import com.twidere.twiderex.viewmodel.user.UserListType
 
 @Composable
 fun FollowingScene(
   userKey: MicroBlogKey,
 ) {
-  val viewModel: FollowingViewModel = getViewModel {
-    parametersOf(userKey)
+  val (state) = rememberPresenterState<UserListState, UserListEvent> {
+    UserListPresenter(it, userType = UserListType.Following(userKey = userKey))
   }
-  TwidereScene {
-    InAppNotificationScaffold(
-      topBar = {
-        AppBar(
-          navigationIcon = {
-            AppBarNavigationButton()
-          },
-          title = {
-            Text(stringResource(res = com.twidere.twiderex.MR.strings.scene_following_title))
-          }
-        )
-      },
-    ) {
-      UserListComponent(viewModel)
+  (state as? UserListState.Data)?.let { data ->
+    TwidereScene {
+      InAppNotificationScaffold(
+        topBar = {
+          AppBar(
+            navigationIcon = {
+              AppBarNavigationButton()
+            },
+            title = {
+              Text(stringResource(res = com.twidere.twiderex.MR.strings.scene_following_title))
+            }
+          )
+        },
+      ) {
+        UserListComponent(data.source)
+      }
     }
   }
 }
