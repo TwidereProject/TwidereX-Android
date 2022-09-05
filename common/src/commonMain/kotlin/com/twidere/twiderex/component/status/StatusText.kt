@@ -56,6 +56,7 @@ fun ColumnScope.StatusText(
   maxLines: Int = Int.MAX_VALUE,
   showMastodonPoll: Boolean = true,
   isSelectionAble: Boolean = true,
+  openLink: (String) -> Unit,
 ) {
   val expandable = status.platformType == PlatformType.Mastodon &&
     status.spoilerText != null
@@ -94,7 +95,8 @@ fun ColumnScope.StatusText(
           linkResolver = { href ->
             status.resolveLink(href)
           },
-          positionWrapper = it
+          positionWrapper = it,
+          openLink = openLink,
         )
       }
       if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.poll != null) {

@@ -38,9 +38,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.placeholder.UiImagePlaceholder
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.model.DisplayPreferences
@@ -49,6 +49,7 @@ import com.twidere.twiderex.ui.LocalVideoPlayback
 @Composable
 fun LazyUiStatusImageList(
   items: LazyPagingItems<Pair<UiMedia, UiStatus>>,
+  openMedia: (MicroBlogKey, Int) -> Unit,
 ) {
   LazyUiList(
     items = items,
@@ -65,7 +66,6 @@ fun LazyUiStatusImageList(
         padding = LazyUiStatusImageListDefaults.Spacing
       ) { index, pair ->
         pair?.let { item ->
-          val navigator = LocalNavigator.current
           CompositionLocalProvider(
             LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
           ) {
@@ -77,7 +77,8 @@ fun LazyUiStatusImageList(
                   MaterialTheme.shapes.medium
                 ),
               onClick = {
-                navigator.media(item.second.statusKey, index)
+                // media
+                openMedia(item.second.statusKey, index)
               }
             )
           }

@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.navigation
 
-import moe.tlaster.precompose.navigation.RouteBuilder
+// import moe.tlaster.precompose.navigation.RouteBuilder
 
-actual fun RouteBuilder.platformScene() {
-}
+// actual fun RouteBuilder.platformScene() {
+// }

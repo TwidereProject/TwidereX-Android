@@ -56,6 +56,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
@@ -63,20 +64,27 @@ import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.StatusNavigationData
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.scenes.lists.platform.MastodonListsEditDialog
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsModifyViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsTimelineViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
 import org.koin.core.parameter.parametersOf
+
+@NavGraphDestination(
+  route = Root.Lists.Timeline.route,
+)
 
 @Composable
 fun ListTimeLineScene(
-  listKey: MicroBlogKey
+  @Path("listKey") listKey: MicroBlogKey,
+  navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current ?: return
-  val navController = LocalNavController.current
   val viewModel: ListsModifyViewModel = getViewModel {
     parametersOf(listKey)
   }
@@ -88,6 +96,7 @@ fun ListTimeLineScene(
   var showDeleteConfirmDialog by remember {
     mutableStateOf(false)
   }
+  val statusNavigationData = rememberStatusNavigationData(navigator)
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -157,12 +166,12 @@ fun ListTimeLineScene(
                 DropdownMenuItem(
                   onClick = {
                     menuExpand = false
-                    navController.navigate(
-                      Root.Lists.Members(
-                        listKey,
-                        uiList.isOwner(account.user.userId)
-                      )
-                    )
+                    // navController.navigate(
+                    //   Root.Lists.Members(
+                    //     listKey,
+                    //     uiList.isOwner(account.user.userId)
+                    //   )
+                    // )
                   }
                 ) {
                   Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_tabs_members))
@@ -172,11 +181,11 @@ fun ListTimeLineScene(
                   DropdownMenuItem(
                     onClick = {
                       menuExpand = false
-                      navController.navigate(
-                        Root.Lists.Subscribers(
-                          listKey
-                        )
-                      )
+                      // navController.navigate(
+                      //   Root.Lists.Subscribers(
+                      //     listKey
+                      //   )
+                      // )
                     }
                   ) {
                     Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_tabs_subscriber))
@@ -188,7 +197,7 @@ fun ListTimeLineScene(
                     onClick = {
                       menuExpand = false
                       when (account.type) {
-                        PlatformType.Twitter -> navController.navigate(
+                        PlatformType.Twitter -> navigator.navigate(
                           Root.Lists.TwitterEdit(listKey = listKey)
                         )
                         PlatformType.StatusNet -> TODO()
@@ -223,7 +232,7 @@ fun ListTimeLineScene(
       },
     ) {
       Box {
-        ListTimelineComponent(listKey)
+        ListTimelineComponent(listKey, statusNavigationData)
         if (showEditDialog) {
           MastodonListsEditDialog(listKey) {
             showEditDialog = false
@@ -243,7 +252,7 @@ fun ListTimeLineScene(
               }
             ) {
               viewModel.deleteList { success, _ ->
-                if (success) navController.popBackStack()
+                if (success) navigator.popBackStack()
               }
             }
           }
@@ -254,7 +263,10 @@ fun ListTimeLineScene(
 }
 
 @Composable
-private fun ListTimelineComponent(listKey: MicroBlogKey) {
+private fun ListTimelineComponent(
+  listKey: MicroBlogKey,
+  statusNavigationData: StatusNavigationData,
+) {
   val viewModel: ListsTimelineViewModel = getViewModel {
     parametersOf(listKey)
   }
@@ -268,6 +280,7 @@ private fun ListTimelineComponent(listKey: MicroBlogKey) {
   ) {
     LazyUiStatusList(
       items = timelineSource,
+      statusNavigation = statusNavigationData,
     )
   }
 }

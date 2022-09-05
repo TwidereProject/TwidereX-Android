@@ -61,17 +61,23 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiGif
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.gif.GifViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
+@NavGraphDestination(
+  route = Root.Gif.Home,
+)
 @Composable
-fun GifScene() {
+fun GifScene(
+  navigator: Navigator,
+) {
   val viewModel = getViewModel<GifViewModel>()
   val enable by viewModel.enable.collectAsState(initial = false)
   val account = LocalActiveAccount.current
-  val navController = LocalNavController.current
   val commitLoading by viewModel.commitLoading.collectAsState(initial = false)
   TwidereScene {
     InAppNotificationScaffold(
@@ -89,7 +95,7 @@ fun GifScene() {
                 viewModel.commit(
                   platform = account?.type ?: PlatformType.Twitter,
                   onSuccess = {
-                    navController.goBackWith(it)
+                    navigator.goBackWith(it)
                   }
                 )
               },

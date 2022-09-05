@@ -24,21 +24,28 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import com.twidere.twiderex.component.foundation.SignInScaffold
-import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.component.navigation.twitterSignInWeb
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.viewmodel.twitter.PinCodeProvider
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
 import org.koin.core.parameter.parametersOf
 
+@NavGraphDestination(
+  route = Root.SignIn.Twitter.route,
+  deepLink = [RootDeepLinks.SignIn]
+)
 @Composable
 fun TwitterSignInScene(
-  consumerKey: String,
-  consumerSecret: String,
+  @Path("consumerKey") consumerKey: String,
+  @Path("consumerSecret") consumerSecret: String,
+  navigator: Navigator,
 ) {
-  val navController = LocalNavController.current
-  val navigator = LocalNavigator.current
   val pinCodeProvider: PinCodeProvider = { target ->
     navigator.twitterSignInWeb(target)
   }
@@ -48,7 +55,7 @@ fun TwitterSignInScene(
       consumerSecret,
       pinCodeProvider,
       { success: Boolean ->
-        navController.goBackWith(success)
+        navigator.goBackWith(success)
       }
     )
   }

@@ -50,6 +50,7 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.humanizedCount
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.navigation.StatusNavigationData
 
 @Composable
 fun DetailedStatusComponent(
@@ -57,6 +58,7 @@ fun DetailedStatusComponent(
   showInfo: Boolean = true,
   showActions: Boolean = true,
   lineUp: Boolean = false,
+  statusNavigationData: StatusNavigationData,
 ) {
   Column(
     modifier = Modifier
@@ -76,6 +78,7 @@ fun DetailedStatusComponent(
         lineUp = lineUp,
         data = data,
         type = StatusContentType.Extend,
+        statusNavigation = statusNavigationData,
       )
       if (showInfo) {
         Spacer(modifier = Modifier.height(DetailedStatusDefaults.InfoContentSpacing))
@@ -111,7 +114,8 @@ fun DetailedStatusComponent(
                 maxLines = 1,
                 linkResolver = {
                   ResolvedLink(null)
-                }
+                },
+                openLink = statusNavigationData.openLink,
               )
             }
 
@@ -174,8 +178,16 @@ fun DetailedStatusComponent(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-          ReplyButton(status = data, withNumber = false)
-          RetweetButton(status = data, withNumber = false)
+          ReplyButton(
+            status = data,
+            withNumber = false,
+            compose = statusNavigationData.composeNavigationData.compose,
+          )
+          RetweetButton(
+            status = data,
+            withNumber = false,
+            compose = statusNavigationData.composeNavigationData.compose,
+          )
           LikeButton(status = data, withNumber = false)
           ShareButton(status = data)
         }

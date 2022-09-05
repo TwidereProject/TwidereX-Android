@@ -52,12 +52,13 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.rememberPagerState
-import com.twidere.twiderex.component.navigation.LocalNavigator
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.scenes.search.presenter.SearchSaveEvent
 import com.twidere.twiderex.scenes.search.presenter.SearchSavePresenter
 import com.twidere.twiderex.scenes.search.presenter.SearchSaveState
@@ -67,12 +68,20 @@ import com.twidere.twiderex.scenes.search.tabs.SearchUserItem
 import com.twidere.twiderex.scenes.search.tabs.TwitterSearchMediaItem
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
 import kotlinx.coroutines.launch
 
+
+@NavGraphDestination(
+  route = Root.Search.Result.route,
+)
 @Composable
-fun SearchScene(keyword: String) {
+fun SearchScene(
+  @Path("keyword") keyword: String,
+  navigator: Navigator,
+) {
   val account = LocalActiveAccount.current ?: return
-  val navigator = LocalNavigator.current
 
   val (state, channel) = rememberPresenterState<SearchSaveState, SearchSaveEvent> {
     SearchSavePresenter(it, content = keyword)
@@ -190,7 +199,7 @@ fun SearchScene(keyword: String) {
           modifier = Modifier.weight(1F),
         ) {
           Pager(state = pagerState) {
-            tabs[page].Content(keyword = keyword)
+            tabs[page].Content(keyword = keyword, navigator = navigator)
           }
         }
       }

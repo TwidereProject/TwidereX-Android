@@ -22,6 +22,7 @@ package com.twidere.twiderex.scenes.home
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.HomeNavigationItem
@@ -43,7 +44,7 @@ class DraftNavigationItem : HomeNavigationItem() {
   }
 
   @Composable
-  override fun Content() {
+  override fun Content(navigator: Navigator) {
     DraftListSceneContent(
       lazyListController = lazyListController,
     )

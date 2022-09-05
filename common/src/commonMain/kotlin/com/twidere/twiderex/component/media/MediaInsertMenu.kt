@@ -49,7 +49,6 @@ import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.model.enums.MediaInsertType
 import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.navigation.Root
-import com.twidere.twiderex.ui.LocalNavController
 import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
 
@@ -69,7 +68,6 @@ fun MediaInsertMenu(
   disableList: List<MediaInsertType> = emptyList(),
   onResult: (List<UiMediaInsert>) -> Unit
 ) {
-  val navController = LocalNavController.current
   val mediaInsertProvider = get<MediaInsertProvider>()
   val scope = rememberCoroutineScope()
 
@@ -110,16 +108,16 @@ fun MediaInsertMenu(
                   }
                 }
                 MediaInsertType.GIF -> scope.launch {
-                  navController.navigateForResult(Root.Gif.Home)
-                    ?.let { result ->
-                      onResult(
-                        listOf(result as String).map {
-                          mediaInsertProvider.provideUiMediaInsert(
-                            it
-                          )
-                        }
-                      )
-                    }
+                  // navController.navigateForResult(Root.Gif.Home)
+                  //   ?.let { result ->
+                  //     onResult(
+                  //       listOf(result as String).map {
+                  //         mediaInsertProvider.provideUiMediaInsert(
+                  //           it
+                  //         )
+                  //       }
+                  //     )
+                  //   }
                 }
               }
               showDropdown = false

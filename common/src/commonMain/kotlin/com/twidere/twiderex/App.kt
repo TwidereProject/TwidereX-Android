@@ -50,7 +50,8 @@ fun App(navController: Navigator = Navigator()) {
     LocalPlatformResolver provides get(),
   ) {
     Router(
-      navController = navController
+      navController = navController,
+      hasAccount = account != null,
     )
   }
 }

@@ -30,7 +30,6 @@ import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
 import com.twidere.twiderex.init.Initializer
 import com.twidere.twiderex.init.TwidereServiceFactoryInitialTask
-import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
@@ -45,17 +44,18 @@ import it.sauronsoftware.junique.JUnique
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
-import moe.tlaster.precompose.navigation.Navigator
+// import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.logger.Level
+import com.twidere.twiderex.navigation.twidereXSchema
 import java.awt.Desktop
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.io.path.absolutePathString
 
-private val navController = Navigator()
+// private val navController = Navigator()
 private val mainScope = MainScope()
 private const val lockId = "b5b887ec-7fc0-45c9-b32d-47f37cb02f9f"
 private const val entryFileName = "twiderex.desktop"
@@ -171,7 +171,7 @@ private fun startDesktopApp() {
         CompositionLocalProvider(
           LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
         ) {
-          App(navController = navController)
+          // App(navController = navController)
         }
       }
     }
@@ -184,6 +184,6 @@ private fun onDeeplink(url: String) {
       CustomTabSignInChannel.send(url)
     }
   } else {
-    navController.navigate(url)
+    // navController.navigate(url)
   }
 }

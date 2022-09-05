@@ -57,7 +57,6 @@ import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import com.twidere.twiderex.component.foundation.NetworkImage
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import kotlinx.coroutines.coroutineScope
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -97,6 +96,7 @@ fun HtmlText(
   linkStyle: TextStyle = textStyle.copy(MaterialTheme.colors.primary),
   linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
   positionWrapper: PositionWrapper? = null,
+  openLink: (String) -> Unit,
 ) {
   val bidi = remember(htmlText) {
     Bidi(htmlText, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT)
@@ -108,7 +108,6 @@ fun HtmlText(
       LayoutDirection.Rtl
     }
   ) {
-    val navigator = LocalNavigator.current
     RenderContent(
       modifier = modifier,
       htmlText = htmlText,
@@ -117,7 +116,7 @@ fun HtmlText(
       textStyle = textStyle,
       linkStyle = linkStyle,
       onLinkClicked = {
-        navigator.openLink(it)
+        openLink(it)
       },
       color = color,
       fontSize = fontSize,

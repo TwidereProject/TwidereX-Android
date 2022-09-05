@@ -59,15 +59,23 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.ParallaxLayout
 import com.twidere.twiderex.component.foundation.rememberParallaxLayoutState
-import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.component.navigation.openLink
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.navigation.RootDeepLinks
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
+import io.github.seiko.precompose.annotation.NavGraphDestination
+
+@NavGraphDestination(
+  route = Root.Settings.About,
+)
 
 @Composable
-fun AboutScene() {
+fun AboutScene(
+  navigator: Navigator,
+) {
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -81,15 +89,31 @@ fun AboutScene() {
         )
       }
     ) {
-      AboutContent()
+      AboutContent(
+        openGithub = {
+          navigator.openLink("https://github.com/TwidereProject/TwidereX-Android")
+        },
+        openTg = {
+          navigator.openLink("https://t.me/twidere_x")
+        },
+        openLicence = {
+          navigator.openLink("https://github.com/TwidereProject/TwidereX-Android/blob/develop/LICENSE")
+        },
+        clickUser = {
+          navigator.navigate(RootDeepLinks.Twitter.User("TwidereProject"))
+        }
+      )
     }
   }
 }
 
 @Composable
-private fun AboutContent() {
-  val navigator = LocalNavigator.current
-  val navController = LocalNavController.current
+private fun AboutContent(
+  openGithub: () -> Unit,
+  openTg: () -> Unit,
+  openLicence: () -> Unit,
+  clickUser: () -> Unit,
+) {
   val parallaxLayoutState = rememberParallaxLayoutState(maxRotate = 2f, maxTransition = 50f)
   Column(
     modifier = Modifier
@@ -192,7 +216,7 @@ private fun AboutContent() {
       Row {
         IconButton(
           onClick = {
-            navController.navigate(RootDeepLinks.Twitter.User("TwidereProject"))
+            clickUser.invoke()
           }
         ) {
           Icon(
@@ -204,7 +228,7 @@ private fun AboutContent() {
         Box(modifier = Modifier.width(AboutContentDefaults.Icon.Spacing))
         IconButton(
           onClick = {
-            navigator.openLink("https://github.com/TwidereProject/TwidereX-Android")
+            openGithub.invoke()
           }
         ) {
           Icon(
@@ -216,7 +240,7 @@ private fun AboutContent() {
         Box(modifier = Modifier.width(AboutContentDefaults.Icon.Spacing))
         IconButton(
           onClick = {
-            navigator.openLink("https://t.me/twidere_x")
+            openTg.invoke()
           }
         ) {
           Icon(
@@ -229,7 +253,7 @@ private fun AboutContent() {
       Box(modifier = Modifier.weight(1F))
       TextButton(
         onClick = {
-          navigator.openLink("https://github.com/TwidereProject/TwidereX-Android/blob/develop/LICENSE")
+          openLicence.invoke()
         },
         colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.typography.body1.color)
       ) {

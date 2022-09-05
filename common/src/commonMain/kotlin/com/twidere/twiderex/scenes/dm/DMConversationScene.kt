@@ -67,6 +67,7 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiDMEventList
 import com.twidere.twiderex.component.media.MediaInsertMenu
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
@@ -74,19 +75,32 @@ import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMediaInsert
+import com.twidere.twiderex.navigation.DMNavigationData
+import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.rememberDMNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMEventViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
 import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
 
+
+@NavGraphDestination(
+  route = Root.Messages.Conversation.route,
+)
 @Composable
-fun DMConversationScene(conversationKey: MicroBlogKey) {
+fun DMConversationScene(
+  @Path("conversationKey") conversationKey: MicroBlogKey,
+  navigator: Navigator,
+) {
   val account = LocalActiveAccount.current ?: return
   val viewModel: DMEventViewModel = getViewModel {
     parametersOf(conversationKey)
   }
   val conversation by viewModel.conversation.observeAsState(null)
+  val dmNavigationData = rememberDMNavigationData(navigator)
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -106,14 +120,19 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
         Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_error_not_supported))
       } else {
         // user might enter this page by notifications after switch platform
-        NormalContent(viewModel)
+        NormalContent(
+          viewModel, dmNavigationData,
+        )
       }
     }
   }
 }
 
 @Composable
-fun NormalContent(viewModel: DMEventViewModel) {
+private fun NormalContent(
+  viewModel: DMEventViewModel,
+  dmNavigationData: DMNavigationData,
+) {
   val clipboardManager = LocalClipboardManager.current
   val source = viewModel.source.collectAsLazyPagingItems()
   val input by viewModel.input.observeAsState(initial = "")
@@ -141,7 +160,8 @@ fun NormalContent(viewModel: DMEventViewModel) {
         state = listState,
         onItemLongClick = {
           viewModel.pendingActionMessage.value = it
-        }
+        },
+        dmNavigationData = dmNavigationData,
       )
       MessageActionComponent(
         pendingActionMessage = pendingActionMessage,

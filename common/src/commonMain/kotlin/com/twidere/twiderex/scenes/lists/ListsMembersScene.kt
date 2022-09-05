@@ -48,26 +48,34 @@ import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
-import com.twidere.twiderex.component.navigation.LocalNavigator
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.navigation.Root
-import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.navigation.rememberUserNavigationData
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.user.UserListEvent
 import com.twidere.twiderex.viewmodel.user.UserListPresenter
 import com.twidere.twiderex.viewmodel.user.UserListState
 import com.twidere.twiderex.viewmodel.user.UserListType
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
+import io.github.seiko.precompose.annotation.Query
 import kotlinx.coroutines.launch
 import java.util.Locale
 
+
+@NavGraphDestination(
+  route = Root.Lists.Members.route,
+)
 @Composable
 fun ListsMembersScene(
-  listKey: MicroBlogKey,
-  owned: Boolean,
+  @Path("listKey") listKey: MicroBlogKey,
+  @Query("owned") owned: Boolean?,
+  navigator: Navigator,
 ) {
   val (state, channel) = rememberPresenterState<UserListState, UserListEvent> {
     UserListPresenter(it, userType = UserListType.ListUsers(listId = listKey.id))
@@ -75,8 +83,7 @@ fun ListsMembersScene(
   if (state !is UserListState.Data) {
     return
   }
-  val navController = LocalNavController.current
-  val navigator = LocalNavigator.current
+  val userNavigationData = rememberUserNavigationData(navigator)
   val scope = rememberCoroutineScope()
   TwidereScene {
     InAppNotificationScaffold(
@@ -91,11 +98,11 @@ fun ListsMembersScene(
         )
       },
       floatingActionButton = {
-        if (owned) FloatingActionButton(
+        if (owned == true) FloatingActionButton(
           onClick = {
             scope.launch {
               val result =
-                navController.navigateForResult(Root.Lists.AddMembers(listKey = listKey)) as? List<*>?
+                navigator.navigateForResult(Root.Lists.AddMembers(listKey = listKey)) as? List<*>?
               if (result != null && result.isNotEmpty()) state.source.refresh()
             }
           }
@@ -128,9 +135,11 @@ fun ListsMembersScene(
         }
       ) {
         LazyUiUserList(
-          items = state.source, onItemClicked = { navigator.user(it) },
+          items = state.source, onItemClicked = {
+            // navigator.user(it)
+            },
           action = {
-            if (!owned) return@LazyUiUserList
+            if (owned == false) return@LazyUiUserList
             var menuExpand by remember {
               mutableStateOf(false)
             }
@@ -158,7 +167,8 @@ fun ListsMembersScene(
                 )
               }
             }
-          }
+          },
+          userNavigationData = userNavigationData,
         )
       }
     }

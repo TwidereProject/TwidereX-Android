@@ -50,18 +50,27 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.ReorderableColumn
 import com.twidere.twiderex.component.foundation.rememberReorderableColumnState
 import com.twidere.twiderex.component.lazy.ItemHeader
+import com.twidere.twiderex.component.navigation.openLink
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.HomeMenus
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.scenes.home.item
 import com.twidere.twiderex.ui.TwidereScene
+import io.github.seiko.precompose.annotation.NavGraphDestination
 
+@NavGraphDestination(
+  route = Root.Settings.Layout,
+)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun LayoutScene() {
+fun LayoutScene(
+  navigator: Navigator,
+) {
   val (state, channel) = rememberPresenterState { LayoutPresenter(it) }
   if (state !is LayoutState.Data) {
     // TODO: Show other states
@@ -90,7 +99,12 @@ fun LayoutScene() {
           ListItem(
             text = {
               Row {
-                UserName(user = state.user)
+                UserName(
+                  user = state.user,
+                  openLink = {
+                    navigator.openLink(it)
+                  }
+                )
                 UserScreenName(user = state.user)
               }
             }

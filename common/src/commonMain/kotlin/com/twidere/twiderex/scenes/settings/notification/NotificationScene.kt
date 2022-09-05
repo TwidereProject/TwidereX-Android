@@ -42,6 +42,9 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.ColoredSwitch
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.ItemHeader
+import com.twidere.twiderex.component.navigation.openLink
+import com.twidere.twiderex.component.navigation.user
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
@@ -50,12 +53,17 @@ import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
+import io.github.seiko.precompose.annotation.NavGraphDestination
 
+@NavGraphDestination(
+  route = Root.Settings.Notification,
+)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun NotificationScene() {
+fun NotificationScene(
+  navigator: Navigator,
+) {
   val activeAccountViewModel = LocalActiveAccountViewModel.current
   val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
   val (state, channel) = rememberPresenterState { NotificationPresenter(it) }
@@ -99,7 +107,6 @@ fun NotificationScene() {
         ItemHeader {
           Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_notification_accounts))
         }
-        val navController = LocalNavController.current
         LazyColumn {
           items(accounts) {
             val user = remember {
@@ -108,7 +115,7 @@ fun NotificationScene() {
             ListItem(
               modifier = Modifier.clickable(
                 onClick = {
-                  navController.navigate(Root.Settings.AccountNotification(it.accountKey))
+                  navigator.navigate(Root.Settings.AccountNotification(it.accountKey))
                 },
                 enabled = state.enabled,
               ),
@@ -123,6 +130,9 @@ fun NotificationScene() {
                   UserAvatar(
                     user = user,
                     withPlatformIcon = true,
+                    toUser = {
+                      navigator.user(it)
+                    }
                   )
                 }
               },
@@ -134,7 +144,12 @@ fun NotificationScene() {
                     emptyArray()
                   }
                 ) {
-                  UserName(user = user)
+                  UserName(
+                    user = user,
+                    openLink = {
+                      navigator.openLink(it)
+                    }
+                  )
                 }
               },
               secondaryText = {

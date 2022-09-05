@@ -27,16 +27,14 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.ui.LocalNavController
 
 @Composable
 fun AppBarNavigationButton(
   icon: ImageVector = Icons.Default.ArrowBack,
 ) {
-  val navController = LocalNavController.current
   IconButton(
     onClick = {
-      navController.popBackStack()
+      // navController.popBackStack()
     }
   ) {
     Icon(

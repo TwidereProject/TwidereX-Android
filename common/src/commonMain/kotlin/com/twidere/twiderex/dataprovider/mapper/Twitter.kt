@@ -50,20 +50,18 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UserMetrics
 import com.twidere.twiderex.model.ui.twitter.TwitterStatusExtra
 import com.twidere.twiderex.model.ui.twitter.TwitterUserExtra
-import com.twidere.twiderex.navigation.IRoute
 import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twitter.twittertext.Autolink
 
 val autolink by lazy {
   Autolink().apply {
     setUsernameIncludeSymbol(true)
-    hashtagUrlBase = "${generateDeepLinkBase(RootDeepLinks.Search)}/%23"
-    cashtagUrlBase = "${generateDeepLinkBase(RootDeepLinks.Search)}/%24"
-    usernameUrlBase = "${generateDeepLinkBase(RootDeepLinks.Twitter.User)}/"
+    hashtagUrlBase = "${generateDeepLinkBase(RootDeepLinks.Search.route)}/%23"
+    cashtagUrlBase = "${generateDeepLinkBase(RootDeepLinks.Search.route)}/%24"
+    usernameUrlBase = "${generateDeepLinkBase(RootDeepLinks.Twitter.User.route)}/"
   }
 }
 
-private fun generateDeepLinkBase(route: IRoute) = generateDeepLinkBase(route.route)
 
 private fun generateDeepLinkBase(deeplink: String): String {
   return deeplink.substring(

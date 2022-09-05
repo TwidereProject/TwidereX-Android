@@ -23,6 +23,7 @@ package com.twidere.twiderex.scenes.home
 import androidx.compose.material.FabPosition
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.HomeNavigationItem
@@ -45,7 +46,7 @@ class ListsNavigationItem : HomeNavigationItem() {
   }
 
   @Composable
-  override fun Fab() {
+  override fun Fab(navigator: Navigator) {
     ListsSceneFab()
   }
 
@@ -53,7 +54,7 @@ class ListsNavigationItem : HomeNavigationItem() {
     get() = FabPosition.Center
 
   @Composable
-  override fun Content() {
+  override fun Content(navigator: Navigator) {
     ListsSceneContent()
   }
 }

@@ -21,10 +21,6 @@
 package com.twidere.twiderex.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.kmp.LocalRemoteNavigator
-import com.twidere.twiderex.ui.LocalNavController
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.rememberNavigator
@@ -32,18 +28,19 @@ import moe.tlaster.precompose.navigation.rememberNavigator
 @Composable
 fun Router(
   navController: Navigator = rememberNavigator(),
-  isDebug: Boolean = false
+  isDebug: Boolean = false,
+  hasAccount: Boolean,
 ) {
-  val remoteNavigator = LocalRemoteNavigator.current
-  CompositionLocalProvider(
-    LocalNavController provides navController,
-    LocalNavigator provides com.twidere.twiderex.component.navigation.Navigator(navController, remoteNavigator),
+  NavHost(
+    navigator = navController,
+    initialRoute = if(hasAccount)
+      Root.Home
+    else
+      Root.SignIn.General
   ) {
-    NavHost(navigator = navController, initialRoute = initialRoute) {
-      route()
-    }
-    if (isDebug) {
-      ComposeDebugTool(navController)
-    }
+    twidereRoute(navigator = navController)
+  }
+  if (isDebug) {
+    ComposeDebugTool(navController)
   }
 }

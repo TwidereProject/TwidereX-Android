@@ -42,6 +42,7 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.stringResource
@@ -51,17 +52,23 @@ import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.rememberUserNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMNewConversationViewModel
 import com.twidere.twiderex.viewmodel.user.UserEvent
 import com.twidere.twiderex.viewmodel.user.UserPresenter
 import com.twidere.twiderex.viewmodel.user.UserState
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
 
+@NavGraphDestination(
+  route = Root.User.route,
+)
 @Composable
 fun UserScene(
-  userKey: MicroBlogKey,
+  @Path("userKey") userKey: MicroBlogKey,
+  navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current ?: return
   val (state, channel) = rememberPresenterState<UserState, UserEvent> {
@@ -71,9 +78,9 @@ fun UserScene(
     return
   }
   val conversationViewModel: DMNewConversationViewModel = getViewModel()
-  val navController = LocalNavController.current
   var expanded by remember { mutableStateOf(false) }
   var showBlockAlert by remember { mutableStateOf(false) }
+  val userNavigationData = rememberUserNavigationData(navigator)
   TwidereScene {
     InAppNotificationScaffold(
       // TODO: Show top bar with actions
@@ -93,7 +100,7 @@ fun UserScene(
                         it,
                         onResult = { conversationKey ->
                           conversationKey?.let {
-                            navController.navigate(Root.Messages.Conversation(it))
+                            // navController.navigate(Root.Messages.Conversation(it))
                           }
                         }
                       )
@@ -156,7 +163,10 @@ fun UserScene(
           elevation = 0.dp,
           title = {
             state.user?.let {
-              UserName(user = it)
+              UserName(
+                user = it,
+                openLink = userNavigationData.statusNavigation.openLink,
+              )
             }
           }
         )
@@ -167,6 +177,7 @@ fun UserScene(
           userKey = userKey,
           state = state,
           channel = channel,
+          userNavigationData = userNavigationData,
         )
         if (showBlockAlert) {
           state.user?.let {

@@ -29,10 +29,12 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
@@ -47,15 +49,18 @@ class NotificationItem : HomeNavigationItem() {
   override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_message_circle)
 
   @Composable
-  override fun Content() {
+  override fun Content(navigator: Navigator) {
     NotificationContent(
       lazyListController = lazyListController,
+      navigator = navigator,
     )
   }
 }
 
 @Composable
-fun NotificationScene() {
+fun NotificationScene(
+  navigator: Navigator,
+) {
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -69,21 +74,24 @@ fun NotificationScene() {
         )
       }
     ) {
-      NotificationContent()
+      NotificationContent(navigator = navigator)
     }
   }
 }
 
 @Composable
 fun NotificationContent(
-  lazyListController: LazyListController? = null
+  lazyListController: LazyListController? = null,
+  navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current ?: return
   if (account.service !is NotificationService) {
     return
   }
+  val statusNavigationData = rememberStatusNavigationData(navigator)
   TimelineComponent(
     lazyListController = lazyListController,
-    savedStateKeyType = SavedStateKeyType.NOTIFICATION
+    savedStateKeyType = SavedStateKeyType.NOTIFICATION,
+    statusNavigation = statusNavigationData,
   )
 }

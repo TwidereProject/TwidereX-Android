@@ -42,16 +42,21 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsModifyViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
 import org.koin.core.parameter.parametersOf
+
+@NavGraphDestination(
+  route = Root.Lists.TwitterEdit.route,
+)
 
 @Composable
 fun TwitterListsEditScene(
-  listKey: MicroBlogKey
+  @Path("listKey") listKey: MicroBlogKey
 ) {
-  val navController = LocalNavController.current
   val listsEditViewModel: ListsModifyViewModel = getViewModel {
     parametersOf(listKey)
   }
@@ -79,7 +84,7 @@ fun TwitterListsEditScene(
                     description = desc,
                     private = isPrivate
                   ) { success, _ ->
-                    if (success) navController.popBackStack()
+                    // if (success) navController.popBackStack()
                   }
                 }
               ) {

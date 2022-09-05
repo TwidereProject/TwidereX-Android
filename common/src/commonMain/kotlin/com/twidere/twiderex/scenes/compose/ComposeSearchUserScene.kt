@@ -20,10 +20,8 @@
  */
 package com.twidere.twiderex.scenes.compose
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -42,22 +40,29 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.rememberUserNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.compose.ComposeSearchUserViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@NavGraphDestination(
+  route = Root.Compose.Search.User,
+)
 @Composable
-fun ComposeSearchUserScene() {
+fun ComposeSearchUserScene(
+  navigator: Navigator,
+) {
   val account = LocalActiveAccount.current ?: return
-  val navController = LocalNavController.current
   val viewModel: ComposeSearchUserViewModel = getViewModel()
   val text by viewModel.text.observeAsState(initial = "")
   val source = viewModel.source.collectAsLazyPagingItems()
+  val userNavigationData = rememberUserNavigationData(navigator)
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -77,7 +82,7 @@ fun ComposeSearchUserScene() {
                 alignment = Alignment.CenterStart,
                 keyboardActions = KeyboardActions(
                   onDone = {
-                    navController.goBackWith("@$text")
+                    navigator.goBackWith("@$text")
                   }
                 ),
                 keyboardOptions = KeyboardOptions(
@@ -92,7 +97,7 @@ fun ComposeSearchUserScene() {
           actions = {
             IconButton(
               onClick = {
-                navController.goBackWith("@$text")
+                navigator.goBackWith("@$text")
               }
             ) {
               Icon(
@@ -108,9 +113,10 @@ fun ComposeSearchUserScene() {
     ) {
       LazyUiUserList(
         items = source,
+        userNavigationData = userNavigationData,
         onItemClicked = {
           val displayName = it.getDisplayScreenName(account.accountKey.host)
-          navController.goBackWith(displayName)
+          navigator.goBackWith(displayName)
         },
         header = {
           loadState(source.loadState.refresh)

@@ -28,9 +28,12 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.HomeNavigationItem
+import com.twidere.twiderex.navigation.StatusNavigationData
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
 
@@ -47,15 +50,20 @@ class AllNotificationItem : HomeNavigationItem() {
   override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_message_circle)
 
   @Composable
-  override fun Content() {
+  override fun Content(navigator: Navigator) {
+    val statusNavigation = rememberStatusNavigationData(navigator)
     AllNotificationSceneContent(
       lazyListController = lazyListController,
+      statusNavigation = statusNavigation,
     )
   }
 }
 
 @Composable
-fun AllNotificationScene() {
+fun AllNotificationScene(
+  navigator: Navigator,
+) {
+  val statusNavigation = rememberStatusNavigationData(navigator)
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -69,7 +77,9 @@ fun AllNotificationScene() {
         )
       }
     ) {
-      AllNotificationSceneContent()
+      AllNotificationSceneContent(
+        statusNavigation = statusNavigation
+      )
     }
   }
 }
@@ -77,9 +87,11 @@ fun AllNotificationScene() {
 @Composable
 fun AllNotificationSceneContent(
   lazyListController: LazyListController? = null,
+  statusNavigation: StatusNavigationData,
 ) {
   TimelineComponent(
     lazyListController = lazyListController,
-    savedStateKeyType = SavedStateKeyType.NOTIFICATION
+    savedStateKeyType = SavedStateKeyType.NOTIFICATION,
+    statusNavigation = statusNavigation,
   )
 }

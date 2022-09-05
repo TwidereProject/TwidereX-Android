@@ -52,7 +52,7 @@ import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
-import com.twidere.twiderex.component.navigation.LocalNavigator
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
@@ -61,16 +61,25 @@ import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.UserNavigationData
+import com.twidere.twiderex.navigation.rememberUserNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsAddMemberViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsSearchUserViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
 import org.koin.core.parameter.parametersOf
 
+
+@NavGraphDestination(
+  route = Root.Lists.AddMembers.route,
+)
 @Composable
 fun ListsAddMembersScene(
-  listKey: MicroBlogKey,
+  @Path("listKey") listKey: MicroBlogKey,
+  navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current ?: return
   val viewModel: ListsAddMemberViewModel = getViewModel {
@@ -88,6 +97,8 @@ fun ListsAddMembersScene(
     parametersOf(onlySearchFollowing)
   }
 
+  val userNavigationData = rememberUserNavigationData(navigator)
+
   val keyword by searchViewModel.text.observeAsState(initial = "")
   val searchSource = searchViewModel.source.collectAsLazyPagingItems()
   TwidereScene {
@@ -97,10 +108,9 @@ fun ListsAddMembersScene(
           Column {
             AppBar(
               navigationIcon = {
-                val navController = LocalNavController.current
                 IconButton(
                   onClick = {
-                    navController.goBackWith(viewModel.pendingMap.values.toList())
+                    navigator.goBackWith(viewModel.pendingMap.values.toList())
                   }
                 ) {
                   Icon(
@@ -145,7 +155,8 @@ fun ListsAddMembersScene(
           onAction = {
             viewModel.addToOrRemove(it)
           },
-          statusChecker = { viewModel.isInPendingList(it) }
+          statusChecker = { viewModel.isInPendingList(it) },
+          userNavigationData = userNavigationData,
         )
 
         if (loading) {
@@ -159,8 +170,12 @@ fun ListsAddMembersScene(
 }
 
 @Composable
-private fun SearchResultsContent(source: LazyPagingItems<UiUser>, onAction: (user: UiUser) -> Unit, statusChecker: (user: UiUser) -> Boolean) {
-  val navigator = LocalNavigator.current
+private fun SearchResultsContent(
+  source: LazyPagingItems<UiUser>,
+  onAction: (user: UiUser) -> Unit,
+  statusChecker: (user: UiUser) -> Boolean,
+  userNavigationData: UserNavigationData,
+) {
   SwipeToRefreshLayout(
     refreshingState = source.loadState.refresh is LoadState.Loading,
     onRefresh = {
@@ -169,7 +184,7 @@ private fun SearchResultsContent(source: LazyPagingItems<UiUser>, onAction: (use
   ) {
     LazyUiUserList(
       items = source,
-      onItemClicked = { navigator.user(it) },
+      onItemClicked = { userNavigationData.statusNavigation.toUser.invoke(it) },
       action = {
         TextButton(
           onClick = {
@@ -191,7 +206,8 @@ private fun SearchResultsContent(source: LazyPagingItems<UiUser>, onAction: (use
             )
           }
         }
-      }
+      },
+      userNavigationData = userNavigationData,
     )
   }
 }

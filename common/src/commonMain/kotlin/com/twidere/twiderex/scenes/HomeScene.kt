@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.scenes
 
-// import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDp
@@ -83,6 +82,9 @@ import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.divider
+import com.twidere.twiderex.component.navigation.openLink
+import com.twidere.twiderex.component.navigation.user
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
@@ -96,18 +98,31 @@ import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.scenes.home.item
+import com.twidere.twiderex.twitterHosts
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
+import io.github.seiko.precompose.annotation.NavGraphDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.BackHandler
 
-@OptIn(ExperimentalAnimationApi::class)
+@NavGraphDestination(
+  route = Root.Home,
+  deepLink = [
+    "https://twitter.com",
+    "https://mobile.twitter.com",
+    "https://www.twitter.com",
+    "http://twitter.com",
+    "http://mobile.twitter.com",
+    "http://www.twitter.com",
+  ]
+)
 @Composable
-fun HomeScene() {
+fun HomeScene(
+  navigator: Navigator,
+) {
   val account = LocalActiveAccount.current ?: return
   val scope = rememberCoroutineScope()
   val tabPosition = LocalAppearancePreferences.current.tabPosition
@@ -148,7 +163,18 @@ fun HomeScene() {
     },
   ) {
     if (!menus.any()) {
-      EmptyColumnHomeContent(scaffoldState)
+      EmptyColumnHomeContent(
+        scaffoldState,
+        toUser = {
+          navigator.user(it)
+        },
+        openLink = {
+          navigator.openLink(it)
+        },
+        navigate = {
+          navigator.navigate(it)
+        }
+      )
     } else {
       NestedScrollScaffold(
         scaffoldState = scaffoldState,
@@ -173,10 +199,21 @@ fun HomeScene() {
           }
         },
         drawerContent = {
-          HomeDrawer(scaffoldState)
+          HomeDrawer(
+            scaffoldState,
+            toUser = {
+              navigator.user(it)
+            },
+            openLink = {
+              navigator.openLink(it)
+            },
+            navigate = {
+              navigator.navigate(it)
+            }
+          )
         },
         floatingActionButton = {
-          menus[pagerState.currentPage].item.Fab()
+          menus[pagerState.currentPage].item.Fab(navigator)
         },
         floatingActionButtonPosition = menus[pagerState.currentPage].item.floatingActionButtonPosition,
         enableFloatingActionButtonNestedScroll = hideFab,
@@ -187,6 +224,9 @@ fun HomeScene() {
             pagerState = pagerState,
             scaffoldState = scaffoldState,
             scope = scope,
+            toUser = {
+              navigator.user(it)
+            }
           )
         },
         enableTopBarNestedScroll = hideAppBar
@@ -199,7 +239,7 @@ fun HomeScene() {
           Pager(
             state = pagerState,
           ) {
-            menus[page].item.Content()
+            menus[page].item.Content(navigator)
           }
         }
       }
@@ -208,19 +248,32 @@ fun HomeScene() {
 }
 
 @Composable
-private fun EmptyColumnHomeContent(scaffoldState: ScaffoldState) {
+private fun EmptyColumnHomeContent(
+  scaffoldState: ScaffoldState,
+  toUser: (UiUser) -> Unit,
+  openLink: (String) -> Unit,
+  navigate: (String) -> Unit,
+) {
   InAppNotificationScaffold(
     scaffoldState = scaffoldState,
     topBar = {
       AppBar(
         backgroundColor = MaterialTheme.colors.surface.withElevation(),
         navigationIcon = {
-          MenuAvatar(scaffoldState)
+          MenuAvatar(
+            scaffoldState,
+            toUser = toUser,
+          )
         },
       )
     },
     drawerContent = {
-      HomeDrawer(scaffoldState = scaffoldState)
+      HomeDrawer(
+        scaffoldState = scaffoldState,
+        toUser = toUser,
+        openLink = openLink,
+        navigate = navigate,
+      )
     }
   ) {
     Column(
@@ -258,6 +311,7 @@ fun HomeAppBar(
   pagerState: PagerState,
   scaffoldState: ScaffoldState,
   scope: CoroutineScope,
+  toUser: (UiUser) -> Unit,
 ) {
   if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
     AnimatedVisibility(
@@ -272,7 +326,10 @@ fun HomeAppBar(
           Text(text = menus[pagerState.currentPage].item.name())
         },
         navigationIcon = {
-          MenuAvatar(scaffoldState)
+          MenuAvatar(
+            scaffoldState = scaffoldState,
+            toUser = toUser,
+          )
         },
         elevation = if (menus[pagerState.currentPage].item.withAppBar) {
           AppBarDefaults.TopAppBarElevation
@@ -299,7 +356,10 @@ fun HomeAppBar(
       Row(
         verticalAlignment = Alignment.CenterVertically
       ) {
-        MenuAvatar(scaffoldState)
+        MenuAvatar(
+          scaffoldState,
+          toUser = toUser,
+        )
         IconTabsComponent(
           modifier = Modifier.weight(1f),
           items = menus.map { it.item.icon() to it.item.name() },
@@ -326,7 +386,10 @@ fun HomeAppBar(
 }
 
 @Composable
-private fun MenuAvatar(scaffoldState: ScaffoldState) {
+private fun MenuAvatar(
+  scaffoldState: ScaffoldState,
+  toUser: (UiUser) -> Unit,
+) {
   val scope = rememberCoroutineScope()
   LocalActiveAccount.current?.let { account ->
     val user = remember(account) {
@@ -344,7 +407,8 @@ private fun MenuAvatar(scaffoldState: ScaffoldState) {
             scaffoldState.drawerState.open()
           }
         }
-      }
+      },
+      toUser = toUser,
     )
   }
 }
@@ -394,7 +458,12 @@ fun HomeBottomNavigation(
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
 @Composable
-private fun HomeDrawer(scaffoldState: ScaffoldState) {
+private fun HomeDrawer(
+  scaffoldState: ScaffoldState,
+  toUser: (UiUser) -> Unit,
+  openLink: (String) -> Unit,
+  navigate: (String) -> Unit,
+) {
   var showAccounts by remember { mutableStateOf(false) }
 
   Column {
@@ -402,10 +471,10 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
 
     val account = LocalActiveAccount.current ?: return
     val currentUser = account.toUi()
-    val navController = LocalNavController.current
     DrawerUserHeader(
       currentUser,
       showAccounts,
+      toUser = toUser,
     ) {
       showAccounts = !showAccounts
     }
@@ -444,11 +513,15 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                   withPlatformIcon = true,
                   onClick = {
                     activeAccountViewModel.setActiveAccount(it)
-                  }
+                  },
+                  toUser = toUser,
                 )
               },
               text = {
-                UserName(user = user)
+                UserName(
+                  user = user,
+                  openLink = openLink,
+                )
               },
               secondaryText = {
                 UserScreenName(user = user)
@@ -462,7 +535,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             ListItem(
               modifier = Modifier.clickable(
                 onClick = {
-                  navController.navigate(Root.SignIn.General)
+                  navigate(Root.SignIn.General)
                 }
               ),
               text = {
@@ -475,7 +548,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             ListItem(
               modifier = Modifier.clickable(
                 onClick = {
-                  navController.navigate(Root.Settings.AccountManagement)
+                  navigate(Root.Settings.AccountManagement)
                 }
               ),
               text = {
@@ -503,7 +576,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
           ) {
             DrawerMenuItem(
               onClick = {
-                navController.navigate(it.item.route)
+                navigate(it.item.route)
               },
               title = it.item.name(),
               icon = it.item.icon(),
@@ -520,7 +593,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
         onClick = {
           scope.launch {
             scaffoldState.drawerState.close()
-            navController.navigate(Root.Settings.Home)
+            navigate(Root.Settings.Home)
           }
         }
       ),
@@ -571,6 +644,8 @@ private fun DrawerUserHeader(
   user: UiUser?,
   showAccounts: Boolean,
   onTrailingClicked: () -> Unit = {},
+  toUser: (UiUser) -> Unit,
+  openLink: (String) -> Unit,
 ) {
   ListItem(
     icon = {
@@ -578,12 +653,16 @@ private fun DrawerUserHeader(
         UserAvatar(
           user = it,
           withPlatformIcon = true,
+          toUser = toUser,
         )
       }
     },
     text = {
       if (user != null) {
-        UserName(user = user)
+        UserName(
+          user = user,
+          openLink = openLink,
+        )
       }
     },
     secondaryText = {

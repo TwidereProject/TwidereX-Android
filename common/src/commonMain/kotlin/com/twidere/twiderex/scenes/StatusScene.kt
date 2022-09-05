@@ -53,6 +53,7 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.ErrorPlaceholder
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.status.DetailedStatusComponent
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.StatusThreadStyle
@@ -61,22 +62,29 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.utils.generateNotificationEvent
 import com.twidere.twiderex.viewmodel.StatusViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
 import org.koin.core.parameter.parametersOf
 
-@OptIn(ExperimentalMaterialApi::class)
+@NavGraphDestination(
+  route = Root.Status.route,
+)
 @Composable
 fun StatusScene(
-  statusKey: MicroBlogKey,
+  @Path("statusKey") statusKey: MicroBlogKey,
+  navigator: Navigator,
 ) {
   val viewModel = getViewModel<StatusViewModel> {
     parametersOf(statusKey)
   }
   val source = viewModel.source.collectAsLazyPagingItems()
   val status by viewModel.status.observeAsState(initial = null)
-
+  val statusNavigationData = rememberStatusNavigationData(navigator)
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -97,7 +105,10 @@ fun StatusScene(
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
           status?.let {
-            DetailedStatusComponent(data = it)
+            DetailedStatusComponent(
+              data = it,
+              statusNavigationData = statusNavigationData,
+            )
           }
           Divider()
           when (val refresh = source.loadState.refresh) {
@@ -151,7 +162,10 @@ fun StatusScene(
           if (source.loadState.refresh is LoadState.Loading || source.loadState.refresh is LoadState.Error) {
             status?.let {
               item(key = it.hashCode()) {
-                DetailedStatusComponent(data = it)
+                DetailedStatusComponent(
+                  data = it,
+                  statusNavigationData = statusNavigationData,
+                )
               }
             }
             if (source.loadState.refresh is LoadState.Loading) {
@@ -168,7 +182,8 @@ fun StatusScene(
                       if (item.statusKey == statusKey) {
                         DetailedStatusComponent(
                           data = item,
-                          lineUp = firstVisibleIndex > 0
+                          lineUp = firstVisibleIndex > 0,
+                          statusNavigationData = statusNavigationData,
                         )
                       } else {
                         val lineUp = index > 0 && source.peek(index - 1)
@@ -189,6 +204,7 @@ fun StatusScene(
                             StatusThreadStyle.NONE,
                           lineUp = lineUp,
                           lineDown = lineDown,
+                          statusNavigation = statusNavigationData,
                         )
                       }
                       if (item.statusKey == statusKey) {
@@ -209,8 +225,7 @@ fun StatusScene(
                     }
                     var itemHeight = placeables.first().measuredHeight
                     if (index == source.itemCount - 1) {
-                      var spacerHeight = placeables.last().measuredHeight
-                      itemHeight = maxOf(itemHeight, spacerHeight)
+                      itemHeight = maxOf(itemHeight, placeables.last().measuredHeight)
                     }
                     layout(constraints.maxWidth, itemHeight) {
                       placeables.getOrNull(0)?.place(0, 0)

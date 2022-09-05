@@ -38,8 +38,13 @@ import com.twidere.twiderex.component.foundation.DialogProperties
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.rememberPresenterState
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.TwidereScene
+import io.github.seiko.precompose.annotation.NavGraphDestination
 
+@NavGraphDestination(
+  route = Root.Settings.Storage,
+)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun StorageScene() {

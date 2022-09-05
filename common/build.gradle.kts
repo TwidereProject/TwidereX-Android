@@ -66,6 +66,7 @@ kotlin {
                 api("com.github.Tlaster.KFilePicker:KFilePicker:${Versions.kFilePicker}")
                 implementation("io.github.reactivecircus.cache4k:cache4k:${Versions.cache4k}")
                 api("moe.tlaster:precompose:${Versions.precompose}")
+                api("io.github.qdsfdhvh:precompose-annotation:${Versions.precomposeKsp}")
             }
         }
         val commonTest by getting {
@@ -136,6 +137,12 @@ kotlin {
         }
         val desktopTest by getting
     }
+}
+
+dependencies {
+    add("kspCommonMainMetadata", "io.github.qdsfdhvh:precompose-ksp:${Versions.precomposeKsp}")
+    add("kspAndroid", "io.github.qdsfdhvh:precompose-ksp:${Versions.precomposeKsp}")
+    add("kspDesktop", "io.github.qdsfdhvh:precompose-ksp:${Versions.precomposeKsp}")
 }
 
 buildkonfig {

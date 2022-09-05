@@ -77,9 +77,10 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.kmp.TimeUtils
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMedia
+import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.navigation.DMNavigationData
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.preferences.model.DisplayPreferences
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -91,7 +92,8 @@ fun LazyUiDMEventList(
   key: ((item: UiDMEvent) -> Any) = { it.messageKey.hashCode() },
   header: LazyListScope.() -> Unit = {},
   onResend: (event: UiDMEvent) -> Unit = {},
-  onItemLongClick: (event: UiDMEvent) -> Unit = {}
+  onItemLongClick: (event: UiDMEvent) -> Unit = {},
+  dmNavigationData: DMNavigationData,
 ) {
   LazyUiList(items = items) {
     LazyColumn(
@@ -111,9 +113,14 @@ fun LazyUiDMEventList(
               .padding(LazyUiDMEventListDefaults.ContentPadding)
           ) {
             if (it.isInCome)
-              DMInComeEvent(it, onItemLongClick)
+              DMInComeEvent(
+                it,
+                onItemLongClick,
+                toUser = dmNavigationData.statusNavigation.toUser,
+                openLink = dmNavigationData.statusNavigation.openLink,
+              )
             else
-              DMOutComeEvent(onResend, it, onItemLongClick)
+              DMOutComeEvent(onResend, it, onItemLongClick, dmNavigationData)
           }
         } ?: run {
           LoadingEventPlaceholder()
@@ -134,7 +141,8 @@ private object LazyUiDMEventListDefaults {
 private fun DMOutComeEvent(
   onResend: (event: UiDMEvent) -> Unit = {},
   event: UiDMEvent,
-  onItemLongClick: (event: UiDMEvent) -> Unit
+  onItemLongClick: (event: UiDMEvent) -> Unit,
+  dmNavigationData: DMNavigationData,
 ) {
   Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
     Column(horizontalAlignment = Alignment.End) {
@@ -165,7 +173,11 @@ private fun DMOutComeEvent(
           }
         }
         Spacer(modifier = Modifier.width(DMEventDefaults.ContentSpacing))
-        MessageBody(event, onItemLongClick)
+        MessageBody(
+          event,
+          onItemLongClick,
+          openLink = dmNavigationData.statusNavigation.openLink,
+        )
       }
       ChatTime(
         modifier = Modifier.padding(
@@ -190,13 +202,25 @@ private object DMOutComeEventDefaults {
 }
 
 @Composable
-private fun DMInComeEvent(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) -> Unit) {
+private fun DMInComeEvent(
+  event: UiDMEvent,
+  onItemLongClick: (event: UiDMEvent) -> Unit,
+  toUser: (UiUser) -> Unit,
+  openLink: (String) -> Unit,
+) {
   Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
     Column {
       Row(verticalAlignment = Alignment.Bottom) {
-        UserAvatar(user = event.sender)
+        UserAvatar(
+          user = event.sender,
+          toUser = toUser,
+        )
         Spacer(modifier = Modifier.width(DMEventDefaults.ContentSpacing))
-        MessageBody(event, onItemLongClick)
+        MessageBody(
+          event,
+          onItemLongClick,
+          openLink = openLink,
+        )
       }
       ChatTime(
         modifier = Modifier.padding(
@@ -220,8 +244,11 @@ private object DMEventDefaults {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun MessageBody(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) -> Unit) {
-  val navController = LocalNavController.current
+private fun MessageBody(
+  event: UiDMEvent,
+  onItemLongClick: (event: UiDMEvent) -> Unit,
+  openLink: (String) -> Unit,
+) {
   Box(
     modifier = Modifier
       .clip(
@@ -249,7 +276,7 @@ private fun MessageBody(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) ->
       MediaMessage(
         media = event.media.firstOrNull(),
         onClick = {
-          navController.navigate(Root.Media.Pure(event.messageKey, 0))
+          // navController.navigate(Root.Media.Pure(event.messageKey, 0))
         }
       )
       if (event.media.isNotEmpty() && event.htmlText.isNotEmpty()) Spacer(
@@ -268,7 +295,8 @@ private fun MessageBody(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) ->
           htmlText = event.htmlText,
           textStyle = textStyle,
           linkStyle = linkStyle,
-          linkResolver = { href -> event.resolveLink(href) }
+          linkResolver = { href -> event.resolveLink(href) },
+          openLink = openLink,
         )
       }
     }

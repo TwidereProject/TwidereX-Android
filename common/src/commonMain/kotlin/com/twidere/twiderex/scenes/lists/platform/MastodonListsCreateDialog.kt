@@ -33,13 +33,11 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.navigation.Root
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
-  val navController = LocalNavController.current
   val scope = rememberCoroutineScope()
   var showMastodonComponent by remember {
     mutableStateOf(true)
@@ -78,9 +76,9 @@ fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
         )
         dismiss()
         if (result != null) {
-          navController.navigate(
-            Root.Lists.Timeline(result.listKey),
-          )
+          // navController.navigate(
+          //   Root.Lists.Timeline(result.listKey),
+          // )
         }
       }
     }

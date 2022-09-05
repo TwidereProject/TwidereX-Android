@@ -33,6 +33,7 @@ import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.rememberPresenterState
+import com.twidere.twiderex.navigation.StatusNavigationData
 import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
 import com.twidere.twiderex.viewmodel.timeline.TimeLineEvent
 import com.twidere.twiderex.viewmodel.timeline.TimelinePresenter
@@ -42,7 +43,8 @@ import com.twidere.twiderex.viewmodel.timeline.TimelineState
 fun TimelineComponent(
   contentPadding: PaddingValues = PaddingValues(0.dp),
   lazyListController: LazyListController? = null,
-  savedStateKeyType: SavedStateKeyType
+  savedStateKeyType: SavedStateKeyType,
+  statusNavigation: StatusNavigationData,
 ) {
 
   val (state, channel) = rememberPresenterState<TimelineState, TimeLineEvent> {
@@ -81,6 +83,7 @@ fun TimelineComponent(
       onLoadBetweenClicked = { current, next ->
         channel.trySend(TimeLineEvent.LoadBetween(current, next))
       },
+      statusNavigation = statusNavigation,
     )
   }
 }

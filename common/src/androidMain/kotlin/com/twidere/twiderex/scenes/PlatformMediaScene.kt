@@ -24,12 +24,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 
 @Composable
-actual fun PlatformStatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
-  StatusMediaScene(statusKey = statusKey, selectedIndex = selectedIndex)
+actual fun PlatformStatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int, navigator: Navigator) {
+  StatusMediaScene(statusKey = statusKey, selectedIndex = selectedIndex, navigator = navigator)
 }
 
 @Composable

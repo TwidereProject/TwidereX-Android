@@ -76,8 +76,7 @@ import com.twidere.twiderex.component.foundation.VideoPlayerState
 import com.twidere.twiderex.component.foundation.platform.HorizontalPagerIndicator
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.foundation.rememberVideoPlayerState
-import com.twidere.twiderex.component.navigation.INavigator
-import com.twidere.twiderex.component.navigation.LocalNavigator
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
@@ -101,23 +100,27 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.navigation.StatusNavigationData
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.utils.video.CustomVideoControl
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
-import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.swiper.Swiper
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
+fun StatusMediaScene(
+  statusKey: MicroBlogKey,
+  selectedIndex: Int,
+  navigator: Navigator,
+) {
   val viewModel = getViewModel<MediaViewModel> {
     parametersOf(statusKey)
   }
@@ -144,10 +147,12 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
       CompositionLocalProvider(
         LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
       ) {
+        val statusNavigationData = rememberStatusNavigationData(navigator)
         StatusMediaScene(
           status = it,
           selectedIndex = selectedIndex.coerceIn(0, it.media.lastIndex),
           viewModel = viewModel,
+          statusNavigationData = statusNavigationData,
         )
       }
     }
@@ -155,12 +160,15 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
 }
 
 @Composable
-fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
+fun StatusMediaScene(
+  status: UiStatus,
+  selectedIndex: Int,
+  viewModel: MediaViewModel,
+  statusNavigationData: StatusNavigationData,
+) {
   val window = LocalPlatformWindow.current
   var controlVisibility by remember { mutableStateOf(true) }
-  val navigator = LocalNavigator.current
   val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
-  val navController = LocalNavController.current
   val pagerState = rememberPagerState(
     initialPage = selectedIndex,
     pageCount = status.media.size,
@@ -171,7 +179,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
 
   val swiperState = rememberSwiperState(
     onDismiss = {
-      navController.popBackStack()
+      // navController.popBackStack()
     },
   )
   StatusMediaSceneLayout(
@@ -182,7 +190,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
         status = status,
         visible = controlVisibility && swiperState.progress == 0f,
         controlPanelColor = controlPanelColor,
-        navigator = navigator,
+        statusNavigationData = statusNavigationData,
         videoPlayerState = videoPlayerState.value,
         viewModel = viewModel,
         currentMedia = currentMedia,
@@ -193,7 +201,6 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
       StatusMediaCloseButton(
         visible = controlVisibility && swiperState.progress == 0f,
         backgroundColor = controlPanelColor,
-        navController = navController
       )
     },
     mediaView = {
@@ -244,7 +251,6 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
 private fun StatusMediaCloseButton(
   visible: Boolean,
   backgroundColor: Color,
-  navController: Navigator
 ) {
   AnimatedVisibility(
     visible = visible,
@@ -268,7 +274,7 @@ private fun StatusMediaCloseButton(
       ) {
         IconButton(
           onClick = {
-            navController.popBackStack()
+            // navController.popBackStack()
           }
         ) {
           Icon(
@@ -289,11 +295,11 @@ private fun StatusMediaBottomContent(
   status: UiStatus,
   visible: Boolean,
   controlPanelColor: Color,
-  navigator: INavigator,
   videoPlayerState: VideoPlayerState?,
   viewModel: MediaViewModel,
   currentMedia: UiMedia,
-  pagerState: PagerState
+  pagerState: PagerState,
+  statusNavigationData: StatusNavigationData
 ) {
   Column(
     modifier = Modifier.fillMaxWidth()
@@ -322,10 +328,10 @@ private fun StatusMediaBottomContent(
         modifier = Modifier
           .background(color = controlPanelColor)
           .bottomInsetsPadding()
-          .clickable { navigator.status(status = status) },
+          .clickable { statusNavigationData.toStatus.invoke(status) },
       ) {
         StatusMediaInfo(
-          videoPlayerState, status, viewModel, currentMedia,
+          videoPlayerState, status, viewModel, currentMedia, statusNavigationData
         )
       }
     }
@@ -339,6 +345,7 @@ private fun StatusMediaInfo(
   status: UiStatus,
   viewModel: MediaViewModel,
   currentMedia: UiMedia,
+  statusNavigationData: StatusNavigationData,
 ) {
   val scope = rememberCoroutineScope()
 
@@ -353,7 +360,7 @@ private fun StatusMediaInfo(
     if (videoPlayerState != null) {
       CustomVideoControl(state = videoPlayerState)
     }
-    StatusText(status = status, maxLines = 2, showMastodonPoll = false)
+    StatusText(status = status, maxLines = 2, showMastodonPoll = false, openLink = statusNavigationData.openLink,)
     Spacer(modifier = Modifier.height(StatusMediaInfoDefaults.TextSpacing))
     Row(
       verticalAlignment = Alignment.CenterVertically,
@@ -363,14 +370,27 @@ private fun StatusMediaInfo(
           .weight(1f),
         verticalAlignment = Alignment.CenterVertically,
       ) {
-        UserAvatar(user = status.user)
+        UserAvatar(
+          user = status.user,
+          toUser = statusNavigationData.toUser,
+        )
         Spacer(modifier = Modifier.width(StatusMediaInfoDefaults.AvatarSpacing))
-        UserName(user = status.user)
+        UserName(
+          user = status.user,
+          openLink = statusNavigationData.openLink,
+        )
         Spacer(modifier = Modifier.width(StatusMediaInfoDefaults.NameSpacing))
         UserScreenName(user = status.user)
       }
-      ReplyButton(status = status, withNumber = false)
-      RetweetButton(status = status, withNumber = false)
+      ReplyButton(
+        status = status,
+        withNumber = false,
+        compose = statusNavigationData.composeNavigationData.compose,
+      )
+      RetweetButton(
+        status = status, withNumber = false,
+        compose = statusNavigationData.composeNavigationData.compose,
+      )
       LikeButton(status = status, withNumber = false)
       ShareButton(status = status) { callback ->
         DropdownMenuItem(
@@ -431,10 +451,9 @@ fun RawMediaScene(url: String, type: MediaType) {
     Scaffold(
       backgroundColor = Color.Transparent
     ) {
-      val navController = LocalNavController.current
       val swiperState = rememberSwiperState(
         onDismiss = {
-          navController.popBackStack()
+          // navController.popBackStack()
         },
       )
       Box {
@@ -444,7 +463,7 @@ fun RawMediaScene(url: String, type: MediaType) {
             .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
         )
         MediaView(media = listOf(MediaData(url, type)), swiperState = swiperState, onClick = {
-          navController.popBackStack()
+          // navController.popBackStack()
         }, backgroundColor = MaterialTheme.colors.background)
       }
     }

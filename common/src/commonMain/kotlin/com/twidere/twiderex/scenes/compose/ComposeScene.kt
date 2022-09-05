@@ -104,6 +104,7 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.foundation.platform.PlatformEmojiPanel
 import com.twidere.twiderex.component.media.MediaInsertMenu
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
@@ -128,8 +129,9 @@ import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.StatusNavigationData
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.Orange
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.compose.ComposeViewModel
@@ -138,16 +140,22 @@ import com.twidere.twiderex.viewmodel.compose.DraftItemViewModel
 import com.twidere.twiderex.viewmodel.compose.VoteExpired
 import com.twidere.twiderex.viewmodel.compose.VoteState
 import com.twitter.twittertext.TwitterTextParser
-import kotlinx.coroutines.flow.collect
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.BackHandler
 import org.koin.core.parameter.parametersOf
 
+
+@NavGraphDestination(
+  route = Root.Draft.Compose.route,
+)
 @Composable
 fun DraftComposeScene(
-  draftId: String,
+  @Path("draftId") draftId: String,
+  navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current ?: return
   val draftItemViewModel: DraftItemViewModel = getViewModel {
@@ -160,20 +168,35 @@ fun DraftComposeScene(
         draft,
       )
     }
-    ComposeBody(viewModel = viewModel, account = account)
+    val statusNavigation = rememberStatusNavigationData(navigator)
+    ComposeBody(
+      viewModel = viewModel,
+      account = account,
+      statusNavigation = statusNavigation,
+    )
   }
 }
 
+
+@NavGraphDestination(
+  route = Root.Compose.Home.route,
+)
 @Composable
 fun ComposeScene(
   statusKey: MicroBlogKey? = null,
   composeType: ComposeType = ComposeType.New,
+  navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current ?: return
   val viewModel: ComposeViewModel = getViewModel {
     parametersOf(statusKey, composeType)
   }
-  ComposeBody(viewModel = viewModel, account = account)
+  val statusNavigation = rememberStatusNavigationData(navigator)
+  ComposeBody(
+    viewModel = viewModel,
+    account = account,
+    statusNavigation = statusNavigation,
+  )
 }
 
 @OptIn(
@@ -185,13 +208,13 @@ fun ComposeScene(
 private fun ComposeBody(
   viewModel: ComposeViewModel,
   account: AccountDetails,
+  statusNavigation: StatusNavigationData,
 ) {
   val composeType = viewModel.composeType
   val status by viewModel.status.observeAsState(null)
   val images by viewModel.images.observeAsState(initial = emptyList())
   val location by viewModel.location.observeAsState(null)
   val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
-  val navController = LocalNavController.current
   val textFieldValue by viewModel.textFieldValue.observeAsState(initial = TextFieldValue())
   val keyboardController = LocalSoftwareKeyboardController.current
   val canSaveDraft by viewModel.canSaveDraft.observeAsState(initial = false)
@@ -221,10 +244,10 @@ private fun ComposeBody(
         onConfirm = {
           showSaveDraftDialog = false
           viewModel.saveDraft()
-          navController.popBackStack()
+          // navController.popBackStack()
         },
         onCancel = {
-          navController.popBackStack()
+          // navController.popBackStack()
         }
       )
     }
@@ -232,7 +255,11 @@ private fun ComposeBody(
       sheetPeekHeight = 0.dp,
       scaffoldState = scaffoldState,
       sheetContent = {
-        ReplySheetContent(viewModel = viewModel, scaffoldState = scaffoldState)
+        ReplySheetContent(
+          viewModel = viewModel,
+          scaffoldState = scaffoldState,
+          statusNavigation = statusNavigation,
+        )
       },
       topBar = {
         AppBar(
@@ -251,7 +278,7 @@ private fun ComposeBody(
                 if (canSaveDraft) {
                   showSaveDraftDialog = true
                 } else {
-                  navController.popBackStack()
+                  // navController.popBackStack()
                 }
               }
             ) {
@@ -269,7 +296,7 @@ private fun ComposeBody(
               enabled = canSend,
               onClick = {
                 viewModel.compose()
-                navController.popBackStack()
+                // navController.popBackStack()
               }
             ) {
               Icon(
@@ -337,6 +364,7 @@ private fun ComposeBody(
                     TimelineStatusComponent(
                       data = status,
                       showActions = false,
+                      statusNavigation = statusNavigation,
                     )
                   }
                 }
@@ -376,6 +404,7 @@ private fun ComposeBody(
                   TimelineStatusComponent(
                     data = status,
                     showActions = false,
+                    statusNavigation = statusNavigation,
                   )
                 }
               }
@@ -644,6 +673,7 @@ object ComposeMastodonVisibilityDefaults {
 private fun ReplySheetContent(
   viewModel: ComposeViewModel,
   scaffoldState: BottomSheetScaffoldState,
+  statusNavigation: StatusNavigationData,
 ) {
   if (viewModel.composeType != ComposeType.Reply) {
     return
@@ -678,10 +708,14 @@ private fun ReplySheetContent(
       icon = {
         UserAvatar(
           user = it.user,
+          toUser = statusNavigation.toUser,
         )
       },
       text = {
-        UserName(user = it.user)
+        UserName(
+          user = it.user,
+          openLink = statusNavigation.openLink,
+        )
       },
       secondaryText = {
         UserScreenName(user = it.user)
@@ -717,10 +751,14 @@ private fun ReplySheetContent(
         icon = {
           UserAvatar(
             user = user,
+            toUser = statusNavigation.toUser,
           )
         },
         text = {
-          UserName(user = user)
+          UserName(
+            user = user,
+            openLink = statusNavigation.openLink,
+          )
         },
         secondaryText = {
           UserScreenName(user = user)
@@ -1032,7 +1070,6 @@ private fun ComposeActions(
     account.type != PlatformType.Mastodon && currentPlatform == Platform.Android
   }
   val scope = rememberCoroutineScope()
-  val navController = LocalNavController.current
 
   val draftCount = viewModel.draftCount.observeAsState(0)
   val insertMode by viewModel.mediaInsertMode.observeAsState(initial = ComposeViewModel.MediaInsertMode.All)
@@ -1085,12 +1122,12 @@ private fun ComposeActions(
         IconButton(
           onClick = {
             scope.launch {
-              val result =
-                navController.navigateForResult(Root.Compose.Search.User)
-                  ?.toString()
-              if (!result.isNullOrEmpty()) {
-                viewModel.insertText("$result ")
-              }
+              // val result =
+              //   navController.navigateForResult(Root.Compose.Search.User)
+              //     ?.toString()
+              // if (!result.isNullOrEmpty()) {
+              //   viewModel.insertText("$result ")
+              // }
             }
           }
         ) {
@@ -1106,12 +1143,12 @@ private fun ComposeActions(
         IconButton(
           onClick = {
             scope.launch {
-              val result =
-                navController.navigateForResult(Root.Mastodon.Compose.Hashtag)
-                  ?.toString()
-              if (!result.isNullOrEmpty()) {
-                viewModel.insertText("$result ")
-              }
+              // val result =
+              //   navController.navigateForResult(Root.Mastodon.Compose.Hashtag)
+              //     ?.toString()
+              // if (!result.isNullOrEmpty()) {
+              //   viewModel.insertText("$result ")
+              // }
             }
           }
         ) {
@@ -1166,7 +1203,7 @@ private fun ComposeActions(
       if (draftCount.value > 0) {
         IconButton(
           onClick = {
-            navController.navigate(Root.Draft.List)
+            // navController.navigate(Root.Draft.List)
           }
         ) {
           Box {
@@ -1207,7 +1244,6 @@ private object ComposeActionsDefaults {
 private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel) {
   var expanded by remember { mutableStateOf(false) }
   val type = item.type
-  val navController = LocalNavController.current
   Box {
     Box(
       modifier = Modifier
@@ -1220,12 +1256,12 @@ private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel) {
         )
         .clickable(
           onClick = {
-            navController.navigate(
-              Root.Media.Raw(
-                if (type == MediaType.video) MediaType.video else MediaType.photo,
-                item.filePath.toString()
-              )
-            )
+            // navController.navigate(
+            //   Root.Media.Raw(
+            //     if (type == MediaType.video) MediaType.video else MediaType.photo,
+            //     item.filePath.toString()
+            //   )
+            // )
           }
         )
         .clip(MaterialTheme.shapes.small),

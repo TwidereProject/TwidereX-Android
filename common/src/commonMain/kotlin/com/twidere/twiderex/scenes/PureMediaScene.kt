@@ -63,7 +63,6 @@ import com.twidere.twiderex.kmp.LocalPlatformWindow
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.utils.video.CustomVideoControl
@@ -91,7 +90,6 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
         val window = LocalPlatformWindow.current
         var controlVisibility by remember { mutableStateOf(true) }
         val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
-        val navController = LocalNavController.current
         val pagerState = rememberPagerState(
           initialPage = selectedIndex,
           pageCount = medias.size,
@@ -99,7 +97,7 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
         val videoPlayerState = mutableStateOf<VideoPlayerState?>(null)
         val swiperState = rememberSwiperState(
           onDismiss = {
-            navController.popBackStack()
+            // navController.popBackStack()
           },
         )
         val display = LocalDisplayPreferences.current
@@ -124,7 +122,7 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
               swiperState = swiperState,
               controlPanelColor = controlPanelColor,
               onPopBack = {
-                navController.popBackStack()
+                // navController.popBackStack()
               }
             )
           },

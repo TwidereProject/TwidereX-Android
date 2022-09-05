@@ -33,17 +33,26 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.ColoredSwitch
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.navigation.openLink
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.TwidereScene
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
 
+@NavGraphDestination(
+  route = Root.Settings.AccountNotification.route,
+)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AccountNotificationScene(
-  accountKey: MicroBlogKey,
+  @Path("accountKey") accountKey: MicroBlogKey,
+  navigator: Navigator,
 ) {
   val (state, channel) = rememberPresenterState { AccountNotificationPresenter(accountKey, it) }
   TwidereScene {
@@ -68,7 +77,12 @@ fun AccountNotificationScene(
               channel.trySend(AccountNotificationEvent.SetIsNotificationEnabled(!state.isNotificationEnabled))
             },
             text = {
-              UserName(user = it)
+              UserName(
+                user = it,
+                openLink = {
+                  navigator.openLink(it)
+                }
+              )
             },
             secondaryText = {
               UserScreenName(user = it)

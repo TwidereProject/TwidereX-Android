@@ -45,11 +45,15 @@ import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
 import java.util.Locale
 
+
+@NavGraphDestination(
+  route = Root.Lists.Home,
+)
 @Composable
 fun ListsScene() {
   TwidereScene {
@@ -77,14 +81,15 @@ fun ListsScene() {
 @Composable
 fun ListsSceneFab() {
   val account = LocalActiveAccount.current ?: return
-  val navController = LocalNavController.current
   FloatingActionButton(
     onClick = {
       when (account.type) {
-        PlatformType.Twitter -> navController.navigate(Root.Lists.TwitterCreate)
+        PlatformType.Twitter -> TODO()
+          // navController.navigate(Root.Lists.TwitterCreate)
         PlatformType.StatusNet -> TODO()
         PlatformType.Fanfou -> TODO()
-        PlatformType.Mastodon -> navController.navigate(Root.Lists.MastodonCreateDialog)
+        PlatformType.Mastodon -> TODO()
+          // navController.navigate(Root.Lists.MastodonCreateDialog)
       }
     }
   ) {
@@ -111,7 +116,6 @@ fun ListsSceneFab() {
 @Composable
 fun ListsSceneContent() {
   val account = LocalActiveAccount.current ?: return
-  val navController = LocalNavController.current
   // if list type is all , display title of each type
   val listsViewMode: ListsViewModel = getViewModel()
   val ownerItems = listsViewMode.ownerSource.collectAsLazyPagingItems()
@@ -126,7 +130,9 @@ fun ListsSceneContent() {
       source = sourceItems,
       ownerItems = ownerItems,
       subscribedItems = subscribeItems,
-      onItemClicked = { navController.navigate(Root.Lists.Timeline(it.listKey)) }
+      onItemClicked = {
+        // navController.navigate(Root.Lists.Timeline(it.listKey))
+      }
     )
   }
 }

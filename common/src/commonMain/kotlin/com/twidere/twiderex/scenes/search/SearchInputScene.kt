@@ -44,18 +44,26 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
-import com.twidere.twiderex.component.navigation.LocalNavigator
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.rememberPresenterState
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.scenes.search.presenter.SearchInputEvent
 import com.twidere.twiderex.scenes.search.presenter.SearchInputPresenter
 import com.twidere.twiderex.scenes.search.presenter.SearchInputState
 import com.twidere.twiderex.ui.TwidereScene
+import io.github.seiko.precompose.annotation.NavGraphDestination
 
+@NavGraphDestination(
+  route = Root.Search.Input.route,
+)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SearchInputScene(initial: String? = null) {
+fun SearchInputScene(
+  initial: String? = null,
+  navigator: Navigator,
+) {
 
   val (state, channel) = rememberPresenterState<SearchInputState, SearchInputEvent> {
     SearchInputPresenter(it, keyword = initial ?: "")
@@ -63,7 +71,6 @@ fun SearchInputScene(initial: String? = null) {
   if (state !is SearchInputState.Data) {
     return
   }
-  val navigator = LocalNavigator.current
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -91,7 +98,7 @@ fun SearchInputScene(initial: String? = null) {
                   onSearch = {
                     if (state.searchInput.text.isNotEmpty()) {
                       channel.trySend(SearchInputEvent.AddOrUpgradeEvent(state.searchInput.text))
-                      navigator.search(state.searchInput.text)
+                      // navigator.search(state.searchInput.text)
                     }
                   }
                 )
@@ -103,7 +110,7 @@ fun SearchInputScene(initial: String? = null) {
               onClick = {
                 if (state.searchInput.text.isNotEmpty()) {
                   channel.trySend(SearchInputEvent.AddOrUpgradeEvent(state.searchInput.text))
-                  navigator.search(state.searchInput.text)
+                  // navigator.search(state.searchInput.text)
                 }
               }
             ) {
@@ -125,7 +132,7 @@ fun SearchInputScene(initial: String? = null) {
               onClick = {
                 channel.trySend(SearchInputEvent.AddOrUpgradeEvent(it.content))
                 channel.trySend(SearchInputEvent.UpdateSearchInput(TextFieldValue(it.content, TextRange(it.content.length))))
-                navigator.search(it.content)
+                // navigator.search(it.content)
               }
             ),
             icon = {

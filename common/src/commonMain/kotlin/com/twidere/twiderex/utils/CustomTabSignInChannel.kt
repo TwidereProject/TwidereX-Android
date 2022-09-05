@@ -41,7 +41,6 @@ object CustomTabSignInChannel {
       uri.startsWith(RootDeepLinks.Callback.SignIn.Twitter)
   }
 
-  @OptIn(ExperimentalCoroutinesApi::class)
   suspend fun waitOne(): String {
     waiting = true
     return channel.receive()

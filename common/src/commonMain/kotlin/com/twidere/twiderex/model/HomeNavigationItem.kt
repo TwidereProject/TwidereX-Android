@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.lazy.LazyListController
+import moe.tlaster.precompose.navigation.Navigator
 
 abstract class HomeNavigationItem {
 
@@ -42,10 +43,10 @@ abstract class HomeNavigationItem {
   open val lazyListController = LazyListController()
 
   @Composable
-  abstract fun Content()
+  abstract fun Content(navigator: Navigator)
 
   @Composable
-  open fun Fab() {
+  open fun Fab(navigator: Navigator) {
     // implement this method to apply FloatingActionButton
     // FIXME: 2021/6/17 Workaround for Scaffold#256 which will filter out fab when size == 0
     Spacer(modifier = Modifier.sizeIn(minWidth = 1.dp, minHeight = 1.dp))

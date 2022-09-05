@@ -45,24 +45,32 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Root
-import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.navigation.UserNavigationData
+import com.twidere.twiderex.navigation.rememberUserNavigationData
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMNewConversationViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.PopUpTo
 
+@NavGraphDestination(
+  route = Root.Messages.NewConversation,
+)
 @Composable
-fun DMNewConversationScene() {
-  val navController = LocalNavController.current
+fun DMNewConversationScene(
+  navigator: Navigator,
+) {
   val viewModel: DMNewConversationViewModel = getViewModel()
   val keyWord by viewModel.input.observeAsState("")
   val source = viewModel.sourceFlow.collectAsLazyPagingItems()
+  val userNavigationData = rememberUserNavigationData(navigator)
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -94,14 +102,15 @@ fun DMNewConversationScene() {
             user,
             onResult = { key ->
               key?.let {
-                navController.navigate(
+                navigator.navigate(
                   Root.Messages.Conversation(it),
                   NavOptions(popUpTo = PopUpTo(Root.Messages.Home))
                 )
               }
             }
           )
-        }
+        },
+        userNavigationData = userNavigationData,
       )
     }
   }
@@ -141,10 +150,15 @@ private object SearchInputDefaults {
 }
 
 @Composable
-fun SearchResult(source: LazyPagingItems<UiUser>, onItemClick: (user: UiUser) -> Unit) {
+fun SearchResult(
+  source: LazyPagingItems<UiUser>,
+  userNavigationData: UserNavigationData,
+  onItemClick: (user: UiUser) -> Unit,
+) {
   LazyUiUserList(
     items = source,
     onItemClicked = onItemClick,
+    userNavigationData = userNavigationData,
     modifier = Modifier.fillMaxSize()
   )
 }

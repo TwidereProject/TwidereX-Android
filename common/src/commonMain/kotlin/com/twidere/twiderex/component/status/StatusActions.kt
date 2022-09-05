@@ -58,11 +58,11 @@ import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.humanizedCount
 import com.twidere.twiderex.kmp.LocalRemoteNavigator
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
@@ -75,13 +75,13 @@ fun ReplyButton(
   modifier: Modifier = Modifier,
   status: UiStatus,
   withNumber: Boolean = true,
+  compose: (ComposeType, MicroBlogKey) -> Unit,
 ) {
   val icon = painterResource(res = com.twidere.twiderex.MR.files.ic_corner_up_left)
   val contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_actions_reply)
 
-  val navigator = LocalNavigator.current
   val action = {
-    navigator.compose(ComposeType.Reply, statusKey = status.statusKey)
+    compose(ComposeType.Reply, status.statusKey)
   }
 
   if (withNumber) {
@@ -165,6 +165,7 @@ fun RetweetButton(
   modifier: Modifier = Modifier,
   status: UiStatus,
   withNumber: Boolean = true,
+  compose: (ComposeType, MicroBlogKey) -> Unit,
 ) {
   val actionsViewModel = LocalStatusActions.current
   val account = LocalActiveAccount.current
@@ -203,10 +204,9 @@ fun RetweetButton(
       ) {
         Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_status_actions_retweet))
       }
-      val navigator = LocalNavigator.current
       DropdownMenuItem(
         onClick = {
-          navigator.compose(ComposeType.Quote, statusKey = status.statusKey)
+          compose(ComposeType.Quote, status.statusKey)
         }
       ) {
         Text(

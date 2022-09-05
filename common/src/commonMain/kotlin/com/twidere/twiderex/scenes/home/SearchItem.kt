@@ -47,7 +47,7 @@ import androidx.paging.compose.items
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.component.navigation.LocalNavigator
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.component.trend.MastodonTrendItem
@@ -77,13 +77,15 @@ class SearchItem : HomeNavigationItem() {
     get() = false
 
   @Composable
-  override fun Content() {
-    SearchSceneContent()
+  override fun Content(navigator: Navigator) {
+    SearchSceneContent(navigator)
   }
 }
 
 @Composable
-fun SearchScene() {
+fun SearchScene(
+  navigator: Navigator,
+) {
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -97,20 +99,21 @@ fun SearchScene() {
         )
       }
     ) {
-      SearchSceneContent()
+      SearchSceneContent(navigator)
     }
   }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SearchSceneContent() {
+fun SearchSceneContent(
+  navigator: Navigator
+) {
   val account = LocalActiveAccount.current ?: return
   val (state, channel) = rememberPresenterState { TrendingPresenter(it) }
   if (state !is SearchItemState.Data) {
     return
   }
-  val navigator = LocalNavigator.current
   Scaffold(
     topBar = {
       AppBar(
@@ -119,7 +122,7 @@ fun SearchSceneContent() {
             Row(
               modifier = Modifier.clickable(
                 onClick = {
-                  navigator.searchInput()
+                  // navigator.searchInput()
                 },
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
@@ -137,7 +140,7 @@ fun SearchSceneContent() {
               }
               IconButton(
                 onClick = {
-                  navigator.searchInput()
+                  // navigator.searchInput()
                 }
               ) {
                 Icon(
@@ -170,7 +173,7 @@ fun SearchSceneContent() {
             modifier = Modifier.clickable(
               onClick = {
                 channel.trySend(SearchInputEvent.AddOrUpgradeEvent(it.content))
-                navigator.search(it.content)
+                // navigator.search(it.content)
               }
 
             ),
@@ -244,7 +247,7 @@ fun SearchSceneContent() {
               trend = it,
               onClick = {
                 channel.trySend(SearchInputEvent.AddOrUpgradeEvent(trend.query))
-                navigator.search(trend.query)
+                // navigator.search(trend.query)
               }
             )
             PlatformType.StatusNet -> TODO()
@@ -252,7 +255,7 @@ fun SearchSceneContent() {
             PlatformType.Mastodon -> MastodonTrendItem(
               trend = it,
               onClick = {
-                navigator.hashtag(it.query)
+                // navigator.hashtag(it.query)
               }
             )
           }

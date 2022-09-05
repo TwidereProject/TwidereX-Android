@@ -34,17 +34,25 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.ui.LazyUiDMConversationList
+import com.twidere.twiderex.component.navigation.openLink
+import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMConversationViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+
+@NavGraphDestination(
+  route = Root.Messages.Home,
+)
 
 @Composable
-fun DMConversationListScene() {
+fun DMConversationListScene(
+  navigator: Navigator,
+) {
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -61,17 +69,18 @@ fun DMConversationListScene() {
         DMConversationListSceneFab()
       },
     ) {
-      DMConversationListSceneContent()
+      DMConversationListSceneContent(
+        navigator = navigator,
+      )
     }
   }
 }
 
 @Composable
 fun DMConversationListSceneFab() {
-  val navController = LocalNavController.current
   FloatingActionButton(
     onClick = {
-      navController.navigate(Root.Messages.NewConversation)
+      // navController.navigate(Root.Messages.NewConversation)
     }
   ) {
     Icon(
@@ -85,10 +94,10 @@ fun DMConversationListSceneFab() {
 
 @Composable
 fun DMConversationListSceneContent(
-  lazyListController: LazyListController? = null
+  lazyListController: LazyListController? = null,
+  navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current ?: return
-  val navController = LocalNavController.current
   if (!account.supportDirectMessage) return
   val viewModel: DMConversationViewModel = getViewModel()
   val source = viewModel.source.collectAsLazyPagingItems()
@@ -104,7 +113,10 @@ fun DMConversationListSceneContent(
       items = source,
       state = listState,
       onItemClicked = {
-        navController.navigate(Root.Messages.Conversation(it.conversation.conversationKey))
+        navigator.navigate(Root.Messages.Conversation(it.conversation.conversationKey))
+      },
+      openLink = {
+        navigator.openLink(it)
       }
     )
   }

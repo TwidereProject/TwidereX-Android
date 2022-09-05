@@ -60,11 +60,16 @@ import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.rememberPresenterState
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.isDarkTheme
 import com.twidere.twiderex.ui.primaryColors
+import io.github.seiko.precompose.annotation.NavGraphDestination
 
+@NavGraphDestination(
+  route = Root.Settings.Appearance,
+)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AppearanceScene() {

@@ -48,6 +48,7 @@ import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.navigation.UserNavigationData
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -55,6 +56,7 @@ fun LazyUiUserList(
   modifier: Modifier = Modifier,
   items: LazyPagingItems<UiUser>,
   state: LazyListState = rememberLazyListState(),
+  userNavigationData: UserNavigationData,
   key: ((item: UiUser) -> Any) = { it.userKey.hashCode() },
   onItemClicked: (UiUser) -> Unit = {},
   header: LazyListScope.() -> Unit = {},
@@ -82,11 +84,15 @@ fun LazyUiUserList(
               icon = {
                 UserAvatar(
                   user = it,
+                  toUser = userNavigationData.statusNavigation.toUser,
                 )
               },
               text = {
                 Row {
-                  UserName(user = it)
+                  UserName(
+                    user = it,
+                    openLink = userNavigationData.statusNavigation.openLink,
+                  )
                   Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
                   UserScreenName(user = it)
                 }
