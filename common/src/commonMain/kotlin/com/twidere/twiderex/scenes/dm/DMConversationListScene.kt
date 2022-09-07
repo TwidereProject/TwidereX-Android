@@ -66,7 +66,7 @@ fun DMConversationListScene(
         )
       },
       floatingActionButton = {
-        DMConversationListSceneFab()
+        DMConversationListSceneFab(navigator)
       },
     ) {
       DMConversationListSceneContent(
@@ -77,10 +77,12 @@ fun DMConversationListScene(
 }
 
 @Composable
-fun DMConversationListSceneFab() {
+fun DMConversationListSceneFab(
+  navigator: Navigator,
+) {
   FloatingActionButton(
     onClick = {
-      // navController.navigate(Root.Messages.NewConversation)
+      navigator.navigate(Root.Messages.NewConversation)
     }
   ) {
     Icon(

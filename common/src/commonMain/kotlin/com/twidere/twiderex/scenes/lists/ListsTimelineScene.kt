@@ -166,12 +166,12 @@ fun ListTimeLineScene(
                 DropdownMenuItem(
                   onClick = {
                     menuExpand = false
-                    // navController.navigate(
-                    //   Root.Lists.Members(
-                    //     listKey,
-                    //     uiList.isOwner(account.user.userId)
-                    //   )
-                    // )
+                    navigator.navigate(
+                      Root.Lists.Members(
+                        listKey,
+                        uiList.isOwner(account.user.userId)
+                      )
+                    )
                   }
                 ) {
                   Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_tabs_members))
@@ -181,11 +181,11 @@ fun ListTimeLineScene(
                   DropdownMenuItem(
                     onClick = {
                       menuExpand = false
-                      // navController.navigate(
-                      //   Root.Lists.Subscribers(
-                      //     listKey
-                      //   )
-                      // )
+                      navigator.navigate(
+                        Root.Lists.Subscribers(
+                          listKey
+                        )
+                      )
                     }
                   ) {
                     Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_tabs_subscriber))

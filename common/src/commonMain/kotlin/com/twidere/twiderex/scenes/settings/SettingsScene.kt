@@ -41,6 +41,7 @@ import com.twidere.twiderex.ui.TwidereScene
 import dev.icerock.moko.resources.FileResource
 import dev.icerock.moko.resources.StringResource
 import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
 data class SettingItem(
   val name: StringResource,
@@ -97,7 +98,9 @@ private val settings =
 )
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SettingsScene() {
+fun SettingsScene(
+  navigator: Navigator,
+) {
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -129,7 +132,7 @@ fun SettingsScene() {
               modifier = Modifier.clickable(
                 onClick = {
                   if (it.route.isNotEmpty()) {
-                    // navController.navigate(it.route)
+                    navigator.navigate(it.route)
                   }
                 }
               ),

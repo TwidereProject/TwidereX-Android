@@ -34,17 +34,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.navigation.user
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.twitter.user.TwitterUserViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
 
+@NavGraphDestination(
+  route = RootDeepLinks.Twitter.User.route,
+)
 @Composable
 fun TwitterUserScene(
-  screenName: String,
-  toUser: (UiUser) -> Unit,
+  @Path("screenName") screenName: String,
+  navigator: Navigator,
 ) {
   val viewModel: TwitterUserViewModel = getViewModel {
     parametersOf(screenName)
@@ -53,7 +60,7 @@ fun TwitterUserScene(
   val error by viewModel.error.observeAsState(initial = null)
   LaunchedEffect(user) {
     user?.let {
-      toUser.invoke(it)
+      navigator.user(it)
     }
   }
 

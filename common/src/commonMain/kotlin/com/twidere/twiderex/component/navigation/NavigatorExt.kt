@@ -1,6 +1,11 @@
 package com.twidere.twiderex.component.navigation
 
 import com.twidere.twiderex.kmp.clearCookie
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.MastodonStatusType
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.enums.ReferenceType
+import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.navigation.twidereXSchema
@@ -8,11 +13,58 @@ import com.twidere.twiderex.twitterHosts
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 
+
 suspend fun Navigator.twitterSignInWeb(target: String): String {
     clearCookie()
     return navigateForResult(
         Root.SignIn.Web.Twitter(target)
     ).toString()
+}
+
+fun Navigator.status(
+    status: UiStatus,
+    navOptions: NavOptions?= null
+) {
+    val statusKey = when (status.platformType) {
+      PlatformType.Twitter -> status.statusKey
+      PlatformType.StatusNet -> TODO()
+      PlatformType.Fanfou -> TODO()
+      PlatformType.Mastodon -> {
+        if (status.mastodonExtra != null) {
+          when (status.mastodonExtra.type) {
+            MastodonStatusType.Status -> status.statusKey
+            MastodonStatusType.NotificationFollow, MastodonStatusType.NotificationFollowRequest -> null
+            else -> status.referenceStatus[ReferenceType.MastodonNotification]?.statusKey
+          }
+        } else {
+          status.statusKey
+        }
+      }
+    }
+    if (statusKey != null) {
+      navigate(
+        Root.Status(statusKey),
+        navOptions
+      )
+    }
+  }
+
+fun Navigator.media(
+    statusKey: MicroBlogKey,
+    selectedIndex: Int = 0,
+    navOptions: NavOptions?= null,
+  ) {
+    navigate(Root.Media.Status(statusKey, selectedIndex), navOptions)
+  }
+
+fun Navigator.searchInput(initial: String?= null) {
+    navigate(
+      Root.Search.Input(initial),
+    )
+  }
+
+fun Navigator.search(keyword: String) {
+    navigate(Root.Search.Result(keyword))
 }
 
 fun Navigator.openLink(

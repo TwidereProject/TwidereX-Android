@@ -20,17 +20,9 @@
  */
 package com.twidere.twiderex.navigation
 
-import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
-import moe.tlaster.precompose.navigation.RouteBuilder
-import moe.tlaster.precompose.navigation.path
-import java.net.URLDecoder
-
-// actual fun RouteBuilder.platformScene() {
-//   scene(
-//     Root.SignIn.Web.Twitter,
-//   ) { backStackEntry ->
-//     backStackEntry.path<String>("target")?.let {
-//       TwitterWebSignInScene(target = URLDecoder.decode(it, "UTF-8"))
-//     }
-//   }
+// import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
+// import java.net.URLDecoder
+//
+// actual fun PlatformScene(target: String) {
+//   TwitterWebSignInScene(target = URLDecoder.decode(target, "UTF-8"))
 // }

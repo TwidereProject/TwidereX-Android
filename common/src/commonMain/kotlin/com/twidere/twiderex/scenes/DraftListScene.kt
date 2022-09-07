@@ -73,7 +73,7 @@ fun DraftListScene(
         )
       }
     ) {
-      DraftListSceneContent()
+      DraftListSceneContent(navigator = navigator)
     }
   }
 }
@@ -82,6 +82,7 @@ fun DraftListScene(
 @Composable
 fun DraftListSceneContent(
   lazyListController: LazyListController? = null,
+  navigator: Navigator,
 ) {
   val viewModel: DraftViewModel = getViewModel()
   val source by viewModel.source.observeAsState(initial = emptyList())
@@ -114,7 +115,7 @@ fun DraftListSceneContent(
             ) {
               DropdownMenuItem(
                 onClick = {
-                  // navController.navigate(Root.Draft.Compose(it.draftId))
+                  navigator.navigate(Root.Draft.Compose(it.draftId))
                 }
               ) {
                 Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_drafts_actions_edit_draft))

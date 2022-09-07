@@ -51,6 +51,7 @@ import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.NavOptions
+import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.PopUpTo
 
 
@@ -58,7 +59,9 @@ import moe.tlaster.precompose.navigation.PopUpTo
   route = Root.Lists.TwitterCreate,
 )
 @Composable
-fun TwitterListsCreateScene() {
+fun TwitterListsCreateScene(
+  navigator: Navigator,
+) {
   val scope = rememberCoroutineScope()
   val listsCreateViewModel: ListsCreateViewModel = getViewModel()
   val loading by listsCreateViewModel.loading.observeAsState(initial = false)
@@ -90,12 +93,12 @@ fun TwitterListsCreateScene() {
                     description = desc,
                     private = isPrivate
                   )?.let {
-                    // navController.navigate(
-                    //   Root.Lists.Timeline(it.listKey),
-                    //   options = NavOptions(
-                    //     popUpTo = PopUpTo(Root.Lists.Home)
-                    //   )
-                    // )
+                    navigator.navigate(
+                      Root.Lists.Timeline(it.listKey),
+                      options = NavOptions(
+                        popUpTo = PopUpTo(Root.Lists.Home)
+                      )
+                    )
                   }
                 }
               }

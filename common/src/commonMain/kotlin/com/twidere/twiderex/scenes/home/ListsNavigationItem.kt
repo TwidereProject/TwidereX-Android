@@ -47,7 +47,7 @@ class ListsNavigationItem : HomeNavigationItem() {
 
   @Composable
   override fun Fab(navigator: Navigator) {
-    ListsSceneFab()
+    ListsSceneFab(navigator)
   }
 
   override val floatingActionButtonPosition: FabPosition
@@ -55,6 +55,6 @@ class ListsNavigationItem : HomeNavigationItem() {
 
   @Composable
   override fun Content(navigator: Navigator) {
-    ListsSceneContent()
+    ListsSceneContent(navigator)
   }
 }

@@ -34,16 +34,24 @@ import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.Navigator
 
+@NavGraphDestination(
+  route = Root.Lists.MastodonCreateDialog,
+  functionName = "dialog"
+)
 @Composable
-fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
+fun MastodonListsCreateDialog(
+  navigator: Navigator,
+) {
   val scope = rememberCoroutineScope()
   var showMastodonComponent by remember {
     mutableStateOf(true)
   }
   val dismiss = {
-    onDismissRequest.invoke()
+    navigator.goBack()
     showMastodonComponent = true
   }
   var name by remember {
@@ -76,9 +84,9 @@ fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
         )
         dismiss()
         if (result != null) {
-          // navController.navigate(
-          //   Root.Lists.Timeline(result.listKey),
-          // )
+          navigator.navigate(
+            Root.Lists.Timeline(result.listKey),
+          )
         }
       }
     }

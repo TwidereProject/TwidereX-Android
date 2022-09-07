@@ -52,6 +52,7 @@ import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.navigation.rememberUserNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
@@ -64,12 +65,14 @@ import io.github.seiko.precompose.annotation.Path
 
 @NavGraphDestination(
   route = Root.User.route,
+  deepLink = [RootDeepLinks.User.route]
 )
 @Composable
 fun UserScene(
-  @Path("userKey") userKey: MicroBlogKey,
+  @Path("userKey") key: String,
   navigator: Navigator,
 ) {
+  val userKey = MicroBlogKey.valueOf(key)
   val account = LocalActiveAccount.current ?: return
   val (state, channel) = rememberPresenterState<UserState, UserEvent> {
     UserPresenter(it, userKey = userKey)
@@ -100,7 +103,7 @@ fun UserScene(
                         it,
                         onResult = { conversationKey ->
                           conversationKey?.let {
-                            // navController.navigate(Root.Messages.Conversation(it))
+                            navigator.navigate(Root.Messages.Conversation(it))
                           }
                         }
                       )

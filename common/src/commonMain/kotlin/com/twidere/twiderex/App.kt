@@ -51,7 +51,6 @@ fun App(navController: Navigator = Navigator()) {
   ) {
     Router(
       navController = navController,
-      hasAccount = account != null,
     )
   }
 }

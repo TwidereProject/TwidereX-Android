@@ -27,6 +27,8 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
+import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
+import java.net.URLDecoder
 
 @Composable
 actual fun PlatformStatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int, navigator: Navigator) {
@@ -41,6 +43,14 @@ actual fun PlatformRawMediaScene(url: String, type: MediaType) {
 @Composable
 actual fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
   PureMediaScene(belongToKey = belongToKey, selectedIndex = selectedIndex)
+}
+
+@Composable
+actual fun PlatformScene(target: String, navigator: Navigator) {
+  TwitterWebSignInScene(
+    target = URLDecoder.decode(target, "UTF-8"),
+    navigator = navigator
+  )
 }
 
 @Composable

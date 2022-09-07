@@ -56,7 +56,9 @@ import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.navigation.Root
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
+import moe.tlaster.precompose.navigation.PopUpTo
 
 @NavGraphDestination(
   route = Root.SignIn.General,
@@ -65,6 +67,20 @@ import moe.tlaster.precompose.navigation.Navigator
 fun SignInScene(
   navigator: Navigator,
 ) {
+  val toHome = remember {
+    {
+      navigator.navigate(
+        Root.Home,
+        NavOptions(
+          popUpTo = PopUpTo(
+            route = Root.SignIn.General,
+            inclusive = true,
+          )
+        )
+      )
+    }
+  }
+
   SignInScaffold {
     TwitterSignIn(
       clickSignIn = {
@@ -77,7 +93,7 @@ fun SignInScene(
           it as Boolean
         }?.let {
           if (it) {
-            navigator.goBackWith(true)
+            toHome.invoke()
           }
         }
       },
@@ -88,7 +104,7 @@ fun SignInScene(
           it as Boolean
         }?.let {
           if (it) {
-            navigator.goBackWith(true)
+            toHome.invoke()
           }
         }
       }
@@ -100,7 +116,7 @@ fun SignInScene(
           it as Boolean
         }?.let {
           if (it) {
-            navigator.goBackWith(true)
+            toHome.invoke()
           }
         }
     }

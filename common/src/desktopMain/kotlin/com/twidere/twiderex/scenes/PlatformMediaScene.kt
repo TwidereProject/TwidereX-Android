@@ -31,6 +31,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
+import java.net.URLDecoder
 
 @Composable
 actual fun PlatformStatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int, navigator: Navigator) {
@@ -51,6 +52,11 @@ actual fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int)
   MediaScene {
     PureMediaScene(belongToKey = belongToKey, selectedIndex = selectedIndex)
   }
+}
+
+@Composable
+actual fun PlatformScene(target: String, navigator: Navigator) {
+
 }
 
 @OptIn(ExperimentalComposeUiApi::class)

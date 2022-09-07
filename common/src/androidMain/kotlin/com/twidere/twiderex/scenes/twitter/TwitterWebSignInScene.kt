@@ -25,12 +25,16 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.WebComponent
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.utils.TwitterWebJavascriptInterface
+import moe.tlaster.precompose.navigation.Navigator
 
 const val INJECT_CONTENT =
   "javascript:window.injector.tryPinCode(document.querySelector('#oauth_pin code').textContent);"
 
 @Composable
-fun TwitterWebSignInScene(target: String) {
+fun TwitterWebSignInScene(
+  target: String,
+  navigator: Navigator,
+) {
   TwidereScene {
     InAppNotificationScaffold {
       WebComponent(

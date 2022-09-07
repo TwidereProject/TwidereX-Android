@@ -47,6 +47,7 @@ class DraftNavigationItem : HomeNavigationItem() {
   override fun Content(navigator: Navigator) {
     DraftListSceneContent(
       lazyListController = lazyListController,
+      navigator = navigator,
     )
   }
 }

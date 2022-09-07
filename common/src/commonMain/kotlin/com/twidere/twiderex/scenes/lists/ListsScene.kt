@@ -48,6 +48,7 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsViewModel
 import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 import java.util.Locale
 
 
@@ -55,7 +56,9 @@ import java.util.Locale
   route = Root.Lists.Home,
 )
 @Composable
-fun ListsScene() {
+fun ListsScene(
+  navigator: Navigator,
+) {
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -69,27 +72,29 @@ fun ListsScene() {
         )
       },
       floatingActionButton = {
-        ListsSceneFab()
+        ListsSceneFab(navigator)
       },
       floatingActionButtonPosition = FabPosition.Center
     ) {
-      ListsSceneContent()
+      ListsSceneContent(
+        navigator,
+      )
     }
   }
 }
 
 @Composable
-fun ListsSceneFab() {
+fun ListsSceneFab(
+  navigator: Navigator,
+) {
   val account = LocalActiveAccount.current ?: return
   FloatingActionButton(
     onClick = {
       when (account.type) {
-        PlatformType.Twitter -> TODO()
-          // navController.navigate(Root.Lists.TwitterCreate)
+        PlatformType.Twitter -> navigator.navigate(Root.Lists.TwitterCreate)
         PlatformType.StatusNet -> TODO()
         PlatformType.Fanfou -> TODO()
-        PlatformType.Mastodon -> TODO()
-          // navController.navigate(Root.Lists.MastodonCreateDialog)
+        PlatformType.Mastodon -> navigator.navigate(Root.Lists.MastodonCreateDialog)
       }
     }
   ) {
@@ -114,7 +119,9 @@ fun ListsSceneFab() {
 }
 
 @Composable
-fun ListsSceneContent() {
+fun ListsSceneContent(
+  navigator: Navigator
+) {
   val account = LocalActiveAccount.current ?: return
   // if list type is all , display title of each type
   val listsViewMode: ListsViewModel = getViewModel()
@@ -131,7 +138,7 @@ fun ListsSceneContent() {
       ownerItems = ownerItems,
       subscribedItems = subscribeItems,
       onItemClicked = {
-        // navController.navigate(Root.Lists.Timeline(it.listKey))
+        navigator.navigate(Root.Lists.Timeline(it.listKey))
       }
     )
   }

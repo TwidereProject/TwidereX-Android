@@ -25,6 +25,10 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.twidere.twiderex.component.navigation.media
+import com.twidere.twiderex.component.navigation.openLink
+import com.twidere.twiderex.component.navigation.status
+import com.twidere.twiderex.component.navigation.user
 import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
@@ -51,19 +55,19 @@ fun rememberStatusNavigationData(
       StatusNavigationData(
         composeNavigationData = composeNavigationData,
         toUser = {
-          // navigator.user(it)
+          navigator.user(it)
         },
         toStatus = {
-          // navigator.status(it)
+          navigator.status(it)
         },
         toMedia = {
-          // navigator.media(it)
+          navigator.media(it)
         },
         toMediaWithIndex = { key, index ->
-          // navigator.media(key, index)
+          navigator.media(key, index)
         },
         openLink = {
-          // navigator.openLink(it)
+          navigator.openLink(it)
         }
       )
     )
@@ -93,7 +97,7 @@ fun rememberComposeNavigationData(navigator: Navigator): ComposeNavigationData {
   val composeNavigationData = remember {
     ComposeNavigationData(
       compose = { type, key ->
-        // navigator.compose(type, key)
+        navigator.navigate(Root.Compose.Home(type, key))
       }
     )
   }

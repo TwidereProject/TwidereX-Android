@@ -46,7 +46,7 @@ class DMConversationListItem : HomeNavigationItem() {
 
   @Composable
   override fun Fab(navigator: Navigator) {
-    DMConversationListSceneFab()
+    DMConversationListSceneFab(navigator)
   }
 
   @Composable

@@ -60,6 +60,15 @@ expect fun PlatformPureMediaScene(
   @Path("selectedIndex") selectedIndex: Int,
 )
 
+@NavGraphDestination(
+  route =  Root.SignIn.Web.Twitter.route,
+)
+@Composable
+expect fun PlatformScene(
+  @Path("target") target: String,
+  navigator: Navigator,
+)
+
 @Composable
 expect fun StatusMediaSceneLayout(
   backgroundColor: Color,

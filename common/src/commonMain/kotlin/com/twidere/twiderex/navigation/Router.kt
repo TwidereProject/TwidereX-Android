@@ -21,6 +21,11 @@
 package com.twidere.twiderex.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.repository.AccountRepository
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.rememberNavigator
@@ -29,18 +34,24 @@ import moe.tlaster.precompose.navigation.rememberNavigator
 fun Router(
   navController: Navigator = rememberNavigator(),
   isDebug: Boolean = false,
-  hasAccount: Boolean,
 ) {
-  NavHost(
-    navigator = navController,
-    initialRoute = if(hasAccount)
-      Root.Home
-    else
-      Root.SignIn.General
-  ) {
-    twidereRoute(navigator = navController)
+  val accountRepository: AccountRepository = get()
+  val hasAccount = remember { mutableStateOf<Boolean?>(null) }
+  LaunchedEffect(Unit) {
+    hasAccount.value = accountRepository.hasAccount()
   }
-  if (isDebug) {
-    ComposeDebugTool(navController)
+  hasAccount.value?.let {
+    NavHost(
+      navigator = navController,
+      initialRoute = if(it)
+        Root.Home
+      else
+        Root.SignIn.General
+    ) {
+      twidereRoute(navigator = navController)
+    }
+    if (isDebug) {
+      ComposeDebugTool(navController)
+    }
   }
 }

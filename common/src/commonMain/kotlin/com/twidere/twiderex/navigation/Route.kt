@@ -1,108 +1,107 @@
-// /*
-//  *  Twidere X
-//  *
-//  *  Copyright (C) TwidereProject and Contributors
-//  *
-//  *  This file is part of Twidere X.
-//  *
-//  *  Twidere X is free software: you can redistribute it and/or modify
-//  *  it under the terms of the GNU General Public License as published by
-//  *  the Free Software Foundation, either version 3 of the License, or
-//  *  (at your option) any later version.
-//  *
-//  *  Twidere X is distributed in the hope that it will be useful,
-//  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  *  GNU General Public License for more details.
-//  *
-//  *  You should have received a copy of the GNU General Public License
-//  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
-//  */
-// package com.twidere.twiderex.navigation
-//
-// import androidx.compose.animation.ExperimentalAnimationApi
-// import androidx.compose.animation.fadeIn
-// import androidx.compose.animation.fadeOut
-// import androidx.compose.animation.scaleIn
-// import androidx.compose.animation.scaleOut
-// import androidx.compose.animation.slideInVertically
-// import androidx.compose.animation.slideOutVertically
-// import androidx.compose.material.Scaffold
-// import androidx.compose.runtime.Composable
-// import androidx.compose.runtime.CompositionLocalProvider
-// import androidx.compose.runtime.LaunchedEffect
-// import androidx.compose.runtime.getValue
-// import androidx.compose.runtime.mutableStateOf
-// import androidx.compose.runtime.saveable.rememberSaveable
-// import androidx.compose.runtime.setValue
-// import com.twidere.twiderex.component.RequireAuthorization
-// import moe.tlaster.precompose.navigation.Navigator
-// import com.twidere.twiderex.model.MicroBlogKey
-// import com.twidere.twiderex.model.enums.ComposeType
-// import com.twidere.twiderex.model.enums.MediaType
-// import com.twidere.twiderex.model.enums.PlatformType
-// import com.twidere.twiderex.scenes.DraftListScene
-// import com.twidere.twiderex.scenes.HomeScene
-// import com.twidere.twiderex.scenes.PlatformPureMediaScene
-// import com.twidere.twiderex.scenes.PlatformRawMediaScene
-// import com.twidere.twiderex.scenes.PlatformStatusMediaScene
-// import com.twidere.twiderex.scenes.SignInScene
-// import com.twidere.twiderex.scenes.StatusScene
-// import com.twidere.twiderex.scenes.compose.ComposeScene
-// import com.twidere.twiderex.scenes.compose.ComposeSearchHashtagScene
-// import com.twidere.twiderex.scenes.compose.ComposeSearchUserScene
-// import com.twidere.twiderex.scenes.compose.DraftComposeScene
-// import com.twidere.twiderex.scenes.dm.DMConversationListScene
-// import com.twidere.twiderex.scenes.dm.DMConversationScene
-// import com.twidere.twiderex.scenes.dm.DMNewConversationScene
-// import com.twidere.twiderex.scenes.gif.GifScene
-// import com.twidere.twiderex.scenes.home.HomeTimelineScene
-// import com.twidere.twiderex.scenes.home.MeScene
-// import com.twidere.twiderex.scenes.home.MentionScene
-// import com.twidere.twiderex.scenes.home.mastodon.FederatedTimelineScene
-// import com.twidere.twiderex.scenes.home.mastodon.LocalTimelineScene
-// import com.twidere.twiderex.scenes.home.mastodon.MastodonNotificationScene
-// import com.twidere.twiderex.scenes.lists.ListTimeLineScene
-// import com.twidere.twiderex.scenes.lists.ListsAddMembersScene
-// import com.twidere.twiderex.scenes.lists.ListsMembersScene
-// import com.twidere.twiderex.scenes.lists.ListsScene
-// import com.twidere.twiderex.scenes.lists.ListsSubscribersScene
-// import com.twidere.twiderex.scenes.lists.platform.MastodonListsCreateDialog
-// import com.twidere.twiderex.scenes.lists.platform.TwitterListsCreateScene
-// import com.twidere.twiderex.scenes.lists.platform.TwitterListsEditScene
-// import com.twidere.twiderex.scenes.mastodon.MastodonHashtagScene
-// import com.twidere.twiderex.scenes.mastodon.MastodonSignInScene
-// import com.twidere.twiderex.scenes.search.SearchInputScene
-// import com.twidere.twiderex.scenes.search.SearchScene
-// import com.twidere.twiderex.scenes.settings.AboutScene
-// import com.twidere.twiderex.scenes.settings.AccountManagementScene
-// import com.twidere.twiderex.scenes.settings.SettingsScene
-// import com.twidere.twiderex.scenes.settings.accountNotification.AccountNotificationScene
-// import com.twidere.twiderex.scenes.settings.appearance.AppearanceScene
-// import com.twidere.twiderex.scenes.settings.display.DisplayScene
-// import com.twidere.twiderex.scenes.settings.layout.LayoutScene
-// import com.twidere.twiderex.scenes.settings.misc.MiscScene
-// import com.twidere.twiderex.scenes.settings.notification.NotificationScene
-// import com.twidere.twiderex.scenes.settings.storage.StorageScene
-// import com.twidere.twiderex.scenes.twitter.TwitterSignInScene
-// import com.twidere.twiderex.scenes.twitter.user.TwitterUserScene
-// import com.twidere.twiderex.scenes.user.FollowersScene
-// import com.twidere.twiderex.scenes.user.FollowingScene
-// import com.twidere.twiderex.scenes.user.UserScene
-// import com.twidere.twiderex.twitterHosts
-// import com.twidere.twiderex.ui.LocalActiveAccount
-// import com.twidere.twiderex.ui.LocalActiveAccountViewModel
-// import com.twidere.twiderex.ui.LocalNavController
-// import com.twidere.twiderex.ui.TwidereScene
-// import com.twidere.twiderex.utils.LocalPlatformResolver
-// import moe.tlaster.precompose.navigation.BackStackEntry
-// import moe.tlaster.precompose.navigation.NavOptions
-// import moe.tlaster.precompose.navigation.PopUpTo
-// import moe.tlaster.precompose.navigation.RouteBuilder
-// import moe.tlaster.precompose.navigation.path
-// import moe.tlaster.precompose.navigation.query
-// import moe.tlaster.precompose.navigation.transition.NavTransition
-// import java.net.URLDecoder
+/*
+ *  Twidere X
+ *
+ *  Copyright (C) TwidereProject and Contributors
+ *
+ *  This file is part of Twidere X.
+ *
+ *  Twidere X is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Twidere X is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.twidere.twiderex.navigation
+
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.material.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import com.twidere.twiderex.component.RequireAuthorization
+import moe.tlaster.precompose.navigation.Navigator
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ComposeType
+import com.twidere.twiderex.model.enums.MediaType
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.scenes.DraftListScene
+import com.twidere.twiderex.scenes.HomeScene
+import com.twidere.twiderex.scenes.PlatformPureMediaScene
+import com.twidere.twiderex.scenes.PlatformRawMediaScene
+import com.twidere.twiderex.scenes.PlatformStatusMediaScene
+import com.twidere.twiderex.scenes.SignInScene
+import com.twidere.twiderex.scenes.StatusScene
+import com.twidere.twiderex.scenes.compose.ComposeScene
+import com.twidere.twiderex.scenes.compose.ComposeSearchHashtagScene
+import com.twidere.twiderex.scenes.compose.ComposeSearchUserScene
+import com.twidere.twiderex.scenes.compose.DraftComposeScene
+import com.twidere.twiderex.scenes.dm.DMConversationListScene
+import com.twidere.twiderex.scenes.dm.DMConversationScene
+import com.twidere.twiderex.scenes.dm.DMNewConversationScene
+import com.twidere.twiderex.scenes.gif.GifScene
+import com.twidere.twiderex.scenes.home.HomeTimelineScene
+import com.twidere.twiderex.scenes.home.MeScene
+import com.twidere.twiderex.scenes.home.MentionScene
+import com.twidere.twiderex.scenes.home.mastodon.FederatedTimelineScene
+import com.twidere.twiderex.scenes.home.mastodon.LocalTimelineScene
+import com.twidere.twiderex.scenes.home.mastodon.MastodonNotificationScene
+import com.twidere.twiderex.scenes.lists.ListTimeLineScene
+import com.twidere.twiderex.scenes.lists.ListsAddMembersScene
+import com.twidere.twiderex.scenes.lists.ListsMembersScene
+import com.twidere.twiderex.scenes.lists.ListsScene
+import com.twidere.twiderex.scenes.lists.ListsSubscribersScene
+import com.twidere.twiderex.scenes.lists.platform.MastodonListsCreateDialog
+import com.twidere.twiderex.scenes.lists.platform.TwitterListsCreateScene
+import com.twidere.twiderex.scenes.lists.platform.TwitterListsEditScene
+import com.twidere.twiderex.scenes.mastodon.MastodonHashtagScene
+import com.twidere.twiderex.scenes.mastodon.MastodonSignInScene
+import com.twidere.twiderex.scenes.search.SearchInputScene
+import com.twidere.twiderex.scenes.search.SearchScene
+import com.twidere.twiderex.scenes.settings.AboutScene
+import com.twidere.twiderex.scenes.settings.AccountManagementScene
+import com.twidere.twiderex.scenes.settings.SettingsScene
+import com.twidere.twiderex.scenes.settings.accountNotification.AccountNotificationScene
+import com.twidere.twiderex.scenes.settings.appearance.AppearanceScene
+import com.twidere.twiderex.scenes.settings.display.DisplayScene
+import com.twidere.twiderex.scenes.settings.layout.LayoutScene
+import com.twidere.twiderex.scenes.settings.misc.MiscScene
+import com.twidere.twiderex.scenes.settings.notification.NotificationScene
+import com.twidere.twiderex.scenes.settings.storage.StorageScene
+import com.twidere.twiderex.scenes.twitter.TwitterSignInScene
+import com.twidere.twiderex.scenes.twitter.user.TwitterUserScene
+import com.twidere.twiderex.scenes.user.FollowersScene
+import com.twidere.twiderex.scenes.user.FollowingScene
+import com.twidere.twiderex.scenes.user.UserScene
+import com.twidere.twiderex.twitterHosts
+import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalActiveAccountViewModel
+import com.twidere.twiderex.ui.TwidereScene
+import com.twidere.twiderex.utils.LocalPlatformResolver
+import moe.tlaster.precompose.navigation.BackStackEntry
+import moe.tlaster.precompose.navigation.NavOptions
+import moe.tlaster.precompose.navigation.PopUpTo
+import moe.tlaster.precompose.navigation.RouteBuilder
+import moe.tlaster.precompose.navigation.path
+import moe.tlaster.precompose.navigation.query
+import moe.tlaster.precompose.navigation.transition.NavTransition
+import java.net.URLDecoder
 //
 //
 // fun RouteBuilder.authorizedScene(
@@ -129,83 +128,83 @@
 //   }
 // }
 //
-// @Composable
-// fun ProvidePlatformType(
-//   key: MicroBlogKey,
-//   provider: suspend () -> PlatformType?,
-//   content: @Composable (platformType: PlatformType) -> Unit,
-// ) {
-//   var platformType by rememberSaveable {
-//     mutableStateOf<PlatformType?>(null)
-//   }
-//   val account = LocalActiveAccount.current
-//   LaunchedEffect(key) {
-//     platformType = provider.invoke() ?: account?.type
-//   }
-//   platformType?.let {
-//     content.invoke(it)
-//   } ?: run {
-//     TwidereScene {
-//       Scaffold {
-//       }
-//     }
-//   }
-// }
-//
-// @Composable
-// fun ProvideStatusPlatform(
-//   statusKey: MicroBlogKey,
-//   content: @Composable (platformType: PlatformType) -> Unit,
-// ) {
-//   val platformResolver = LocalPlatformResolver.current
-//   val account = LocalActiveAccount.current ?: return
-//   ProvidePlatformType(
-//     key = statusKey,
-//     provider = {
-//       platformResolver.resolveStatus(statusKey = statusKey, account.accountKey)
-//     },
-//     content = content
-//   )
-// }
-//
-// @Composable
-// fun ProvideUserPlatform(
-//   userKey: MicroBlogKey,
-//   content: @Composable (platformType: PlatformType) -> Unit,
-// ) {
-//   val platformResolver = LocalPlatformResolver.current
-//   ProvidePlatformType(
-//     key = userKey,
-//     provider = {
-//       platformResolver.resolveUser(userKey = userKey)
-//     },
-//     content = content
-//   )
-// }
-//
-// @Composable
-// fun RequirePlatformAccount(
-//   platformType: PlatformType,
-//   fallback: () -> Unit = {},
-//   content: @Composable () -> Unit,
-// ) {
-//   var account = LocalActiveAccount.current ?: run {
-//     fallback.invoke()
-//     return
-//   }
-//   if (account.type != platformType) {
-//     account = LocalActiveAccountViewModel.current.getTargetPlatformDefault(platformType)
-//       ?: run {
-//         fallback.invoke()
-//         return
-//       }
-//   }
-//   CompositionLocalProvider(
-//     LocalActiveAccount provides account
-//   ) {
-//     content.invoke()
-//   }
-// }
+@Composable
+fun ProvidePlatformType(
+  key: MicroBlogKey,
+  provider: suspend () -> PlatformType?,
+  content: @Composable (platformType: PlatformType) -> Unit,
+) {
+  var platformType by rememberSaveable {
+    mutableStateOf<PlatformType?>(null)
+  }
+  val account = LocalActiveAccount.current
+  LaunchedEffect(key) {
+    platformType = provider.invoke() ?: account?.type
+  }
+  platformType?.let {
+    content.invoke(it)
+  } ?: run {
+    TwidereScene {
+      Scaffold {
+      }
+    }
+  }
+}
+
+@Composable
+fun ProvideStatusPlatform(
+  statusKey: MicroBlogKey,
+  content: @Composable (platformType: PlatformType) -> Unit,
+) {
+  val platformResolver = LocalPlatformResolver.current
+  val account = LocalActiveAccount.current ?: return
+  ProvidePlatformType(
+    key = statusKey,
+    provider = {
+      platformResolver.resolveStatus(statusKey = statusKey, account.accountKey)
+    },
+    content = content
+  )
+}
+
+@Composable
+fun ProvideUserPlatform(
+  userKey: MicroBlogKey,
+  content: @Composable (platformType: PlatformType) -> Unit,
+) {
+  val platformResolver = LocalPlatformResolver.current
+  ProvidePlatformType(
+    key = userKey,
+    provider = {
+      platformResolver.resolveUser(userKey = userKey)
+    },
+    content = content
+  )
+}
+
+@Composable
+fun RequirePlatformAccount(
+  platformType: PlatformType,
+  fallback: () -> Unit = {},
+  content: @Composable () -> Unit,
+) {
+  var account = LocalActiveAccount.current ?: run {
+    fallback.invoke()
+    return
+  }
+  if (account.type != platformType) {
+    account = LocalActiveAccountViewModel.current.getTargetPlatformDefault(platformType)
+      ?: run {
+        fallback.invoke()
+        return
+      }
+  }
+  CompositionLocalProvider(
+    LocalActiveAccount provides account
+  ) {
+    content.invoke()
+  }
+}
 //
 // /**
 //  * Note: Path/Query key must be exactly the same as function's parameter's name in Root/RootDeepLinks
