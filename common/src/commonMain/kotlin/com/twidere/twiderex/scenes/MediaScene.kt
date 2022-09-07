@@ -100,6 +100,8 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.navigation.ProvideStatusPlatform
+import com.twidere.twiderex.navigation.RequirePlatformAccount
 import com.twidere.twiderex.navigation.StatusNavigationData
 import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
@@ -117,6 +119,25 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun StatusMediaScene(
+  statusKey: String,
+  selectedIndex: Int,
+  navigator: Navigator,
+) {
+  MicroBlogKey.valueOf(statusKey).let { key ->
+    ProvideStatusPlatform(statusKey = key) { platformType ->
+      RequirePlatformAccount(platformType = platformType) {
+        StatusMediaScene(
+          statusKey = key,
+          selectedIndex = selectedIndex,
+          navigator = navigator,
+        )
+      }
+    }
+  }
+}
+
+@Composable
+private fun StatusMediaScene(
   statusKey: MicroBlogKey,
   selectedIndex: Int,
   navigator: Navigator,

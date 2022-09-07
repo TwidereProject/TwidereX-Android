@@ -25,14 +25,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import moe.tlaster.precompose.navigation.Navigator
-import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
 import java.net.URLDecoder
 
 @Composable
-actual fun PlatformStatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int, navigator: Navigator) {
-  StatusMediaScene(statusKey = statusKey, selectedIndex = selectedIndex, navigator = navigator)
+actual fun PlatformStatusMediaScene(
+  statusKey: String,
+  selectedIndex: Int?,
+  navigator: Navigator,
+) {
+  StatusMediaScene(
+    statusKey = statusKey,
+    selectedIndex = selectedIndex ?: 0,
+    navigator = navigator,
+  )
 }
 
 @Composable
@@ -41,8 +48,16 @@ actual fun PlatformRawMediaScene(url: String, type: MediaType) {
 }
 
 @Composable
-actual fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int?) {
-  PureMediaScene(belongToKey = belongToKey, selectedIndex = selectedIndex ?: 0)
+actual fun PlatformPureMediaScene(
+  belongToKey: String,
+  selectedIndex: Int?,
+  navigator: Navigator
+) {
+  PureMediaScene(
+    belongToKey = belongToKey,
+    selectedIndex = selectedIndex ?: 0,
+    navigator = navigator,
+  )
 }
 
 @Composable

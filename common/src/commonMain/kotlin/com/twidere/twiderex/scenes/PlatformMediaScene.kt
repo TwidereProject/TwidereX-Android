@@ -35,8 +35,8 @@ import io.github.seiko.precompose.annotation.Query
 )
 @Composable
 expect fun PlatformStatusMediaScene(
-  @Path("statusKey") statusKey: MicroBlogKey,
-  @Path("selectedIndex") selectedIndex: Int,
+  @Path("statusKey") statusKey: String,
+  @Query("selectedIndex") selectedIndex: Int?,
   navigator: Navigator,
 )
 
@@ -56,8 +56,9 @@ expect fun PlatformRawMediaScene(
 )
 @Composable
 expect fun PlatformPureMediaScene(
-  @Path("belongToKey") belongToKey: MicroBlogKey,
+  @Path("belongToKey") belongToKey: String,
   @Query("selectedIndex") selectedIndex: Int?,
+  navigator: Navigator,
 )
 
 @NavGraphDestination(

@@ -50,7 +50,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.ExperimentalPagerApi
 import com.twidere.twiderex.component.bottomInsetsPadding
 import com.twidere.twiderex.component.foundation.VideoPlayerState
 import com.twidere.twiderex.component.foundation.rememberPagerState
@@ -67,13 +66,33 @@ import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.utils.video.CustomVideoControl
 import com.twidere.twiderex.viewmodel.PureMediaViewModel
+import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
 import org.koin.core.parameter.parametersOf
 
-@OptIn(ExperimentalPagerApi::class)
+
 @Composable
-fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
+fun PureMediaScene(
+  belongToKey: String,
+  selectedIndex: Int,
+  navigator: Navigator,
+) {
+  MicroBlogKey.valueOf(belongToKey).let {
+    InnerPureMediaScene(
+      belongToKey = it,
+      selectedIndex = selectedIndex,
+      navigator = navigator
+    )
+  }
+}
+
+@Composable
+private fun InnerPureMediaScene(
+  belongToKey: MicroBlogKey,
+  selectedIndex: Int,
+  navigator: Navigator,
+) {
   val viewModel = getViewModel<PureMediaViewModel> {
     parametersOf(belongToKey)
   }
@@ -97,7 +116,7 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
         val videoPlayerState = mutableStateOf<VideoPlayerState?>(null)
         val swiperState = rememberSwiperState(
           onDismiss = {
-            // navController.popBackStack()
+            navigator.popBackStack()
           },
         )
         val display = LocalDisplayPreferences.current
@@ -122,7 +141,7 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
               swiperState = swiperState,
               controlPanelColor = controlPanelColor,
               onPopBack = {
-                // navController.popBackStack()
+                navigator.popBackStack()
               }
             )
           },
@@ -172,7 +191,6 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
   }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun PureMediaBottomInfo(
   controlVisibility: Boolean,
