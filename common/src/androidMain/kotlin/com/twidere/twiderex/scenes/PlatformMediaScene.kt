@@ -41,8 +41,8 @@ actual fun PlatformRawMediaScene(url: String, type: MediaType) {
 }
 
 @Composable
-actual fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
-  PureMediaScene(belongToKey = belongToKey, selectedIndex = selectedIndex)
+actual fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int?) {
+  PureMediaScene(belongToKey = belongToKey, selectedIndex = selectedIndex ?: 0)
 }
 
 @Composable

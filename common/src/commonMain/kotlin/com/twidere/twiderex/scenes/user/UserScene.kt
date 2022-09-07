@@ -49,8 +49,11 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.navigation.ProvideUserPlatform
+import com.twidere.twiderex.navigation.RequirePlatformAccount
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.navigation.rememberUserNavigationData
@@ -67,13 +70,32 @@ import io.github.seiko.precompose.annotation.Path
   route = Root.User.route,
   deepLink = [RootDeepLinks.User.route]
 )
+
 @Composable
 fun UserScene(
   @Path("userKey") key: String,
   navigator: Navigator,
 ) {
-  val userKey = MicroBlogKey.valueOf(key)
   val account = LocalActiveAccount.current ?: return
+  MicroBlogKey.valueOf(key).let { userKey ->
+    ProvideUserPlatform(userKey = userKey) { platformType ->
+      RequirePlatformAccount(platformType = platformType) {
+        InnerUserScene(
+          userKey = userKey,
+          navigator = navigator,
+          account = account,
+        )
+      }
+    }
+  }
+}
+
+@Composable
+fun InnerUserScene(
+  userKey: MicroBlogKey,
+  navigator: Navigator,
+  account: AccountDetails,
+) {
   val (state, channel) = rememberPresenterState<UserState, UserEvent> {
     UserPresenter(it, userKey = userKey)
   }

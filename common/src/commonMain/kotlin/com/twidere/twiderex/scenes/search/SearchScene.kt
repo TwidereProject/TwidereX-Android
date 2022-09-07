@@ -66,6 +66,13 @@ import com.twidere.twiderex.scenes.search.tabs.MastodonSearchHashtagItem
 import com.twidere.twiderex.scenes.search.tabs.SearchTweetsItem
 import com.twidere.twiderex.scenes.search.tabs.SearchUserItem
 import com.twidere.twiderex.scenes.search.tabs.TwitterSearchMediaItem
+import com.twidere.twiderex.twitterHost1
+import com.twidere.twiderex.twitterHost2
+import com.twidere.twiderex.twitterHost3
+import com.twidere.twiderex.twitterHost4
+import com.twidere.twiderex.twitterHost5
+import com.twidere.twiderex.twitterHost6
+import com.twidere.twiderex.twitterSearchDeeplinkSuffix
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import io.github.seiko.precompose.annotation.NavGraphDestination
@@ -75,6 +82,14 @@ import kotlinx.coroutines.launch
 
 @NavGraphDestination(
   route = Root.Search.Result.route,
+  deepLink = [
+    "$twitterHost1$twitterSearchDeeplinkSuffix",
+    "$twitterHost2$twitterSearchDeeplinkSuffix",
+    "$twitterHost3$twitterSearchDeeplinkSuffix",
+    "$twitterHost4$twitterSearchDeeplinkSuffix",
+    "$twitterHost5$twitterSearchDeeplinkSuffix",
+    "$twitterHost6$twitterSearchDeeplinkSuffix",
+  ]
 )
 @Composable
 fun SearchScene(

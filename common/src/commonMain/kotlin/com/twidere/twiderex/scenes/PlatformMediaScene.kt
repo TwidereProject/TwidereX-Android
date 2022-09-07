@@ -57,7 +57,7 @@ expect fun PlatformRawMediaScene(
 @Composable
 expect fun PlatformPureMediaScene(
   @Path("belongToKey") belongToKey: MicroBlogKey,
-  @Path("selectedIndex") selectedIndex: Int,
+  @Query("selectedIndex") selectedIndex: Int?,
 )
 
 @NavGraphDestination(

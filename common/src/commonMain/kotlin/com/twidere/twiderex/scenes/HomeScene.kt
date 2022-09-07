@@ -98,7 +98,13 @@ import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.scenes.home.item
-import com.twidere.twiderex.twitterHosts
+import com.twidere.twiderex.twitterHomeDeeplinkSuffix
+import com.twidere.twiderex.twitterHost1
+import com.twidere.twiderex.twitterHost2
+import com.twidere.twiderex.twitterHost3
+import com.twidere.twiderex.twitterHost4
+import com.twidere.twiderex.twitterHost5
+import com.twidere.twiderex.twitterHost6
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.TwidereScene
@@ -111,12 +117,12 @@ import moe.tlaster.precompose.navigation.BackHandler
 @NavGraphDestination(
   route = Root.Home,
   deepLink = [
-    "https://twitter.com",
-    "https://mobile.twitter.com",
-    "https://www.twitter.com",
-    "http://twitter.com",
-    "http://mobile.twitter.com",
-    "http://www.twitter.com",
+    "$twitterHost1$twitterHomeDeeplinkSuffix",
+    "$twitterHost2$twitterHomeDeeplinkSuffix",
+    "$twitterHost3$twitterHomeDeeplinkSuffix",
+    "$twitterHost4$twitterHomeDeeplinkSuffix",
+    "$twitterHost5$twitterHomeDeeplinkSuffix",
+    "$twitterHost6$twitterHomeDeeplinkSuffix",
   ]
 )
 @Composable
