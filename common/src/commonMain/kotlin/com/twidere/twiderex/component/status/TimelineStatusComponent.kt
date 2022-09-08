@@ -116,7 +116,7 @@ fun MastodonFollowStatus(
       statusNavigation = statusNavigation,
     )
     Row {
-      UserAvatar(user = data.user, toUser = statusNavigation.toUser)
+      UserAvatar(user = data.user, onClick = statusNavigation.toUser)
       Spacer(modifier = Modifier.width(MastodonFollowStatusDefaults.AvatarSpacing))
       Column {
         UserName(
@@ -453,7 +453,7 @@ fun StatusContent(
         UserAvatar(
           user = status.user,
           modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing),
-          toUser = statusNavigation.toUser,
+          onClick = statusNavigation.toUser,
         )
         if (lineDown) {
           AvatarConnectLine(
@@ -471,7 +471,7 @@ fun StatusContent(
             user = data.user,
             size = StatusThreadDefaults.AvatarSize,
             modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing),
-            toUser = statusNavigation.toUser,
+            onClick = statusNavigation.toUser,
           )
           Spacer(modifier = Modifier.height(NormalStatusDefaults.ThreadBottomPadding))
         }
@@ -782,7 +782,7 @@ fun StatusQuote(
       UserAvatar(
         user = quote.user,
         size = LocalTextStyle.current.fontSize.value.dp,
-        toUser = statusNavigation.toUser,
+        onClick = statusNavigation.toUser,
       )
       Spacer(modifier = Modifier.width(StatusQuoteDefaults.AvatarSpacing))
       Row(

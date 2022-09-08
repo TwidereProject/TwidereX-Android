@@ -45,7 +45,7 @@ fun StatusThreadWithAvatar(
       user = data.user,
       size = StatusThreadDefaults.AvatarSize,
       modifier = Modifier.padding(start = StatusThreadDefaults.HorizontalSpacing),
-      toUser = toUser,
+      onClick = toUser,
     )
     TextButton(
       onClick = onClick,

@@ -84,7 +84,7 @@ fun LazyUiUserList(
               icon = {
                 UserAvatar(
                   user = it,
-                  toUser = userNavigationData.statusNavigation.toUser,
+                  onClick = userNavigationData.statusNavigation.toUser,
                 )
               },
               text = {

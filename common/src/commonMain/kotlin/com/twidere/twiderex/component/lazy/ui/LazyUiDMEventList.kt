@@ -213,7 +213,7 @@ private fun DMInComeEvent(
       Row(verticalAlignment = Alignment.Bottom) {
         UserAvatar(
           user = event.sender,
-          toUser = toUser,
+          onClick = toUser,
         )
         Spacer(modifier = Modifier.width(DMEventDefaults.ContentSpacing))
         MessageBody(

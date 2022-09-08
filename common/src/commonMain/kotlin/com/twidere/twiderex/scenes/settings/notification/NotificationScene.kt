@@ -130,7 +130,7 @@ fun NotificationScene(
                   UserAvatar(
                     user = user,
                     withPlatformIcon = true,
-                    toUser = {
+                    onClick = {
                       navigator.user(it)
                     }
                   )

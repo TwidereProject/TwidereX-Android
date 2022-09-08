@@ -46,9 +46,13 @@ actual fun PlatformStatusMediaScene(
 }
 
 @Composable
-actual fun PlatformRawMediaScene(url: String, type: MediaType) {
+actual fun PlatformRawMediaScene(
+  url: String,
+  type: String,
+  navigator: Navigator,
+) {
   MediaScene {
-    RawMediaScene(url = url, type = type)
+    RawMediaScene(url = url, type = type, navigator = navigator)
   }
 }
 

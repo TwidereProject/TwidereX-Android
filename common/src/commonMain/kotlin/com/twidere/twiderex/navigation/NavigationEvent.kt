@@ -32,6 +32,7 @@ import com.twidere.twiderex.component.navigation.user
 import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
+import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
 
@@ -43,6 +44,7 @@ data class StatusNavigationData(
   val toMediaWithIndex: (MicroBlogKey, Int) -> Unit = { _: MicroBlogKey, _: Int -> },
   val openLink: (String) -> Unit = { },
   val composeNavigationData: ComposeNavigationData = ComposeNavigationData(),
+  val popBackStack: () -> Unit = {},
 )
 
 @Composable
@@ -68,6 +70,9 @@ fun rememberStatusNavigationData(
         },
         openLink = {
           navigator.openLink(it)
+        },
+        popBackStack = {
+          navigator.popBackStack()
         }
       )
     )
@@ -77,13 +82,27 @@ fun rememberStatusNavigationData(
 
 data class UserNavigationData(
   val statusNavigation: StatusNavigationData = StatusNavigationData(),
+  val showAvatar: (UiUser) -> Unit,
+  val onUserBannerClick: (MediaType, String) -> Unit,
+  val navigate: (String) -> Unit,
 )
 
 @Composable
 fun rememberUserNavigationData(navigator: Navigator): UserNavigationData {
   val statusNavigation = rememberStatusNavigationData(navigator)
   val userNavigation = remember {
-    UserNavigationData(statusNavigation = statusNavigation)
+    UserNavigationData(
+      statusNavigation = statusNavigation,
+      showAvatar = {
+        navigator.navigate(Root.Media.Raw(MediaType.photo, it.profileImage))
+      },
+      onUserBannerClick = { mediaType, url ->
+        navigator.navigate(Root.Media.Raw(mediaType, url))
+      },
+      navigate = {
+        navigator.navigate(it)
+      }
+    )
   }
   return userNavigation
 }

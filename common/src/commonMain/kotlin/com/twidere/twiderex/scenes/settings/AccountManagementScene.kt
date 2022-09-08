@@ -101,7 +101,7 @@ fun AccountManagementScene(
                 UserAvatar(
                   user = it,
                   withPlatformIcon = true,
-                  toUser = {
+                  onClick = {
                     navigator.user(it)
                   }
                 )

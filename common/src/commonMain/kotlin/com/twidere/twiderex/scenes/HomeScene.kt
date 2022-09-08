@@ -268,7 +268,6 @@ private fun EmptyColumnHomeContent(
         navigationIcon = {
           MenuAvatar(
             scaffoldState,
-            toUser = toUser,
           )
         },
       )
@@ -334,7 +333,6 @@ fun HomeAppBar(
         navigationIcon = {
           MenuAvatar(
             scaffoldState = scaffoldState,
-            toUser = toUser,
           )
         },
         elevation = if (menus[pagerState.currentPage].item.withAppBar) {
@@ -364,7 +362,6 @@ fun HomeAppBar(
       ) {
         MenuAvatar(
           scaffoldState,
-          toUser = toUser,
         )
         IconTabsComponent(
           modifier = Modifier.weight(1f),
@@ -394,7 +391,6 @@ fun HomeAppBar(
 @Composable
 private fun MenuAvatar(
   scaffoldState: ScaffoldState,
-  toUser: (UiUser) -> Unit,
 ) {
   val scope = rememberCoroutineScope()
   LocalActiveAccount.current?.let { account ->
@@ -414,7 +410,6 @@ private fun MenuAvatar(
           }
         }
       },
-      toUser = toUser,
     )
   }
 }
@@ -487,7 +482,7 @@ private fun HomeDrawer(
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    UserMetrics(user = currentUser)
+    UserMetrics(user = currentUser, onclick = navigate)
 
     Spacer(modifier = Modifier.height(24.dp))
 
@@ -505,12 +500,12 @@ private fun HomeDrawer(
         exit = shrinkVertically() + fadeOut(),
       ) {
         LazyColumn {
-          items(allAccounts) {
-            val user = it.toUi()
+          items(allAccounts) { accountDetail ->
+            val user = accountDetail.toUi()
             ListItem(
               modifier = Modifier.clickable(
                 onClick = {
-                  activeAccountViewModel.setActiveAccount(it)
+                  activeAccountViewModel.setActiveAccount(accountDetail)
                 }
               ),
               icon = {
@@ -518,9 +513,8 @@ private fun HomeDrawer(
                   user = user,
                   withPlatformIcon = true,
                   onClick = {
-                    activeAccountViewModel.setActiveAccount(it)
+                    activeAccountViewModel.setActiveAccount(accountDetail)
                   },
-                  toUser = toUser,
                 )
               },
               text = {
@@ -659,7 +653,7 @@ private fun DrawerUserHeader(
         UserAvatar(
           user = it,
           withPlatformIcon = true,
-          toUser = toUser,
+          onClick = toUser,
         )
       }
     },

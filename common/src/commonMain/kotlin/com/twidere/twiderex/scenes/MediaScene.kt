@@ -21,7 +21,6 @@
 package com.twidere.twiderex.scenes
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -76,7 +75,6 @@ import com.twidere.twiderex.component.foundation.VideoPlayerState
 import com.twidere.twiderex.component.foundation.platform.HorizontalPagerIndicator
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.foundation.rememberVideoPlayerState
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
@@ -112,10 +110,12 @@ import com.twidere.twiderex.utils.video.CustomVideoControl
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
+import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.swiper.Swiper
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
 import org.koin.core.parameter.parametersOf
+import java.net.URLDecoder
 
 @Composable
 fun StatusMediaScene(
@@ -200,7 +200,7 @@ fun StatusMediaScene(
 
   val swiperState = rememberSwiperState(
     onDismiss = {
-      // navController.popBackStack()
+      statusNavigationData.popBackStack()
     },
   )
   StatusMediaSceneLayout(
@@ -222,6 +222,7 @@ fun StatusMediaScene(
       StatusMediaCloseButton(
         visible = controlVisibility && swiperState.progress == 0f,
         backgroundColor = controlPanelColor,
+        onBack = statusNavigationData.popBackStack
       )
     },
     mediaView = {
@@ -267,11 +268,11 @@ fun StatusMediaScene(
   )
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun StatusMediaCloseButton(
   visible: Boolean,
   backgroundColor: Color,
+  onBack: () -> Unit,
 ) {
   AnimatedVisibility(
     visible = visible,
@@ -295,7 +296,7 @@ private fun StatusMediaCloseButton(
       ) {
         IconButton(
           onClick = {
-            // navController.popBackStack()
+            onBack.invoke()
           }
         ) {
           Icon(
@@ -310,7 +311,6 @@ private fun StatusMediaCloseButton(
   }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun StatusMediaBottomContent(
   status: UiStatus,
@@ -393,7 +393,7 @@ private fun StatusMediaInfo(
       ) {
         UserAvatar(
           user = status.user,
-          toUser = statusNavigationData.toUser,
+          onClick = statusNavigationData.toUser,
         )
         Spacer(modifier = Modifier.width(StatusMediaInfoDefaults.AvatarSpacing))
         UserName(
@@ -463,7 +463,23 @@ private object StatusMediaInfoDefaults {
 }
 
 @Composable
-fun RawMediaScene(url: String, type: MediaType) {
+fun RawMediaScene(
+  url: String,
+  type: String,
+  navigator: Navigator,
+) {
+  val mediaType = MediaType.valueOf(type)
+  InnerRawMediaScene(url = URLDecoder.decode(url, "UTF-8"), type = mediaType) {
+    navigator.popBackStack()
+  }
+}
+
+@Composable
+private fun InnerRawMediaScene(
+  url: String,
+  type: MediaType,
+  onBack: () -> Unit,
+) {
   TwidereDialog(
     requireDarkTheme = true,
     extendViewIntoStatusBar = true,
@@ -474,7 +490,7 @@ fun RawMediaScene(url: String, type: MediaType) {
     ) {
       val swiperState = rememberSwiperState(
         onDismiss = {
-          // navController.popBackStack()
+          onBack.invoke()
         },
       )
       Box {
@@ -484,7 +500,7 @@ fun RawMediaScene(url: String, type: MediaType) {
             .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
         )
         MediaView(media = listOf(MediaData(url, type)), swiperState = swiperState, onClick = {
-          // navController.popBackStack()
+          onBack.invoke()
         }, backgroundColor = MaterialTheme.colors.background)
       }
     }

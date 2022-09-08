@@ -46,8 +46,7 @@ fun UserAvatar(
   user: UiUser,
   size: Dp = UserAvatarDefaults.AvatarSize,
   withPlatformIcon: Boolean = false,
-  toUser: (UiUser) -> Unit,
-  onClick: (() -> Unit)? = null,
+  onClick: (UiUser) -> Unit,
 ) {
   Box(
     contentAlignment = Alignment.BottomEnd
@@ -57,7 +56,7 @@ fun UserAvatar(
       avatar = user.profileImage.takeIf { it.isNotEmpty() } ?: painterResource(com.twidere.twiderex.MR.images.ic_profile_image_twidere),
       size = size,
       onClick = {
-        onClick?.invoke() ?: run { toUser(user) }
+        onClick.invoke(user)
       }
     )
     if (withPlatformIcon) {

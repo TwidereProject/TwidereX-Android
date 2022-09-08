@@ -23,8 +23,6 @@ package com.twidere.twiderex.scenes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import moe.tlaster.precompose.navigation.Navigator
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.navigation.Root
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import io.github.seiko.precompose.annotation.Path
@@ -43,11 +41,13 @@ expect fun PlatformStatusMediaScene(
 
 @NavGraphDestination(
   route = Root.Media.Raw.route,
+  functionName = "dialog",
 )
 @Composable
 expect fun PlatformRawMediaScene(
   @Path("url") url: String,
-  @Path("type") type: MediaType
+  @Path("type") type: String,
+  navigator: Navigator,
 )
 
 

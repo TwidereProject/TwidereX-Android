@@ -708,7 +708,7 @@ private fun ReplySheetContent(
       icon = {
         UserAvatar(
           user = it.user,
-          toUser = statusNavigation.toUser,
+          onClick = statusNavigation.toUser,
         )
       },
       text = {
@@ -751,7 +751,7 @@ private fun ReplySheetContent(
         icon = {
           UserAvatar(
             user = user,
-            toUser = statusNavigation.toUser,
+            onClick = statusNavigation.toUser,
           )
         },
         text = {

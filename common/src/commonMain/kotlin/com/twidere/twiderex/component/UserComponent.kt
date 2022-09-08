@@ -112,7 +112,6 @@ import kotlinx.coroutines.launch
 import moe.tlaster.nestedscrollview.VerticalNestedScrollView
 import moe.tlaster.nestedscrollview.rememberNestedScrollViewState
 import moe.tlaster.placeholder.Placeholder
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.navigation.twidereXSchema
 
 @OptIn(ExperimentalPagerApi::class)
@@ -208,7 +207,6 @@ fun UserComponent(
                 onClick = {
                   scope.launch {
                     pagerState.currentPage = index
-                    // pagerState.animateScrollToPage(index)
                   }
                 },
                 content = {
@@ -450,7 +448,7 @@ fun UserInfo(
   ) {
     // TODO: parallax effect
     user?.profileBackgroundImage?.let {
-      UserBanner(it)
+      UserBanner(it, userNavigationData.onUserBannerClick)
     }
     Column(
       horizontalAlignment = Alignment.CenterHorizontally
@@ -481,10 +479,8 @@ fun UserInfo(
           UserAvatar(
             user = user,
             size = UserInfoDefaults.AvatarSize,
-            toUser = userNavigationData.statusNavigation.toUser,
-          ) {
-            // navController.navigate(Root.Media.Raw(MediaType.photo, user.profileImage))
-          }
+            onClick = userNavigationData.showAvatar,
+          )
         }
       }
       Spacer(modifier = Modifier.height(UserInfoDefaults.AvatarSpacing))
@@ -542,7 +538,7 @@ fun UserInfo(
         )
       }
       Spacer(modifier = Modifier.height(UserInfoDefaults.UserMetricsSpacing))
-      user?.let { UserMetrics(it) }
+      user?.let { UserMetrics(it, userNavigationData.navigate) }
       Spacer(modifier = Modifier.height(UserInfoDefaults.UserMetricsSpacing))
     }
   }
@@ -767,13 +763,14 @@ private object UserRelationshipDefaults {
 @Composable
 private fun UserBanner(
   bannerUrl: String,
+  onUserBannerClick: (MediaType, String) -> Unit,
 ) {
   Box(
     modifier = Modifier
       .heightIn(max = maxBannerSize)
       .clickable(
         onClick = {
-          // navController.navigate(Root.Media.Raw(MediaType.photo, bannerUrl))
+          onUserBannerClick.invoke(MediaType.photo, bannerUrl)
         },
         indication = null,
         interactionSource = remember { MutableInteractionSource() },
@@ -792,6 +789,7 @@ private fun UserBanner(
 @Composable
 fun UserMetrics(
   user: UiUser,
+  onclick: (String) -> Unit,
 ) {
   Row(
     verticalAlignment = Alignment.CenterVertically,
@@ -800,7 +798,7 @@ fun UserMetrics(
       modifier = Modifier
         .weight(1f)
         .clickable {
-          // navController.navigate(Root.Following(user.userKey))
+          onclick.invoke(Root.Following(user.userKey))
         },
       primaryText = user.metrics.follow.toString(),
       secondaryText = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_profile_dashboard_following),
@@ -812,7 +810,7 @@ fun UserMetrics(
       modifier = Modifier
         .weight(1f)
         .clickable {
-          // navController.navigate(Root.Followers(user.userKey))
+          onclick.invoke(Root.Followers(user.userKey))
         },
       primaryText = user.metrics.fans.toString(),
       secondaryText = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_profile_dashboard_followers),
