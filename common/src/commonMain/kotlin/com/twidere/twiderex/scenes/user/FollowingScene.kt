@@ -45,7 +45,19 @@ import io.github.seiko.precompose.annotation.Path
 )
 @Composable
 fun FollowingScene(
-  @Path("userKey") userKey: MicroBlogKey,
+  @Path("userKey") userKey: String,
+  navigator: Navigator,
+) {
+  FollowingScene(
+    userKey = MicroBlogKey.valueOf(userKey),
+    navigator = navigator,
+  )
+}
+
+
+@Composable
+private fun FollowingScene(
+  userKey: MicroBlogKey,
   navigator: Navigator,
 ) {
   val (state) = rememberPresenterState<UserListState, UserListEvent> {

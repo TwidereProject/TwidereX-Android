@@ -44,6 +44,7 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
+import com.twidere.twiderex.component.navigation.search
 import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
@@ -102,7 +103,7 @@ fun SearchInputScene(
                   onSearch = {
                     if (state.searchInput.text.isNotEmpty()) {
                       channel.trySend(SearchInputEvent.AddOrUpgradeEvent(state.searchInput.text))
-                      // navigator.search(state.searchInput.text)
+                      navigator.search(state.searchInput.text)
                     }
                   }
                 )
@@ -114,7 +115,7 @@ fun SearchInputScene(
               onClick = {
                 if (state.searchInput.text.isNotEmpty()) {
                   channel.trySend(SearchInputEvent.AddOrUpgradeEvent(state.searchInput.text))
-                  // navigator.search(state.searchInput.text)
+                  navigator.search(state.searchInput.text)
                 }
               }
             ) {
@@ -136,7 +137,7 @@ fun SearchInputScene(
               onClick = {
                 channel.trySend(SearchInputEvent.AddOrUpgradeEvent(it.content))
                 channel.trySend(SearchInputEvent.UpdateSearchInput(TextFieldValue(it.content, TextRange(it.content.length))))
-                // navigator.search(it.content)
+                navigator.search(it.content)
               }
             ),
             icon = {

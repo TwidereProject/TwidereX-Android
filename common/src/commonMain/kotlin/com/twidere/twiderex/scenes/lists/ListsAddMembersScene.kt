@@ -78,7 +78,18 @@ import org.koin.core.parameter.parametersOf
 )
 @Composable
 fun ListsAddMembersScene(
-  @Path("listKey") listKey: MicroBlogKey,
+  @Path("listKey") listKey: String,
+  navigator: Navigator,
+) {
+  ListsAddMembersScene(
+    listKey = MicroBlogKey.valueOf(listKey),
+    navigator = navigator,
+  )
+}
+
+@Composable
+fun ListsAddMembersScene(
+  listKey: MicroBlogKey,
   navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current ?: return

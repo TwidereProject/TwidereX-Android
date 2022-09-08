@@ -32,6 +32,7 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
+import com.twidere.twiderex.component.navigation.compose
 import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
@@ -118,7 +119,7 @@ private fun HomeTimelineFab(
 ) {
   FloatingActionButton(
     onClick = {
-      // navigator.compose(ComposeType.New)
+      navigator.compose(ComposeType.New)
     }
   ) {
     Icon(

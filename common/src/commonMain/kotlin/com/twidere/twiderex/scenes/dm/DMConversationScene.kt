@@ -77,6 +77,7 @@ import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.navigation.DMNavigationData
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.navigation.rememberDMNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
@@ -89,10 +90,24 @@ import org.koin.core.parameter.parametersOf
 
 @NavGraphDestination(
   route = Root.Messages.Conversation.route,
+  deepLink = [
+    RootDeepLinks.Conversation.route
+  ]
 )
 @Composable
 fun DMConversationScene(
-  @Path("conversationKey") conversationKey: MicroBlogKey,
+  @Path("conversationKey") conversationKey: String,
+  navigator: Navigator,
+) {
+  DMConversationScene(
+    conversationKey = MicroBlogKey.valueOf(conversationKey),
+    navigator = navigator,
+  )
+}
+
+@Composable
+fun DMConversationScene(
+  conversationKey: MicroBlogKey,
   navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current ?: return

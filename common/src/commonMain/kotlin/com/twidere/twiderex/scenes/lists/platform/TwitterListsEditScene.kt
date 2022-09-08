@@ -53,10 +53,20 @@ import org.koin.core.parameter.parametersOf
 @NavGraphDestination(
   route = Root.Lists.TwitterEdit.route,
 )
+@Composable
+fun TwitterListsEditScene(
+  @Path("listKey") listKey: String,
+  navigator: Navigator,
+){
+  TwitterListsEditScene(
+    listKey = MicroBlogKey.valueOf(listKey),
+    navigator = navigator,
+  )
+}
 
 @Composable
 fun TwitterListsEditScene(
-  @Path("listKey") listKey: MicroBlogKey,
+  listKey: MicroBlogKey,
   navigator: Navigator,
 ) {
   val listsEditViewModel: ListsModifyViewModel = getViewModel {
@@ -93,7 +103,7 @@ fun TwitterListsEditScene(
                     description = desc,
                     private = isPrivate
                   ) { success, _ ->
-                    // if (success) navController.popBackStack()
+                    if (success) navigator.popBackStack()
                   }
                 }
               ) {

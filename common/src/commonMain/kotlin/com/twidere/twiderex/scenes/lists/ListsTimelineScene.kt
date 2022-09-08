@@ -78,10 +78,20 @@ import org.koin.core.parameter.parametersOf
 @NavGraphDestination(
   route = Root.Lists.Timeline.route,
 )
+@Composable
+fun ListTimeLineScene(
+  @Path("listKey") listKey: String,
+  navigator: Navigator,
+) {
+  ListTimeLineScene(
+    listKey = MicroBlogKey.valueOf(listKey),
+    navigator = navigator,
+  )
+}
 
 @Composable
 fun ListTimeLineScene(
-  @Path("listKey") listKey: MicroBlogKey,
+  listKey: MicroBlogKey,
   navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current ?: return

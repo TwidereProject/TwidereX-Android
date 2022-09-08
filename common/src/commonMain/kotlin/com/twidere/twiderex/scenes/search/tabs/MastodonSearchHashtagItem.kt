@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.paging.LoadState
 import androidx.paging.compose.items
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
+import com.twidere.twiderex.component.navigation.hashtag
 import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.refreshOrRetry
@@ -70,7 +71,7 @@ class MastodonSearchHashtagItem : SearchSceneItem {
                 ListItem(
                   modifier = Modifier
                     .clickable {
-                      // navigator.hashtag(name)
+                      navigator.hashtag(name)
                     }
                 ) {
                   Text(text = name)

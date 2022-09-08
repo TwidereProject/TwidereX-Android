@@ -47,6 +47,9 @@ import androidx.paging.compose.items
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.navigation.hashtag
+import com.twidere.twiderex.component.navigation.search
+import com.twidere.twiderex.component.navigation.searchInput
 import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
@@ -126,7 +129,7 @@ fun SearchSceneContent(
             Row(
               modifier = Modifier.clickable(
                 onClick = {
-                  // navigator.searchInput()
+                  navigator.searchInput()
                 },
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
@@ -251,7 +254,7 @@ fun SearchSceneContent(
               trend = it,
               onClick = {
                 channel.trySend(SearchInputEvent.AddOrUpgradeEvent(trend.query))
-                // navigator.search(trend.query)
+                navigator.search(trend.query)
               }
             )
             PlatformType.StatusNet -> TODO()
@@ -259,7 +262,7 @@ fun SearchSceneContent(
             PlatformType.Mastodon -> MastodonTrendItem(
               trend = it,
               onClick = {
-                // navigator.hashtag(it.query)
+                navigator.hashtag(it.query)
               }
             )
           }

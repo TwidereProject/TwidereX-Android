@@ -73,8 +73,20 @@ import java.util.Locale
 )
 @Composable
 fun ListsMembersScene(
-  @Path("listKey") listKey: MicroBlogKey,
+  @Path("listKey") listKey: String,
   @Query("owned") owned: Boolean?,
+  navigator: Navigator,
+) {
+  ListsMembersScene(
+    listKey = MicroBlogKey.valueOf(listKey),
+    owned = owned ?: false,
+    navigator = navigator,
+  )
+}
+@Composable
+fun ListsMembersScene(
+  listKey: MicroBlogKey,
+  owned: Boolean,
   navigator: Navigator,
 ) {
   val (state, channel) = rememberPresenterState<UserListState, UserListEvent> {
@@ -102,7 +114,7 @@ fun ListsMembersScene(
         )
       },
       floatingActionButton = {
-        if (owned == true) FloatingActionButton(
+        if (owned) FloatingActionButton(
           onClick = {
             scope.launch {
               val result =
@@ -143,7 +155,7 @@ fun ListsMembersScene(
             // navigator.user(it)
             },
           action = {
-            if (owned == false) return@LazyUiUserList
+            if (!owned) return@LazyUiUserList
             var menuExpand by remember {
               mutableStateOf(false)
             }

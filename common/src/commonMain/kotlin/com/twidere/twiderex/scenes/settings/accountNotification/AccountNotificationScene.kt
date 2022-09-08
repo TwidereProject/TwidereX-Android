@@ -48,10 +48,21 @@ import io.github.seiko.precompose.annotation.Path
 @NavGraphDestination(
   route = Root.Settings.AccountNotification.route,
 )
+@Composable
+fun AccountNotificationScene(
+  @Path("accountKey") accountKey: String,
+  navigator: Navigator,
+) {
+  AccountNotificationScene(
+    accountKey = MicroBlogKey.valueOf(accountKey),
+    navigator = navigator,
+  )
+}
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AccountNotificationScene(
-  @Path("accountKey") accountKey: MicroBlogKey,
+  accountKey: MicroBlogKey,
   navigator: Navigator,
 ) {
   val (state, channel) = rememberPresenterState { AccountNotificationPresenter(accountKey, it) }

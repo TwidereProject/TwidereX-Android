@@ -538,7 +538,11 @@ private fun HomeDrawer(
                 }
               ),
               text = {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_drawer_sign_in))
+                Text(
+                  text = stringResource(
+                    res = com.twidere.twiderex.MR.strings.scene_drawer_sign_in
+                  )
+                )
               }
             )
           }
@@ -551,7 +555,11 @@ private fun HomeDrawer(
                 }
               ),
               text = {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_manage_accounts_title))
+                Text(
+                  text = stringResource(
+                    res = com.twidere.twiderex.MR.strings.scene_manage_accounts_title
+                  )
+                )
               }
             )
           }
@@ -598,14 +606,20 @@ private fun HomeDrawer(
       ),
       icon = {
         Icon(
-          painter = painterResource(res = com.twidere.twiderex.MR.files.ic_adjustments_horizontal),
+          painter = painterResource(
+            res = com.twidere.twiderex.MR.files.ic_adjustments_horizontal
+          ),
           contentDescription = stringResource(
             res = com.twidere.twiderex.MR.strings.scene_settings_title
           )
         )
       },
       text = {
-        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_title))
+        Text(
+          text = stringResource(
+            res = com.twidere.twiderex.MR.strings.scene_settings_title
+          )
+        )
       }
     )
   }

@@ -2,6 +2,7 @@ package com.twidere.twiderex.component.navigation
 
 import com.twidere.twiderex.kmp.clearCookie
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.enums.ReferenceType
@@ -76,6 +77,18 @@ fun Navigator.openLink(
     } else {
         // openDeepLink(link)
     }
+}
+
+fun Navigator.compose(
+    composeType: ComposeType,
+    statusKey: MicroBlogKey?= null,
+    navOptions: NavOptions?= null,
+) {
+    navigate(Root.Compose.Home(composeType, statusKey))
+}
+
+fun Navigator.hashtag(name: String) {
+    navigate(Root.Mastodon.Hashtag(name))
 }
 
 fun Navigator.user(
