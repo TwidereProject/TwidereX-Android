@@ -76,7 +76,11 @@ fun SearchInputScene(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             ProvideTextStyle(value = MaterialTheme.typography.body1) {

@@ -157,7 +157,11 @@ fun InnerStatusScene(
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_tabs_tweets))
           },
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           }
         )
       }

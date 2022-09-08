@@ -61,7 +61,9 @@ fun TwitterSignInScene(
   }
   val loading by viewModel.loading.observeAsState(initial = false)
 
-  SignInScaffold {
+  SignInScaffold(popBackStack = {
+    navigator.popBackStack()
+  }) {
     if (loading) {
       CircularProgressIndicator()
     }

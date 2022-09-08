@@ -62,11 +62,17 @@ import moe.tlaster.precompose.navigation.Navigator
 )
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MastodonSignInScene() {
+fun MastodonSignInScene(
+  navigator: Navigator,
+) {
   val viewModel: MastodonSignInViewModel = getViewModel()
   val host by viewModel.host.observeAsState(initial = TextFieldValue())
   val loading by viewModel.loading.observeAsState(initial = false)
-  SignInScaffold {
+  SignInScaffold(
+    popBackStack = {
+      navigator.popBackStack()
+    }
+  ) {
     if (loading) {
       CircularProgressIndicator()
     } else {

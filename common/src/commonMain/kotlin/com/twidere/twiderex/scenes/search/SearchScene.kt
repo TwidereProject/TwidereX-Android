@@ -127,7 +127,11 @@ fun SearchScene(
           Column {
             AppBar(
               navigationIcon = {
-                AppBarNavigationButton()
+                AppBarNavigationButton(
+                  popBackStack = {
+                    navigator.popBackStack()
+                  }
+                )
               },
               elevation = 0.dp,
               title = {

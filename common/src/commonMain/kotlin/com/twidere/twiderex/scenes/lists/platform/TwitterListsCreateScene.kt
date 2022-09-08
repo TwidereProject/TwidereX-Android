@@ -79,7 +79,14 @@ fun TwitterListsCreateScene(
     InAppNotificationScaffold(
       topBar = {
         AppBar(
-          navigationIcon = { AppBarNavigationButton(Icons.Default.Close) },
+          navigationIcon = {
+            AppBarNavigationButton(
+              Icons.Default.Close,
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
+          },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_create_title))
           },

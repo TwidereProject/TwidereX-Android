@@ -230,9 +230,6 @@ fun HomeScene(
             pagerState = pagerState,
             scaffoldState = scaffoldState,
             scope = scope,
-            toUser = {
-              navigator.user(it)
-            }
           )
         },
         enableTopBarNestedScroll = hideAppBar
@@ -307,7 +304,6 @@ private object EmptyColumnHomeContentDefaults {
   val VerticalPadding = 48.dp
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeAppBar(
   modifier: Modifier = Modifier,
@@ -316,7 +312,6 @@ fun HomeAppBar(
   pagerState: PagerState,
   scaffoldState: ScaffoldState,
   scope: CoroutineScope,
-  toUser: (UiUser) -> Unit,
 ) {
   if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
     AnimatedVisibility(
@@ -476,9 +471,13 @@ private fun HomeDrawer(
       currentUser,
       showAccounts,
       toUser = toUser,
-    ) {
-      showAccounts = !showAccounts
-    }
+      onTrailingClicked = {
+        showAccounts = !showAccounts
+      },
+      openLink = {
+        //todo refactor check
+      }
+    )
 
     Spacer(modifier = Modifier.height(16.dp))
 

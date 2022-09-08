@@ -76,7 +76,11 @@ fun MeScene(
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_profile_title))
           },
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           }
         )
       }

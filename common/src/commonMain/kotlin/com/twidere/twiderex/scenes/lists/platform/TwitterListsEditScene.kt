@@ -47,6 +47,7 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsModifyViewModel
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
 
 @NavGraphDestination(
@@ -55,7 +56,8 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun TwitterListsEditScene(
-  @Path("listKey") listKey: MicroBlogKey
+  @Path("listKey") listKey: MicroBlogKey,
+  navigator: Navigator,
 ) {
   val listsEditViewModel: ListsModifyViewModel = getViewModel {
     parametersOf(listKey)
@@ -70,7 +72,14 @@ fun TwitterListsEditScene(
       InAppNotificationScaffold(
         topBar = {
           AppBar(
-            navigationIcon = { AppBarNavigationButton(Icons.Default.Close) },
+            navigationIcon = {
+              AppBarNavigationButton(
+                Icons.Default.Close,
+                popBackStack = {
+                  navigator.popBackStack()
+                }
+              )
+            },
             title = {
               Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_edit_title))
             },

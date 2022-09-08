@@ -69,7 +69,11 @@ fun NotificationScene(
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_mentions_title))
           },
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           }
         )
       }

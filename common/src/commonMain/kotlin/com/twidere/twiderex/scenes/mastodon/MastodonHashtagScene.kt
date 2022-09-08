@@ -59,7 +59,11 @@ fun MastodonHashtagScene(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             Text(text = keyword)

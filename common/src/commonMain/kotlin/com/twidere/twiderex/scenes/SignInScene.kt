@@ -81,7 +81,9 @@ fun SignInScene(
     }
   }
 
-  SignInScaffold {
+  SignInScaffold(popBackStack = {
+    navigator.popBackStack()
+  }) {
     TwitterSignIn(
       clickSignIn = {
         navigator.navigateForResult(
@@ -107,7 +109,8 @@ fun SignInScene(
             toHome.invoke()
           }
         }
-      }
+      },
+
     )
     Spacer(modifier = Modifier.height(SignInSceneDefaults.ButtonSpacing))
     MastodonSignIn {

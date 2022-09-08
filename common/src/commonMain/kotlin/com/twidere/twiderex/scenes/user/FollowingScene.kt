@@ -58,7 +58,11 @@ fun FollowingScene(
         topBar = {
           AppBar(
             navigationIcon = {
-              AppBarNavigationButton()
+              AppBarNavigationButton(
+                popBackStack = {
+                  navigator.popBackStack()
+                }
+              )
             },
             title = {
               Text(stringResource(res = com.twidere.twiderex.MR.strings.scene_following_title))

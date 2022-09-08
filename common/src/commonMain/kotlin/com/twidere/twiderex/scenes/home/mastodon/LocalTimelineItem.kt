@@ -75,7 +75,11 @@ fun LocalTimelineScene(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             Text(text = "Local")

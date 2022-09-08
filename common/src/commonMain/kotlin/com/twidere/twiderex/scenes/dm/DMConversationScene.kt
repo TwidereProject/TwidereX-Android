@@ -106,7 +106,11 @@ fun DMConversationScene(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             conversation?.let {

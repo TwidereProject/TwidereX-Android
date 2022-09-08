@@ -31,15 +31,18 @@ import com.twidere.twiderex.component.stringResource
 @Composable
 fun AppBarNavigationButton(
   icon: ImageVector = Icons.Default.ArrowBack,
+  popBackStack: () -> Unit,
 ) {
   IconButton(
     onClick = {
-      // navController.popBackStack()
+      popBackStack.invoke()
     }
   ) {
     Icon(
       imageVector = icon,
-      contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_back)
+      contentDescription = stringResource(
+        res = com.twidere.twiderex.MR.strings.accessibility_common_back
+      )
     )
   }
 }

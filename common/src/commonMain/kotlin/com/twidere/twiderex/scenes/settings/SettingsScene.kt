@@ -106,7 +106,11 @@ fun SettingsScene(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             Text(text = stringResource(com.twidere.twiderex.MR.strings.scene_settings_title))

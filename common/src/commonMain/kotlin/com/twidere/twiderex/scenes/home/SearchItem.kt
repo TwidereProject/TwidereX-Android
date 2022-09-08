@@ -94,7 +94,11 @@ fun SearchScene(
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_title))
           },
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           }
         )
       }

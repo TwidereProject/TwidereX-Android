@@ -113,7 +113,11 @@ fun InnerUserScene(
         AppBar(
           backgroundColor = MaterialTheme.colors.surface.withElevation(),
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           },
           actions = {
             if (account.type == PlatformType.Twitter && state.user?.platformType == PlatformType.Twitter) {

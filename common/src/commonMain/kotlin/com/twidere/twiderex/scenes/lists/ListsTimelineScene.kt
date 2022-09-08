@@ -102,7 +102,11 @@ fun ListTimeLineScene(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             Row(verticalAlignment = Alignment.CenterVertically) {

@@ -92,7 +92,11 @@ fun ComposeSearchUserScene(
             }
           },
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           },
           actions = {
             IconButton(

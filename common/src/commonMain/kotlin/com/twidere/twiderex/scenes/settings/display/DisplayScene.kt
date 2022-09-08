@@ -56,20 +56,27 @@ import com.twidere.twiderex.navigation.StatusNavigationData
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.TwidereScene
 import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
 @NavGraphDestination(
   route = Root.Settings.Display,
 )
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun DisplayScene() {
+fun DisplayScene(
+  navigator: Navigator,
+) {
   val (state, channel) = rememberPresenterState { DisplayPresenter(it) }
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_title))

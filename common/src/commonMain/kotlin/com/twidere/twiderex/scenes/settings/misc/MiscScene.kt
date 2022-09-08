@@ -96,7 +96,11 @@ fun MiscScene(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             Text(text = stringResource(res = MR.strings.scene_settings_misc_title))

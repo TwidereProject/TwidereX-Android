@@ -41,13 +41,16 @@ import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.TwidereScene
 import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
 @NavGraphDestination(
   route = Root.Settings.Storage,
 )
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun StorageScene() {
+fun StorageScene(
+  navigator: Navigator,
+) {
   val (state, channel) = rememberPresenterState { StoragePresenter(it) }
   if (state.loading) {
     Dialog(
@@ -66,7 +69,11 @@ fun StorageScene() {
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_title))

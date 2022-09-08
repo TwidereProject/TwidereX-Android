@@ -63,7 +63,11 @@ fun FollowersScene(
         topBar = {
           AppBar(
             navigationIcon = {
-              AppBarNavigationButton()
+              AppBarNavigationButton(
+                popBackStack = {
+                  navigator.popBackStack()
+                }
+              )
             },
             title = {
               Text(stringResource(res = com.twidere.twiderex.MR.strings.scene_followers_title))

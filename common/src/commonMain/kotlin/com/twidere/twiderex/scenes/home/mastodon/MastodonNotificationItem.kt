@@ -88,7 +88,11 @@ fun MastodonNotificationScene(
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_title))
           },
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           }
         )
       }

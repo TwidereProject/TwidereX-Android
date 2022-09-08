@@ -52,6 +52,7 @@ import com.twidere.twiderex.ui.TwidereScene
 
 @Composable
 fun SignInScaffold(
+  popBackStack: () -> Unit,
   countAction: (count: Int) -> Unit = {},
   content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -62,7 +63,8 @@ fun SignInScaffold(
         AppBar(
           navigationIcon = {
             AppBarNavigationButton(
-              icon = Icons.Default.Close
+              icon = Icons.Default.Close,
+              popBackStack = popBackStack,
             )
           },
           elevation = 0.dp,

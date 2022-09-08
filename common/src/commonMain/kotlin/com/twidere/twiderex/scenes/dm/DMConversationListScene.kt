@@ -58,7 +58,11 @@ fun DMConversationListScene(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              popBackStack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_title))
