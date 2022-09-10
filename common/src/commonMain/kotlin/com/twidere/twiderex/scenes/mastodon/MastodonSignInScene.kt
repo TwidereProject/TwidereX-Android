@@ -93,14 +93,14 @@ fun MastodonSignInScene(
         ),
         keyboardActions = KeyboardActions(
           onGo = {
-            // signin(viewModel, host, navController)
+            signin(viewModel, host, navigator)
           }
         )
       )
       Spacer(modifier = Modifier.height(16.dp))
       SignInButton(
         onClick = {
-          // signin(viewModel, host, navController)
+          signin(viewModel, host, navigator)
         }
       ) {
         ListItem(

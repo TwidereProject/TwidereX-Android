@@ -33,6 +33,7 @@ import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.mastodon.MastodonHashtagViewModel
@@ -43,6 +44,7 @@ import org.koin.core.parameter.parametersOf
 
 @NavGraphDestination(
   route = Root.Mastodon.Hashtag.route,
+  deepLink = [RootDeepLinks.Mastodon.Hashtag.route]
 )
 @Composable
 fun MastodonHashtagScene(

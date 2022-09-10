@@ -54,6 +54,7 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.RootDeepLinks
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.NavOptions
@@ -62,6 +63,7 @@ import moe.tlaster.precompose.navigation.PopUpTo
 
 @NavGraphDestination(
   route = Root.SignIn.General,
+  deepLink = [RootDeepLinks.SignIn]
 )
 @Composable
 fun SignInScene(
