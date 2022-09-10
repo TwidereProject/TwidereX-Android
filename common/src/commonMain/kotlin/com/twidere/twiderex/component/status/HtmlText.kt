@@ -33,10 +33,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -75,7 +73,6 @@ data class ResolvedLink(
   val clickable: Boolean = true,
 )
 
-@OptIn(ExperimentalUnitApi::class)
 @Composable
 fun HtmlText(
   modifier: Modifier = Modifier,
@@ -134,7 +131,7 @@ fun HtmlText(
   }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalUnitApi::class)
+@OptIn(ExperimentalUnitApi::class)
 @Composable
 private fun RenderContent(
   modifier: Modifier = Modifier,
@@ -238,7 +235,6 @@ private fun RenderContent(
 }
 
 @ExperimentalUnitApi
-@OptIn(ExperimentalComposeApi::class)
 @Composable
 fun renderContentAnnotatedString(
   htmlText: String,

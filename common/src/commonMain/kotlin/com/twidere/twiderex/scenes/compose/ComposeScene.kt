@@ -242,10 +242,10 @@ private fun ComposeBody(
         onConfirm = {
           showSaveDraftDialog = false
           viewModel.saveDraft()
-          // navController.popBackStack()
+          statusNavigation.popBackStack()
         },
         onCancel = {
-          // navController.popBackStack()
+          statusNavigation.popBackStack()
         }
       )
     }
@@ -276,7 +276,7 @@ private fun ComposeBody(
                 if (canSaveDraft) {
                   showSaveDraftDialog = true
                 } else {
-                  // navController.popBackStack()
+                  statusNavigation.popBackStack()
                 }
               }
             ) {
@@ -294,7 +294,7 @@ private fun ComposeBody(
               enabled = canSend,
               onClick = {
                 viewModel.compose()
-                // navController.popBackStack()
+                statusNavigation.popBackStack()
               }
             ) {
               Icon(
@@ -411,7 +411,7 @@ private fun ComposeBody(
         }
 
         if (images.any()) {
-          ComposeImageList(images, viewModel)
+          ComposeImageList(images, viewModel, statusNavigation.navigate)
         }
 
         Row(
@@ -456,6 +456,8 @@ private fun ComposeBody(
           ComposeActions(
             viewModel,
             showEmoji = showEmoji,
+            navigateForResult = statusNavigation.navigateForResult,
+            navigate = statusNavigation.navigate,
             emojiButtonClicked = {
               showEmoji = !showEmoji
             },
@@ -476,7 +478,8 @@ private fun ComposeBody(
 @Composable
 private fun ComposeImageList(
   images: List<UiMediaInsert>,
-  viewModel: ComposeViewModel
+  viewModel: ComposeViewModel,
+  navigate: (String) -> Unit,
 ) {
   Spacer(modifier = Modifier.height(ComposeImageListDefaults.Spacing))
   LazyRow(
@@ -485,7 +488,11 @@ private fun ComposeImageList(
     itemsIndexed(
       items = images,
     ) { index, item ->
-      ComposeImage(item, viewModel)
+      ComposeImage(
+        item,
+        viewModel,
+        navigate,
+      )
       if (index != images.lastIndex) {
         Spacer(modifier = Modifier.width(ComposeImageListDefaults.ItemSpacing))
       }
@@ -1049,6 +1056,8 @@ private object ComposeVoteDefaults {
 private fun ComposeActions(
   viewModel: ComposeViewModel,
   showEmoji: Boolean = false,
+  navigateForResult: suspend (String) -> Any?,
+  navigate: (String) -> Unit,
   emojiButtonClicked: () -> Unit = {},
 ) {
   val account = LocalActiveAccount.current ?: return
@@ -1119,12 +1128,12 @@ private fun ComposeActions(
         IconButton(
           onClick = {
             scope.launch {
-              // val result =
-              //   navController.navigateForResult(Root.Compose.Search.User)
-              //     ?.toString()
-              // if (!result.isNullOrEmpty()) {
-              //   viewModel.insertText("$result ")
-              // }
+              val result =
+                navigateForResult(Root.Compose.Search.User)
+                  ?.toString()
+              if (!result.isNullOrEmpty()) {
+                viewModel.insertText("$result ")
+              }
             }
           }
         ) {
@@ -1140,12 +1149,11 @@ private fun ComposeActions(
         IconButton(
           onClick = {
             scope.launch {
-              // val result =
-              //   navController.navigateForResult(Root.Mastodon.Compose.Hashtag)
-              //     ?.toString()
-              // if (!result.isNullOrEmpty()) {
-              //   viewModel.insertText("$result ")
-              // }
+              val result = navigateForResult(Root.Mastodon.Compose.Hashtag)
+                ?.toString()
+              if (!result.isNullOrEmpty()) {
+                viewModel.insertText("$result ")
+              }
             }
           }
         ) {
@@ -1200,7 +1208,7 @@ private fun ComposeActions(
       if (draftCount.value > 0) {
         IconButton(
           onClick = {
-            // navController.navigate(Root.Draft.List)
+            navigate(Root.Draft.List)
           }
         ) {
           Box {
@@ -1238,7 +1246,11 @@ private object ComposeActionsDefaults {
 }
 
 @Composable
-private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel) {
+private fun ComposeImage(
+  item: UiMediaInsert,
+  viewModel: ComposeViewModel,
+  navigate: (String) -> Unit,
+) {
   var expanded by remember { mutableStateOf(false) }
   val type = item.type
   Box {
@@ -1253,12 +1265,12 @@ private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel) {
         )
         .clickable(
           onClick = {
-            // navController.navigate(
-            //   Root.Media.Raw(
-            //     if (type == MediaType.video) MediaType.video else MediaType.photo,
-            //     item.filePath.toString()
-            //   )
-            // )
+            navigate(
+              Root.Media.Raw(
+                if (type == MediaType.video) MediaType.video else MediaType.photo,
+                item.filePath
+              )
+            )
           }
         )
         .clip(MaterialTheme.shapes.small),

@@ -45,6 +45,8 @@ data class StatusNavigationData(
   val openLink: (String) -> Unit = { },
   val composeNavigationData: ComposeNavigationData = ComposeNavigationData(),
   val popBackStack: () -> Unit = {},
+  val navigateForResult: suspend (String) -> Any? = {},
+  val navigate: (String) -> Unit = {},
 )
 
 @Composable
@@ -73,6 +75,12 @@ fun rememberStatusNavigationData(
         },
         popBackStack = {
           navigator.popBackStack()
+        },
+        navigateForResult = {
+          navigator.navigateForResult(it)
+        },
+        navigate = {
+          navigator.navigate(it)
         }
       )
     )
