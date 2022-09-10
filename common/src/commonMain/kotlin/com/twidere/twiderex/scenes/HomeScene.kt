@@ -475,7 +475,7 @@ private fun HomeDrawer(
         showAccounts = !showAccounts
       },
       openLink = {
-        //todo refactor check
+        openLink.invoke(it)
       }
     )
 

@@ -23,6 +23,7 @@ package com.twidere.twiderex.navigation
 import io.github.seiko.precompose.annotation.GeneratedRoute
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
+
 @Suppress("NO_ACTUAL_FOR_EXPECT")
 @GeneratedRoute
 expect fun RouteBuilder.twidereRoute(navigator: Navigator)
@@ -33,6 +34,7 @@ object Root {
   const val Notification = "/Root/Notification"
   const val Mentions = "/Root/Mentions"
   const val Me = "/Root/Me"
+  const val Empty = ""
   object Draft {
     const val List = "/Root/Draft/List"
     object Compose {

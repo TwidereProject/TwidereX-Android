@@ -54,6 +54,8 @@ import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.TwidereScene
 import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.NavOptions
+import moe.tlaster.precompose.navigation.PopUpTo
 
 @NavGraphDestination(
   route = Root.Settings.AccountManagement,
@@ -76,7 +78,11 @@ fun AccountManagementScene(
             )
           },
           title = {
-            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_manage_accounts_title))
+            Text(
+              text = stringResource(
+                res = com.twidere.twiderex.MR.strings.scene_manage_accounts_title
+              )
+            )
           },
           actions = {
             IconButton(
@@ -143,10 +149,23 @@ fun AccountManagementScene(
                     DropdownMenuItem(
                       onClick = {
                         activeAccountViewModel.deleteAccount(detail)
+                        if(!activeAccountViewModel.hasAccount()) {
+                          navigator.navigate(
+                            Root.SignIn.General,
+                            NavOptions(
+                              popUpTo = PopUpTo(
+                                route = Root.Empty,
+                                inclusive = true,
+                              )
+                            )
+                          )
+                        }
                       },
                     ) {
                       Text(
-                        text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_remove),
+                        text = stringResource(
+                          res = com.twidere.twiderex.MR.strings.common_controls_actions_remove
+                        ),
                         color = Color.Red,
                       )
                     }
