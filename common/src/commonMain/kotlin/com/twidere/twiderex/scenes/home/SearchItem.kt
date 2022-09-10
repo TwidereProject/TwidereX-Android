@@ -180,7 +180,7 @@ fun SearchSceneContent(
             modifier = Modifier.clickable(
               onClick = {
                 channel.trySend(SearchInputEvent.AddOrUpgradeEvent(it.content))
-                // navigator.search(it.content)
+                navigator.search(it.content)
               }
 
             ),

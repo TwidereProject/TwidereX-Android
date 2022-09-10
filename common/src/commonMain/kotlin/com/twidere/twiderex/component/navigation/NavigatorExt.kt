@@ -1,5 +1,6 @@
 package com.twidere.twiderex.component.navigation
 
+import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.kmp.clearCookie
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
@@ -11,6 +12,7 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.twitterHosts
+import com.twidere.twiderex.kmp.RemoteNavigator
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 
@@ -71,11 +73,12 @@ fun Navigator.search(keyword: String) {
 fun Navigator.openLink(
     link: String,
     deepLink: Boolean =  true,
+    remoteNavigator: RemoteNavigator = get(),
 ) {
     if ((link.contains(twidereXSchema) || isTwitterDeeplink(link)) && deepLink) {
         navigate(link)
     } else {
-        // openDeepLink(link)
+        remoteNavigator.openDeepLink(link)
     }
 }
 
@@ -84,7 +87,7 @@ fun Navigator.compose(
     statusKey: MicroBlogKey?= null,
     navOptions: NavOptions?= null,
 ) {
-    navigate(Root.Compose.Home(composeType, statusKey))
+    navigate(Root.Compose.Home(composeType, statusKey), navOptions)
 }
 
 fun Navigator.hashtag(name: String) {
