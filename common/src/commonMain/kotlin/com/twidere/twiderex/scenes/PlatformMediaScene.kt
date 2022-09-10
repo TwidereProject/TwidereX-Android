@@ -22,11 +22,11 @@ package com.twidere.twiderex.scenes
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.navigation.Root
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import io.github.seiko.precompose.annotation.Path
 import io.github.seiko.precompose.annotation.Query
+import moe.tlaster.precompose.navigation.Navigator
 
 @NavGraphDestination(
   route = Root.Media.Status.route,
@@ -37,7 +37,6 @@ expect fun PlatformStatusMediaScene(
   @Query("selectedIndex") selectedIndex: Int?,
   navigator: Navigator,
 )
-
 
 @NavGraphDestination(
   route = Root.Media.Raw.route,
@@ -50,7 +49,6 @@ expect fun PlatformRawMediaScene(
   navigator: Navigator,
 )
 
-
 @NavGraphDestination(
   route = Root.Media.Pure.route,
 )
@@ -62,7 +60,7 @@ expect fun PlatformPureMediaScene(
 )
 
 @NavGraphDestination(
-  route =  Root.SignIn.Web.Twitter.route,
+  route = Root.SignIn.Web.Twitter.route,
 )
 @Composable
 expect fun PlatformScene(

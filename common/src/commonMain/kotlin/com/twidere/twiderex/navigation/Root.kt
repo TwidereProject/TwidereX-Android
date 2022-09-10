@@ -56,50 +56,50 @@ object Root {
       }
     }
   }
-  object User  {
-    const val  route = "/Root/User/{userKey}"
+  object User {
+    const val route = "/Root/User/{userKey}"
     operator fun invoke(userKey: com.twidere.twiderex.model.MicroBlogKey) = "/Root/User/$userKey"
   }
   object Media {
-    object Status  {
-      const val  route = "/Root/Media/Status/{statusKey}"
+    object Status {
+      const val route = "/Root/Media/Status/{statusKey}"
       operator fun invoke(statusKey: com.twidere.twiderex.model.MicroBlogKey, selectedIndex: Int?) = "/Root/Media/Status/$statusKey?selectedIndex=$selectedIndex"
     }
-    object Raw  {
-      const val  route = "/Root/Media/Raw/{type}/{url}"
+    object Raw {
+      const val route = "/Root/Media/Raw/{type}/{url}"
       operator fun invoke(type: com.twidere.twiderex.model.enums.MediaType, url: String) = "/Root/Media/Raw/$type/${java.net.URLEncoder.encode(url, "UTF-8")}"
     }
-    object Pure  {
-      const val  route = "/Root/Media/Pure/{belongToKey}"
+    object Pure {
+      const val route = "/Root/Media/Pure/{belongToKey}"
       operator fun invoke(belongToKey: com.twidere.twiderex.model.MicroBlogKey, selectedIndex: Int?) = "/Root/Media/Pure/$belongToKey?selectedIndex=$selectedIndex"
     }
   }
   object Search {
     const val Home = "/Root/Search/Home"
-    object Result  {
-      const val  route = "/Root/Search/Result/{keyword}"
+    object Result {
+      const val route = "/Root/Search/Result/{keyword}"
       operator fun invoke(keyword: String) = "/Root/Search/Result/${java.net.URLEncoder.encode(keyword, "UTF-8")}"
     }
-    object Input  {
-      const val  route = "/Root/Search/Input"
+    object Input {
+      const val route = "/Root/Search/Input"
       operator fun invoke(keyword: String?) = "/Root/Search/Input?keyword=${java.net.URLEncoder.encode(if (keyword == null) "" else keyword, "UTF-8")}"
     }
   }
   object Compose {
-    object Home  {
-      const val  route = "/Root/Compose/Home"
+    object Home {
+      const val route = "/Root/Compose/Home"
       operator fun invoke(composeType: com.twidere.twiderex.model.enums.ComposeType?, statusKey: com.twidere.twiderex.model.MicroBlogKey?) = "/Root/Compose/Home?composeType=$composeType&statusKey=$statusKey"
     }
     object Search {
       const val User = "/Root/Compose/Search/User"
     }
   }
-  object Following  {
-    const val  route = "/Root/Following/{userKey}"
+  object Following {
+    const val route = "/Root/Following/{userKey}"
     operator fun invoke(userKey: com.twidere.twiderex.model.MicroBlogKey) = "/Root/Following/$userKey"
   }
-  object Followers  {
-    const val  route = "/Root/Followers/{userKey}"
+  object Followers {
+    const val route = "/Root/Followers/{userKey}"
     operator fun invoke(userKey: com.twidere.twiderex.model.MicroBlogKey) = "/Root/Followers/$userKey"
   }
   object Settings {
@@ -112,18 +112,18 @@ object Root {
     const val Misc = "/Root/Settings/Misc"
     const val Notification = "/Root/Settings/Notification"
     const val Layout = "/Root/Settings/Layout"
-    object AccountNotification  {
-      const val  route = "/Root/Settings/AccountNotification/{accountKey}"
+    object AccountNotification {
+      const val route = "/Root/Settings/AccountNotification/{accountKey}"
       operator fun invoke(accountKey: com.twidere.twiderex.model.MicroBlogKey) = "/Root/Settings/AccountNotification/$accountKey"
     }
   }
-  object Status  {
-    const val  route = "/Root/Status/{statusKey}"
+  object Status {
+    const val route = "/Root/Status/{statusKey}"
     operator fun invoke(statusKey: com.twidere.twiderex.model.MicroBlogKey) = "/Root/Status/$statusKey"
   }
   object Mastodon {
-    object Hashtag  {
-      const val  route = "/Root/Mastodon/Hashtag/{keyword}"
+    object Hashtag {
+      const val route = "/Root/Mastodon/Hashtag/{keyword}"
       operator fun invoke(keyword: String) = "/Root/Mastodon/Hashtag/${java.net.URLEncoder.encode(keyword, "UTF-8")}"
     }
     const val Notification = "/Root/Mastodon/Notification"
@@ -137,31 +137,31 @@ object Root {
     const val Home = "/Root/Lists/Home"
     const val MastodonCreateDialog = "/Root/Lists/MastodonCreateDialog"
     const val TwitterCreate = "/Root/Lists/TwitterCreate"
-    object TwitterEdit  {
-      const val  route = "/Root/Lists/TwitterEdit/{listKey}"
+    object TwitterEdit {
+      const val route = "/Root/Lists/TwitterEdit/{listKey}"
       operator fun invoke(listKey: com.twidere.twiderex.model.MicroBlogKey) = "/Root/Lists/TwitterEdit/$listKey"
     }
-    object Timeline  {
-      const val  route = "/Root/Lists/Timeline/{listKey}"
+    object Timeline {
+      const val route = "/Root/Lists/Timeline/{listKey}"
       operator fun invoke(listKey: com.twidere.twiderex.model.MicroBlogKey) = "/Root/Lists/Timeline/$listKey"
     }
-    object Members  {
-      const val  route = "/Root/Lists/Members/{listKey}"
+    object Members {
+      const val route = "/Root/Lists/Members/{listKey}"
       operator fun invoke(listKey: com.twidere.twiderex.model.MicroBlogKey, owned: Boolean?) = "/Root/Lists/Members/$listKey?owned=$owned"
     }
-    object Subscribers  {
-      const val  route = "/Root/Lists/Subscribers/{listKey}"
+    object Subscribers {
+      const val route = "/Root/Lists/Subscribers/{listKey}"
       operator fun invoke(listKey: com.twidere.twiderex.model.MicroBlogKey) = "/Root/Lists/Subscribers/$listKey"
     }
-    object AddMembers  {
-      const val  route = "/Root/Lists/AddMembers/{listKey}"
+    object AddMembers {
+      const val route = "/Root/Lists/AddMembers/{listKey}"
       operator fun invoke(listKey: com.twidere.twiderex.model.MicroBlogKey) = "/Root/Lists/AddMembers/$listKey"
     }
   }
   object Messages {
     const val Home = "/Root/Messages/Home"
-    object Conversation  {
-      const val  route = "/Root/Messages/Conversation/{conversationKey}"
+    object Conversation {
+      const val route = "/Root/Messages/Conversation/{conversationKey}"
       operator fun invoke(conversationKey: com.twidere.twiderex.model.MicroBlogKey) = "/Root/Messages/Conversation/$conversationKey"
     }
     const val NewConversation = "/Root/Messages/NewConversation"

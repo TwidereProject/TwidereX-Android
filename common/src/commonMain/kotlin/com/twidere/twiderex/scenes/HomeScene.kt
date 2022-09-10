@@ -84,7 +84,6 @@ import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.divider
 import com.twidere.twiderex.component.navigation.openLink
 import com.twidere.twiderex.component.navigation.user
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
@@ -113,6 +112,7 @@ import io.github.seiko.precompose.annotation.NavGraphDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.BackHandler
+import moe.tlaster.precompose.navigation.Navigator
 
 @NavGraphDestination(
   route = Root.Home,

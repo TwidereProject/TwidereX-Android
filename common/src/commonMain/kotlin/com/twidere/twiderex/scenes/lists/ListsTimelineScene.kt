@@ -56,7 +56,6 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
@@ -73,6 +72,7 @@ import com.twidere.twiderex.viewmodel.lists.ListsModifyViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsTimelineViewModel
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
 
 @NavGraphDestination(

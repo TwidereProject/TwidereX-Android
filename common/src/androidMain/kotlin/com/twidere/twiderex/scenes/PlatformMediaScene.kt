@@ -24,8 +24,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
+import moe.tlaster.precompose.navigation.Navigator
 import java.net.URLDecoder
 
 @Composable

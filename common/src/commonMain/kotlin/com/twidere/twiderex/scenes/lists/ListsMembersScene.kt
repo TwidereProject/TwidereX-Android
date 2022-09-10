@@ -48,7 +48,6 @@ import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.refreshOrRetry
@@ -65,8 +64,8 @@ import io.github.seiko.precompose.annotation.NavGraphDestination
 import io.github.seiko.precompose.annotation.Path
 import io.github.seiko.precompose.annotation.Query
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.Navigator
 import java.util.Locale
-
 
 @NavGraphDestination(
   route = Root.Lists.Members.route,
@@ -153,7 +152,7 @@ fun ListsMembersScene(
         LazyUiUserList(
           items = state.source, onItemClicked = {
             // navigator.user(it)
-            },
+          },
           action = {
             if (!owned) return@LazyUiUserList
             var menuExpand by remember {

@@ -21,7 +21,6 @@
 package com.twidere.twiderex.component.status
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -49,7 +48,6 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ColumnScope.StatusText(
   status: UiStatus,

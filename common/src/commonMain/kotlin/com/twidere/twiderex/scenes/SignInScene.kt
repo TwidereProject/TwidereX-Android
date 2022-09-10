@@ -285,9 +285,9 @@ private fun TwitterCustomKeySignIn(
       TextButton(
         onClick = {
           scope.launch {
-           clickCustomKeySignIn(
-             Root.SignIn.Twitter(apiKey, apiSecret)
-           )
+            clickCustomKeySignIn(
+              Root.SignIn.Twitter(apiKey, apiSecret)
+            )
           }
         },
         enabled = apiKey.isNotEmpty() && apiSecret.isNotEmpty()

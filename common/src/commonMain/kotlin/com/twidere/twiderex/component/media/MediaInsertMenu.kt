@@ -48,7 +48,6 @@ import com.twidere.twiderex.kmp.PlatformMediaWrapper
 import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.model.enums.MediaInsertType
 import com.twidere.twiderex.model.ui.UiMediaInsert
-import com.twidere.twiderex.navigation.Root
 import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
 

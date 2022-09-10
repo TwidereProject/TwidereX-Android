@@ -50,7 +50,6 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.hashtag
 import com.twidere.twiderex.component.navigation.search
 import com.twidere.twiderex.component.navigation.searchInput
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.component.trend.MastodonTrendItem
@@ -65,6 +64,7 @@ import com.twidere.twiderex.scenes.search.presenter.SearchInputEvent
 import com.twidere.twiderex.scenes.search.presenter.SearchInputState
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
+import moe.tlaster.precompose.navigation.Navigator
 
 class SearchItem : HomeNavigationItem() {
 

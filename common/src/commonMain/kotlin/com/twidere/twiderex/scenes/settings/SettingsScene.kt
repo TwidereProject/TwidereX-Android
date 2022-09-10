@@ -92,7 +92,6 @@ private val settings =
     )
   )
 
-
 @NavGraphDestination(
   route = Root.Settings.Home,
 )

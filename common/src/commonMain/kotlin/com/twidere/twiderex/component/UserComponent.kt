@@ -102,6 +102,7 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.navigation.StatusNavigationData
 import com.twidere.twiderex.navigation.UserNavigationData
+import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.viewmodel.user.UserEvent
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineState
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineState
@@ -112,7 +113,6 @@ import kotlinx.coroutines.launch
 import moe.tlaster.nestedscrollview.VerticalNestedScrollView
 import moe.tlaster.nestedscrollview.rememberNestedScrollViewState
 import moe.tlaster.placeholder.Placeholder
-import com.twidere.twiderex.navigation.twidereXSchema
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable

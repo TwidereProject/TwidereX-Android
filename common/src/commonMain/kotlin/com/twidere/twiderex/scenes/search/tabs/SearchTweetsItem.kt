@@ -26,13 +26,13 @@ import androidx.compose.runtime.getValue
 import androidx.paging.LoadState
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.rememberPresenter
 import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.scenes.search.tabs.presenter.SearchTweetsPresenter
 import com.twidere.twiderex.scenes.search.tabs.presenter.SearchTweetsState
+import moe.tlaster.precompose.navigation.Navigator
 
 class SearchTweetsItem : SearchSceneItem {
   @Composable

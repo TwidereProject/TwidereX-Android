@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.component.lazy.ui
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -79,7 +78,6 @@ import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.DMNavigationData
-import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalVideoPlayback
 
@@ -310,7 +308,6 @@ private object MessageBodyDefaults {
   val ContentSpacing = 10.dp
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun MediaMessage(media: UiMedia?, onClick: (UiMedia) -> Unit) {
   media?.let { item ->

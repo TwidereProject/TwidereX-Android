@@ -21,7 +21,6 @@
 package com.twidere.twiderex.scenes.dm
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -67,7 +66,6 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiDMEventList
 import com.twidere.twiderex.component.media.MediaInsertMenu
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
@@ -85,8 +83,8 @@ import com.twidere.twiderex.viewmodel.dm.DMEventViewModel
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import io.github.seiko.precompose.annotation.Path
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
-
 
 @NavGraphDestination(
   route = Root.Messages.Conversation.route,
@@ -307,7 +305,6 @@ private object InputPhotoPreviewDefaults {
   val IconPadding = 6.dp
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun InputComponent(
   modifier: Modifier = Modifier,

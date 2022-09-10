@@ -21,7 +21,6 @@
 package com.twidere.twiderex.scenes
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -70,7 +69,6 @@ import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
 import org.koin.core.parameter.parametersOf
-
 
 @Composable
 fun PureMediaScene(
@@ -221,7 +219,6 @@ private object PureMediaSceneDefaults {
   val ContentPadding = PaddingValues(8.dp)
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun PureMediaControlPanel(
   controlVisibility: Boolean,

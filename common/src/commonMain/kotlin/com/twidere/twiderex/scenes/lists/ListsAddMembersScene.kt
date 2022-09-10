@@ -52,7 +52,6 @@ import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
@@ -70,8 +69,8 @@ import com.twidere.twiderex.viewmodel.lists.ListsAddMemberViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsSearchUserViewModel
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
-
 
 @NavGraphDestination(
   route = Root.Lists.AddMembers.route,

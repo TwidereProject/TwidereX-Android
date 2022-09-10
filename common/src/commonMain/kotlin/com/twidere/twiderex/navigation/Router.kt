@@ -43,7 +43,7 @@ fun Router(
   hasAccount.value?.let {
     NavHost(
       navigator = navController,
-      initialRoute = if(it)
+      initialRoute = if (it)
         Root.Home
       else
         Root.SignIn.General

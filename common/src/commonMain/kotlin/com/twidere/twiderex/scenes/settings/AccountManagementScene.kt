@@ -44,7 +44,6 @@ import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.openLink
 import com.twidere.twiderex.component.navigation.user
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
@@ -55,6 +54,7 @@ import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.TwidereScene
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import moe.tlaster.precompose.navigation.NavOptions
+import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.PopUpTo
 
 @NavGraphDestination(
@@ -149,7 +149,7 @@ fun AccountManagementScene(
                     DropdownMenuItem(
                       onClick = {
                         activeAccountViewModel.deleteAccount(detail)
-                        if(!activeAccountViewModel.hasAccount()) {
+                        if (!activeAccountViewModel.hasAccount()) {
                           navigator.navigate(
                             Root.SignIn.General,
                             NavOptions(

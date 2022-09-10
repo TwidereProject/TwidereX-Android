@@ -62,7 +62,6 @@ val autolink by lazy {
   }
 }
 
-
 private fun generateDeepLinkBase(deeplink: String): String {
   return deeplink.substring(
     0,

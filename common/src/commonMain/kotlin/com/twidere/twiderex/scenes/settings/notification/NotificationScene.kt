@@ -44,7 +44,6 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.ItemHeader
 import com.twidere.twiderex.component.navigation.openLink
 import com.twidere.twiderex.component.navigation.user
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
@@ -55,6 +54,7 @@ import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.TwidereScene
 import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
 @NavGraphDestination(
   route = Root.Settings.Notification,

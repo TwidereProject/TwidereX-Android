@@ -57,7 +57,7 @@ import org.koin.core.parameter.parametersOf
 fun TwitterListsEditScene(
   @Path("listKey") listKey: String,
   navigator: Navigator,
-){
+) {
   TwitterListsEditScene(
     listKey = MicroBlogKey.valueOf(listKey),
     navigator = navigator,

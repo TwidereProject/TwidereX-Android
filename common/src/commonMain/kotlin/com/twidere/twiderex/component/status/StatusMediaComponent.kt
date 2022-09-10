@@ -261,7 +261,6 @@ object StatusMediaDefaults {
   }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun StatusMediaPreviewItem(
   media: UiMedia,

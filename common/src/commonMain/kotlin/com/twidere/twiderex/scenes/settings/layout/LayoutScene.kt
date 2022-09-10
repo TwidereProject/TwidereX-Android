@@ -51,7 +51,6 @@ import com.twidere.twiderex.component.foundation.ReorderableColumn
 import com.twidere.twiderex.component.foundation.rememberReorderableColumnState
 import com.twidere.twiderex.component.lazy.ItemHeader
 import com.twidere.twiderex.component.navigation.openLink
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
@@ -62,6 +61,7 @@ import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.scenes.home.item
 import com.twidere.twiderex.ui.TwidereScene
 import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
 @NavGraphDestination(
   route = Root.Settings.Layout,

@@ -33,12 +33,12 @@ import androidx.paging.LoadState
 import androidx.paging.compose.items
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.navigation.hashtag
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.rememberPresenter
 import com.twidere.twiderex.scenes.search.tabs.presenter.MastodonSearchHashtagPresenter
 import com.twidere.twiderex.scenes.search.tabs.presenter.MastodonSearchHashtagState
+import moe.tlaster.precompose.navigation.Navigator
 
 class MastodonSearchHashtagItem : SearchSceneItem {
   @Composable

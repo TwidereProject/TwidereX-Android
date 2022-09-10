@@ -27,7 +27,6 @@ import androidx.compose.runtime.getValue
 import androidx.paging.LoadState
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusImageList
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.rememberPresenter
@@ -35,6 +34,7 @@ import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.scenes.search.tabs.presenter.TwitterSearchMediaPresenter
 import com.twidere.twiderex.scenes.search.tabs.presenter.TwitterSearchMediaState
 import com.twidere.twiderex.ui.LocalVideoPlayback
+import moe.tlaster.precompose.navigation.Navigator
 
 class TwitterSearchMediaItem : SearchSceneItem {
   @Composable

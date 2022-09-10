@@ -20,11 +20,6 @@
  */
 package com.twidere.twiderex.navigation
 
-import androidx.compose.runtime.Composable
-import moe.tlaster.precompose.navigation.BackStackEntry
-import moe.tlaster.precompose.navigation.RouteBuilder
-import moe.tlaster.precompose.navigation.transition.NavTransition
-
 // interface IRoute {
 //   val route: String
 // }

@@ -67,13 +67,13 @@ import com.twidere.twiderex.navigation.RequirePlatformAccount
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.navigation.rememberStatusNavigationData
-import com.twidere.twiderex.twitterStatusDeeplinkSuffix
 import com.twidere.twiderex.twitterHost1
 import com.twidere.twiderex.twitterHost2
 import com.twidere.twiderex.twitterHost3
 import com.twidere.twiderex.twitterHost4
 import com.twidere.twiderex.twitterHost5
 import com.twidere.twiderex.twitterHost6
+import com.twidere.twiderex.twitterStatusDeeplinkSuffix
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.utils.generateNotificationEvent
 import com.twidere.twiderex.viewmodel.StatusViewModel
@@ -91,7 +91,7 @@ fun StatusScene(
   @Path("statusKey") statusKey: String,
   navigator: Navigator,
 ) {
-  MicroBlogKey.valueOf(statusKey).let { statusKey->
+  MicroBlogKey.valueOf(statusKey).let { statusKey ->
     ProvideStatusPlatform(statusKey = statusKey) { platformType ->
       RequirePlatformAccount(platformType = platformType) {
         InnerStatusScene(
@@ -102,7 +102,6 @@ fun StatusScene(
     }
   }
 }
-
 
 @NavGraphDestination(
   route = RootDeepLinks.Twitter.Status.route,
@@ -125,7 +124,7 @@ fun TwitterStatusScene(
     platformType = PlatformType.Twitter,
     fallback = {
       navigator.openLink(
-        "https://twitter.com/${screenName}/status/$statusId",
+        "https://twitter.com/$screenName/status/$statusId",
         deepLink = false
       )
       navigator.goBack()

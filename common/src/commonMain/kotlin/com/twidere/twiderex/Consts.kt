@@ -34,7 +34,6 @@ const val twitterHomeDeeplinkSuffix = "/*"
 const val twitterUserDeeplinkSuffix = "{screenName}"
 const val twitterSearchDeeplinkSuffix = "/search?q={keyword}"
 
-
 val twitterHosts = listOf(
   twitterHost1,
   twitterHost2,

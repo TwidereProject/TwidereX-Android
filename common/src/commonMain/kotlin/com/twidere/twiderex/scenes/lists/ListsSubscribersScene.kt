@@ -26,7 +26,6 @@ import com.twidere.twiderex.component.UserListComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.MicroBlogKey
@@ -39,6 +38,7 @@ import com.twidere.twiderex.viewmodel.user.UserListState
 import com.twidere.twiderex.viewmodel.user.UserListType
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
 
 @NavGraphDestination(
   route = Root.Lists.Subscribers.route,

@@ -56,7 +56,6 @@ import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import moe.tlaster.precompose.navigation.Navigator
 
-
 @NavGraphDestination(
   route = Root.SignIn.Mastodon,
 )

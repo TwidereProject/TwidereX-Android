@@ -29,12 +29,12 @@ import com.twidere.twiderex.component.navigation.media
 import com.twidere.twiderex.component.navigation.openLink
 import com.twidere.twiderex.component.navigation.status
 import com.twidere.twiderex.component.navigation.user
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
+import moe.tlaster.precompose.navigation.Navigator
 
 @Immutable
 data class StatusNavigationData(

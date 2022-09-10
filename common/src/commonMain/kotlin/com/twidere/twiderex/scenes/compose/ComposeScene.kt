@@ -104,7 +104,6 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.foundation.platform.PlatformEmojiPanel
 import com.twidere.twiderex.component.media.MediaInsertMenu
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
@@ -146,8 +145,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.BackHandler
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
-
 
 @NavGraphDestination(
   route = Root.Draft.Compose.route,
@@ -176,7 +175,6 @@ fun DraftComposeScene(
     )
   }
 }
-
 
 @NavGraphDestination(
   route = Root.Compose.Home.route,
@@ -1047,7 +1045,6 @@ private object ComposeVoteDefaults {
   val MultipleCheckBoxSpacing = 8.dp
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun ComposeActions(
   viewModel: ComposeViewModel,

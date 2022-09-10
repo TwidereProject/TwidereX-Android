@@ -54,7 +54,6 @@ import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.PopUpTo
 
-
 @NavGraphDestination(
   route = Root.Lists.TwitterCreate,
 )

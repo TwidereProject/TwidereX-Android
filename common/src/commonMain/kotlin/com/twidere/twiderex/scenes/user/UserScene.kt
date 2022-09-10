@@ -42,7 +42,6 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.stringResource
@@ -65,6 +64,7 @@ import com.twidere.twiderex.viewmodel.user.UserPresenter
 import com.twidere.twiderex.viewmodel.user.UserState
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
 
 @NavGraphDestination(
   route = Root.User.route,

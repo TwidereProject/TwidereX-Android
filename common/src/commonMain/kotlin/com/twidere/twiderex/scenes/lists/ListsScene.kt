@@ -51,7 +51,6 @@ import io.github.seiko.precompose.annotation.NavGraphDestination
 import moe.tlaster.precompose.navigation.Navigator
 import java.util.Locale
 
-
 @NavGraphDestination(
   route = Root.Lists.Home,
 )

@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.component.navigation.twitterSignInWeb
-import moe.tlaster.precompose.navigation.Navigator
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.navigation.Root
@@ -34,6 +33,7 @@ import com.twidere.twiderex.viewmodel.twitter.PinCodeProvider
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
 
 @NavGraphDestination(

@@ -72,7 +72,6 @@ actual fun PlatformPureMediaScene(
 
 @Composable
 actual fun PlatformScene(target: String, navigator: Navigator) {
-
 }
 
 @Composable
