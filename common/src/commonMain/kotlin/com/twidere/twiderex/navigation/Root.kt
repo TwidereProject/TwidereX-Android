@@ -20,13 +20,112 @@
  */
 package com.twidere.twiderex.navigation
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import com.twidere.twiderex.component.navigation.openLink
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.scenes.HomeScene
+import com.twidere.twiderex.scenes.StatusScene
+import com.twidere.twiderex.scenes.search.SearchScene
+import com.twidere.twiderex.scenes.twitter.user.TwitterUserScene
+import com.twidere.twiderex.twitterHosts
 import io.github.seiko.precompose.annotation.GeneratedRoute
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
+import moe.tlaster.precompose.navigation.path
+import moe.tlaster.precompose.navigation.transition.NavTransition
+import java.net.URLDecoder
 
 @Suppress("NO_ACTUAL_FOR_EXPECT")
 @GeneratedRoute
 expect fun RouteBuilder.twidereRoute(navigator: Navigator)
+
+fun RouteBuilder.complexRoute(navigator: Navigator) {
+
+  scene(
+    Root.Home,
+    deepLinks = twitterHosts.map { "$it/*" }
+  ) {
+    HomeScene(
+      navigator = navigator,
+    )
+  }
+
+  scene(
+    RootDeepLinks.Twitter.User.route,
+    deepLinks = twitterHosts.map {
+      "$it/{screenName}"
+    }
+  ) { backStackEntry ->
+    backStackEntry.path<String>("screenName")?.let { screenName ->
+      RequirePlatformAccount(
+        platformType = PlatformType.Twitter,
+        fallback = {
+          navigator.openLink(
+            "https://twitter.com/$screenName",
+            deepLink = false
+          )
+          navigator.goBack()
+        }
+      ) {
+        TwitterUserScene(
+          screenName = screenName,
+          navigator = navigator,
+        )
+      }
+    }
+  }
+
+  scene(
+    RootDeepLinks.Twitter.Status.route,
+    deepLinks = twitterHosts.map {
+      "$it/{screenName}/status/{statusId:[0-9]+}"
+    }
+  ) { backStackEntry ->
+    backStackEntry.path<String>("statusId")?.let { statusId ->
+      RequirePlatformAccount(
+        platformType = PlatformType.Twitter,
+        fallback = {
+          navigator.openLink(
+            "https://twitter.com/${
+            backStackEntry.path<String>("screenName")
+            }/status/$statusId",
+            deepLink = false
+          )
+          navigator.goBack()
+        }
+      ) {
+        StatusScene(
+          statusKey = MicroBlogKey.twitter(statusId),
+          navigator = navigator,
+        )
+      }
+    }
+  }
+
+  scene(
+    Root.Search.Result.route,
+    deepLinks = twitterHosts.map {
+      "$it/search?q={keyword}"
+    } + RootDeepLinks.Search.route,
+    navTransition = NavTransition(
+      createTransition = fadeIn(),
+      destroyTransition = fadeOut(),
+      pauseTransition = fadeOut(),
+      resumeTransition = fadeIn(),
+    ),
+  ) { backStackEntry ->
+    backStackEntry.path<String>("keyword")?.takeIf {
+      it.isNotEmpty()
+    }?.let {
+      SearchScene(
+        keyword = URLDecoder.decode(it, "UTF-8"),
+        navigator = navigator,
+      )
+    }
+  }
+}
 
 object Root {
   const val Home = "/Root/Home"

@@ -22,17 +22,12 @@ package com.twidere.twiderex
 
 const val defaultLoadCount = 20
 
-const val twitterHost1 = "https://twitter.com"
-const val twitterHost2 = "https://mobile.twitter.com"
-const val twitterHost3 = "https://www.twitter.com"
-const val twitterHost4 = "http://twitter.com"
-const val twitterHost5 = "http://mobile.twitter.com"
-const val twitterHost6 = "http://www.twitter.com"
-
-const val twitterStatusDeeplinkSuffix = "/{screenName}/status/{statusId:[0-9]+}"
-const val twitterHomeDeeplinkSuffix = "/*"
-const val twitterUserDeeplinkSuffix = "{screenName}"
-const val twitterSearchDeeplinkSuffix = "/search?q={keyword}"
+private const val twitterHost1 = "https://twitter.com"
+private const val twitterHost2 = "https://mobile.twitter.com"
+private const val twitterHost3 = "https://www.twitter.com"
+private const val twitterHost4 = "http://twitter.com"
+private const val twitterHost5 = "http://mobile.twitter.com"
+private const val twitterHost6 = "http://www.twitter.com"
 
 val twitterHosts = listOf(
   twitterHost1,

@@ -128,6 +128,7 @@ import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.navigation.StatusNavigationData
 import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
@@ -150,6 +151,7 @@ import org.koin.core.parameter.parametersOf
 
 @NavGraphDestination(
   route = Root.Draft.Compose.route,
+  deepLink = [RootDeepLinks.Draft.route]
 )
 @Composable
 fun DraftComposeScene(
@@ -178,6 +180,7 @@ fun DraftComposeScene(
 
 @NavGraphDestination(
   route = Root.Compose.Home.route,
+  deepLink = [RootDeepLinks.Compose.route]
 )
 @Composable
 fun ComposeScene(
@@ -814,7 +817,7 @@ private fun ConfirmDraftDialog(
   )
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @Composable

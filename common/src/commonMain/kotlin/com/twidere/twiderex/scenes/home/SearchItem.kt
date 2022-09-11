@@ -147,7 +147,7 @@ fun SearchSceneContent(
               }
               IconButton(
                 onClick = {
-                  // navigator.searchInput()
+                  navigator.searchInput()
                 }
               ) {
                 Icon(

@@ -52,7 +52,6 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.ErrorPlaceholder
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.component.navigation.openLink
 import com.twidere.twiderex.component.status.DetailedStatusComponent
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.StatusThreadStyle
@@ -61,19 +60,11 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.ProvideStatusPlatform
 import com.twidere.twiderex.navigation.RequirePlatformAccount
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.navigation.rememberStatusNavigationData
-import com.twidere.twiderex.twitterHost1
-import com.twidere.twiderex.twitterHost2
-import com.twidere.twiderex.twitterHost3
-import com.twidere.twiderex.twitterHost4
-import com.twidere.twiderex.twitterHost5
-import com.twidere.twiderex.twitterHost6
-import com.twidere.twiderex.twitterStatusDeeplinkSuffix
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.utils.generateNotificationEvent
 import com.twidere.twiderex.viewmodel.StatusViewModel
@@ -94,7 +85,7 @@ fun StatusScene(
   MicroBlogKey.valueOf(statusKey).let { statusKey ->
     ProvideStatusPlatform(statusKey = statusKey) { platformType ->
       RequirePlatformAccount(platformType = platformType) {
-        InnerStatusScene(
+        StatusScene(
           statusKey = statusKey,
           navigator = navigator,
         )
@@ -103,42 +94,8 @@ fun StatusScene(
   }
 }
 
-@NavGraphDestination(
-  route = RootDeepLinks.Twitter.Status.route,
-  deepLink = [
-    "$twitterHost1$twitterStatusDeeplinkSuffix",
-    "$twitterHost2$twitterStatusDeeplinkSuffix",
-    "$twitterHost3$twitterStatusDeeplinkSuffix",
-    "$twitterHost4$twitterStatusDeeplinkSuffix",
-    "$twitterHost5$twitterStatusDeeplinkSuffix",
-    "$twitterHost6$twitterStatusDeeplinkSuffix",
-  ]
-)
 @Composable
-fun TwitterStatusScene(
-  @Path("statusId") statusId: String,
-  @Path("screenName") screenName: String,
-  navigator: Navigator,
-) {
-  RequirePlatformAccount(
-    platformType = PlatformType.Twitter,
-    fallback = {
-      navigator.openLink(
-        "https://twitter.com/$screenName/status/$statusId",
-        deepLink = false
-      )
-      navigator.goBack()
-    }
-  ) {
-    InnerStatusScene(
-      statusKey = MicroBlogKey.twitter(statusId),
-      navigator = navigator,
-    )
-  }
-}
-
-@Composable
-fun InnerStatusScene(
+fun StatusScene(
   statusKey: MicroBlogKey,
   navigator: Navigator,
 ) {

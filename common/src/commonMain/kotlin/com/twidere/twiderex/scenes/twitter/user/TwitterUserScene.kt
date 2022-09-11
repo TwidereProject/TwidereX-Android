@@ -37,35 +37,14 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.user
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.navigation.RootDeepLinks
-import com.twidere.twiderex.twitterHost1
-import com.twidere.twiderex.twitterHost2
-import com.twidere.twiderex.twitterHost3
-import com.twidere.twiderex.twitterHost4
-import com.twidere.twiderex.twitterHost5
-import com.twidere.twiderex.twitterHost6
-import com.twidere.twiderex.twitterUserDeeplinkSuffix
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.twitter.user.TwitterUserViewModel
-import io.github.seiko.precompose.annotation.NavGraphDestination
-import io.github.seiko.precompose.annotation.Path
 import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
 
-@NavGraphDestination(
-  route = RootDeepLinks.Twitter.User.route,
-  deepLink = [
-    "$twitterHost1$twitterUserDeeplinkSuffix",
-    "$twitterHost2$twitterUserDeeplinkSuffix",
-    "$twitterHost3$twitterUserDeeplinkSuffix",
-    "$twitterHost4$twitterUserDeeplinkSuffix",
-    "$twitterHost5$twitterUserDeeplinkSuffix",
-    "$twitterHost6$twitterUserDeeplinkSuffix",
-  ]
-)
 @Composable
 fun TwitterUserScene(
-  @Path("screenName") screenName: String,
+  screenName: String,
   navigator: Navigator,
 ) {
   val viewModel: TwitterUserViewModel = getViewModel {

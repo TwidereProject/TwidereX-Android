@@ -49,6 +49,7 @@ fun Router(
         Root.SignIn.General
     ) {
       twidereRoute(navigator = navController)
+      complexRoute(navigator = navController)
     }
     if (isDebug) {
       ComposeDebugTool(navController)

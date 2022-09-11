@@ -57,7 +57,6 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.scenes.search.presenter.SearchSaveEvent
 import com.twidere.twiderex.scenes.search.presenter.SearchSavePresenter
 import com.twidere.twiderex.scenes.search.presenter.SearchSaveState
@@ -65,34 +64,14 @@ import com.twidere.twiderex.scenes.search.tabs.MastodonSearchHashtagItem
 import com.twidere.twiderex.scenes.search.tabs.SearchTweetsItem
 import com.twidere.twiderex.scenes.search.tabs.SearchUserItem
 import com.twidere.twiderex.scenes.search.tabs.TwitterSearchMediaItem
-import com.twidere.twiderex.twitterHost1
-import com.twidere.twiderex.twitterHost2
-import com.twidere.twiderex.twitterHost3
-import com.twidere.twiderex.twitterHost4
-import com.twidere.twiderex.twitterHost5
-import com.twidere.twiderex.twitterHost6
-import com.twidere.twiderex.twitterSearchDeeplinkSuffix
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
-import io.github.seiko.precompose.annotation.NavGraphDestination
-import io.github.seiko.precompose.annotation.Path
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.Navigator
 
-@NavGraphDestination(
-  route = Root.Search.Result.route,
-  deepLink = [
-    "$twitterHost1$twitterSearchDeeplinkSuffix",
-    "$twitterHost2$twitterSearchDeeplinkSuffix",
-    "$twitterHost3$twitterSearchDeeplinkSuffix",
-    "$twitterHost4$twitterSearchDeeplinkSuffix",
-    "$twitterHost5$twitterSearchDeeplinkSuffix",
-    "$twitterHost6$twitterSearchDeeplinkSuffix",
-  ]
-)
 @Composable
 fun SearchScene(
-  @Path("keyword") keyword: String,
+  keyword: String,
   navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current ?: return
@@ -198,7 +177,6 @@ fun SearchScene(
                   onClick = {
                     scope.launch {
                       pagerState.currentPage = index
-                      // pagerState.animateScrollToPage(index)
                     }
                   },
                   content = {
