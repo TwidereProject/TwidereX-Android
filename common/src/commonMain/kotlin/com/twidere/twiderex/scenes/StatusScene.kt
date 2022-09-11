@@ -82,11 +82,11 @@ fun StatusScene(
   @Path("statusKey") statusKey: String,
   navigator: Navigator,
 ) {
-  MicroBlogKey.valueOf(statusKey).let { statusKey ->
-    ProvideStatusPlatform(statusKey = statusKey) { platformType ->
+  MicroBlogKey.valueOf(statusKey).let { key ->
+    ProvideStatusPlatform(statusKey = key) { platformType ->
       RequirePlatformAccount(platformType = platformType) {
         StatusScene(
-          statusKey = statusKey,
+          statusKey = key,
           navigator = navigator,
         )
       }

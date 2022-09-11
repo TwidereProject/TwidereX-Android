@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.paging.LoadState
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusImageList
+import com.twidere.twiderex.component.navigation.media
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.rememberPresenter
@@ -65,7 +66,7 @@ class TwitterSearchMediaItem : SearchSceneItem {
           LazyUiStatusImageList(
             items = it.data,
             openMedia = { key, index ->
-              // navigator.media(key, index)
+              navigator.media(key, index)
             }
           )
         }

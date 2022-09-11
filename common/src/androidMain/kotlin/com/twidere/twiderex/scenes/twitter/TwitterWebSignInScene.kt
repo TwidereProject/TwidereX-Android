@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.WebComponent
 import com.twidere.twiderex.ui.TwidereScene
+import com.twidere.twiderex.utils.TwitterWebJavascriptInterface
 import moe.tlaster.precompose.navigation.Navigator
 
 const val INJECT_CONTENT =
@@ -41,11 +42,11 @@ fun TwitterWebSignInScene(
         onPageFinished = { view, _ ->
           view.loadUrl(INJECT_CONTENT)
         },
-        // javascriptInterface = mapOf(
-        //   "injector" to TwitterWebJavascriptInterface(
-        //     navController
-        //   )
-        // ),
+        javascriptInterface = mapOf(
+          "injector" to TwitterWebJavascriptInterface(
+            navigator
+          )
+        ),
       )
     }
   }

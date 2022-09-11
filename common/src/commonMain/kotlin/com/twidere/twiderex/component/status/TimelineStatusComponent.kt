@@ -41,7 +41,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
@@ -198,7 +197,9 @@ private fun StatusHeader(
   statusNavigation: StatusNavigationData,
 ) {
   when {
-    data.platformType == PlatformType.Mastodon && data.mastodonExtra != null && data.mastodonExtra.type != MastodonStatusType.Status -> {
+    data.platformType == PlatformType.Mastodon &&
+      data.mastodonExtra != null &&
+      data.mastodonExtra.type != MastodonStatusType.Status -> {
       MastodonStatusHeader(
         mastodonExtra = data.mastodonExtra,
         data = data,
@@ -398,7 +399,6 @@ object AvatarConnectLineDefaults {
   val LineWidth = 2.dp
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun StatusContent(
   modifier: Modifier = Modifier,

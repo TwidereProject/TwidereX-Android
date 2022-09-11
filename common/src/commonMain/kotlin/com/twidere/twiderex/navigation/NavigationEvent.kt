@@ -88,6 +88,7 @@ fun rememberStatusNavigationData(
   return statusNavigation
 }
 
+@Immutable
 data class UserNavigationData(
   val statusNavigation: StatusNavigationData = StatusNavigationData(),
   val showAvatar: (UiUser) -> Unit,
