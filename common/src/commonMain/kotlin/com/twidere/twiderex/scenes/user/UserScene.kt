@@ -80,7 +80,7 @@ fun UserScene(
   MicroBlogKey.valueOf(key).let { userKey ->
     ProvideUserPlatform(userKey = userKey) { platformType ->
       RequirePlatformAccount(platformType = platformType) {
-        InnerUserScene(
+        UserScene(
           userKey = userKey,
           navigator = navigator,
           account = account,
@@ -91,7 +91,7 @@ fun UserScene(
 }
 
 @Composable
-fun InnerUserScene(
+fun UserScene(
   userKey: MicroBlogKey,
   navigator: Navigator,
   account: AccountDetails,

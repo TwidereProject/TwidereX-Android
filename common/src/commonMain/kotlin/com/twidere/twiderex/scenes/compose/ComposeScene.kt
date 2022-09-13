@@ -1091,7 +1091,8 @@ private fun ComposeActions(
           },
           supportMultipleSelect = insertMode.multiSelect,
           disableList = insertMode.disabledInsertType,
-          librariesSupported = insertMode.librarySupportedType.toTypedArray()
+          librariesSupported = insertMode.librarySupportedType.toTypedArray(),
+          navigateForResult = navigateForResult,
         )
       }
       if (account.type == PlatformType.Mastodon) {

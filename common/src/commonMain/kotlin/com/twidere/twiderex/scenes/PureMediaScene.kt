@@ -77,7 +77,7 @@ fun PureMediaScene(
   navigator: Navigator,
 ) {
   MicroBlogKey.valueOf(belongToKey).let {
-    InnerPureMediaScene(
+    PureMediaScene(
       belongToKey = it,
       selectedIndex = selectedIndex,
       navigator = navigator
@@ -86,7 +86,7 @@ fun PureMediaScene(
 }
 
 @Composable
-private fun InnerPureMediaScene(
+private fun PureMediaScene(
   belongToKey: MicroBlogKey,
   selectedIndex: Int,
   navigator: Navigator,

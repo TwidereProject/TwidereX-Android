@@ -76,12 +76,11 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.kmp.TimeUtils
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMedia
-import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.DMNavigationData
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalVideoPlayback
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LazyUiDMEventList(
   modifier: Modifier = Modifier,
@@ -114,8 +113,7 @@ fun LazyUiDMEventList(
               DMInComeEvent(
                 it,
                 onItemLongClick,
-                toUser = dmNavigationData.statusNavigation.toUser,
-                openLink = dmNavigationData.statusNavigation.openLink,
+                dmNavigationData = dmNavigationData,
               )
             else
               DMOutComeEvent(onResend, it, onItemLongClick, dmNavigationData)
@@ -175,6 +173,7 @@ private fun DMOutComeEvent(
           event,
           onItemLongClick,
           openLink = dmNavigationData.statusNavigation.openLink,
+          navigate = dmNavigationData.statusNavigation.navigate,
         )
       }
       ChatTime(
@@ -203,21 +202,21 @@ private object DMOutComeEventDefaults {
 private fun DMInComeEvent(
   event: UiDMEvent,
   onItemLongClick: (event: UiDMEvent) -> Unit,
-  toUser: (UiUser) -> Unit,
-  openLink: (String) -> Unit,
+  dmNavigationData: DMNavigationData,
 ) {
   Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
     Column {
       Row(verticalAlignment = Alignment.Bottom) {
         UserAvatar(
           user = event.sender,
-          onClick = toUser,
+          onClick = dmNavigationData.statusNavigation.toUser,
         )
         Spacer(modifier = Modifier.width(DMEventDefaults.ContentSpacing))
         MessageBody(
           event,
           onItemLongClick,
-          openLink = openLink,
+          openLink = dmNavigationData.statusNavigation.openLink,
+          navigate = dmNavigationData.statusNavigation.navigate
         )
       }
       ChatTime(
@@ -246,6 +245,7 @@ private fun MessageBody(
   event: UiDMEvent,
   onItemLongClick: (event: UiDMEvent) -> Unit,
   openLink: (String) -> Unit,
+  navigate: (String) -> Unit,
 ) {
   Box(
     modifier = Modifier
@@ -274,7 +274,7 @@ private fun MessageBody(
       MediaMessage(
         media = event.media.firstOrNull(),
         onClick = {
-          // navController.navigate(Root.Media.Pure(event.messageKey, 0))
+          navigate(Root.Media.Pure(event.messageKey, 0))
         }
       )
       if (event.media.isNotEmpty() && event.htmlText.isNotEmpty()) Spacer(

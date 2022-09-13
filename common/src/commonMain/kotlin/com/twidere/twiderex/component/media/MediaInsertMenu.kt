@@ -48,6 +48,7 @@ import com.twidere.twiderex.kmp.PlatformMediaWrapper
 import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.model.enums.MediaInsertType
 import com.twidere.twiderex.model.ui.UiMediaInsert
+import com.twidere.twiderex.navigation.Root
 import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
 
@@ -65,7 +66,8 @@ fun MediaInsertMenu(
   supportMultipleSelect: Boolean = true,
   librariesSupported: Array<MediaLibraryType> = MediaLibraryType.values(),
   disableList: List<MediaInsertType> = emptyList(),
-  onResult: (List<UiMediaInsert>) -> Unit
+  onResult: (List<UiMediaInsert>) -> Unit,
+  navigateForResult: suspend (String) -> Any?,
 ) {
   val mediaInsertProvider = get<MediaInsertProvider>()
   val scope = rememberCoroutineScope()
@@ -107,16 +109,16 @@ fun MediaInsertMenu(
                   }
                 }
                 MediaInsertType.GIF -> scope.launch {
-                  // navController.navigateForResult(Root.Gif.Home)
-                  //   ?.let { result ->
-                  //     onResult(
-                  //       listOf(result as String).map {
-                  //         mediaInsertProvider.provideUiMediaInsert(
-                  //           it
-                  //         )
-                  //       }
-                  //     )
-                  //   }
+                  navigateForResult(Root.Gif.Home)
+                    ?.let { result ->
+                      onResult(
+                        listOf(result as String).map {
+                          mediaInsertProvider.provideUiMediaInsert(
+                            it
+                          )
+                        }
+                      )
+                    }
                 }
               }
               showDropdown = false

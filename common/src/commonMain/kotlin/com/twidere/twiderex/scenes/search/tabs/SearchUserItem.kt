@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.paging.LoadState
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
+import com.twidere.twiderex.component.navigation.user
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.rememberPresenter
@@ -60,7 +61,9 @@ class SearchUserItem : SearchSceneItem {
       ) {
         LazyUiUserList(
           items = it.data,
-          // onItemClicked = { navigator.user(it) },
+          onItemClicked = {
+            navigator.user(it)
+          },
           userNavigationData = userNavigationData,
         )
       }

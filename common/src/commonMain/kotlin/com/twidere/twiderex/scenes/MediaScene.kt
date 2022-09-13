@@ -469,13 +469,13 @@ fun RawMediaScene(
   navigator: Navigator,
 ) {
   val mediaType = MediaType.valueOf(type)
-  InnerRawMediaScene(url = URLDecoder.decode(url, "UTF-8"), type = mediaType) {
+  RawMediaScene(url = URLDecoder.decode(url, "UTF-8"), type = mediaType) {
     navigator.popBackStack()
   }
 }
 
 @Composable
-private fun InnerRawMediaScene(
+private fun RawMediaScene(
   url: String,
   type: MediaType,
   onBack: () -> Unit,

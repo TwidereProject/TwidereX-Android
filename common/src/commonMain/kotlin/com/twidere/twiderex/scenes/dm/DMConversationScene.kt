@@ -205,6 +205,7 @@ private fun NormalContent(
       input = input,
       onValueChanged = { viewModel.input.value = it },
       onSend = { viewModel.sendMessage() },
+      navigateForResult = dmNavigationData.statusNavigation.navigateForResult
     )
   }
   firstEventKey?.let {
@@ -314,6 +315,7 @@ fun InputComponent(
   enableSelectPhoto: Boolean,
   enableSend: Boolean,
   onSend: () -> Unit,
+  navigateForResult: suspend (String) -> Any?,
 ) {
   Row(
     modifier = modifier.padding(InputComponentDefaults.ContentPadding),
@@ -325,6 +327,7 @@ fun InputComponent(
           onMediaInsert(it)
         },
         supportMultipleSelect = false,
+        navigateForResult = navigateForResult,
       )
     }
     Spacer(modifier = Modifier.width(InputComponentDefaults.ContentSpacing))
