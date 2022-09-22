@@ -69,7 +69,7 @@ fun MentionScene(
           },
           navigationIcon = {
             AppBarNavigationButton(
-              popBackStack = {
+              onBack = {
                 navigator.popBackStack()
               }
             )

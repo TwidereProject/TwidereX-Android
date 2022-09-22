@@ -82,7 +82,7 @@ fun AboutScene(
         AppBar(
           navigationIcon = {
             AppBarNavigationButton(
-              popBackStack = {
+              onBack = {
                 navigator.popBackStack()
               }
             )

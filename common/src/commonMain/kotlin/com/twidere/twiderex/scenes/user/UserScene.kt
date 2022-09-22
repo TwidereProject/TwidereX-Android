@@ -114,7 +114,7 @@ fun UserScene(
           backgroundColor = MaterialTheme.colors.surface.withElevation(),
           navigationIcon = {
             AppBarNavigationButton(
-              popBackStack = {
+              onBack = {
                 navigator.popBackStack()
               }
             )

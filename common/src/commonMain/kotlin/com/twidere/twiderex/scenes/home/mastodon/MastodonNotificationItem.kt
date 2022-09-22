@@ -89,7 +89,7 @@ fun MastodonNotificationScene(
           },
           navigationIcon = {
             AppBarNavigationButton(
-              popBackStack = {
+              onBack = {
                 navigator.popBackStack()
               }
             )

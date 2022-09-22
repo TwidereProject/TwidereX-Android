@@ -73,7 +73,7 @@ fun AllNotificationScene(
           },
           navigationIcon = {
             AppBarNavigationButton(
-              popBackStack = {
+              onBack = {
                 navigator.popBackStack()
               }
             )

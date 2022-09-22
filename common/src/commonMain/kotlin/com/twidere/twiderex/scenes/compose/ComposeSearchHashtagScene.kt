@@ -95,7 +95,7 @@ fun ComposeSearchHashtagScene(
           },
           navigationIcon = {
             AppBarNavigationButton(
-              popBackStack = {
+              onBack = {
                 navigator.popBackStack()
               }
             )

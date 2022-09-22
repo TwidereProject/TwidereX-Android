@@ -97,7 +97,7 @@ fun MiscScene(
         AppBar(
           navigationIcon = {
             AppBarNavigationButton(
-              popBackStack = {
+              onBack = {
                 navigator.popBackStack()
               }
             )

@@ -76,7 +76,7 @@ fun FederatedTimelineScene(
         AppBar(
           navigationIcon = {
             AppBarNavigationButton(
-              popBackStack = {
+              onBack = {
                 navigator.popBackStack()
               }
             )

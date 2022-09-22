@@ -31,11 +31,11 @@ import com.twidere.twiderex.component.stringResource
 @Composable
 fun AppBarNavigationButton(
   icon: ImageVector = Icons.Default.ArrowBack,
-  popBackStack: () -> Unit,
+  onBack: () -> Unit,
 ) {
   IconButton(
     onClick = {
-      popBackStack.invoke()
+      onBack.invoke()
     }
   ) {
     Icon(

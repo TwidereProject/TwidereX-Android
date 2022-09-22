@@ -106,7 +106,7 @@ fun SearchScene(
             AppBar(
               navigationIcon = {
                 AppBarNavigationButton(
-                  popBackStack = {
+                  onBack = {
                     navigator.popBackStack()
                   }
                 )

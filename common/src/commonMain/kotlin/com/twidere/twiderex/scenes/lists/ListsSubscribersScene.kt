@@ -75,7 +75,7 @@ fun ListsSubscribersScene(
           AppBar(
             navigationIcon = {
               AppBarNavigationButton(
-                popBackStack = {
+                onBack = {
                   navigator.popBackStack()
                 }
               )

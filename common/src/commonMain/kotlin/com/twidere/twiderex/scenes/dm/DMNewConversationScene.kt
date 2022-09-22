@@ -79,7 +79,7 @@ fun DMNewConversationScene(
             navigationIcon = {
               AppBarNavigationButton(
                 icon = Icons.Default.Close,
-                popBackStack = {
+                onBack = {
                   navigator.popBackStack()
                 }
               )

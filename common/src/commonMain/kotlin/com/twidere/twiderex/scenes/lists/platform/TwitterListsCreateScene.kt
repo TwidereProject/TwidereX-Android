@@ -81,7 +81,7 @@ fun TwitterListsCreateScene(
           navigationIcon = {
             AppBarNavigationButton(
               Icons.Default.Close,
-              popBackStack = {
+              onBack = {
                 navigator.popBackStack()
               }
             )

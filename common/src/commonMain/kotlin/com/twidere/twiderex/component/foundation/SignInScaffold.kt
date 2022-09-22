@@ -64,7 +64,7 @@ fun SignInScaffold(
           navigationIcon = {
             AppBarNavigationButton(
               icon = Icons.Default.Close,
-              popBackStack = popBackStack,
+              onBack = popBackStack,
             )
           },
           elevation = 0.dp,
