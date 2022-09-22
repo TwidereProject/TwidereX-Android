@@ -96,7 +96,7 @@ fun LazyUiDMConversationList(
                 Row {
                   UserName(
                     userName = it.conversation.conversationName,
-                    openLink = openLink,
+                    onUserNameClicked = openLink,
                   )
                   Spacer(
                     modifier = Modifier.width(

@@ -194,7 +194,7 @@ fun UserScene(
             state.user?.let {
               UserName(
                 user = it,
-                openLink = userNavigationData.statusNavigation.openLink,
+                onUserNameClicked = userNavigationData.statusNavigation.openLink,
               )
             }
           }

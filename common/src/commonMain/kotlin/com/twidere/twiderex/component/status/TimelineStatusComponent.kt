@@ -120,7 +120,7 @@ fun MastodonFollowStatus(
       Column {
         UserName(
           user = data.user,
-          openLink = statusNavigation.openLink
+          onUserNameClicked = statusNavigation.openLink
         )
         Spacer(modifier = Modifier.width(MastodonFollowStatusDefaults.NameSpacing))
         UserScreenName(data.user)
@@ -490,7 +490,7 @@ fun StatusContent(
             UserName(
               status.user,
               fontWeight = FontWeight.W600,
-              openLink = statusNavigation.openLink,
+              onUserNameClicked = statusNavigation.openLink,
             )
             if (type == StatusContentType.Normal) {
               Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
@@ -790,7 +790,7 @@ fun StatusQuote(
       ) {
         UserName(
           quote.user,
-          openLink = statusNavigation.openLink,
+          onUserNameClicked = statusNavigation.openLink,
         )
         Spacer(modifier = Modifier.width(StatusQuoteDefaults.NameSpacing))
         UserScreenName(quote.user)

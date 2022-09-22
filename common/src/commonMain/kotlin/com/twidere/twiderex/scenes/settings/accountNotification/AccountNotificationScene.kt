@@ -94,7 +94,7 @@ fun AccountNotificationScene(
             text = {
               UserName(
                 user = it,
-                openLink = {
+                onUserNameClicked = {
                   navigator.openLink(it)
                 }
               )

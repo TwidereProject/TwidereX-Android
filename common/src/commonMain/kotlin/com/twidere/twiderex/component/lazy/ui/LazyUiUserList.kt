@@ -91,7 +91,7 @@ fun LazyUiUserList(
                 Row {
                   UserName(
                     user = it,
-                    openLink = userNavigationData.statusNavigation.openLink,
+                    onUserNameClicked = userNavigationData.statusNavigation.openLink,
                   )
                   Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
                   UserScreenName(user = it)

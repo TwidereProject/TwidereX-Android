@@ -500,7 +500,7 @@ private fun HomeDrawer(
               text = {
                 UserName(
                   user = user,
-                  openLink = openLink,
+                  onUserNameClicked = openLink,
                 )
               },
               secondaryText = {
@@ -655,7 +655,7 @@ private fun DrawerUserHeader(
       if (user != null) {
         UserName(
           user = user,
-          openLink = openLink,
+          onUserNameClicked = openLink,
         )
       }
     },

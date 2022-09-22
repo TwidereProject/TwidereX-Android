@@ -722,7 +722,7 @@ private fun ReplySheetContent(
       text = {
         UserName(
           user = it.user,
-          openLink = statusNavigation.openLink,
+          onUserNameClicked = statusNavigation.openLink,
         )
       },
       secondaryText = {
@@ -765,7 +765,7 @@ private fun ReplySheetContent(
         text = {
           UserName(
             user = user,
-            openLink = statusNavigation.openLink,
+            onUserNameClicked = statusNavigation.openLink,
           )
         },
         secondaryText = {

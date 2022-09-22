@@ -105,7 +105,7 @@ fun LayoutScene(
               Row {
                 UserName(
                   user = state.user,
-                  openLink = {
+                  onUserNameClicked = {
                     navigator.openLink(it)
                   }
                 )

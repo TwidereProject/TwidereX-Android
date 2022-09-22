@@ -150,7 +150,7 @@ fun NotificationScene(
                 ) {
                   UserName(
                     user = user,
-                    openLink = {
+                    onUserNameClicked = {
                       navigator.openLink(it)
                     }
                   )

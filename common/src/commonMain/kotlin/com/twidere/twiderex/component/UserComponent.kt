@@ -487,7 +487,7 @@ fun UserInfo(
       user?.let { user ->
         UserInfoName(
           user = user,
-          openLick = userNavigationData.statusNavigation.openLink,
+          onUserNameClicked = userNavigationData.statusNavigation.openLink,
         )
       }
       if (!isMe) {
@@ -565,7 +565,7 @@ object UserInfoDefaults {
 @Composable
 private fun UserInfoName(
   user: UiUser,
-  openLick: (String) -> Unit,
+  onUserNameClicked: (String) -> Unit,
 ) {
   Row(
     modifier = Modifier.padding(UserInfoNameDefaults.ContentPadding)
@@ -586,7 +586,7 @@ private fun UserInfoName(
       style = MaterialTheme.typography.h6,
       maxLines = Int.MAX_VALUE,
       textAlign = TextAlign.Center,
-      openLink = openLick,
+      onUserNameClicked = onUserNameClicked,
     )
   }
   UserScreenName(user = user)

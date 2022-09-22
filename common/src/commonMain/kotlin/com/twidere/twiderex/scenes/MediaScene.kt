@@ -398,7 +398,7 @@ private fun StatusMediaInfo(
         Spacer(modifier = Modifier.width(StatusMediaInfoDefaults.AvatarSpacing))
         UserName(
           user = status.user,
-          openLink = statusNavigationData.openLink,
+          onUserNameClicked = statusNavigationData.openLink,
         )
         Spacer(modifier = Modifier.width(StatusMediaInfoDefaults.NameSpacing))
         UserScreenName(user = status.user)
