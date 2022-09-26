@@ -46,16 +46,21 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.navigation.Root
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.NavOptions
+import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.PopUpTo
 
+@NavGraphDestination(
+  route = Root.Lists.TwitterCreate,
+)
 @Composable
-fun TwitterListsCreateScene() {
-  val navController = LocalNavController.current
+fun TwitterListsCreateScene(
+  navigator: Navigator,
+) {
   val scope = rememberCoroutineScope()
   val listsCreateViewModel: ListsCreateViewModel = getViewModel()
   val loading by listsCreateViewModel.loading.observeAsState(initial = false)
@@ -73,7 +78,14 @@ fun TwitterListsCreateScene() {
     InAppNotificationScaffold(
       topBar = {
         AppBar(
-          navigationIcon = { AppBarNavigationButton(Icons.Default.Close) },
+          navigationIcon = {
+            AppBarNavigationButton(
+              Icons.Default.Close,
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
+          },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_create_title))
           },
@@ -87,7 +99,7 @@ fun TwitterListsCreateScene() {
                     description = desc,
                     private = isPrivate
                   )?.let {
-                    navController.navigate(
+                    navigator.navigate(
                       Root.Lists.Timeline(it.listKey),
                       options = NavOptions(
                         popUpTo = PopUpTo(Root.Lists.Home)

@@ -43,8 +43,6 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.ItemDivider
 import com.twidere.twiderex.component.lazy.ItemHeader
-import com.twidere.twiderex.component.navigation.FakeNavigator
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.settings.RadioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
@@ -53,19 +51,32 @@ import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.StatusNavigationData
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.TwidereScene
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
+@NavGraphDestination(
+  route = Root.Settings.Display,
+)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun DisplayScene() {
+fun DisplayScene(
+  navigator: Navigator,
+) {
   val (state, channel) = rememberPresenterState { DisplayPresenter(it) }
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_title))
@@ -83,10 +94,15 @@ fun DisplayScene() {
           Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_section_header_preview))
         }
         CompositionLocalProvider(
-          LocalNavigator provides FakeNavigator,
           LocalStatusActions provides FakeStatusActions,
         ) {
-          TimelineStatusComponent(data = UiStatus.sample())
+          val statusNavigation = remember {
+            StatusNavigationData()
+          }
+          TimelineStatusComponent(
+            data = UiStatus.sample(),
+            statusNavigation = statusNavigation,
+          )
         }
         ItemDivider()
         ItemHeader() {

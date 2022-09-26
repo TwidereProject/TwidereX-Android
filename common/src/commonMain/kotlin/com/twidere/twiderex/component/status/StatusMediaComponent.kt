@@ -59,13 +59,13 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.foundation.rememberVideoPlayerState
 import com.twidere.twiderex.component.image.ImageBlur
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.extensions.playEnable
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.navigation.StatusNavigationData
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.TwidereTheme
 import moe.tlaster.placeholder.Placeholder
@@ -74,15 +74,15 @@ import moe.tlaster.placeholder.Placeholder
 @Composable
 fun StatusMediaComponent(
   status: UiStatus,
+  statusNavigation: StatusNavigationData,
 ) {
-  val navigator = LocalNavigator.current
   val media = status.media
   if (!media.any() || media.any { it.type == MediaType.audio }) {
     return
   }
   val onItemClick = { it: UiMedia ->
     val index = media.indexOf(it)
-    navigator.media(statusKey = status.statusKey, selectedIndex = index)
+    statusNavigation.toMediaWithIndex(status.statusKey, index)
   }
   var sensitive by rememberSaveable(status.statusKey.toString()) {
     mutableStateOf(status.sensitive)
@@ -261,7 +261,6 @@ object StatusMediaDefaults {
   }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun StatusMediaPreviewItem(
   media: UiMedia,

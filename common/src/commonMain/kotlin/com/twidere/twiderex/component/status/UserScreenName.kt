@@ -73,7 +73,8 @@ fun UserName(
   overflow: TextOverflow = TextOverflow.Ellipsis,
   softWrap: Boolean = true,
   maxLines: Int = 1,
-  style: TextStyle = LocalTextStyle.current
+  style: TextStyle = LocalTextStyle.current,
+  onUserNameClicked: (String) -> Unit,
 ) {
   UserName(
     userName = user.name.takeIf { it.isNotEmpty() } ?: user.screenName,
@@ -91,6 +92,7 @@ fun UserName(
     softWrap = softWrap,
     maxLines = maxLines,
     style = style,
+    onUserNameClicked = onUserNameClicked,
   )
 }
 
@@ -110,7 +112,8 @@ fun UserName(
   overflow: TextOverflow = TextOverflow.Ellipsis,
   softWrap: Boolean = true,
   maxLines: Int = 1,
-  style: TextStyle = LocalTextStyle.current
+  style: TextStyle = LocalTextStyle.current,
+  onUserNameClicked: (String) -> Unit,
 ) {
   HtmlText(
     htmlText = userName,
@@ -128,5 +131,6 @@ fun UserName(
     softWrap = softWrap,
     maxLines = maxLines,
     textStyle = style,
+    openLink = onUserNameClicked,
   )
 }

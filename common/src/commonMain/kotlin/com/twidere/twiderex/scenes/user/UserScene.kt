@@ -48,22 +48,54 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.navigation.ProvideUserPlatform
+import com.twidere.twiderex.navigation.RequirePlatformAccount
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.RootDeepLinks
+import com.twidere.twiderex.navigation.rememberUserNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMNewConversationViewModel
 import com.twidere.twiderex.viewmodel.user.UserEvent
 import com.twidere.twiderex.viewmodel.user.UserPresenter
 import com.twidere.twiderex.viewmodel.user.UserState
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
+
+@NavGraphDestination(
+  route = Root.User.route,
+  deepLink = [RootDeepLinks.User.route]
+)
+
+@Composable
+fun UserScene(
+  @Path("userKey") key: String,
+  navigator: Navigator,
+) {
+  val account = LocalActiveAccount.current ?: return
+  MicroBlogKey.valueOf(key).let { userKey ->
+    ProvideUserPlatform(userKey = userKey) { platformType ->
+      RequirePlatformAccount(platformType = platformType) {
+        UserScene(
+          userKey = userKey,
+          navigator = navigator,
+          account = account,
+        )
+      }
+    }
+  }
+}
 
 @Composable
 fun UserScene(
   userKey: MicroBlogKey,
+  navigator: Navigator,
+  account: AccountDetails,
 ) {
-  val account = LocalActiveAccount.current ?: return
   val (state, channel) = rememberPresenterState<UserState, UserEvent> {
     UserPresenter(it, userKey = userKey)
   }
@@ -71,9 +103,9 @@ fun UserScene(
     return
   }
   val conversationViewModel: DMNewConversationViewModel = getViewModel()
-  val navController = LocalNavController.current
   var expanded by remember { mutableStateOf(false) }
   var showBlockAlert by remember { mutableStateOf(false) }
+  val userNavigationData = rememberUserNavigationData(navigator)
   TwidereScene {
     InAppNotificationScaffold(
       // TODO: Show top bar with actions
@@ -81,7 +113,11 @@ fun UserScene(
         AppBar(
           backgroundColor = MaterialTheme.colors.surface.withElevation(),
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           },
           actions = {
             if (account.type == PlatformType.Twitter && state.user?.platformType == PlatformType.Twitter) {
@@ -93,7 +129,7 @@ fun UserScene(
                         it,
                         onResult = { conversationKey ->
                           conversationKey?.let {
-                            navController.navigate(Root.Messages.Conversation(it))
+                            navigator.navigate(Root.Messages.Conversation(it))
                           }
                         }
                       )
@@ -156,7 +192,10 @@ fun UserScene(
           elevation = 0.dp,
           title = {
             state.user?.let {
-              UserName(user = it)
+              UserName(
+                user = it,
+                onUserNameClicked = userNavigationData.statusNavigation.openLink,
+              )
             }
           }
         )
@@ -167,6 +206,7 @@ fun UserScene(
           userKey = userKey,
           state = state,
           channel = channel,
+          userNavigationData = userNavigationData,
         )
         if (showBlockAlert) {
           state.user?.let {

@@ -33,17 +33,37 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.ColoredSwitch
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.navigation.openLink
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.TwidereScene
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
+
+@NavGraphDestination(
+  route = Root.Settings.AccountNotification.route,
+)
+@Composable
+fun AccountNotificationScene(
+  @Path("accountKey") accountKey: String,
+  navigator: Navigator,
+) {
+  AccountNotificationScene(
+    accountKey = MicroBlogKey.valueOf(accountKey),
+    navigator = navigator,
+  )
+}
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AccountNotificationScene(
   accountKey: MicroBlogKey,
+  navigator: Navigator,
 ) {
   val (state, channel) = rememberPresenterState { AccountNotificationPresenter(accountKey, it) }
   TwidereScene {
@@ -54,7 +74,11 @@ fun AccountNotificationScene(
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_notification_title))
           },
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           },
         )
       },
@@ -68,7 +92,12 @@ fun AccountNotificationScene(
               channel.trySend(AccountNotificationEvent.SetIsNotificationEnabled(!state.isNotificationEnabled))
             },
             text = {
-              UserName(user = it)
+              UserName(
+                user = it,
+                onUserNameClicked = {
+                  navigator.openLink(it)
+                }
+              )
             },
             secondaryText = {
               UserScreenName(user = it)

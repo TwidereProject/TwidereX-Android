@@ -29,8 +29,10 @@ import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.rememberPresenter
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.scenes.search.tabs.presenter.SearchTweetsPresenter
 import com.twidere.twiderex.scenes.search.tabs.presenter.SearchTweetsState
+import moe.tlaster.precompose.navigation.Navigator
 
 class SearchTweetsItem : SearchSceneItem {
   @Composable
@@ -39,7 +41,10 @@ class SearchTweetsItem : SearchSceneItem {
   }
 
   @Composable
-  override fun Content(keyword: String) {
+  override fun Content(
+    keyword: String,
+    navigator: Navigator
+  ) {
 
     val state by rememberPresenter {
       SearchTweetsPresenter(keyword = keyword)
@@ -52,8 +57,10 @@ class SearchTweetsItem : SearchSceneItem {
           it.data.refreshOrRetry()
         }
       ) {
+        val statusNavigation = rememberStatusNavigationData(navigator)
         LazyUiStatusList(
           items = it.data,
+          statusNavigation = statusNavigation,
         )
       }
     }

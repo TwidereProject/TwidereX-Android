@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.scenes
 
-// import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDp
@@ -83,6 +82,8 @@ import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.divider
+import com.twidere.twiderex.component.navigation.openLink
+import com.twidere.twiderex.component.navigation.user
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
@@ -98,16 +99,17 @@ import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.scenes.home.item
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.BackHandler
+import moe.tlaster.precompose.navigation.Navigator
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun HomeScene() {
+fun HomeScene(
+  navigator: Navigator,
+) {
   val account = LocalActiveAccount.current ?: return
   val scope = rememberCoroutineScope()
   val tabPosition = LocalAppearancePreferences.current.tabPosition
@@ -148,7 +150,18 @@ fun HomeScene() {
     },
   ) {
     if (!menus.any()) {
-      EmptyColumnHomeContent(scaffoldState)
+      EmptyColumnHomeContent(
+        scaffoldState,
+        toUser = {
+          navigator.user(it)
+        },
+        openLink = {
+          navigator.openLink(it)
+        },
+        navigate = {
+          navigator.navigate(it)
+        }
+      )
     } else {
       NestedScrollScaffold(
         scaffoldState = scaffoldState,
@@ -173,10 +186,21 @@ fun HomeScene() {
           }
         },
         drawerContent = {
-          HomeDrawer(scaffoldState)
+          HomeDrawer(
+            scaffoldState,
+            toUser = {
+              navigator.user(it)
+            },
+            openLink = {
+              navigator.openLink(it)
+            },
+            navigate = {
+              navigator.navigate(it)
+            }
+          )
         },
         floatingActionButton = {
-          menus[pagerState.currentPage].item.Fab()
+          menus[pagerState.currentPage].item.Fab(navigator)
         },
         floatingActionButtonPosition = menus[pagerState.currentPage].item.floatingActionButtonPosition,
         enableFloatingActionButtonNestedScroll = hideFab,
@@ -199,7 +223,7 @@ fun HomeScene() {
           Pager(
             state = pagerState,
           ) {
-            menus[page].item.Content()
+            menus[page].item.Content(navigator)
           }
         }
       }
@@ -208,19 +232,31 @@ fun HomeScene() {
 }
 
 @Composable
-private fun EmptyColumnHomeContent(scaffoldState: ScaffoldState) {
+private fun EmptyColumnHomeContent(
+  scaffoldState: ScaffoldState,
+  toUser: (UiUser) -> Unit,
+  openLink: (String) -> Unit,
+  navigate: (String) -> Unit,
+) {
   InAppNotificationScaffold(
     scaffoldState = scaffoldState,
     topBar = {
       AppBar(
         backgroundColor = MaterialTheme.colors.surface.withElevation(),
         navigationIcon = {
-          MenuAvatar(scaffoldState)
+          MenuAvatar(
+            scaffoldState,
+          )
         },
       )
     },
     drawerContent = {
-      HomeDrawer(scaffoldState = scaffoldState)
+      HomeDrawer(
+        scaffoldState = scaffoldState,
+        toUser = toUser,
+        openLink = openLink,
+        navigate = navigate,
+      )
     }
   ) {
     Column(
@@ -249,7 +285,6 @@ private object EmptyColumnHomeContentDefaults {
   val VerticalPadding = 48.dp
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeAppBar(
   modifier: Modifier = Modifier,
@@ -272,7 +307,9 @@ fun HomeAppBar(
           Text(text = menus[pagerState.currentPage].item.name())
         },
         navigationIcon = {
-          MenuAvatar(scaffoldState)
+          MenuAvatar(
+            scaffoldState = scaffoldState,
+          )
         },
         elevation = if (menus[pagerState.currentPage].item.withAppBar) {
           AppBarDefaults.TopAppBarElevation
@@ -299,7 +336,9 @@ fun HomeAppBar(
       Row(
         verticalAlignment = Alignment.CenterVertically
       ) {
-        MenuAvatar(scaffoldState)
+        MenuAvatar(
+          scaffoldState,
+        )
         IconTabsComponent(
           modifier = Modifier.weight(1f),
           items = menus.map { it.item.icon() to it.item.name() },
@@ -326,7 +365,9 @@ fun HomeAppBar(
 }
 
 @Composable
-private fun MenuAvatar(scaffoldState: ScaffoldState) {
+private fun MenuAvatar(
+  scaffoldState: ScaffoldState,
+) {
   val scope = rememberCoroutineScope()
   LocalActiveAccount.current?.let { account ->
     val user = remember(account) {
@@ -344,7 +385,7 @@ private fun MenuAvatar(scaffoldState: ScaffoldState) {
             scaffoldState.drawerState.open()
           }
         }
-      }
+      },
     )
   }
 }
@@ -394,7 +435,12 @@ fun HomeBottomNavigation(
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
 @Composable
-private fun HomeDrawer(scaffoldState: ScaffoldState) {
+private fun HomeDrawer(
+  scaffoldState: ScaffoldState,
+  toUser: (UiUser) -> Unit,
+  openLink: (String) -> Unit,
+  navigate: (String) -> Unit,
+) {
   var showAccounts by remember { mutableStateOf(false) }
 
   Column {
@@ -402,17 +448,21 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
 
     val account = LocalActiveAccount.current ?: return
     val currentUser = account.toUi()
-    val navController = LocalNavController.current
     DrawerUserHeader(
       currentUser,
       showAccounts,
-    ) {
-      showAccounts = !showAccounts
-    }
+      toUser = toUser,
+      onTrailingClicked = {
+        showAccounts = !showAccounts
+      },
+      openLink = {
+        openLink.invoke(it)
+      }
+    )
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    UserMetrics(user = currentUser)
+    UserMetrics(user = currentUser, onclick = navigate)
 
     Spacer(modifier = Modifier.height(24.dp))
 
@@ -430,12 +480,12 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
         exit = shrinkVertically() + fadeOut(),
       ) {
         LazyColumn {
-          items(allAccounts) {
-            val user = it.toUi()
+          items(allAccounts) { accountDetail ->
+            val user = accountDetail.toUi()
             ListItem(
               modifier = Modifier.clickable(
                 onClick = {
-                  activeAccountViewModel.setActiveAccount(it)
+                  activeAccountViewModel.setActiveAccount(accountDetail)
                 }
               ),
               icon = {
@@ -443,12 +493,15 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                   user = user,
                   withPlatformIcon = true,
                   onClick = {
-                    activeAccountViewModel.setActiveAccount(it)
-                  }
+                    activeAccountViewModel.setActiveAccount(accountDetail)
+                  },
                 )
               },
               text = {
-                UserName(user = user)
+                UserName(
+                  user = user,
+                  onUserNameClicked = openLink,
+                )
               },
               secondaryText = {
                 UserScreenName(user = user)
@@ -462,11 +515,15 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             ListItem(
               modifier = Modifier.clickable(
                 onClick = {
-                  navController.navigate(Root.SignIn.General)
+                  navigate(Root.SignIn.General)
                 }
               ),
               text = {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_drawer_sign_in))
+                Text(
+                  text = stringResource(
+                    res = com.twidere.twiderex.MR.strings.scene_drawer_sign_in
+                  )
+                )
               }
             )
           }
@@ -475,11 +532,15 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             ListItem(
               modifier = Modifier.clickable(
                 onClick = {
-                  navController.navigate(Root.Settings.AccountManagement)
+                  navigate(Root.Settings.AccountManagement)
                 }
               ),
               text = {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_manage_accounts_title))
+                Text(
+                  text = stringResource(
+                    res = com.twidere.twiderex.MR.strings.scene_manage_accounts_title
+                  )
+                )
               }
             )
           }
@@ -503,7 +564,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
           ) {
             DrawerMenuItem(
               onClick = {
-                navController.navigate(it.item.route)
+                navigate(it.item.route)
               },
               title = it.item.name(),
               icon = it.item.icon(),
@@ -520,20 +581,26 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
         onClick = {
           scope.launch {
             scaffoldState.drawerState.close()
-            navController.navigate(Root.Settings.Home)
+            navigate(Root.Settings.Home)
           }
         }
       ),
       icon = {
         Icon(
-          painter = painterResource(res = com.twidere.twiderex.MR.files.ic_adjustments_horizontal),
+          painter = painterResource(
+            res = com.twidere.twiderex.MR.files.ic_adjustments_horizontal
+          ),
           contentDescription = stringResource(
             res = com.twidere.twiderex.MR.strings.scene_settings_title
           )
         )
       },
       text = {
-        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_title))
+        Text(
+          text = stringResource(
+            res = com.twidere.twiderex.MR.strings.scene_settings_title
+          )
+        )
       }
     )
   }
@@ -571,6 +638,8 @@ private fun DrawerUserHeader(
   user: UiUser?,
   showAccounts: Boolean,
   onTrailingClicked: () -> Unit = {},
+  toUser: (UiUser) -> Unit,
+  openLink: (String) -> Unit,
 ) {
   ListItem(
     icon = {
@@ -578,12 +647,16 @@ private fun DrawerUserHeader(
         UserAvatar(
           user = it,
           withPlatformIcon = true,
+          onClick = toUser,
         )
       }
     },
     text = {
       if (user != null) {
-        UserName(user = user)
+        UserName(
+          user = user,
+          onUserNameClicked = openLink,
+        )
       }
     },
     secondaryText = {

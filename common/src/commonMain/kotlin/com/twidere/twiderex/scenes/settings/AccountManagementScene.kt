@@ -42,6 +42,8 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.navigation.openLink
+import com.twidere.twiderex.component.navigation.user
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
@@ -49,27 +51,43 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.NavOptions
+import moe.tlaster.precompose.navigation.Navigator
+import moe.tlaster.precompose.navigation.PopUpTo
+
+@NavGraphDestination(
+  route = Root.Settings.AccountManagement,
+)
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun AccountManagementScene() {
+fun AccountManagementScene(
+  navigator: Navigator,
+) {
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
-            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_manage_accounts_title))
+            Text(
+              text = stringResource(
+                res = com.twidere.twiderex.MR.strings.scene_manage_accounts_title
+              )
+            )
           },
           actions = {
-            val navController = LocalNavController.current
             IconButton(
               onClick = {
-                navController.navigate(Root.SignIn.General)
+                navigator.navigate(Root.SignIn.General)
               }
             ) {
               Icon(
@@ -93,10 +111,18 @@ fun AccountManagementScene() {
                 UserAvatar(
                   user = it,
                   withPlatformIcon = true,
+                  onClick = {
+                    navigator.user(it)
+                  }
                 )
               },
               text = {
-                UserName(user = it)
+                UserName(
+                  user = it,
+                  onUserNameClicked = {
+                    navigator.openLink(it)
+                  }
+                )
               },
               secondaryText = {
                 UserScreenName(user = it)
@@ -123,10 +149,23 @@ fun AccountManagementScene() {
                     DropdownMenuItem(
                       onClick = {
                         activeAccountViewModel.deleteAccount(detail)
+                        if (!activeAccountViewModel.hasAccount()) {
+                          navigator.navigate(
+                            Root.SignIn.General,
+                            NavOptions(
+                              popUpTo = PopUpTo(
+                                route = Root.Empty,
+                                inclusive = true,
+                              )
+                            )
+                          )
+                        }
                       },
                     ) {
                       Text(
-                        text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_remove),
+                        text = stringResource(
+                          res = com.twidere.twiderex.MR.strings.common_controls_actions_remove
+                        ),
                         color = Color.Red,
                       )
                     }

@@ -42,7 +42,9 @@ import com.twidere.twiderex.scenes.home.AllNotificationItem
 import com.twidere.twiderex.scenes.home.MentionItem
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
+import io.github.seiko.precompose.annotation.NavGraphDestination
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.Navigator
 
 class MastodonNotificationItem : HomeNavigationItem() {
   @Composable
@@ -61,17 +63,23 @@ class MastodonNotificationItem : HomeNavigationItem() {
   override var lazyListController: LazyListController = LazyListController()
 
   @Composable
-  override fun Content() {
+  override fun Content(navigator: Navigator) {
     MastodonNotificationSceneContent(
       setLazyListController = {
         lazyListController = it
-      }
+      },
+      navigator = navigator,
     )
   }
 }
 
+@NavGraphDestination(
+  route = Root.Mastodon.Notification,
+)
 @Composable
-fun MastodonNotificationScene() {
+fun MastodonNotificationScene(
+  navigator: Navigator
+) {
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -80,12 +88,18 @@ fun MastodonNotificationScene() {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_title))
           },
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           }
         )
       }
     ) {
-      MastodonNotificationSceneContent()
+      MastodonNotificationSceneContent(
+        navigator = navigator
+      )
     }
   }
 }
@@ -93,6 +107,7 @@ fun MastodonNotificationScene() {
 @Composable
 fun MastodonNotificationSceneContent(
   setLazyListController: ((lazyListController: LazyListController) -> Unit)? = null,
+  navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current ?: return
   val tabs = remember(account) {
@@ -123,7 +138,7 @@ fun MastodonNotificationSceneContent(
     }
   ) {
     Pager(state = pagerState) {
-      tabs[page].Content()
+      tabs[page].Content(navigator)
     }
   }
 }

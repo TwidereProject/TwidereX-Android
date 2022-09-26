@@ -29,15 +29,35 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.rememberUserNavigationData
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.user.UserListEvent
 import com.twidere.twiderex.viewmodel.user.UserListPresenter
 import com.twidere.twiderex.viewmodel.user.UserListState
 import com.twidere.twiderex.viewmodel.user.UserListType
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
+
+@NavGraphDestination(
+  route = Root.Lists.Subscribers.route,
+)
+@Composable
+fun ListsSubscribersScene(
+  @Path("listKey") listKey: String,
+  navigator: Navigator,
+) {
+  ListsSubscribersScene(
+    listKey = MicroBlogKey.valueOf(listKey),
+    navigator = navigator,
+  )
+}
 
 @Composable
 fun ListsSubscribersScene(
   listKey: MicroBlogKey,
+  navigator: Navigator,
 ) {
   val (state) = rememberPresenterState<UserListState, UserListEvent> {
     UserListPresenter(
@@ -47,13 +67,18 @@ fun ListsSubscribersScene(
       )
     )
   }
+  val userNavigationData = rememberUserNavigationData(navigator)
   (state as? UserListState.Data)?.let { data ->
     TwidereScene {
       InAppNotificationScaffold(
         topBar = {
           AppBar(
             navigationIcon = {
-              AppBarNavigationButton()
+              AppBarNavigationButton(
+                onBack = {
+                  navigator.popBackStack()
+                }
+              )
             },
             title = {
               Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_tabs_subscriber))
@@ -61,7 +86,10 @@ fun ListsSubscribersScene(
           )
         },
       ) {
-        UserListComponent(data.source)
+        UserListComponent(
+          source = data.source,
+          userNavigationData = userNavigationData,
+        )
       }
     }
   }

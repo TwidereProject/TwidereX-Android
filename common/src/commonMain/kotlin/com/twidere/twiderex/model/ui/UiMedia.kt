@@ -28,7 +28,8 @@ import com.twidere.twiderex.model.enums.MediaType
 import java.net.URI
 
 @Immutable
-data class UiMedia(
+data class
+UiMedia(
   val url: String?,
   val belongToKey: MicroBlogKey,
   val mediaUrl: String?,

@@ -44,18 +44,27 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
-import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.component.navigation.search
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.rememberPresenterState
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.scenes.search.presenter.SearchInputEvent
 import com.twidere.twiderex.scenes.search.presenter.SearchInputPresenter
 import com.twidere.twiderex.scenes.search.presenter.SearchInputState
 import com.twidere.twiderex.ui.TwidereScene
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
+@NavGraphDestination(
+  route = Root.Search.Input.route,
+)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SearchInputScene(initial: String? = null) {
+fun SearchInputScene(
+  initial: String? = null,
+  navigator: Navigator,
+) {
 
   val (state, channel) = rememberPresenterState<SearchInputState, SearchInputEvent> {
     SearchInputPresenter(it, keyword = initial ?: "")
@@ -63,13 +72,16 @@ fun SearchInputScene(initial: String? = null) {
   if (state !is SearchInputState.Data) {
     return
   }
-  val navigator = LocalNavigator.current
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             ProvideTextStyle(value = MaterialTheme.typography.body1) {

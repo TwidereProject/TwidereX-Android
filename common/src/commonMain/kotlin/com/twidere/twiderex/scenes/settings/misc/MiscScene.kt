@@ -66,18 +66,26 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.ItemHeader
-import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.component.navigation.openLink
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.settings.RadioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.preferences.model.MiscPreferences
 import com.twidere.twiderex.ui.TwidereScene
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
+@NavGraphDestination(
+  route = Root.Settings.Misc,
+)
 @Composable
-fun MiscScene() {
+fun MiscScene(
+  navigator: Navigator,
+) {
   val (state, channel) = rememberPresenterState { MiscPresenter(it) }
   if (state !is MiscState.State) {
     // TODO: Show other states
@@ -88,7 +96,11 @@ fun MiscScene() {
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             Text(text = stringResource(res = MR.strings.scene_settings_misc_title))
@@ -127,6 +139,12 @@ fun MiscScene() {
               onVerify = {
                 channel.trySend(MiscEvent.Nitter(NitterEvent.Verify))
               },
+              openNitterLink = {
+                navigator.openLink(
+                  "https://github.com/zedeus/nitter",
+                  deepLink = false
+                )
+              }
             )
           }
           ProxyPreference(
@@ -403,6 +421,7 @@ fun NitterPreference(
   onHideInformationDialog: () -> Unit,
   onConfirm: () -> Unit,
   onVerify: () -> Unit,
+  openNitterLink: () -> Unit,
 ) {
   val value = state.nitter
   val nitterVerify = state.nitterVerify
@@ -422,7 +441,8 @@ fun NitterPreference(
       isValid = isNitterInputValid,
       onValueChange = {
         onChanged.invoke(it)
-      }
+      },
+      openNitterLink = openNitterLink,
     )
   }
   if (showInformationDialog) {
@@ -515,9 +535,9 @@ fun NitterUsageDialog(
   value: TextFieldValue,
   onValueChange: (TextFieldValue) -> Unit,
   onConfirm: () -> Unit,
-  isValid: Boolean
+  isValid: Boolean,
+  openNitterLink: () -> Unit,
 ) {
-  val navigator = LocalNavigator.current
   AlertDialog(
     onDismissRequest = onDismissRequest,
     title = {
@@ -561,10 +581,7 @@ fun NitterUsageDialog(
     dismissButton = {
       TextButton(
         onClick = {
-          navigator.openLink(
-            "https://github.com/zedeus/nitter",
-            deepLink = false
-          )
+          openNitterLink.invoke()
         }
       ) {
         Text(text = stringResource(res = MR.strings.scene_settings_misc_nitter_dialog_usage_project_button))

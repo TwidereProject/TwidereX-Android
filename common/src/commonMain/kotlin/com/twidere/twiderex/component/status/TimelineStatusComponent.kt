@@ -41,7 +41,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
@@ -63,7 +62,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.HumanizedTime
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.icon
@@ -72,6 +70,7 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiCard
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
+import com.twidere.twiderex.navigation.StatusNavigationData
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.utils.PreviewResolver
@@ -83,6 +82,7 @@ fun TimelineStatusComponent(
   lineUp: Boolean = false,
   lineDown: Boolean = false,
   threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
+  statusNavigation: StatusNavigationData
 ) {
   when {
     data.platformType == PlatformType.Mastodon &&
@@ -91,29 +91,37 @@ fun TimelineStatusComponent(
         data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
           data.mastodonExtra.type == MastodonStatusType.NotificationFollow
         ) -> {
-      MastodonFollowStatus(data)
+      MastodonFollowStatus(data, statusNavigation)
     }
-    else -> NormalStatus(data, showActions, threadStyle, lineUp, lineDown)
+    else -> NormalStatus(data, showActions, threadStyle, lineUp, lineDown, statusNavigation)
   }
 }
 
 @Composable
-fun MastodonFollowStatus(data: UiStatus) {
-  val navigator = LocalNavigator.current
+fun MastodonFollowStatus(
+  data: UiStatus,
+  statusNavigation: StatusNavigationData,
+) {
   Column(
     modifier = Modifier
       .fillMaxWidth()
       .clickable {
-        navigator.user(data.user)
+        statusNavigation.toUser.invoke(data.user)
       }
       .padding(MastodonFollowStatusDefaults.ContentPadding),
   ) {
-    StatusHeader(data = data)
+    StatusHeader(
+      data = data,
+      statusNavigation = statusNavigation,
+    )
     Row {
-      UserAvatar(user = data.user)
+      UserAvatar(user = data.user, onClick = statusNavigation.toUser)
       Spacer(modifier = Modifier.width(MastodonFollowStatusDefaults.AvatarSpacing))
       Column {
-        UserName(data.user)
+        UserName(
+          user = data.user,
+          onUserNameClicked = statusNavigation.openLink
+        )
         Spacer(modifier = Modifier.width(MastodonFollowStatusDefaults.NameSpacing))
         UserScreenName(data.user)
       }
@@ -136,15 +144,15 @@ private fun NormalStatus(
   showActions: Boolean,
   threadStyle: StatusThreadStyle,
   lineUp: Boolean,
-  lineDown: Boolean
+  lineDown: Boolean,
+  statusNavigation: StatusNavigationData,
 ) {
-  val navigator = LocalNavigator.current
   Column(
     modifier = Modifier
       .fillMaxWidth()
       .clickable(
         onClick = {
-          navigator.status(data)
+          statusNavigation.toStatus.invoke(data)
         },
       )
   ) {
@@ -157,13 +165,17 @@ private fun NormalStatus(
       footer = {
         Column {
           if (showActions) {
-            StatusActions(data)
+            StatusActions(
+              status = data,
+              statusNavigation = statusNavigation,
+            )
           } else {
             Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
           }
         }
       },
       isSelectionAble = true,
+      statusNavigation = statusNavigation,
     )
   }
 }
@@ -180,13 +192,25 @@ object NormalStatusDefaults {
 }
 
 @Composable
-private fun StatusHeader(data: UiStatus) {
+private fun StatusHeader(
+  data: UiStatus,
+  statusNavigation: StatusNavigationData,
+) {
   when {
-    data.platformType == PlatformType.Mastodon && data.mastodonExtra != null && data.mastodonExtra.type != MastodonStatusType.Status -> {
-      MastodonStatusHeader(data.mastodonExtra, data)
+    data.platformType == PlatformType.Mastodon &&
+      data.mastodonExtra != null &&
+      data.mastodonExtra.type != MastodonStatusType.Status -> {
+      MastodonStatusHeader(
+        mastodonExtra = data.mastodonExtra,
+        data = data,
+        openLink = statusNavigation.openLink,
+      )
     }
     data.retweet != null -> {
-      RetweetHeader(data = data)
+      RetweetHeader(
+        data = data,
+        openLink = statusNavigation.openLink,
+      )
       Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
     }
   }
@@ -199,7 +223,8 @@ private object StatusHeaderDefaults {
 @Composable
 private fun MastodonStatusHeader(
   mastodonExtra: MastodonStatusExtra,
-  data: UiStatus
+  data: UiStatus,
+  openLink: (String) -> Unit,
 ) {
   when (mastodonExtra.type) {
     MastodonStatusType.Status -> Unit
@@ -245,7 +270,10 @@ private fun MastodonStatusHeader(
     }
     MastodonStatusType.NotificationMention -> Unit
     MastodonStatusType.NotificationReblog -> {
-      RetweetHeader(data = data)
+      RetweetHeader(
+        data = data,
+        openLink = openLink,
+      )
       Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
     }
     MastodonStatusType.NotificationFavourite -> {
@@ -320,7 +348,10 @@ private fun MastodonStatusHeader(
 }
 
 @Composable
-private fun StatusActions(status: UiStatus) {
+private fun StatusActions(
+  status: UiStatus,
+  statusNavigation: StatusNavigationData,
+) {
   CompositionLocalProvider(
     LocalContentAlpha provides ContentAlpha.medium,
   ) {
@@ -328,8 +359,14 @@ private fun StatusActions(status: UiStatus) {
       modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = Arrangement.SpaceBetween
     ) {
-      ReplyButton(status = status)
-      RetweetButton(status = status)
+      ReplyButton(
+        status = status,
+        compose = statusNavigation.composeNavigationData.compose
+      )
+      RetweetButton(
+        status = status,
+        compose = statusNavigation.composeNavigationData.compose
+      )
       LikeButton(status = status)
       ShareButton(status = status, compat = true)
     }
@@ -362,7 +399,6 @@ object AvatarConnectLineDefaults {
   val LineWidth = 2.dp
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun StatusContent(
   modifier: Modifier = Modifier,
@@ -374,6 +410,7 @@ fun StatusContent(
   threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
   footer: @Composable () -> Unit = {},
   isSelectionAble: Boolean = true,
+  statusNavigation: StatusNavigationData,
 ) {
   val layoutDirection = LocalLayoutDirection.current
   val status = data.retweet ?: data
@@ -402,7 +439,10 @@ fun StatusContent(
       Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2))
       Column {
         Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
-        StatusHeader(data)
+        StatusHeader(
+          data = data,
+          statusNavigation = statusNavigation,
+        )
       }
     }
     Row(modifier = Modifier.height(IntrinsicSize.Min)) {
@@ -412,7 +452,8 @@ fun StatusContent(
       ) {
         UserAvatar(
           user = status.user,
-          modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing)
+          modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing),
+          onClick = statusNavigation.toUser,
         )
         if (lineDown) {
           AvatarConnectLine(
@@ -429,7 +470,8 @@ fun StatusContent(
           UserAvatar(
             user = data.user,
             size = StatusThreadDefaults.AvatarSize,
-            modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing)
+            modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing),
+            onClick = statusNavigation.toUser,
           )
           Spacer(modifier = Modifier.height(NormalStatusDefaults.ThreadBottomPadding))
         }
@@ -445,7 +487,11 @@ fun StatusContent(
           Row(
             modifier = Modifier.weight(1f),
           ) {
-            UserName(status.user, fontWeight = FontWeight.W600)
+            UserName(
+              status.user,
+              fontWeight = FontWeight.W600,
+              onUserNameClicked = statusNavigation.openLink,
+            )
             if (type == StatusContentType.Normal) {
               Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
               UserScreenName(status.user)
@@ -475,6 +521,7 @@ fun StatusContent(
               status = status,
               type = type,
               isSelectionAble = isSelectionAble,
+              statusNavigation = statusNavigation,
             )
           }
           StatusContentType.Extend -> UserScreenName(status.user)
@@ -485,7 +532,8 @@ fun StatusContent(
             StatusBody(
               status = status,
               type = type,
-              isSelectionAble = isSelectionAble
+              isSelectionAble = isSelectionAble,
+              statusNavigation = statusNavigation,
             )
           }
         }
@@ -495,7 +543,7 @@ fun StatusContent(
           Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
         }
         if (data.isInThread()) {
-          StatusThread(threadStyle, data)
+          StatusThread(threadStyle, data, toStatus = statusNavigation.toStatus)
           Spacer(modifier = Modifier.height(NormalStatusDefaults.ThreadBottomPadding))
         }
       }
@@ -504,8 +552,11 @@ fun StatusContent(
 }
 
 @Composable
-private fun StatusThread(threadStyle: StatusThreadStyle, data: UiStatus) {
-  val navigator = LocalNavigator.current
+private fun StatusThread(
+  threadStyle: StatusThreadStyle,
+  data: UiStatus,
+  toStatus: (UiStatus) -> Unit,
+) {
   when (threadStyle) {
     StatusThreadStyle.NONE -> {
       // show nothing
@@ -514,7 +565,7 @@ private fun StatusThread(threadStyle: StatusThreadStyle, data: UiStatus) {
       StatusThreadTextOnly(
         modifier = Modifier.padding(start = UserAvatarDefaults.AvatarSize),
         onClick = {
-          navigator.status(data)
+          toStatus.invoke(data)
         }
       )
     }
@@ -548,13 +599,18 @@ fun ColumnScope.StatusBody(
   status: UiStatus,
   type: StatusContentType,
   isSelectionAble: Boolean,
+  statusNavigation: StatusNavigationData,
 ) {
   StatusText(
     status = status,
-    isSelectionAble = isSelectionAble
+    isSelectionAble = isSelectionAble,
+    openLink = statusNavigation.openLink,
   )
 
-  StatusBodyMedia(status)
+  StatusBodyMedia(
+    status = status,
+    statusNavigation = statusNavigation,
+  )
 
   if (
     LocalDisplayPreferences.current.urlPreview &&
@@ -565,7 +621,10 @@ fun ColumnScope.StatusBody(
       PreviewResolver.parsePreview(status.card)
     }
     Spacer(modifier = Modifier.height(StatusBodyDefaults.LinkPreviewSpacing))
-    StatusLinkPreview(card)
+    StatusLinkPreview(
+      card = card,
+      openLink = statusNavigation.openLink
+    )
   }
 
   if (status.geo.name.isNotEmpty() && type == StatusContentType.Normal) {
@@ -600,7 +659,10 @@ fun ColumnScope.StatusBody(
       MaterialTheme(
         shapes = StatusBodyDefaults.QuoteShape,
       ) {
-        StatusQuote(quote = quote)
+        StatusQuote(
+          quote = quote,
+          statusNavigation = statusNavigation,
+        )
       }
     }
   }
@@ -616,13 +678,15 @@ object StatusBodyDefaults {
 }
 
 @Composable
-private fun StatusLinkPreview(card: UiCard) {
-  val navigator = LocalNavigator.current
+private fun StatusLinkPreview(
+  card: UiCard,
+  openLink: (String) -> Unit,
+) {
   LinkPreview(
     modifier = Modifier
       .fillMaxWidth()
       .clickable {
-        navigator.openLink(card.link)
+        openLink(card.link)
       },
     link = card.displayLink ?: card.link,
     title = card.title?.trim(),
@@ -636,19 +700,22 @@ private fun StatusLinkPreview(card: UiCard) {
 @OptIn(ExperimentalAnimationApi::class)
 private fun ColumnScope.StatusBodyMedia(
   status: UiStatus,
+  statusNavigation: StatusNavigationData,
 ) {
-  val navigator = LocalNavigator.current
   if (status.media.any()) {
     Spacer(modifier = Modifier.height(StatusBodyMediaDefaults.Spacing))
     AnimatedContent(LocalDisplayPreferences.current.mediaPreview) { mediaPreview ->
       if (mediaPreview) {
-        StatusMediaComponent(status = status)
+        StatusMediaComponent(
+          status = status,
+          statusNavigation = statusNavigation,
+        )
       } else {
         CompositionLocalProvider(
           LocalContentAlpha provides ContentAlpha.medium
         ) {
           MediaPreviewButton {
-            navigator.media(statusKey = status.statusKey)
+            statusNavigation.toMedia(status.statusKey)
           }
         }
       }
@@ -696,13 +763,15 @@ object MediaPreviewButtonDefaults {
 }
 
 @Composable
-fun StatusQuote(quote: UiStatus) {
-  val navigator = LocalNavigator.current
+fun StatusQuote(
+  quote: UiStatus,
+  statusNavigation: StatusNavigationData,
+) {
   Column(
     modifier = Modifier
       .clickable(
         onClick = {
-          navigator.status(quote)
+          statusNavigation.toStatus(quote)
         }
       )
       .padding(StatusQuoteDefaults.ContentPadding),
@@ -712,13 +781,17 @@ fun StatusQuote(quote: UiStatus) {
     ) {
       UserAvatar(
         user = quote.user,
-        size = LocalTextStyle.current.fontSize.value.dp
+        size = LocalTextStyle.current.fontSize.value.dp,
+        onClick = statusNavigation.toUser,
       )
       Spacer(modifier = Modifier.width(StatusQuoteDefaults.AvatarSpacing))
       Row(
         modifier = Modifier.weight(1f),
       ) {
-        UserName(quote.user)
+        UserName(
+          quote.user,
+          onUserNameClicked = statusNavigation.openLink,
+        )
         Spacer(modifier = Modifier.width(StatusQuoteDefaults.NameSpacing))
         UserScreenName(quote.user)
       }
@@ -727,9 +800,13 @@ fun StatusQuote(quote: UiStatus) {
     StatusText(
       status = quote,
       maxLines = 5,
-      isSelectionAble = false
+      isSelectionAble = false,
+      openLink = statusNavigation.openLink,
     )
-    StatusBodyMedia(status = quote)
+    StatusBodyMedia(
+      status = quote,
+      statusNavigation = statusNavigation,
+    )
   }
 }
 

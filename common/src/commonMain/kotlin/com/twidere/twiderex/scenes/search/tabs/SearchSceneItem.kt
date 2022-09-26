@@ -21,11 +21,12 @@
 package com.twidere.twiderex.scenes.search.tabs
 
 import androidx.compose.runtime.Composable
+import moe.tlaster.precompose.navigation.Navigator
 
 interface SearchSceneItem {
   @Composable
   fun name(): String
 
   @Composable
-  fun Content(keyword: String)
+  fun Content(keyword: String, navigator: Navigator)
 }

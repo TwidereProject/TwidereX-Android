@@ -20,66 +20,58 @@
  */
 package com.twidere.twiderex.navigation
 
-import com.twidere.route.processor.AppRoute
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.enums.ComposeType
-
 /**
  * if deeplink has the same parameters with route in Root.kt,
  * make it's name the same to route parameters in Root.kt too
  */
 const val twidereXSchema = "twiderex"
 
-@AppRoute(
-  schema = twidereXSchema
-)
-expect object RootDeepLinks {
+object RootDeepLinks {
   object Twitter {
-    object User : IRoute {
-      operator fun invoke(screenName: String): String
+    object User {
+      const val route = "$twidereXSchema://RootDeepLinks/Twitter/User/{screenName}"
+      operator fun invoke(screenName: String) = "$twidereXSchema://RootDeepLinks/Twitter/User/${java.net.URLEncoder.encode(screenName, "UTF-8")}"
     }
-
-    object Status : IRoute {
-      operator fun invoke(statusId: String): String
+    object Status {
+      const val route = "$twidereXSchema://RootDeepLinks/Twitter/Status/{statusId}"
+      operator fun invoke(statusId: String) = "$twidereXSchema://RootDeepLinks/Twitter/Status/${java.net.URLEncoder.encode(statusId, "UTF-8")}"
     }
   }
-
   object Mastodon {
-    object Hashtag : IRoute {
-      operator fun invoke(keyword: String): String
+    object Hashtag {
+      const val route = "$twidereXSchema://RootDeepLinks/Mastodon/Hashtag/{keyword}"
+      operator fun invoke(keyword: String) = "$twidereXSchema://RootDeepLinks/Mastodon/Hashtag/${java.net.URLEncoder.encode(keyword, "UTF-8")}"
     }
   }
-
-  object User : IRoute {
-    operator fun invoke(userKey: MicroBlogKey): String
+  object User {
+    const val route = "$twidereXSchema://RootDeepLinks/User/{userKey}"
+    operator fun invoke(userKey: com.twidere.twiderex.model.MicroBlogKey) = "$twidereXSchema://RootDeepLinks/User/$userKey"
   }
-
-  object Status : IRoute {
-    operator fun invoke(statusKey: MicroBlogKey): String
+  object Status {
+    const val route = "$twidereXSchema://RootDeepLinks/Status/{statusKey}"
+    operator fun invoke(statusKey: com.twidere.twiderex.model.MicroBlogKey) = "$twidereXSchema://RootDeepLinks/Status/$statusKey"
   }
-
-  object Search : IRoute {
-    operator fun invoke(keyword: String): String
+  object Search {
+    const val route = "$twidereXSchema://RootDeepLinks/Search/{keyword}"
+    operator fun invoke(keyword: String) = "$twidereXSchema://RootDeepLinks/Search/${java.net.URLEncoder.encode(keyword, "UTF-8")}"
   }
-
-  val SignIn: String
-
-  object Draft : IRoute {
-    operator fun invoke(draftId: String): String
+  const val SignIn = "$twidereXSchema://RootDeepLinks/SignIn"
+  object Draft {
+    const val route = "$twidereXSchema://RootDeepLinks/Draft/{draftId}"
+    operator fun invoke(draftId: String) = "$twidereXSchema://RootDeepLinks/Draft/${java.net.URLEncoder.encode(draftId, "UTF-8")}"
   }
-
-  object Compose : IRoute {
-    operator fun invoke(composeType: ComposeType?, statusKey: MicroBlogKey?): String
+  object Compose {
+    const val route = "$twidereXSchema://RootDeepLinks/Compose"
+    operator fun invoke(composeType: com.twidere.twiderex.model.enums.ComposeType?, statusKey: com.twidere.twiderex.model.MicroBlogKey?) = "$twidereXSchema://RootDeepLinks/Compose?composeType=$composeType&statusKey=$statusKey"
   }
-
-  object Conversation : IRoute {
-    operator fun invoke(conversationKey: MicroBlogKey): String
+  object Conversation {
+    const val route = "$twidereXSchema://RootDeepLinks/Conversation/{conversationKey}"
+    operator fun invoke(conversationKey: com.twidere.twiderex.model.MicroBlogKey) = "$twidereXSchema://RootDeepLinks/Conversation/$conversationKey"
   }
-
   object Callback {
     object SignIn {
-      val Mastodon: String
-      val Twitter: String
+      const val Mastodon = "$twidereXSchema://RootDeepLinks/Callback/SignIn/Mastodon"
+      const val Twitter = "$twidereXSchema://RootDeepLinks/Callback/SignIn/Twitter"
     }
   }
 }

@@ -21,13 +21,21 @@
 package com.twidere.twiderex
 
 const val defaultLoadCount = 20
+
+private const val twitterHost1 = "https://twitter.com"
+private const val twitterHost2 = "https://mobile.twitter.com"
+private const val twitterHost3 = "https://www.twitter.com"
+private const val twitterHost4 = "http://twitter.com"
+private const val twitterHost5 = "http://mobile.twitter.com"
+private const val twitterHost6 = "http://www.twitter.com"
+
 val twitterHosts = listOf(
-  "https://twitter.com",
-  "https://mobile.twitter.com",
-  "https://www.twitter.com",
-  "http://twitter.com",
-  "http://mobile.twitter.com",
-  "http://www.twitter.com",
+  twitterHost1,
+  twitterHost2,
+  twitterHost3,
+  twitterHost4,
+  twitterHost5,
+  twitterHost6,
 )
 
 internal const val twitterTonApiHost = "ton.twitter.com"

@@ -32,8 +32,11 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
 class MentionItem : HomeNavigationItem() {
   @Composable
@@ -45,13 +48,18 @@ class MentionItem : HomeNavigationItem() {
   override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_message_circle)
 
   @Composable
-  override fun Content() {
-    MentionSceneContent(lazyListController)
+  override fun Content(navigator: Navigator) {
+    MentionSceneContent(lazyListController, navigator)
   }
 }
 
+@NavGraphDestination(
+  route = Root.Mentions,
+)
 @Composable
-fun MentionScene() {
+fun MentionScene(
+  navigator: Navigator,
+) {
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -60,22 +68,31 @@ fun MentionScene() {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_mentions_title))
           },
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           }
         )
       }
     ) {
-      MentionSceneContent()
+      MentionSceneContent(
+        navigator = navigator,
+      )
     }
   }
 }
 
 @Composable
 fun MentionSceneContent(
-  lazyListController: LazyListController? = null
+  lazyListController: LazyListController? = null,
+  navigator: Navigator,
 ) {
+  val statusNavigationData = rememberStatusNavigationData(navigator)
   TimelineComponent(
     lazyListController = lazyListController,
-    savedStateKeyType = SavedStateKeyType.MENTIONS
+    savedStateKeyType = SavedStateKeyType.MENTIONS,
+    statusNavigation = statusNavigationData,
   )
 }

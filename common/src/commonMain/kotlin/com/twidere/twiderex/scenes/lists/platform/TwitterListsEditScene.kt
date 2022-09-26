@@ -42,16 +42,33 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsModifyViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
+
+@NavGraphDestination(
+  route = Root.Lists.TwitterEdit.route,
+)
+@Composable
+fun TwitterListsEditScene(
+  @Path("listKey") listKey: String,
+  navigator: Navigator,
+) {
+  TwitterListsEditScene(
+    listKey = MicroBlogKey.valueOf(listKey),
+    navigator = navigator,
+  )
+}
 
 @Composable
 fun TwitterListsEditScene(
-  listKey: MicroBlogKey
+  listKey: MicroBlogKey,
+  navigator: Navigator,
 ) {
-  val navController = LocalNavController.current
   val listsEditViewModel: ListsModifyViewModel = getViewModel {
     parametersOf(listKey)
   }
@@ -65,7 +82,14 @@ fun TwitterListsEditScene(
       InAppNotificationScaffold(
         topBar = {
           AppBar(
-            navigationIcon = { AppBarNavigationButton(Icons.Default.Close) },
+            navigationIcon = {
+              AppBarNavigationButton(
+                Icons.Default.Close,
+                onBack = {
+                  navigator.popBackStack()
+                }
+              )
+            },
             title = {
               Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_edit_title))
             },
@@ -79,7 +103,7 @@ fun TwitterListsEditScene(
                     description = desc,
                     private = isPrivate
                   ) { success, _ ->
-                    if (success) navController.popBackStack()
+                    if (success) navigator.popBackStack()
                   }
                 }
               ) {

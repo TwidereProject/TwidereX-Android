@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.component.lazy.ui
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -77,12 +76,11 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.kmp.TimeUtils
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMedia
+import com.twidere.twiderex.navigation.DMNavigationData
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.preferences.model.DisplayPreferences
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LazyUiDMEventList(
   modifier: Modifier = Modifier,
@@ -91,7 +89,8 @@ fun LazyUiDMEventList(
   key: ((item: UiDMEvent) -> Any) = { it.messageKey.hashCode() },
   header: LazyListScope.() -> Unit = {},
   onResend: (event: UiDMEvent) -> Unit = {},
-  onItemLongClick: (event: UiDMEvent) -> Unit = {}
+  onItemLongClick: (event: UiDMEvent) -> Unit = {},
+  dmNavigationData: DMNavigationData,
 ) {
   LazyUiList(items = items) {
     LazyColumn(
@@ -111,9 +110,13 @@ fun LazyUiDMEventList(
               .padding(LazyUiDMEventListDefaults.ContentPadding)
           ) {
             if (it.isInCome)
-              DMInComeEvent(it, onItemLongClick)
+              DMInComeEvent(
+                it,
+                onItemLongClick,
+                dmNavigationData = dmNavigationData,
+              )
             else
-              DMOutComeEvent(onResend, it, onItemLongClick)
+              DMOutComeEvent(onResend, it, onItemLongClick, dmNavigationData)
           }
         } ?: run {
           LoadingEventPlaceholder()
@@ -134,7 +137,8 @@ private object LazyUiDMEventListDefaults {
 private fun DMOutComeEvent(
   onResend: (event: UiDMEvent) -> Unit = {},
   event: UiDMEvent,
-  onItemLongClick: (event: UiDMEvent) -> Unit
+  onItemLongClick: (event: UiDMEvent) -> Unit,
+  dmNavigationData: DMNavigationData,
 ) {
   Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
     Column(horizontalAlignment = Alignment.End) {
@@ -165,7 +169,12 @@ private fun DMOutComeEvent(
           }
         }
         Spacer(modifier = Modifier.width(DMEventDefaults.ContentSpacing))
-        MessageBody(event, onItemLongClick)
+        MessageBody(
+          event,
+          onItemLongClick,
+          openLink = dmNavigationData.statusNavigation.openLink,
+          navigate = dmNavigationData.statusNavigation.navigate,
+        )
       }
       ChatTime(
         modifier = Modifier.padding(
@@ -190,13 +199,25 @@ private object DMOutComeEventDefaults {
 }
 
 @Composable
-private fun DMInComeEvent(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) -> Unit) {
+private fun DMInComeEvent(
+  event: UiDMEvent,
+  onItemLongClick: (event: UiDMEvent) -> Unit,
+  dmNavigationData: DMNavigationData,
+) {
   Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
     Column {
       Row(verticalAlignment = Alignment.Bottom) {
-        UserAvatar(user = event.sender)
+        UserAvatar(
+          user = event.sender,
+          onClick = dmNavigationData.statusNavigation.toUser,
+        )
         Spacer(modifier = Modifier.width(DMEventDefaults.ContentSpacing))
-        MessageBody(event, onItemLongClick)
+        MessageBody(
+          event,
+          onItemLongClick,
+          openLink = dmNavigationData.statusNavigation.openLink,
+          navigate = dmNavigationData.statusNavigation.navigate
+        )
       }
       ChatTime(
         modifier = Modifier.padding(
@@ -220,8 +241,12 @@ private object DMEventDefaults {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun MessageBody(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) -> Unit) {
-  val navController = LocalNavController.current
+private fun MessageBody(
+  event: UiDMEvent,
+  onItemLongClick: (event: UiDMEvent) -> Unit,
+  openLink: (String) -> Unit,
+  navigate: (String) -> Unit,
+) {
   Box(
     modifier = Modifier
       .clip(
@@ -249,7 +274,7 @@ private fun MessageBody(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) ->
       MediaMessage(
         media = event.media.firstOrNull(),
         onClick = {
-          navController.navigate(Root.Media.Pure(event.messageKey, 0))
+          navigate(Root.Media.Pure(event.messageKey, 0))
         }
       )
       if (event.media.isNotEmpty() && event.htmlText.isNotEmpty()) Spacer(
@@ -268,7 +293,8 @@ private fun MessageBody(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) ->
           htmlText = event.htmlText,
           textStyle = textStyle,
           linkStyle = linkStyle,
-          linkResolver = { href -> event.resolveLink(href) }
+          linkResolver = { href -> event.resolveLink(href) },
+          openLink = openLink,
         )
       }
     }
@@ -282,7 +308,6 @@ private object MessageBodyDefaults {
   val ContentSpacing = 10.dp
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun MediaMessage(media: UiMedia?, onClick: (UiMedia) -> Unit) {
   media?.let { item ->

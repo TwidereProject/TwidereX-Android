@@ -28,6 +28,7 @@ import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.scenes.dm.DMConversationListSceneContent
 import com.twidere.twiderex.scenes.dm.DMConversationListSceneFab
+import moe.tlaster.precompose.navigation.Navigator
 
 class DMConversationListItem : HomeNavigationItem() {
   @Composable
@@ -44,14 +45,15 @@ class DMConversationListItem : HomeNavigationItem() {
   }
 
   @Composable
-  override fun Fab() {
-    DMConversationListSceneFab()
+  override fun Fab(navigator: Navigator) {
+    DMConversationListSceneFab(navigator)
   }
 
   @Composable
-  override fun Content() {
+  override fun Content(navigator: Navigator) {
     DMConversationListSceneContent(
-      lazyListController
+      lazyListController,
+      navigator = navigator,
     )
   }
 }

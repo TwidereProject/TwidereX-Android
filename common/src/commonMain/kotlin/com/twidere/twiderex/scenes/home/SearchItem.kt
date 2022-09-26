@@ -47,7 +47,9 @@ import androidx.paging.compose.items
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.component.navigation.hashtag
+import com.twidere.twiderex.component.navigation.search
+import com.twidere.twiderex.component.navigation.searchInput
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.component.trend.MastodonTrendItem
@@ -62,6 +64,7 @@ import com.twidere.twiderex.scenes.search.presenter.SearchInputEvent
 import com.twidere.twiderex.scenes.search.presenter.SearchInputState
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
+import moe.tlaster.precompose.navigation.Navigator
 
 class SearchItem : HomeNavigationItem() {
 
@@ -77,13 +80,15 @@ class SearchItem : HomeNavigationItem() {
     get() = false
 
   @Composable
-  override fun Content() {
-    SearchSceneContent()
+  override fun Content(navigator: Navigator) {
+    SearchSceneContent(navigator)
   }
 }
 
 @Composable
-fun SearchScene() {
+fun SearchScene(
+  navigator: Navigator,
+) {
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -92,25 +97,30 @@ fun SearchScene() {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_title))
           },
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           }
         )
       }
     ) {
-      SearchSceneContent()
+      SearchSceneContent(navigator)
     }
   }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SearchSceneContent() {
+fun SearchSceneContent(
+  navigator: Navigator
+) {
   val account = LocalActiveAccount.current ?: return
   val (state, channel) = rememberPresenterState { TrendingPresenter(it) }
   if (state !is SearchItemState.Data) {
     return
   }
-  val navigator = LocalNavigator.current
   Scaffold(
     topBar = {
       AppBar(

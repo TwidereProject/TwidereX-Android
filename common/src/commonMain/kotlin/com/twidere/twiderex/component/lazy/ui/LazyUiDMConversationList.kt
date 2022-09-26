@@ -61,7 +61,8 @@ fun LazyUiDMConversationList(
   key: ((item: UiDMConversationWithLatestMessage) -> Any) = { it.conversation.conversationKey.hashCode() },
   onItemClicked: (UiDMConversationWithLatestMessage) -> Unit = {},
   header: LazyListScope.() -> Unit = {},
-  action: @Composable (user: UiDMConversationWithLatestMessage) -> Unit = {}
+  action: @Composable (user: UiDMConversationWithLatestMessage) -> Unit = {},
+  openLink: (String) -> Unit,
 ) {
   val resLoader = LocalResLoader.current
   LazyUiList(items = items) {
@@ -93,7 +94,10 @@ fun LazyUiDMConversationList(
               },
               text = {
                 Row {
-                  UserName(userName = it.conversation.conversationName)
+                  UserName(
+                    userName = it.conversation.conversationName,
+                    onUserNameClicked = openLink,
+                  )
                   Spacer(
                     modifier = Modifier.width(
                       LazyUiDMConversationListDefaults.HorizontalPadding
@@ -112,6 +116,7 @@ fun LazyUiDMConversationList(
                       resLoader
                     )
                   },
+                  openLink = openLink,
                 )
               },
             )

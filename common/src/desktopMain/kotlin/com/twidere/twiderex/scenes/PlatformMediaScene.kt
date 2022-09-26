@@ -24,35 +24,56 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.enums.MediaType
+import moe.tlaster.precompose.navigation.Navigator
 
 @Composable
-actual fun PlatformStatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
+actual fun PlatformStatusMediaScene(
+  statusKey: String,
+  selectedIndex: Int?,
+  navigator: Navigator,
+) {
   MediaScene {
-    StatusMediaScene(statusKey = statusKey, selectedIndex = selectedIndex)
+    StatusMediaScene(
+      statusKey = statusKey,
+      selectedIndex = selectedIndex ?: 0,
+      navigator = navigator,
+    )
   }
 }
 
 @Composable
-actual fun PlatformRawMediaScene(url: String, type: MediaType) {
+actual fun PlatformRawMediaScene(
+  url: String,
+  type: String,
+  navigator: Navigator,
+) {
   MediaScene {
-    RawMediaScene(url = url, type = type)
+    RawMediaScene(url = url, type = type, navigator = navigator)
   }
 }
 
 @Composable
-actual fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
+actual fun PlatformPureMediaScene(
+  belongToKey: String,
+  selectedIndex: Int?,
+  navigator: Navigator,
+) {
   MediaScene {
-    PureMediaScene(belongToKey = belongToKey, selectedIndex = selectedIndex)
+    PureMediaScene(
+      belongToKey = belongToKey,
+      selectedIndex = selectedIndex ?: 0,
+      navigator = navigator,
+    )
   }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+actual fun PlatformScene(target: String, navigator: Navigator) {
+}
+
 @Composable
 actual fun StatusMediaSceneLayout(
   backgroundColor: Color,

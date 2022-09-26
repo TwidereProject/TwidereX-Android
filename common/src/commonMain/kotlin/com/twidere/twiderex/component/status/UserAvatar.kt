@@ -34,7 +34,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
@@ -47,9 +46,8 @@ fun UserAvatar(
   user: UiUser,
   size: Dp = UserAvatarDefaults.AvatarSize,
   withPlatformIcon: Boolean = false,
-  onClick: (() -> Unit)? = null,
+  onClick: (UiUser) -> Unit,
 ) {
-  val navigator = LocalNavigator.current
   Box(
     contentAlignment = Alignment.BottomEnd
   ) {
@@ -58,7 +56,7 @@ fun UserAvatar(
       avatar = user.profileImage.takeIf { it.isNotEmpty() } ?: painterResource(com.twidere.twiderex.MR.images.ic_profile_image_twidere),
       size = size,
       onClick = {
-        onClick?.invoke() ?: run { navigator.user(user) }
+        onClick.invoke(user)
       }
     )
     if (withPlatformIcon) {

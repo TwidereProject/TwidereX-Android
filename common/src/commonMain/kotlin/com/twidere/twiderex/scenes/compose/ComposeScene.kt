@@ -128,8 +128,10 @@ import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.RootDeepLinks
+import com.twidere.twiderex.navigation.StatusNavigationData
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.Orange
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.compose.ComposeViewModel
@@ -138,16 +140,23 @@ import com.twidere.twiderex.viewmodel.compose.DraftItemViewModel
 import com.twidere.twiderex.viewmodel.compose.VoteExpired
 import com.twidere.twiderex.viewmodel.compose.VoteState
 import com.twitter.twittertext.TwitterTextParser
-import kotlinx.coroutines.flow.collect
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.BackHandler
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
 
+@NavGraphDestination(
+  route = Root.Draft.Compose.route,
+  deepLink = [RootDeepLinks.Draft.route]
+)
 @Composable
 fun DraftComposeScene(
-  draftId: String,
+  @Path("draftId") draftId: String,
+  navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current ?: return
   val draftItemViewModel: DraftItemViewModel = getViewModel {
@@ -160,20 +169,35 @@ fun DraftComposeScene(
         draft,
       )
     }
-    ComposeBody(viewModel = viewModel, account = account)
+    val statusNavigation = rememberStatusNavigationData(navigator)
+    ComposeBody(
+      viewModel = viewModel,
+      account = account,
+      statusNavigation = statusNavigation,
+    )
   }
 }
 
+@NavGraphDestination(
+  route = Root.Compose.Home.route,
+  deepLink = [RootDeepLinks.Compose.route]
+)
 @Composable
 fun ComposeScene(
   statusKey: MicroBlogKey? = null,
   composeType: ComposeType = ComposeType.New,
+  navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current ?: return
   val viewModel: ComposeViewModel = getViewModel {
     parametersOf(statusKey, composeType)
   }
-  ComposeBody(viewModel = viewModel, account = account)
+  val statusNavigation = rememberStatusNavigationData(navigator)
+  ComposeBody(
+    viewModel = viewModel,
+    account = account,
+    statusNavigation = statusNavigation,
+  )
 }
 
 @OptIn(
@@ -185,13 +209,13 @@ fun ComposeScene(
 private fun ComposeBody(
   viewModel: ComposeViewModel,
   account: AccountDetails,
+  statusNavigation: StatusNavigationData,
 ) {
   val composeType = viewModel.composeType
   val status by viewModel.status.observeAsState(null)
   val images by viewModel.images.observeAsState(initial = emptyList())
   val location by viewModel.location.observeAsState(null)
   val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
-  val navController = LocalNavController.current
   val textFieldValue by viewModel.textFieldValue.observeAsState(initial = TextFieldValue())
   val keyboardController = LocalSoftwareKeyboardController.current
   val canSaveDraft by viewModel.canSaveDraft.observeAsState(initial = false)
@@ -221,10 +245,10 @@ private fun ComposeBody(
         onConfirm = {
           showSaveDraftDialog = false
           viewModel.saveDraft()
-          navController.popBackStack()
+          statusNavigation.popBackStack()
         },
         onCancel = {
-          navController.popBackStack()
+          statusNavigation.popBackStack()
         }
       )
     }
@@ -232,7 +256,11 @@ private fun ComposeBody(
       sheetPeekHeight = 0.dp,
       scaffoldState = scaffoldState,
       sheetContent = {
-        ReplySheetContent(viewModel = viewModel, scaffoldState = scaffoldState)
+        ReplySheetContent(
+          viewModel = viewModel,
+          scaffoldState = scaffoldState,
+          statusNavigation = statusNavigation,
+        )
       },
       topBar = {
         AppBar(
@@ -251,7 +279,7 @@ private fun ComposeBody(
                 if (canSaveDraft) {
                   showSaveDraftDialog = true
                 } else {
-                  navController.popBackStack()
+                  statusNavigation.popBackStack()
                 }
               }
             ) {
@@ -269,7 +297,7 @@ private fun ComposeBody(
               enabled = canSend,
               onClick = {
                 viewModel.compose()
-                navController.popBackStack()
+                statusNavigation.popBackStack()
               }
             ) {
               Icon(
@@ -337,6 +365,7 @@ private fun ComposeBody(
                     TimelineStatusComponent(
                       data = status,
                       showActions = false,
+                      statusNavigation = statusNavigation,
                     )
                   }
                 }
@@ -376,6 +405,7 @@ private fun ComposeBody(
                   TimelineStatusComponent(
                     data = status,
                     showActions = false,
+                    statusNavigation = statusNavigation,
                   )
                 }
               }
@@ -384,7 +414,7 @@ private fun ComposeBody(
         }
 
         if (images.any()) {
-          ComposeImageList(images, viewModel)
+          ComposeImageList(images, viewModel, statusNavigation.navigate)
         }
 
         Row(
@@ -429,6 +459,8 @@ private fun ComposeBody(
           ComposeActions(
             viewModel,
             showEmoji = showEmoji,
+            navigateForResult = statusNavigation.navigateForResult,
+            navigate = statusNavigation.navigate,
             emojiButtonClicked = {
               showEmoji = !showEmoji
             },
@@ -449,7 +481,8 @@ private fun ComposeBody(
 @Composable
 private fun ComposeImageList(
   images: List<UiMediaInsert>,
-  viewModel: ComposeViewModel
+  viewModel: ComposeViewModel,
+  navigate: (String) -> Unit,
 ) {
   Spacer(modifier = Modifier.height(ComposeImageListDefaults.Spacing))
   LazyRow(
@@ -458,7 +491,11 @@ private fun ComposeImageList(
     itemsIndexed(
       items = images,
     ) { index, item ->
-      ComposeImage(item, viewModel)
+      ComposeImage(
+        item,
+        viewModel,
+        navigate,
+      )
       if (index != images.lastIndex) {
         Spacer(modifier = Modifier.width(ComposeImageListDefaults.ItemSpacing))
       }
@@ -644,6 +681,7 @@ object ComposeMastodonVisibilityDefaults {
 private fun ReplySheetContent(
   viewModel: ComposeViewModel,
   scaffoldState: BottomSheetScaffoldState,
+  statusNavigation: StatusNavigationData,
 ) {
   if (viewModel.composeType != ComposeType.Reply) {
     return
@@ -678,10 +716,14 @@ private fun ReplySheetContent(
       icon = {
         UserAvatar(
           user = it.user,
+          onClick = statusNavigation.toUser,
         )
       },
       text = {
-        UserName(user = it.user)
+        UserName(
+          user = it.user,
+          onUserNameClicked = statusNavigation.openLink,
+        )
       },
       secondaryText = {
         UserScreenName(user = it.user)
@@ -717,10 +759,14 @@ private fun ReplySheetContent(
         icon = {
           UserAvatar(
             user = user,
+            onClick = statusNavigation.toUser,
           )
         },
         text = {
-          UserName(user = user)
+          UserName(
+            user = user,
+            onUserNameClicked = statusNavigation.openLink,
+          )
         },
         secondaryText = {
           UserScreenName(user = user)
@@ -771,7 +817,7 @@ private fun ConfirmDraftDialog(
   )
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @Composable
@@ -1009,11 +1055,12 @@ private object ComposeVoteDefaults {
   val MultipleCheckBoxSpacing = 8.dp
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun ComposeActions(
   viewModel: ComposeViewModel,
   showEmoji: Boolean = false,
+  navigateForResult: suspend (String) -> Any?,
+  navigate: (String) -> Unit,
   emojiButtonClicked: () -> Unit = {},
 ) {
   val account = LocalActiveAccount.current ?: return
@@ -1032,7 +1079,6 @@ private fun ComposeActions(
     account.type != PlatformType.Mastodon && currentPlatform == Platform.Android
   }
   val scope = rememberCoroutineScope()
-  val navController = LocalNavController.current
 
   val draftCount = viewModel.draftCount.observeAsState(0)
   val insertMode by viewModel.mediaInsertMode.observeAsState(initial = ComposeViewModel.MediaInsertMode.All)
@@ -1045,7 +1091,8 @@ private fun ComposeActions(
           },
           supportMultipleSelect = insertMode.multiSelect,
           disableList = insertMode.disabledInsertType,
-          librariesSupported = insertMode.librarySupportedType.toTypedArray()
+          librariesSupported = insertMode.librarySupportedType.toTypedArray(),
+          navigateForResult = navigateForResult,
         )
       }
       if (account.type == PlatformType.Mastodon) {
@@ -1086,7 +1133,7 @@ private fun ComposeActions(
           onClick = {
             scope.launch {
               val result =
-                navController.navigateForResult(Root.Compose.Search.User)
+                navigateForResult(Root.Compose.Search.User)
                   ?.toString()
               if (!result.isNullOrEmpty()) {
                 viewModel.insertText("$result ")
@@ -1106,9 +1153,8 @@ private fun ComposeActions(
         IconButton(
           onClick = {
             scope.launch {
-              val result =
-                navController.navigateForResult(Root.Mastodon.Compose.Hashtag)
-                  ?.toString()
+              val result = navigateForResult(Root.Mastodon.Compose.Hashtag)
+                ?.toString()
               if (!result.isNullOrEmpty()) {
                 viewModel.insertText("$result ")
               }
@@ -1166,7 +1212,7 @@ private fun ComposeActions(
       if (draftCount.value > 0) {
         IconButton(
           onClick = {
-            navController.navigate(Root.Draft.List)
+            navigate(Root.Draft.List)
           }
         ) {
           Box {
@@ -1204,10 +1250,13 @@ private object ComposeActionsDefaults {
 }
 
 @Composable
-private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel) {
+private fun ComposeImage(
+  item: UiMediaInsert,
+  viewModel: ComposeViewModel,
+  navigate: (String) -> Unit,
+) {
   var expanded by remember { mutableStateOf(false) }
   val type = item.type
-  val navController = LocalNavController.current
   Box {
     Box(
       modifier = Modifier
@@ -1220,10 +1269,10 @@ private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel) {
         )
         .clickable(
           onClick = {
-            navController.navigate(
+            navigate(
               Root.Media.Raw(
                 if (type == MediaType.video) MediaType.video else MediaType.photo,
-                item.filePath.toString()
+                item.filePath
               )
             )
           }

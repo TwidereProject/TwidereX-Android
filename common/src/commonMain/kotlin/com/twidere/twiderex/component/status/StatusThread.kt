@@ -31,14 +31,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.model.ui.UiUser
 
 @Composable
-fun StatusThreadWithAvatar(modifier: Modifier = Modifier, data: UiStatus, onClick: () -> Unit) {
+fun StatusThreadWithAvatar(
+  modifier: Modifier = Modifier,
+  data: UiStatus,
+  onClick: () -> Unit,
+  toUser: (UiUser) -> Unit,
+) {
   Row(modifier = modifier) {
     UserAvatar(
       user = data.user,
       size = StatusThreadDefaults.AvatarSize,
-      modifier = Modifier.padding(start = StatusThreadDefaults.HorizontalSpacing)
+      modifier = Modifier.padding(start = StatusThreadDefaults.HorizontalSpacing),
+      onClick = toUser,
     )
     TextButton(
       onClick = onClick,

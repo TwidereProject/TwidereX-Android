@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.paging.LoadState
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusImageList
+import com.twidere.twiderex.component.navigation.media
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.rememberPresenter
@@ -34,6 +35,7 @@ import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.scenes.search.tabs.presenter.TwitterSearchMediaPresenter
 import com.twidere.twiderex.scenes.search.tabs.presenter.TwitterSearchMediaState
 import com.twidere.twiderex.ui.LocalVideoPlayback
+import moe.tlaster.precompose.navigation.Navigator
 
 class TwitterSearchMediaItem : SearchSceneItem {
   @Composable
@@ -42,7 +44,10 @@ class TwitterSearchMediaItem : SearchSceneItem {
   }
 
   @Composable
-  override fun Content(keyword: String) {
+  override fun Content(
+    keyword: String,
+    navigator: Navigator,
+  ) {
 
     val state by rememberPresenter {
       TwitterSearchMediaPresenter(keyword = keyword)
@@ -58,7 +63,12 @@ class TwitterSearchMediaItem : SearchSceneItem {
             it.data.refreshOrRetry()
           }
         ) {
-          LazyUiStatusImageList(items = it.data)
+          LazyUiStatusImageList(
+            items = it.data,
+            openMedia = { key, index ->
+              navigator.media(key, index)
+            }
+          )
         }
       }
     }

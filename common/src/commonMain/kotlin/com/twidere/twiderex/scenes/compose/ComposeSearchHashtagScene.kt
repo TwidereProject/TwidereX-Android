@@ -48,14 +48,20 @@ import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.compose.MastodonComposeSearchHashtagViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
+@NavGraphDestination(
+  route = Root.Mastodon.Compose.Hashtag,
+)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ComposeSearchHashtagScene() {
-  val navController = LocalNavController.current
+fun ComposeSearchHashtagScene(
+  navigator: Navigator,
+) {
   val viewModel: MastodonComposeSearchHashtagViewModel = getViewModel()
   val text by viewModel.text.observeAsState(initial = "")
   val source = viewModel.source.collectAsLazyPagingItems()
@@ -78,7 +84,7 @@ fun ComposeSearchHashtagScene() {
                 alignment = Alignment.CenterStart,
                 keyboardActions = KeyboardActions(
                   onDone = {
-                    navController.goBackWith("#$text")
+                    navigator.goBackWith("#$text")
                   }
                 ),
                 keyboardOptions = KeyboardOptions(
@@ -88,12 +94,16 @@ fun ComposeSearchHashtagScene() {
             }
           },
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           },
           actions = {
             IconButton(
               onClick = {
-                navController.goBackWith("#$text")
+                navigator.goBackWith("#$text")
               }
             ) {
               Icon(
@@ -114,7 +124,7 @@ fun ComposeSearchHashtagScene() {
             ListItem(
               modifier = Modifier
                 .clickable {
-                  navController.goBackWith("#$name")
+                  navigator.goBackWith("#$name")
                 }
             ) {
               Text(text = name)

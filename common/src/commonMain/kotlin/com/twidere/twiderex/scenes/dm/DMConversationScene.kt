@@ -21,7 +21,6 @@
 package com.twidere.twiderex.scenes.dm
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -74,25 +73,57 @@ import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMediaInsert
+import com.twidere.twiderex.navigation.DMNavigationData
+import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.RootDeepLinks
+import com.twidere.twiderex.navigation.rememberDMNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMEventViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
 
+@NavGraphDestination(
+  route = Root.Messages.Conversation.route,
+  deepLink = [
+    RootDeepLinks.Conversation.route
+  ]
+)
 @Composable
-fun DMConversationScene(conversationKey: MicroBlogKey) {
+fun DMConversationScene(
+  @Path("conversationKey") conversationKey: String,
+  navigator: Navigator,
+) {
+  DMConversationScene(
+    conversationKey = MicroBlogKey.valueOf(conversationKey),
+    navigator = navigator,
+  )
+}
+
+@Composable
+fun DMConversationScene(
+  conversationKey: MicroBlogKey,
+  navigator: Navigator,
+) {
   val account = LocalActiveAccount.current ?: return
   val viewModel: DMEventViewModel = getViewModel {
     parametersOf(conversationKey)
   }
   val conversation by viewModel.conversation.observeAsState(null)
+  val dmNavigationData = rememberDMNavigationData(navigator)
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             conversation?.let {
@@ -106,14 +137,19 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
         Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_error_not_supported))
       } else {
         // user might enter this page by notifications after switch platform
-        NormalContent(viewModel)
+        NormalContent(
+          viewModel, dmNavigationData,
+        )
       }
     }
   }
 }
 
 @Composable
-fun NormalContent(viewModel: DMEventViewModel) {
+private fun NormalContent(
+  viewModel: DMEventViewModel,
+  dmNavigationData: DMNavigationData,
+) {
   val clipboardManager = LocalClipboardManager.current
   val source = viewModel.source.collectAsLazyPagingItems()
   val input by viewModel.input.observeAsState(initial = "")
@@ -141,7 +177,8 @@ fun NormalContent(viewModel: DMEventViewModel) {
         state = listState,
         onItemLongClick = {
           viewModel.pendingActionMessage.value = it
-        }
+        },
+        dmNavigationData = dmNavigationData,
       )
       MessageActionComponent(
         pendingActionMessage = pendingActionMessage,
@@ -168,6 +205,7 @@ fun NormalContent(viewModel: DMEventViewModel) {
       input = input,
       onValueChanged = { viewModel.input.value = it },
       onSend = { viewModel.sendMessage() },
+      navigateForResult = dmNavigationData.statusNavigation.navigateForResult
     )
   }
   firstEventKey?.let {
@@ -268,7 +306,6 @@ private object InputPhotoPreviewDefaults {
   val IconPadding = 6.dp
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun InputComponent(
   modifier: Modifier = Modifier,
@@ -278,6 +315,7 @@ fun InputComponent(
   enableSelectPhoto: Boolean,
   enableSend: Boolean,
   onSend: () -> Unit,
+  navigateForResult: suspend (String) -> Any?,
 ) {
   Row(
     modifier = modifier.padding(InputComponentDefaults.ContentPadding),
@@ -289,6 +327,7 @@ fun InputComponent(
           onMediaInsert(it)
         },
         supportMultipleSelect = false,
+        navigateForResult = navigateForResult,
       )
     }
     Spacer(modifier = Modifier.width(InputComponentDefaults.ContentSpacing))

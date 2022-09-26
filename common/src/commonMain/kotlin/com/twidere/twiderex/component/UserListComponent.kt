@@ -26,23 +26,30 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.navigation.UserNavigationData
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun UserListComponent(
   source: LazyPagingItems<UiUser>,
-  action: @Composable (user: UiUser) -> Unit = {}
+  action: @Composable (user: UiUser) -> Unit = {},
+  userNavigationData: UserNavigationData,
 ) {
-  val navigator = LocalNavigator.current
   SwipeToRefreshLayout(
     refreshingState = source.loadState.refresh is LoadState.Loading,
     onRefresh = {
       source.refreshOrRetry()
     }
   ) {
-    LazyUiUserList(items = source, onItemClicked = { navigator.user(it) }, action = action)
+    LazyUiUserList(
+      items = source,
+      userNavigationData = userNavigationData,
+      onItemClicked = {
+        userNavigationData.statusNavigation.toUser(it)
+      },
+      action = action,
+    )
   }
 }

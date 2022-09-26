@@ -48,18 +48,28 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.navigation.Root
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.DraftViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
+@NavGraphDestination(
+  route = Root.Draft.List,
+)
 @Composable
-fun DraftListScene() {
+fun DraftListScene(
+  navigator: Navigator,
+) {
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_drafts_title))
@@ -67,7 +77,7 @@ fun DraftListScene() {
         )
       }
     ) {
-      DraftListSceneContent()
+      DraftListSceneContent(navigator = navigator)
     }
   }
 }
@@ -76,10 +86,10 @@ fun DraftListScene() {
 @Composable
 fun DraftListSceneContent(
   lazyListController: LazyListController? = null,
+  navigator: Navigator,
 ) {
   val viewModel: DraftViewModel = getViewModel()
   val source by viewModel.source.observeAsState(initial = emptyList())
-  val navController = LocalNavController.current
   val listState = rememberLazyListState()
   LaunchedEffect(lazyListController) {
     lazyListController?.listState = listState
@@ -109,7 +119,7 @@ fun DraftListSceneContent(
             ) {
               DropdownMenuItem(
                 onClick = {
-                  navController.navigate(Root.Draft.Compose(it.draftId))
+                  navigator.navigate(Root.Draft.Compose(it.draftId))
                 }
               ) {
                 Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_drafts_actions_edit_draft))

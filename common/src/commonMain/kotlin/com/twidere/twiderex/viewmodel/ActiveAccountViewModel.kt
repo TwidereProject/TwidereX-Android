@@ -40,6 +40,8 @@ class ActiveAccountViewModel(
     return repository.getFirstByType(type)
   }
 
+  fun hasAccount(): Boolean = repository.hasAccount()
+
   val account by lazy {
     repository.activeAccount
   }

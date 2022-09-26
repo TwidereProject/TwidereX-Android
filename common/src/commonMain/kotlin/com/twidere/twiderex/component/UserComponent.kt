@@ -87,7 +87,6 @@ import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusImageList
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.status.HtmlText
 import com.twidere.twiderex.component.status.ResolvedLink
 import com.twidere.twiderex.component.status.UserAvatar
@@ -101,8 +100,9 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.StatusNavigationData
+import com.twidere.twiderex.navigation.UserNavigationData
 import com.twidere.twiderex.navigation.twidereXSchema
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.user.UserEvent
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineState
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineState
@@ -113,14 +113,14 @@ import kotlinx.coroutines.launch
 import moe.tlaster.nestedscrollview.VerticalNestedScrollView
 import moe.tlaster.nestedscrollview.rememberNestedScrollViewState
 import moe.tlaster.placeholder.Placeholder
-import moe.tlaster.precompose.navigation.Navigator
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun UserComponent(
   userKey: MicroBlogKey,
   state: UserState,
-  channel: Channel<UserEvent>
+  channel: Channel<UserEvent>,
+  userNavigationData: UserNavigationData,
 ) {
   if (state !is UserState.Data) {
     return
@@ -130,7 +130,11 @@ fun UserComponent(
       painterResource(res = com.twidere.twiderex.MR.files.ic_float_left),
       stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_status)
     ) {
-      UserStatusTimeline(user = state.user, state = state.userTimelineState) {
+      UserStatusTimeline(
+        user = state.user,
+        state = state.userTimelineState,
+        statusNavigationData = userNavigationData.statusNavigation,
+      ) {
         channel.trySend(UserEvent.ExcludeReplies(it))
       }
     },
@@ -138,7 +142,10 @@ fun UserComponent(
       painterResource(res = com.twidere.twiderex.MR.files.ic_photo),
       stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_media)
     ) {
-      UserMediaTimeline(state = state.userMediaTimelineState)
+      UserMediaTimeline(
+        state = state.userMediaTimelineState,
+        openMedia = userNavigationData.statusNavigation.toMediaWithIndex,
+      )
     },
   ).let {
     if (state.isMe || userKey.host == MicroBlogKey.TwitterHost) {
@@ -146,7 +153,10 @@ fun UserComponent(
         painterResource(res = com.twidere.twiderex.MR.files.ic_heart),
         stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_favourite)
       ) {
-        UserFavouriteTimeline(state = state.userFavouriteTimelineState)
+        UserFavouriteTimeline(
+          state = state.userFavouriteTimelineState,
+          statusNavigationData = userNavigationData.statusNavigation,
+        )
       }
     } else {
       it
@@ -165,6 +175,7 @@ fun UserComponent(
         UserInfo(
           user = state.user,
           isMe = state.isMe,
+          userNavigationData = userNavigationData,
           userRelationship = {
             UserRelationship(
               relationship = state.relationship,
@@ -196,7 +207,6 @@ fun UserComponent(
                 onClick = {
                   scope.launch {
                     pagerState.currentPage = index
-                    // pagerState.animateScrollToPage(index)
                   }
                 },
                 content = {
@@ -284,6 +294,7 @@ private object PermissionDeniedInfoDefaults {
 fun UserStatusTimeline(
   user: UiUser?,
   state: UserTimelineState,
+  statusNavigationData: StatusNavigationData,
   excludeReplies: (Boolean) -> Unit,
 ) {
   (state as? UserTimelineState.Data)?.let {
@@ -298,6 +309,7 @@ fun UserStatusTimeline(
           }
         }
       },
+      statusNavigation = statusNavigationData,
     )
   }
 }
@@ -397,20 +409,26 @@ private object UserStatusTimelineFilterDefaults {
 
 @Composable
 fun UserMediaTimeline(
-  state: UserMediaTimelineState
+  state: UserMediaTimelineState,
+  openMedia: (MicroBlogKey, Int) -> Unit,
 ) {
   (state as? UserMediaTimelineState.Data)?.let {
-    LazyUiStatusImageList(it.source)
+    LazyUiStatusImageList(
+      items = it.source,
+      openMedia = openMedia,
+    )
   }
 }
 
 @Composable
 fun UserFavouriteTimeline(
-  state: UserFavouriteTimelineState
+  state: UserFavouriteTimelineState,
+  statusNavigationData: StatusNavigationData,
 ) {
   (state as? UserFavouriteTimelineState.Data)?.let {
     LazyUiStatusList(
       items = it.source,
+      statusNavigation = statusNavigationData,
     )
   }
 }
@@ -421,16 +439,16 @@ val maxBannerSize = 200.dp
 fun UserInfo(
   user: UiUser?,
   isMe: Boolean,
-  userRelationship: @Composable () -> Unit
+  userNavigationData: UserNavigationData,
+  userRelationship: @Composable () -> Unit,
 ) {
-  val navController = LocalNavController.current
   Box(
     modifier = Modifier
       .background(MaterialTheme.colors.surface.withElevation())
   ) {
     // TODO: parallax effect
     user?.profileBackgroundImage?.let {
-      UserBanner(navController, it)
+      UserBanner(it, userNavigationData.onUserBannerClick)
     }
     Column(
       horizontalAlignment = Alignment.CenterHorizontally
@@ -460,15 +478,17 @@ fun UserInfo(
         user?.let { user ->
           UserAvatar(
             user = user,
-            size = UserInfoDefaults.AvatarSize
-          ) {
-            navController.navigate(Root.Media.Raw(MediaType.photo, user.profileImage))
-          }
+            size = UserInfoDefaults.AvatarSize,
+            onClick = userNavigationData.showAvatar,
+          )
         }
       }
       Spacer(modifier = Modifier.height(UserInfoDefaults.AvatarSpacing))
       user?.let { user ->
-        UserInfoName(user)
+        UserInfoName(
+          user = user,
+          onUserNameClicked = userNavigationData.statusNavigation.openLink,
+        )
       }
       if (!isMe) {
         Spacer(modifier = Modifier.height(UserInfoDefaults.RelationshipSpacing))
@@ -479,15 +499,15 @@ fun UserInfo(
           modifier = Modifier.padding(UserInfoDefaults.DescPaddingValue),
           htmlDesc = user.htmlDesc,
           url = user.twitterExtra?.url ?: emptyList(),
+          openLick = userNavigationData.statusNavigation.openLink,
         )
       }
       user?.website?.let {
-        val navigator = LocalNavigator.current
         ProfileItem(
           modifier = Modifier
             .clickable(
               onClick = {
-                navigator.openLink(it)
+                userNavigationData.statusNavigation.openLink.invoke(it)
               }
             )
             .padding(UserInfoDefaults.WebsitePaddingValue)
@@ -512,10 +532,13 @@ fun UserInfo(
         Spacer(modifier = Modifier.height(UserInfoDefaults.LocationSpacing))
       }
       user?.let {
-        MastodonUserField(it)
+        MastodonUserField(
+          user = it,
+          openLick = userNavigationData.statusNavigation.openLink,
+        )
       }
       Spacer(modifier = Modifier.height(UserInfoDefaults.UserMetricsSpacing))
-      user?.let { UserMetrics(it) }
+      user?.let { UserMetrics(it, userNavigationData.navigate) }
       Spacer(modifier = Modifier.height(UserInfoDefaults.UserMetricsSpacing))
     }
   }
@@ -540,7 +563,10 @@ object UserInfoDefaults {
 }
 
 @Composable
-private fun UserInfoName(user: UiUser) {
+private fun UserInfoName(
+  user: UiUser,
+  onUserNameClicked: (String) -> Unit,
+) {
   Row(
     modifier = Modifier.padding(UserInfoNameDefaults.ContentPadding)
   ) {
@@ -559,7 +585,8 @@ private fun UserInfoName(user: UiUser) {
       user = user,
       style = MaterialTheme.typography.h6,
       maxLines = Int.MAX_VALUE,
-      textAlign = TextAlign.Center
+      textAlign = TextAlign.Center,
+      onUserNameClicked = onUserNameClicked,
     )
   }
   UserScreenName(user = user)
@@ -574,7 +601,10 @@ private object UserInfoNameDefaults {
 }
 
 @Composable
-fun MastodonUserField(user: UiUser) {
+fun MastodonUserField(
+  user: UiUser,
+  openLick: (String) -> Unit,
+) {
   if (user.platformType != PlatformType.Mastodon || user.mastodonExtra == null) {
     return
   }
@@ -593,6 +623,7 @@ fun MastodonUserField(user: UiUser) {
       field.value?.let {
         HtmlText(
           htmlText = it,
+          openLink = openLick,
         )
       }
     }
@@ -731,15 +762,15 @@ private object UserRelationshipDefaults {
 
 @Composable
 private fun UserBanner(
-  navController: Navigator,
-  bannerUrl: String
+  bannerUrl: String,
+  onUserBannerClick: (MediaType, String) -> Unit,
 ) {
   Box(
     modifier = Modifier
       .heightIn(max = maxBannerSize)
       .clickable(
         onClick = {
-          navController.navigate(Root.Media.Raw(MediaType.photo, bannerUrl))
+          onUserBannerClick.invoke(MediaType.photo, bannerUrl)
         },
         indication = null,
         interactionSource = remember { MutableInteractionSource() },
@@ -758,8 +789,8 @@ private fun UserBanner(
 @Composable
 fun UserMetrics(
   user: UiUser,
+  onclick: (String) -> Unit,
 ) {
-  val navController = LocalNavController.current
   Row(
     verticalAlignment = Alignment.CenterVertically,
   ) {
@@ -767,7 +798,7 @@ fun UserMetrics(
       modifier = Modifier
         .weight(1f)
         .clickable {
-          navController.navigate(Root.Following(user.userKey))
+          onclick.invoke(Root.Following(user.userKey))
         },
       primaryText = user.metrics.follow.toString(),
       secondaryText = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_profile_dashboard_following),
@@ -779,7 +810,7 @@ fun UserMetrics(
       modifier = Modifier
         .weight(1f)
         .clickable {
-          navController.navigate(Root.Followers(user.userKey))
+          onclick.invoke(Root.Followers(user.userKey))
         },
       primaryText = user.metrics.fans.toString(),
       secondaryText = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_profile_dashboard_followers),
@@ -818,6 +849,7 @@ fun UserDescText(
   modifier: Modifier = Modifier,
   htmlDesc: String,
   url: List<UiUrlEntity>,
+  openLick: (String) -> Unit,
 ) {
   key(
     htmlDesc,
@@ -838,7 +870,8 @@ fun UserDescText(
         } else {
           ResolvedLink(expanded = null)
         }
-      }
+      },
+      openLink = openLick,
     )
   }
 }

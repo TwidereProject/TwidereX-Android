@@ -24,19 +24,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
+import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.ui.LocalBackDispatcherOwner
 
 @Composable
 fun RequireAuthorization(
   content: @Composable () -> Unit,
+  navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current
   if (account == null) {
-    val navController = LocalNavController.current
     val backDispatcher = LocalBackDispatcherOwner.current?.backDispatcher
     LaunchedEffect(Unit) {
-      val result = navController.navigateForResult(Root.SignIn.General)
+      val result = navigator.navigateForResult(Root.SignIn.General)
       if (result == null) {
         backDispatcher?.onBackPress()
       }

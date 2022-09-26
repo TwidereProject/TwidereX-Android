@@ -77,6 +77,7 @@ import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.navigation.StatusNavigationData
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapNotNull
@@ -141,6 +142,7 @@ fun LazyUiStatusList(
   state: LazyListState = rememberLazyListState(),
   loadingBetween: List<MicroBlogKey> = emptyList(),
   contentPadding: PaddingValues = PaddingValues(0.dp),
+  statusNavigation: StatusNavigationData,
   onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
   key: ((index: Int, item: UiStatus) -> Any) = { _, item -> item.statusKey.hashCode() },
   header: LazyListScope.() -> Unit = {},
@@ -192,6 +194,7 @@ fun LazyUiStatusList(
                 threadStyle = StatusThreadStyle.WITH_AVATAR,
                 lineUp = index > 0 && items.peek(index - 1)?.statusId == item.inReplyToStatusId,
                 lineDown = index < items.itemCount - 1 && items.peek(index + 1)?.inReplyToStatusId == item.statusId,
+                statusNavigation = statusNavigation,
               )
               when {
                 loadingBetween.contains(item.statusKey) -> {

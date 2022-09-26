@@ -45,19 +45,29 @@ import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 import java.util.Locale
 
+@NavGraphDestination(
+  route = Root.Lists.Home,
+)
 @Composable
-fun ListsScene() {
+fun ListsScene(
+  navigator: Navigator,
+) {
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_title))
@@ -65,26 +75,29 @@ fun ListsScene() {
         )
       },
       floatingActionButton = {
-        ListsSceneFab()
+        ListsSceneFab(navigator)
       },
       floatingActionButtonPosition = FabPosition.Center
     ) {
-      ListsSceneContent()
+      ListsSceneContent(
+        navigator,
+      )
     }
   }
 }
 
 @Composable
-fun ListsSceneFab() {
+fun ListsSceneFab(
+  navigator: Navigator,
+) {
   val account = LocalActiveAccount.current ?: return
-  val navController = LocalNavController.current
   FloatingActionButton(
     onClick = {
       when (account.type) {
-        PlatformType.Twitter -> navController.navigate(Root.Lists.TwitterCreate)
+        PlatformType.Twitter -> navigator.navigate(Root.Lists.TwitterCreate)
         PlatformType.StatusNet -> TODO()
         PlatformType.Fanfou -> TODO()
-        PlatformType.Mastodon -> navController.navigate(Root.Lists.MastodonCreateDialog)
+        PlatformType.Mastodon -> navigator.navigate(Root.Lists.MastodonCreateDialog)
       }
     }
   ) {
@@ -109,9 +122,10 @@ fun ListsSceneFab() {
 }
 
 @Composable
-fun ListsSceneContent() {
+fun ListsSceneContent(
+  navigator: Navigator
+) {
   val account = LocalActiveAccount.current ?: return
-  val navController = LocalNavController.current
   // if list type is all , display title of each type
   val listsViewMode: ListsViewModel = getViewModel()
   val ownerItems = listsViewMode.ownerSource.collectAsLazyPagingItems()
@@ -126,7 +140,9 @@ fun ListsSceneContent() {
       source = sourceItems,
       ownerItems = ownerItems,
       subscribedItems = subscribeItems,
-      onItemClicked = { navController.navigate(Root.Lists.Timeline(it.listKey)) }
+      onItemClicked = {
+        navigator.navigate(Root.Lists.Timeline(it.listKey))
+      }
     )
   }
 }

@@ -24,22 +24,51 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.enums.MediaType
+import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
+import moe.tlaster.precompose.navigation.Navigator
+import java.net.URLDecoder
 
 @Composable
-actual fun PlatformStatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
-  StatusMediaScene(statusKey = statusKey, selectedIndex = selectedIndex)
+actual fun PlatformStatusMediaScene(
+  statusKey: String,
+  selectedIndex: Int?,
+  navigator: Navigator,
+) {
+  StatusMediaScene(
+    statusKey = statusKey,
+    selectedIndex = selectedIndex ?: 0,
+    navigator = navigator,
+  )
 }
 
 @Composable
-actual fun PlatformRawMediaScene(url: String, type: MediaType) {
-  RawMediaScene(url = url, type = type)
+actual fun PlatformRawMediaScene(
+  url: String,
+  type: String,
+  navigator: Navigator,
+) {
+  RawMediaScene(url = url, type = type, navigator = navigator)
 }
 
 @Composable
-actual fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
-  PureMediaScene(belongToKey = belongToKey, selectedIndex = selectedIndex)
+actual fun PlatformPureMediaScene(
+  belongToKey: String,
+  selectedIndex: Int?,
+  navigator: Navigator
+) {
+  PureMediaScene(
+    belongToKey = belongToKey,
+    selectedIndex = selectedIndex ?: 0,
+    navigator = navigator,
+  )
+}
+
+@Composable
+actual fun PlatformScene(target: String, navigator: Navigator) {
+  TwitterWebSignInScene(
+    target = URLDecoder.decode(target, "UTF-8"),
+    navigator = navigator
+  )
 }
 
 @Composable

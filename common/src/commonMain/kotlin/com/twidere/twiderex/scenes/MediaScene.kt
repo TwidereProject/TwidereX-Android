@@ -21,7 +21,6 @@
 package com.twidere.twiderex.scenes
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -76,8 +75,6 @@ import com.twidere.twiderex.component.foundation.VideoPlayerState
 import com.twidere.twiderex.component.foundation.platform.HorizontalPagerIndicator
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.foundation.rememberVideoPlayerState
-import com.twidere.twiderex.component.navigation.INavigator
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
@@ -101,9 +98,12 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.navigation.ProvideStatusPlatform
+import com.twidere.twiderex.navigation.RequirePlatformAccount
+import com.twidere.twiderex.navigation.StatusNavigationData
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.utils.video.CustomVideoControl
@@ -115,9 +115,33 @@ import moe.tlaster.swiper.Swiper
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
 import org.koin.core.parameter.parametersOf
+import java.net.URLDecoder
 
 @Composable
-fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
+fun StatusMediaScene(
+  statusKey: String,
+  selectedIndex: Int,
+  navigator: Navigator,
+) {
+  MicroBlogKey.valueOf(statusKey).let { key ->
+    ProvideStatusPlatform(statusKey = key) { platformType ->
+      RequirePlatformAccount(platformType = platformType) {
+        StatusMediaScene(
+          statusKey = key,
+          selectedIndex = selectedIndex,
+          navigator = navigator,
+        )
+      }
+    }
+  }
+}
+
+@Composable
+private fun StatusMediaScene(
+  statusKey: MicroBlogKey,
+  selectedIndex: Int,
+  navigator: Navigator,
+) {
   val viewModel = getViewModel<MediaViewModel> {
     parametersOf(statusKey)
   }
@@ -144,10 +168,12 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
       CompositionLocalProvider(
         LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
       ) {
+        val statusNavigationData = rememberStatusNavigationData(navigator)
         StatusMediaScene(
           status = it,
           selectedIndex = selectedIndex.coerceIn(0, it.media.lastIndex),
           viewModel = viewModel,
+          statusNavigationData = statusNavigationData,
         )
       }
     }
@@ -155,12 +181,15 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
 }
 
 @Composable
-fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
+fun StatusMediaScene(
+  status: UiStatus,
+  selectedIndex: Int,
+  viewModel: MediaViewModel,
+  statusNavigationData: StatusNavigationData,
+) {
   val window = LocalPlatformWindow.current
   var controlVisibility by remember { mutableStateOf(true) }
-  val navigator = LocalNavigator.current
   val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
-  val navController = LocalNavController.current
   val pagerState = rememberPagerState(
     initialPage = selectedIndex,
     pageCount = status.media.size,
@@ -171,7 +200,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
 
   val swiperState = rememberSwiperState(
     onDismiss = {
-      navController.popBackStack()
+      statusNavigationData.popBackStack()
     },
   )
   StatusMediaSceneLayout(
@@ -182,7 +211,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
         status = status,
         visible = controlVisibility && swiperState.progress == 0f,
         controlPanelColor = controlPanelColor,
-        navigator = navigator,
+        statusNavigationData = statusNavigationData,
         videoPlayerState = videoPlayerState.value,
         viewModel = viewModel,
         currentMedia = currentMedia,
@@ -193,7 +222,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
       StatusMediaCloseButton(
         visible = controlVisibility && swiperState.progress == 0f,
         backgroundColor = controlPanelColor,
-        navController = navController
+        onBack = statusNavigationData.popBackStack
       )
     },
     mediaView = {
@@ -239,12 +268,11 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
   )
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun StatusMediaCloseButton(
   visible: Boolean,
   backgroundColor: Color,
-  navController: Navigator
+  onBack: () -> Unit,
 ) {
   AnimatedVisibility(
     visible = visible,
@@ -268,7 +296,7 @@ private fun StatusMediaCloseButton(
       ) {
         IconButton(
           onClick = {
-            navController.popBackStack()
+            onBack.invoke()
           }
         ) {
           Icon(
@@ -283,17 +311,16 @@ private fun StatusMediaCloseButton(
   }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun StatusMediaBottomContent(
   status: UiStatus,
   visible: Boolean,
   controlPanelColor: Color,
-  navigator: INavigator,
   videoPlayerState: VideoPlayerState?,
   viewModel: MediaViewModel,
   currentMedia: UiMedia,
-  pagerState: PagerState
+  pagerState: PagerState,
+  statusNavigationData: StatusNavigationData
 ) {
   Column(
     modifier = Modifier.fillMaxWidth()
@@ -322,10 +349,10 @@ private fun StatusMediaBottomContent(
         modifier = Modifier
           .background(color = controlPanelColor)
           .bottomInsetsPadding()
-          .clickable { navigator.status(status = status) },
+          .clickable { statusNavigationData.toStatus.invoke(status) },
       ) {
         StatusMediaInfo(
-          videoPlayerState, status, viewModel, currentMedia,
+          videoPlayerState, status, viewModel, currentMedia, statusNavigationData
         )
       }
     }
@@ -339,6 +366,7 @@ private fun StatusMediaInfo(
   status: UiStatus,
   viewModel: MediaViewModel,
   currentMedia: UiMedia,
+  statusNavigationData: StatusNavigationData,
 ) {
   val scope = rememberCoroutineScope()
 
@@ -353,7 +381,7 @@ private fun StatusMediaInfo(
     if (videoPlayerState != null) {
       CustomVideoControl(state = videoPlayerState)
     }
-    StatusText(status = status, maxLines = 2, showMastodonPoll = false)
+    StatusText(status = status, maxLines = 2, showMastodonPoll = false, openLink = statusNavigationData.openLink,)
     Spacer(modifier = Modifier.height(StatusMediaInfoDefaults.TextSpacing))
     Row(
       verticalAlignment = Alignment.CenterVertically,
@@ -363,14 +391,27 @@ private fun StatusMediaInfo(
           .weight(1f),
         verticalAlignment = Alignment.CenterVertically,
       ) {
-        UserAvatar(user = status.user)
+        UserAvatar(
+          user = status.user,
+          onClick = statusNavigationData.toUser,
+        )
         Spacer(modifier = Modifier.width(StatusMediaInfoDefaults.AvatarSpacing))
-        UserName(user = status.user)
+        UserName(
+          user = status.user,
+          onUserNameClicked = statusNavigationData.openLink,
+        )
         Spacer(modifier = Modifier.width(StatusMediaInfoDefaults.NameSpacing))
         UserScreenName(user = status.user)
       }
-      ReplyButton(status = status, withNumber = false)
-      RetweetButton(status = status, withNumber = false)
+      ReplyButton(
+        status = status,
+        withNumber = false,
+        compose = statusNavigationData.composeNavigationData.compose,
+      )
+      RetweetButton(
+        status = status, withNumber = false,
+        compose = statusNavigationData.composeNavigationData.compose,
+      )
       LikeButton(status = status, withNumber = false)
       ShareButton(status = status) { callback ->
         DropdownMenuItem(
@@ -422,7 +463,23 @@ private object StatusMediaInfoDefaults {
 }
 
 @Composable
-fun RawMediaScene(url: String, type: MediaType) {
+fun RawMediaScene(
+  url: String,
+  type: String,
+  navigator: Navigator,
+) {
+  val mediaType = MediaType.valueOf(type)
+  RawMediaScene(url = URLDecoder.decode(url, "UTF-8"), type = mediaType) {
+    navigator.popBackStack()
+  }
+}
+
+@Composable
+private fun RawMediaScene(
+  url: String,
+  type: MediaType,
+  onBack: () -> Unit,
+) {
   TwidereDialog(
     requireDarkTheme = true,
     extendViewIntoStatusBar = true,
@@ -431,10 +488,9 @@ fun RawMediaScene(url: String, type: MediaType) {
     Scaffold(
       backgroundColor = Color.Transparent
     ) {
-      val navController = LocalNavController.current
       val swiperState = rememberSwiperState(
         onDismiss = {
-          navController.popBackStack()
+          onBack.invoke()
         },
       )
       Box {
@@ -444,7 +500,7 @@ fun RawMediaScene(url: String, type: MediaType) {
             .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
         )
         MediaView(media = listOf(MediaData(url, type)), swiperState = swiperState, onClick = {
-          navController.popBackStack()
+          onBack.invoke()
         }, backgroundColor = MaterialTheme.colors.background)
       }
     }

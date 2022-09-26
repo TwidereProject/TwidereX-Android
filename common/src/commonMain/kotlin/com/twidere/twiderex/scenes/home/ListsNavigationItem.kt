@@ -29,6 +29,7 @@ import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.scenes.lists.ListsSceneContent
 import com.twidere.twiderex.scenes.lists.ListsSceneFab
+import moe.tlaster.precompose.navigation.Navigator
 
 class ListsNavigationItem : HomeNavigationItem() {
   @Composable
@@ -45,15 +46,15 @@ class ListsNavigationItem : HomeNavigationItem() {
   }
 
   @Composable
-  override fun Fab() {
-    ListsSceneFab()
+  override fun Fab(navigator: Navigator) {
+    ListsSceneFab(navigator)
   }
 
   override val floatingActionButtonPosition: FabPosition
     get() = FabPosition.Center
 
   @Composable
-  override fun Content() {
-    ListsSceneContent()
+  override fun Content(navigator: Navigator) {
+    ListsSceneContent(navigator)
   }
 }

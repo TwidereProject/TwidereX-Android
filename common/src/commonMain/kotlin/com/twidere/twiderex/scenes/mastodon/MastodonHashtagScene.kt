@@ -31,22 +31,40 @@ import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
+import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.RootDeepLinks
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.mastodon.MastodonHashtagViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
 
+@NavGraphDestination(
+  route = Root.Mastodon.Hashtag.route,
+  deepLink = [RootDeepLinks.Mastodon.Hashtag.route]
+)
 @Composable
-fun MastodonHashtagScene(keyword: String) {
+fun MastodonHashtagScene(
+  @Path("keyword") keyword: String,
+  navigator: Navigator,
+) {
   val viewModel: MastodonHashtagViewModel = getViewModel {
     parametersOf(keyword)
   }
   val source = viewModel.source.collectAsLazyPagingItems()
+  val statusNavigationData = rememberStatusNavigationData(navigator)
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             Text(text = keyword)
@@ -60,7 +78,10 @@ fun MastodonHashtagScene(keyword: String) {
           source.refreshOrRetry()
         },
       ) {
-        LazyUiStatusList(items = source)
+        LazyUiStatusList(
+          items = source,
+          statusNavigation = statusNavigationData,
+        )
       }
     }
   }

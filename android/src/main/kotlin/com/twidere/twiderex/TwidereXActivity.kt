@@ -26,7 +26,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
@@ -104,7 +103,6 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
 
   private val isActiveNetworkMetered = MutableStateFlow(false)
 
-  @OptIn(ExperimentalAnimationApi::class)
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     FilePicker.init(activityResultRegistry, this, contentResolver)
@@ -177,7 +175,7 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
       ) {
         Router(
           navController = navController,
-          isDebug = moe.tlaster.kfilepicker.BuildConfig.DEBUG
+          isDebug = moe.tlaster.kfilepicker.BuildConfig.DEBUG,
         )
       }
     }

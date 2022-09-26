@@ -33,9 +33,12 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
 class FederatedTimelineItem : HomeNavigationItem() {
   @Composable
@@ -52,21 +55,31 @@ class FederatedTimelineItem : HomeNavigationItem() {
   }
 
   @Composable
-  override fun Content() {
+  override fun Content(navigator: Navigator) {
     FederatedTimelineContent(
-      lazyListController = lazyListController
+      lazyListController = lazyListController,
+      navigator = navigator,
     )
   }
 }
 
+@NavGraphDestination(
+  route = Root.Mastodon.FederatedTimeline,
+)
 @Composable
-fun FederatedTimelineScene() {
+fun FederatedTimelineScene(
+  navigator: Navigator
+) {
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             Text(text = "Federated")
@@ -74,7 +87,9 @@ fun FederatedTimelineScene() {
         )
       }
     ) {
-      FederatedTimelineContent()
+      FederatedTimelineContent(
+        navigator = navigator
+      )
     }
   }
 }
@@ -82,14 +97,16 @@ fun FederatedTimelineScene() {
 @Composable
 fun FederatedTimelineContent(
   lazyListController: LazyListController? = null,
+  navigator: Navigator,
 ) {
   val account = LocalActiveAccount.current ?: return
   if (account.service !is MastodonService) {
     return
   }
-
+  val statusNavigationData = rememberStatusNavigationData(navigator)
   TimelineComponent(
     lazyListController = lazyListController,
-    savedStateKeyType = SavedStateKeyType.FEDERATED
+    savedStateKeyType = SavedStateKeyType.FEDERATED,
+    statusNavigation = statusNavigationData,
   )
 }

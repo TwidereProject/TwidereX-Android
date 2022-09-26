@@ -37,10 +37,11 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.navigation.Root
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import dev.icerock.moko.resources.FileResource
 import dev.icerock.moko.resources.StringResource
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
 data class SettingItem(
   val name: StringResource,
@@ -91,15 +92,24 @@ private val settings =
     )
   )
 
+@NavGraphDestination(
+  route = Root.Settings.Home,
+)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SettingsScene() {
+fun SettingsScene(
+  navigator: Navigator,
+) {
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
         AppBar(
           navigationIcon = {
-            AppBarNavigationButton()
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
           },
           title = {
             Text(text = stringResource(com.twidere.twiderex.MR.strings.scene_settings_title))
@@ -121,12 +131,11 @@ fun SettingsScene() {
             )
           }
           items(it.value) {
-            val navController = LocalNavController.current
             ListItem(
               modifier = Modifier.clickable(
                 onClick = {
                   if (it.route.isNotEmpty()) {
-                    navController.navigate(it.route)
+                    navigator.navigate(it.route)
                   }
                 }
               ),

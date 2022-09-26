@@ -51,18 +51,27 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
 import moe.tlaster.precompose.navigation.Navigator
 
+@NavGraphDestination(
+  route = Root.SignIn.Mastodon,
+)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MastodonSignInScene() {
+fun MastodonSignInScene(
+  navigator: Navigator,
+) {
   val viewModel: MastodonSignInViewModel = getViewModel()
   val host by viewModel.host.observeAsState(initial = TextFieldValue())
   val loading by viewModel.loading.observeAsState(initial = false)
-  val navController = LocalNavController.current
-  SignInScaffold {
+  SignInScaffold(
+    popBackStack = {
+      navigator.popBackStack()
+    }
+  ) {
     if (loading) {
       CircularProgressIndicator()
     } else {
@@ -83,14 +92,14 @@ fun MastodonSignInScene() {
         ),
         keyboardActions = KeyboardActions(
           onGo = {
-            signin(viewModel, host, navController)
+            signin(viewModel, host, navigator)
           }
         )
       )
       Spacer(modifier = Modifier.height(16.dp))
       SignInButton(
         onClick = {
-          signin(viewModel, host, navController)
+          signin(viewModel, host, navigator)
         }
       ) {
         ListItem(
@@ -131,10 +140,9 @@ private fun signin(
 ) {
   viewModel.beginOAuth(
     host.text,
-    { success ->
-      if (success) {
-        navController.goBackWith(success)
-      }
-    },
-  )
+  ) { success ->
+    if (success) {
+      navController.goBackWith(success)
+    }
+  }
 }

@@ -27,6 +27,7 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.scenes.DraftListSceneContent
+import moe.tlaster.precompose.navigation.Navigator
 
 class DraftNavigationItem : HomeNavigationItem() {
   @Composable
@@ -43,9 +44,10 @@ class DraftNavigationItem : HomeNavigationItem() {
   }
 
   @Composable
-  override fun Content() {
+  override fun Content(navigator: Navigator) {
     DraftListSceneContent(
       lazyListController = lazyListController,
+      navigator = navigator,
     )
   }
 }

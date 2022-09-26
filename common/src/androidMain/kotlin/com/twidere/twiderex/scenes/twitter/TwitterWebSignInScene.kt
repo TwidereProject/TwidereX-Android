@@ -23,16 +23,18 @@ package com.twidere.twiderex.scenes.twitter
 import androidx.compose.runtime.Composable
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.WebComponent
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.utils.TwitterWebJavascriptInterface
+import moe.tlaster.precompose.navigation.Navigator
 
 const val INJECT_CONTENT =
   "javascript:window.injector.tryPinCode(document.querySelector('#oauth_pin code').textContent);"
 
 @Composable
-fun TwitterWebSignInScene(target: String) {
-  val navController = LocalNavController.current
+fun TwitterWebSignInScene(
+  target: String,
+  navigator: Navigator,
+) {
   TwidereScene {
     InAppNotificationScaffold {
       WebComponent(
@@ -42,7 +44,7 @@ fun TwitterWebSignInScene(target: String) {
         },
         javascriptInterface = mapOf(
           "injector" to TwitterWebJavascriptInterface(
-            navController
+            navigator
           )
         ),
       )

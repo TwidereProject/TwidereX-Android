@@ -52,7 +52,6 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.rememberPagerState
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.rememberPresenterState
@@ -68,11 +67,14 @@ import com.twidere.twiderex.scenes.search.tabs.TwitterSearchMediaItem
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.Navigator
 
 @Composable
-fun SearchScene(keyword: String) {
+fun SearchScene(
+  keyword: String,
+  navigator: Navigator,
+) {
   val account = LocalActiveAccount.current ?: return
-  val navigator = LocalNavigator.current
 
   val (state, channel) = rememberPresenterState<SearchSaveState, SearchSaveEvent> {
     SearchSavePresenter(it, content = keyword)
@@ -103,7 +105,11 @@ fun SearchScene(keyword: String) {
           Column {
             AppBar(
               navigationIcon = {
-                AppBarNavigationButton()
+                AppBarNavigationButton(
+                  onBack = {
+                    navigator.popBackStack()
+                  }
+                )
               },
               elevation = 0.dp,
               title = {
@@ -171,7 +177,6 @@ fun SearchScene(keyword: String) {
                   onClick = {
                     scope.launch {
                       pagerState.currentPage = index
-                      // pagerState.animateScrollToPage(index)
                     }
                   },
                   content = {
@@ -190,7 +195,7 @@ fun SearchScene(keyword: String) {
           modifier = Modifier.weight(1F),
         ) {
           Pager(state = pagerState) {
-            tabs[page].Content(keyword = keyword)
+            tabs[page].Content(keyword = keyword, navigator = navigator)
           }
         }
       }

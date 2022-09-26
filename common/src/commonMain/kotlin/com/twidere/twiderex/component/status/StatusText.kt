@@ -21,7 +21,6 @@
 package com.twidere.twiderex.component.status
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -49,13 +48,13 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ColumnScope.StatusText(
   status: UiStatus,
   maxLines: Int = Int.MAX_VALUE,
   showMastodonPoll: Boolean = true,
   isSelectionAble: Boolean = true,
+  openLink: (String) -> Unit,
 ) {
   val expandable = status.platformType == PlatformType.Mastodon &&
     status.spoilerText != null
@@ -94,7 +93,8 @@ fun ColumnScope.StatusText(
           linkResolver = { href ->
             status.resolveLink(href)
           },
-          positionWrapper = it
+          positionWrapper = it,
+          openLink = openLink,
         )
       }
       if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.poll != null) {

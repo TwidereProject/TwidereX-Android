@@ -43,6 +43,7 @@ import com.twidere.twiderex.model.ui.UiStatus
 @Composable
 fun RetweetHeader(
   data: UiStatus,
+  openLink: (String) -> Unit,
 ) {
   TweetHeader(
     icon = {
@@ -59,6 +60,7 @@ fun RetweetHeader(
           res = com.twidere.twiderex.MR.strings.common_controls_status_user_retweeted,
           data.user.displayName
         ),
+        openLink = openLink,
       )
     },
   )

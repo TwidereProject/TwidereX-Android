@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.component.status
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.expandIn
@@ -190,7 +189,6 @@ object MastodonPollDefaults {
   val VoteTimeSpacing = 8.dp
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun MastodonPollOption(
   option: Option,

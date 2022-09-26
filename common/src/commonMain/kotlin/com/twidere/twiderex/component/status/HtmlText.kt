@@ -33,10 +33,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -57,7 +55,6 @@ import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import com.twidere.twiderex.component.foundation.NetworkImage
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import kotlinx.coroutines.coroutineScope
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -76,7 +73,6 @@ data class ResolvedLink(
   val clickable: Boolean = true,
 )
 
-@OptIn(ExperimentalUnitApi::class)
 @Composable
 fun HtmlText(
   modifier: Modifier = Modifier,
@@ -97,6 +93,7 @@ fun HtmlText(
   linkStyle: TextStyle = textStyle.copy(MaterialTheme.colors.primary),
   linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
   positionWrapper: PositionWrapper? = null,
+  openLink: (String) -> Unit,
 ) {
   val bidi = remember(htmlText) {
     Bidi(htmlText, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT)
@@ -108,7 +105,6 @@ fun HtmlText(
       LayoutDirection.Rtl
     }
   ) {
-    val navigator = LocalNavigator.current
     RenderContent(
       modifier = modifier,
       htmlText = htmlText,
@@ -117,7 +113,7 @@ fun HtmlText(
       textStyle = textStyle,
       linkStyle = linkStyle,
       onLinkClicked = {
-        navigator.openLink(it)
+        openLink(it)
       },
       color = color,
       fontSize = fontSize,
@@ -135,7 +131,7 @@ fun HtmlText(
   }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalUnitApi::class)
+@OptIn(ExperimentalUnitApi::class)
 @Composable
 private fun RenderContent(
   modifier: Modifier = Modifier,
@@ -239,7 +235,6 @@ private fun RenderContent(
 }
 
 @ExperimentalUnitApi
-@OptIn(ExperimentalComposeApi::class)
 @Composable
 fun renderContentAnnotatedString(
   htmlText: String,

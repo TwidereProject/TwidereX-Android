@@ -54,16 +54,77 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.navigation.Root
-import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.navigation.RootDeepLinks
+import io.github.seiko.precompose.annotation.NavGraphDestination
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.NavOptions
+import moe.tlaster.precompose.navigation.Navigator
+import moe.tlaster.precompose.navigation.PopUpTo
 
-@OptIn(ExperimentalMaterialApi::class)
+@NavGraphDestination(
+  route = Root.SignIn.General,
+  deepLink = [RootDeepLinks.SignIn]
+)
 @Composable
-fun SignInScene() {
-  SignInScaffold {
-    TwitterSignIn()
+fun SignInScene(
+  navigator: Navigator,
+) {
+  val toHome = remember {
+    {
+      navigator.navigate(
+        Root.Home,
+        NavOptions(
+          popUpTo = PopUpTo(
+            route = Root.SignIn.General,
+            inclusive = true,
+          )
+        )
+      )
+    }
+  }
+
+  SignInScaffold(popBackStack = {
+    navigator.popBackStack()
+  }) {
+    TwitterSignIn(
+      clickSignIn = {
+        navigator.navigateForResult(
+          Root.SignIn.Twitter(
+            BuildConfig.CONSUMERKEY,
+            BuildConfig.CONSUMERSECRET,
+          )
+        )?.let {
+          it as Boolean
+        }?.let {
+          if (it) {
+            toHome.invoke()
+          }
+        }
+      },
+      clickCustomKeySignIn = {
+        navigator.navigateForResult(
+          it
+        )?.let {
+          it as Boolean
+        }?.let {
+          if (it) {
+            toHome.invoke()
+          }
+        }
+      },
+
+    )
     Spacer(modifier = Modifier.height(SignInSceneDefaults.ButtonSpacing))
-    MastodonSignIn()
+    MastodonSignIn {
+      navigator.navigateForResult(Root.SignIn.Mastodon)
+        ?.let {
+          it as Boolean
+        }?.let {
+          if (it) {
+            toHome.invoke()
+          }
+        }
+    }
   }
 }
 
@@ -73,20 +134,14 @@ object SignInSceneDefaults {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun MastodonSignIn() {
+private fun MastodonSignIn(
+  clickSignIn: suspend () -> Unit,
+) {
   val scope = rememberCoroutineScope()
-  val navController = LocalNavController.current
   SignInButton(
     onClick = {
       scope.launch {
-        navController.navigateForResult(Root.SignIn.Mastodon)
-          ?.let {
-            it as Boolean
-          }?.let {
-            if (it) {
-              navController.goBackWith(true)
-            }
-          }
+        clickSignIn.invoke()
       }
     },
     border = ButtonDefaults.outlinedBorder,
@@ -126,32 +181,24 @@ private fun MastodonSignIn() {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun TwitterSignIn() {
+private fun TwitterSignIn(
+  clickSignIn: suspend () -> Unit,
+  clickCustomKeySignIn: suspend (String) -> Unit,
+) {
   val scope = rememberCoroutineScope()
-  val navController = LocalNavController.current
   var showKeyConfiguration by remember { mutableStateOf(false) }
   if (showKeyConfiguration) {
     TwitterCustomKeySignIn(
       onDismissRequest = {
         showKeyConfiguration = false
-      }
+      },
+      clickCustomKeySignIn = clickCustomKeySignIn,
     )
   }
   SignInButton(
     onClick = {
       scope.launch {
-        navController.navigateForResult(
-          Root.SignIn.Twitter(
-            BuildConfig.CONSUMERKEY,
-            BuildConfig.CONSUMERSECRET,
-          )
-        )?.let {
-          it as Boolean
-        }?.let {
-          if (it) {
-            navController.goBackWith(true)
-          }
-        }
+        clickSignIn.invoke()
       }
     },
   ) {
@@ -192,9 +239,9 @@ private fun TwitterSignIn() {
 @Composable
 private fun TwitterCustomKeySignIn(
   onDismissRequest: () -> Unit,
+  clickCustomKeySignIn: suspend (String) -> Unit,
 ) {
   val scope = rememberCoroutineScope()
-  val navController = LocalNavController.current
   var apiKey by remember { mutableStateOf("") }
   var apiSecret by remember { mutableStateOf("") }
   AlertDialog(
@@ -238,18 +285,9 @@ private fun TwitterCustomKeySignIn(
       TextButton(
         onClick = {
           scope.launch {
-            navController.navigateForResult(
-              Root.SignIn.Twitter(
-                apiKey,
-                apiSecret,
-              )
-            )?.let {
-              it as Boolean
-            }?.let {
-              if (it) {
-                navController.goBackWith(true)
-              }
-            }
+            clickCustomKeySignIn(
+              Root.SignIn.Twitter(apiKey, apiSecret)
+            )
           }
         },
         enabled = apiKey.isNotEmpty() && apiSecret.isNotEmpty()

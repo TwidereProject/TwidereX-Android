@@ -34,30 +34,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.component.navigation.user
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.twitter.user.TwitterUserViewModel
-import moe.tlaster.precompose.navigation.NavOptions
-import moe.tlaster.precompose.navigation.PopUpTo
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun TwitterUserScene(screenName: String) {
+fun TwitterUserScene(
+  screenName: String,
+  navigator: Navigator,
+) {
   val viewModel: TwitterUserViewModel = getViewModel {
     parametersOf(screenName)
   }
   val user by viewModel.user.observeAsState(initial = null)
   val error by viewModel.error.observeAsState(initial = null)
-  val navigator = LocalNavigator.current
   LaunchedEffect(user) {
     user?.let {
-      navigator.user(
-        user = it,
-        NavOptions(popUpTo = PopUpTo(RootDeepLinks.Twitter.User.route, inclusive = true))
-      )
+      navigator.user(it)
     }
   }
 
