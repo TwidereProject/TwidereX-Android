@@ -10,7 +10,7 @@ plugins {
     id("com.google.devtools.ksp").version(Versions.ksp)
     id("dev.icerock.mobile.multiplatform-resources") version Versions.moko
     id("com.squareup.sqldelight") version Versions.sqlDelight
-    id("com.codingfeline.buildkonfig") version "0.11.0"
+    id("com.codingfeline.buildkonfig") version "0.13.3"
 }
 
 sqldelight {
@@ -55,12 +55,12 @@ kotlin {
                 api("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:${Versions.Kotlin.serialization}")
                 api("io.insert-koin:koin-core:${Versions.koin}")
                 implementation("com.twitter.twittertext:twitter-text:3.1.0")
-                implementation("org.jsoup:jsoup:1.14.3")
+                implementation("org.jsoup:jsoup:1.15.3")
                 implementation(projects.routeProcessor)
                 kspAll(projects.routeProcessor)
                 implementation("com.squareup.sqldelight:coroutines-extensions-jvm:${Versions.sqlDelight}")
                 api("dev.icerock.moko:resources:${Versions.moko}")
-                implementation("app.cash.turbine:turbine:0.7.0")
+                implementation("app.cash.turbine:turbine:0.11.0")
                 implementation("ca.gosyer:accompanist-pager:${Versions.accompanist_jb}")
                 implementation("ca.gosyer:accompanist-pager-indicators:${Versions.accompanist_jb}")
                 api("com.github.Tlaster.KFilePicker:KFilePicker:${Versions.kFilePicker}")
@@ -74,18 +74,19 @@ kotlin {
                 implementation(kotlin("test"))
                 implementation("io.insert-koin:koin-test:${Versions.koin}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.coroutines}")
-                implementation("io.mockk:mockk:1.12.1")
+                implementation("io.mockk:mockk:1.13.1")
                 implementation("joda-time:joda-time:${Versions.jodaTime}")
             }
         }
         val androidMain by getting {
             dependencies {
+                api("dev.icerock.moko:resources-compose:${Versions.moko}")
                 api("androidx.compose.runtime:runtime:${Versions.compose}")
                 api("androidx.compose.foundation:foundation:${Versions.compose}")
                 api("androidx.compose.material:material:${Versions.compose}")
                 api("androidx.compose.material:material-icons-extended:${Versions.compose}")
                 implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
-                implementation("androidx.core:core-ktx:1.9.0-alpha05")
+                implementation("androidx.core:core-ktx:1.9.0")
                 implementation("io.insert-koin:koin-android:${Versions.koin}")
                 implementation("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
                 implementation("androidx.work:work-runtime-ktx:${Versions.work}")
@@ -127,11 +128,12 @@ kotlin {
         }
         val desktopMain by getting {
             dependencies {
-                implementation("uk.co.caprica:vlcj:4.7.1")
+                api("dev.icerock.moko:resources-compose:${Versions.moko}")
+                implementation("uk.co.caprica:vlcj:4.8.1")
                 implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
                 implementation("de.huxhorn.lilith:de.huxhorn.lilith.3rdparty.junique:1.0.4")
                 implementation("org.javassist:javassist:3.28.0-GA")
-                implementation("org.ocpsoft.prettytime:prettytime:5.0.2.Final")
+                implementation("org.ocpsoft.prettytime:prettytime:5.0.4.Final")
                 implementation("com.mayakapps.compose:window-styler:0.3.2")
             }
         }
@@ -184,6 +186,7 @@ android {
     compileSdk = AndroidSdk.compile
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["androidTest"].assets.srcDirs("$projectDir/schemas")
+    namespace = "com.twidere.common"
     defaultConfig {
         minSdk = AndroidSdk.min
         targetSdk = AndroidSdk.target
