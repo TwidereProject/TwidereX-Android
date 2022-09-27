@@ -112,9 +112,9 @@ import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.icon
 import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.extensions.stringName
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.kmp.Platform
@@ -127,6 +127,8 @@ import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiMediaInsert
+import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twidere.twiderex.navigation.StatusNavigationData
@@ -134,9 +136,9 @@ import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.Orange
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.compose.ComposeViewModel
-import com.twidere.twiderex.viewmodel.compose.DraftComposeViewModel
-import com.twidere.twiderex.viewmodel.compose.DraftItemViewModel
+import com.twidere.twiderex.viewmodel.compose.ComposeEvent
+import com.twidere.twiderex.viewmodel.compose.ComposePresenter
+import com.twidere.twiderex.viewmodel.compose.ComposeState
 import com.twidere.twiderex.viewmodel.compose.VoteExpired
 import com.twidere.twiderex.viewmodel.compose.VoteState
 import com.twitter.twittertext.TwitterTextParser
@@ -147,7 +149,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.BackHandler
 import moe.tlaster.precompose.navigation.Navigator
-import org.koin.core.parameter.parametersOf
 
 @NavGraphDestination(
   route = Root.Draft.Compose.route,
@@ -158,24 +159,11 @@ fun DraftComposeScene(
   @Path("draftId") draftId: String,
   navigator: Navigator,
 ) {
-  val account = LocalActiveAccount.current ?: return
-  val draftItemViewModel: DraftItemViewModel = getViewModel {
-    parametersOf(draftId)
-  }
-  val data by draftItemViewModel.draft.observeAsState(null)
-  data?.let { draft ->
-    val viewModel: DraftComposeViewModel = getViewModel {
-      parametersOf(
-        draft,
-      )
-    }
-    val statusNavigation = rememberStatusNavigationData(navigator)
-    ComposeBody(
-      viewModel = viewModel,
-      account = account,
-      statusNavigation = statusNavigation,
-    )
-  }
+  val statusNavigation = rememberStatusNavigationData(navigator)
+  ComposeBody(
+    statusNavigation = statusNavigation,
+    draftId = draftId,
+  )
 }
 
 @NavGraphDestination(
@@ -188,15 +176,11 @@ fun ComposeScene(
   composeType: ComposeType = ComposeType.New,
   navigator: Navigator,
 ) {
-  val account = LocalActiveAccount.current ?: return
-  val viewModel: ComposeViewModel = getViewModel {
-    parametersOf(statusKey, composeType)
-  }
   val statusNavigation = rememberStatusNavigationData(navigator)
   ComposeBody(
-    viewModel = viewModel,
-    account = account,
     statusNavigation = statusNavigation,
+    statusKey = statusKey,
+    composeType = composeType,
   )
 }
 
@@ -207,30 +191,32 @@ fun ComposeScene(
 )
 @Composable
 private fun ComposeBody(
-  viewModel: ComposeViewModel,
-  account: AccountDetails,
   statusNavigation: StatusNavigationData,
+  draftId: String? = null,
+  statusKey: MicroBlogKey? = null,
+  composeType: ComposeType? = null,
 ) {
-  val composeType = viewModel.composeType
-  val status by viewModel.status.observeAsState(null)
-  val images by viewModel.images.observeAsState(initial = emptyList())
-  val location by viewModel.location.observeAsState(null)
-  val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
-  val textFieldValue by viewModel.textFieldValue.observeAsState(initial = TextFieldValue())
+  val (state, channel) = rememberPresenterState<ComposeState, ComposeEvent> {
+    ComposePresenter(
+      it,
+      id = draftId,
+      type = composeType,
+      statusKey = statusKey,
+    )
+  }
+  if (state !is ComposeState.Data) {
+    return
+  }
   val keyboardController = LocalSoftwareKeyboardController.current
-  val canSaveDraft by viewModel.canSaveDraft.observeAsState(initial = false)
-  val enableThreadMode by viewModel.enableThreadMode.observeAsState(initial = false)
   var showSaveDraftDialog by remember { mutableStateOf(false) }
   val scaffoldState = rememberBottomSheetScaffoldState()
-  val emojis by viewModel.emojis.observeAsState(emptyList())
-  val maxLength by viewModel.maxContentLength.observeAsState(initial = 1)
-  if (showSaveDraftDialog || canSaveDraft) {
+  if (showSaveDraftDialog || state.canSaveDraft) {
     BackHandler {
       when {
         showSaveDraftDialog -> {
           showSaveDraftDialog = false
         }
-        canSaveDraft -> {
+        state.canSaveDraft -> {
           showSaveDraftDialog = true
         }
       }
@@ -244,7 +230,7 @@ private fun ComposeBody(
         },
         onConfirm = {
           showSaveDraftDialog = false
-          viewModel.saveDraft()
+          channel.trySend(ComposeEvent.SaveDraft)
           statusNavigation.popBackStack()
         },
         onCancel = {
@@ -257,7 +243,6 @@ private fun ComposeBody(
       scaffoldState = scaffoldState,
       sheetContent = {
         ReplySheetContent(
-          viewModel = viewModel,
           scaffoldState = scaffoldState,
           statusNavigation = statusNavigation,
         )
@@ -276,7 +261,7 @@ private fun ComposeBody(
           navigationIcon = {
             IconButton(
               onClick = {
-                if (canSaveDraft) {
+                if (state.canSaveDraft) {
                   showSaveDraftDialog = true
                 } else {
                   statusNavigation.popBackStack()
@@ -292,20 +277,30 @@ private fun ComposeBody(
             }
           },
           actions = {
-            val canSend by viewModel.canSend.observeAsState(initial = false)
             IconButton(
-              enabled = canSend,
+              enabled = state.canSend,
               onClick = {
-                viewModel.compose()
+                channel.trySend(ComposeEvent.Compose)
                 statusNavigation.popBackStack()
               }
             ) {
               Icon(
-                painter = painterResource(res = if (enableThreadMode) com.twidere.twiderex.MR.files.ic_send_thread else com.twidere.twiderex.MR.files.ic_send),
-                contentDescription = stringResource(
-                  res = if (enableThreadMode) com.twidere.twiderex.MR.strings.accessibility_scene_compose_thread else com.twidere.twiderex.MR.strings.accessibility_scene_compose_send
+                painter = painterResource(
+                  res = if (state.enableThreadMode)
+                    com.twidere.twiderex.MR.files.ic_send_thread
+                  else
+                    com.twidere.twiderex.MR.files.ic_send
                 ),
-                tint = if (canSend) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                contentDescription = stringResource(
+                  res = if (state.enableThreadMode)
+                    com.twidere.twiderex
+                      .MR.strings.accessibility_scene_compose_thread
+                  else
+                    com.twidere.twiderex.MR.strings.accessibility_scene_compose_send
+                ),
+                tint = if (state.canSend)
+                  MaterialTheme.colors.primary
+                else LocalContentColor.current.copy(
                   alpha = LocalContentAlpha.current
                 )
               )
@@ -356,7 +351,7 @@ private fun ComposeBody(
               this@BoxWithConstraints.constraints.maxHeight.toDp()
             }
             if (composeType == ComposeType.Reply || composeType == ComposeType.Thread) {
-              status?.let { status ->
+              state.status?.let { status ->
                 Box(
                   modifier = Modifier
                     .background(MaterialTheme.colors.surface.withElevation())
@@ -394,7 +389,7 @@ private fun ComposeBody(
               )
             }
             if (composeType == ComposeType.Quote) {
-              status?.let { status ->
+              state.status?.let { status ->
                 Box(
                   modifier = Modifier.background(
                     LocalContentColor.current.copy(
@@ -413,27 +408,43 @@ private fun ComposeBody(
           }
         }
 
-        if (images.any()) {
-          ComposeImageList(images, viewModel, statusNavigation.navigate)
+        if (state.images.any()) {
+          ComposeImageList(
+            images = state.images,
+            removeImage = {
+              channel.trySend(ComposeEvent.RemoveImage(it))
+            },
+            navigate = statusNavigation.navigate,
+          )
         }
 
         Row(
           verticalAlignment = Alignment.CenterVertically,
         ) {
-          TextProgress(textFieldValue, maxLength)
+          TextProgress(state.textFieldValue, state.maxLength)
           if (account.type == PlatformType.Mastodon) {
             ComposeMastodonVisibility(
               modifier = Modifier.weight(1f),
               viewModel = viewModel,
             )
             CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
-              MastodonExtraActions(images.map { it.filePath }, viewModel)
+              MastodonExtraActions(
+                images = state.images.map { it.filePath },
+                isContentWarning = state.isContentWarning,
+                isImageSensitive = state.isImageSensitive,
+                setImageSensitive = {
+                  channel.trySend(ComposeEvent.EnableSensitive)
+                },
+                setContentWarningEnabled = {
+                  channel.trySend(ComposeEvent.EnableWarning)
+                },
+              )
             }
           } else {
             Spacer(modifier = Modifier.weight(1F))
           }
-          if (locationEnabled) {
-            location?.let {
+          if (state.locationEnabled) {
+            state.location?.let {
               LocationDisplay(it)
             }
           }
@@ -468,9 +479,11 @@ private fun ComposeBody(
         }
         PlatformEmojiPanel(
           showEmoji = showEmoji,
-          items = emojis,
+          items = state.emojis,
           onEmojiSelected = {
-            viewModel.insertEmoji(it)
+            channel.trySend(
+              ComposeEvent.InsertEmoji(it)
+            )
           },
         )
       }
@@ -481,7 +494,7 @@ private fun ComposeBody(
 @Composable
 private fun ComposeImageList(
   images: List<UiMediaInsert>,
-  viewModel: ComposeViewModel,
+  removeImage: (String) -> Unit,
   navigate: (String) -> Unit,
 ) {
   Spacer(modifier = Modifier.height(ComposeImageListDefaults.Spacing))
@@ -493,7 +506,7 @@ private fun ComposeImageList(
     ) { index, item ->
       ComposeImage(
         item,
-        viewModel,
+        removeImage,
         navigate,
       )
       if (index != images.lastIndex) {
@@ -515,15 +528,15 @@ private object ComposeImageListDefaults {
 @Composable
 private fun MastodonExtraActions(
   images: List<String>,
-  viewModel: ComposeViewModel
+  isContentWarning: Boolean,
+  isImageSensitive: Boolean,
+  setImageSensitive: () -> Unit,
+  setContentWarningEnabled: () -> Unit,
 ) {
   if (images.any()) {
-    val isImageSensitive by viewModel.isImageSensitive.observeAsState(
-      initial = false
-    )
     IconButton(
       onClick = {
-        viewModel.setImageSensitive(!isImageSensitive)
+        setImageSensitive.invoke()
       }
     ) {
       Icon(
@@ -537,12 +550,9 @@ private fun MastodonExtraActions(
       )
     }
   }
-  val isContentWarning by viewModel.isContentWarningEnabled.observeAsState(
-    initial = false
-  )
   IconButton(
     onClick = {
-      viewModel.setContentWarningEnabled(!isContentWarning)
+      setContentWarningEnabled.invoke()
     }
   ) {
     Icon(
@@ -679,16 +689,14 @@ object ComposeMastodonVisibilityDefaults {
 @ExperimentalMaterialApi
 @Composable
 private fun ReplySheetContent(
-  viewModel: ComposeViewModel,
   scaffoldState: BottomSheetScaffoldState,
   statusNavigation: StatusNavigationData,
+  status: UiStatus?,
+  replyToUser: List<UiUser>,
 ) {
-  if (viewModel.composeType != ComposeType.Reply) {
+  if (composeType != ComposeType.Reply) {
     return
   }
-  val replyToUser by viewModel.replyToUser.observeAsState(initial = emptyList())
-  val excludedUserIds by viewModel.excludedReplyUserIds.observeAsState(initial = emptyList())
-  val status by viewModel.status.observeAsState(initial = null)
   val scope = rememberCoroutineScope()
   ListItem(
     icon = {
@@ -1081,7 +1089,7 @@ private fun ComposeActions(
   val scope = rememberCoroutineScope()
 
   val draftCount = viewModel.draftCount.observeAsState(0)
-  val insertMode by viewModel.mediaInsertMode.observeAsState(initial = ComposeViewModel.MediaInsertMode.All)
+  val insertMode by viewModel.mediaInsertMode.observeAsState(initial = MediaInsertMode.All)
   Box {
     Row {
       AnimatedVisibility(visible = allowImage) {
@@ -1252,7 +1260,7 @@ private object ComposeActionsDefaults {
 @Composable
 private fun ComposeImage(
   item: UiMediaInsert,
-  viewModel: ComposeViewModel,
+  removeImage: (String) -> Unit,
   navigate: (String) -> Unit,
 ) {
   var expanded by remember { mutableStateOf(false) }
@@ -1318,7 +1326,7 @@ private fun ComposeImage(
       DropdownMenuItem(
         onClick = {
           expanded = false
-          viewModel.removeImage(item.filePath)
+          removeImage.invoke(item.filePath)
         }
       ) {
         Text(
