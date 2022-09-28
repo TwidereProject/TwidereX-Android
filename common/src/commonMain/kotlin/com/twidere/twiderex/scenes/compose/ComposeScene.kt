@@ -71,7 +71,6 @@ import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -117,10 +116,7 @@ import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.extensions.stringName
 import com.twidere.twiderex.extensions.withElevation
-import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.RequestLocationPermission
-import com.twidere.twiderex.kmp.currentPlatform
-import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonVisibility
@@ -144,6 +140,7 @@ import com.twidere.twiderex.viewmodel.compose.VoteState
 import com.twitter.twittertext.TwitterTextParser
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import io.github.seiko.precompose.annotation.Path
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -204,7 +201,10 @@ private fun ComposeBody(
       statusKey = statusKey,
     )
   }
-  if (state !is ComposeState.Data) {
+  if (
+    state !is ComposeState.Data ||
+    state.composeType == null
+  ) {
     return
   }
   val keyboardController = LocalSoftwareKeyboardController.current
@@ -245,6 +245,18 @@ private fun ComposeBody(
         ReplySheetContent(
           scaffoldState = scaffoldState,
           statusNavigation = statusNavigation,
+          composeType = state.composeType,
+          status = state.status,
+          replyToUser = state.replyToUser,
+          contains = {
+            state.excludedReplyUserIds.contains(it)
+          },
+          includeReplyUser = {
+            channel.trySend(ComposeEvent.IncludeReplyUser(it))
+          },
+          excludeReplyUser = {
+            channel.trySend(ComposeEvent.ExcludeReplyUser(it))
+          }
         )
       },
       topBar = {
@@ -377,15 +389,24 @@ private fun ComposeBody(
               lineUp = composeType == ComposeType.Reply || composeType == ComposeType.Thread,
             ) {
               ComposeInput(
-                scaffoldState,
-                viewModel,
-                account,
+                scaffoldState = scaffoldState,
+                state = state,
                 autoFocus = if (composeType == ComposeType.Reply || composeType == ComposeType.Thread) {
                   scrollState.value == 0
                 } else {
                   true
                 },
                 focusRequester = focusRequester,
+                setText = {
+                  channel.trySend(
+                    ComposeEvent.SetText(it)
+                  )
+                },
+                setContentWarningText = {
+                  channel.trySend(
+                    ComposeEvent.WarmingText(it)
+                  )
+                }
               )
             }
             if (composeType == ComposeType.Quote) {
@@ -422,10 +443,13 @@ private fun ComposeBody(
           verticalAlignment = Alignment.CenterVertically,
         ) {
           TextProgress(state.textFieldValue, state.maxLength)
-          if (account.type == PlatformType.Mastodon) {
+          if (state.account.type == PlatformType.Mastodon) {
             ComposeMastodonVisibility(
               modifier = Modifier.weight(1f),
-              viewModel = viewModel,
+              visibility = state.visibility,
+              setVisibility = {
+                channel.trySend(ComposeEvent.ChangeVisibility(it))
+              }
             )
             CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
               MastodonExtraActions(
@@ -468,13 +492,14 @@ private fun ComposeBody(
         }
         CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
           ComposeActions(
-            viewModel,
             showEmoji = showEmoji,
             navigateForResult = statusNavigation.navigateForResult,
             navigate = statusNavigation.navigate,
             emojiButtonClicked = {
               showEmoji = !showEmoji
             },
+            state = state,
+            channel = channel,
           )
         }
         PlatformEmojiPanel(
@@ -629,12 +654,12 @@ private fun TextProgress(textFieldValue: TextFieldValue, maxLength: Int) {
 @Composable
 fun ComposeMastodonVisibility(
   modifier: Modifier = Modifier,
-  viewModel: ComposeViewModel
+  visibility: MastodonVisibility,
+  setVisibility: (MastodonVisibility) -> Unit,
 ) {
   var showDropdown by remember {
     mutableStateOf(false)
   }
-  val visibility by viewModel.visibility.observeAsState(initial = MastodonVisibility.Public)
   Box(
     modifier = modifier
   ) {
@@ -643,7 +668,7 @@ fun ComposeMastodonVisibility(
         DropdownMenuItem(
           onClick = {
             showDropdown = false
-            viewModel.setVisibility(it)
+            setVisibility(it)
           }
         ) {
           ListItem(
@@ -691,8 +716,13 @@ object ComposeMastodonVisibilityDefaults {
 private fun ReplySheetContent(
   scaffoldState: BottomSheetScaffoldState,
   statusNavigation: StatusNavigationData,
+  composeType: ComposeType,
   status: UiStatus?,
   replyToUser: List<UiUser>,
+  contains: (String) -> Boolean,
+  includeReplyUser: (UiUser) -> Unit,
+  excludeReplyUser: (UiUser) -> Unit,
+
 ) {
   if (composeType != ComposeType.Reply) {
     return
@@ -753,14 +783,14 @@ private fun ReplySheetContent(
     }
     Divider(modifier = Modifier.padding(horizontal = 16.dp))
     replyToUser.forEach { user ->
-      val excluded = excludedUserIds.contains(user.id)
+      val excluded = contains(user.id)
       ListItem(
         modifier = Modifier.clickable(
           onClick = {
             if (excluded) {
-              viewModel.includeReplyUser(user)
+              includeReplyUser(user)
             } else {
-              viewModel.excludeReplyUser(user)
+              excludeReplyUser(user)
             }
           }
         ),
@@ -785,9 +815,9 @@ private fun ReplySheetContent(
               checked = !excluded,
               onCheckedChange = {
                 if (excluded) {
-                  viewModel.includeReplyUser(user)
+                  includeReplyUser(user)
                 } else {
-                  viewModel.excludeReplyUser(user)
+                  excludeReplyUser(user)
                 }
               },
             )
@@ -831,20 +861,23 @@ private fun ConfirmDraftDialog(
 @Composable
 private fun ComposeInput(
   scaffoldState: BottomSheetScaffoldState,
-  viewModel: ComposeViewModel,
-  account: AccountDetails,
+  state: ComposeState.Data,
   autoFocus: Boolean = true,
   focusRequester: FocusRequester,
+  setText: (TextFieldValue) -> Unit,
+  setContentWarningText: (TextFieldValue) -> Unit,
 ) {
-  val text by viewModel.textFieldValue.observeAsState(initial = TextFieldValue())
   Column {
-    ComposeReply(composeViewModel = viewModel, scaffoldState = scaffoldState)
+    ComposeReply(
+      scaffoldState = scaffoldState,
+      state = state,
+    )
     Row(
       modifier = Modifier
         .padding(start = 16.dp, bottom = 16.dp, end = 16.dp),
     ) {
       NetworkImage(
-        data = account.user.profileImage,
+        data = state.account.user.profileImage,
         modifier = Modifier
           .clip(CircleShape)
           .width(UserAvatarDefaults.AvatarSize)
@@ -854,15 +887,21 @@ private fun ComposeInput(
       Column(
         modifier = Modifier.weight(1F)
       ) {
-        if (account.type == PlatformType.Mastodon) {
-          MastodonContentWarningInput(viewModel)
+        if (state.account.type == PlatformType.Mastodon) {
+          MastodonContentWarningInput(
+            isContentWarningEnabled = state.isContentWarningEnabled,
+            cwText = state.contentWarningTextFieldValue,
+            setContentWarningText = setContentWarningText,
+          )
         }
         TextInput(
           modifier = Modifier
             .fillMaxWidth()
             .focusRequester(focusRequester),
-          value = text,
-          onValueChange = { viewModel.setText(it) },
+          value = state.textFieldValue,
+          onValueChange = {
+            setText(it)
+          },
           autoFocus = autoFocus,
           placeholder = {
             CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
@@ -873,9 +912,7 @@ private fun ComposeInput(
             capitalization = KeyboardCapitalization.Sentences,
           )
         )
-
-        val voteState by viewModel.voteState.observeAsState(initial = null)
-        voteState?.let {
+        state.voteState?.let {
           Spacer(modifier = Modifier.height(ComposeInputDefaults.VoteSpacing))
           ComposeVote(voteState = it)
         }
@@ -890,12 +927,12 @@ private object ComposeInputDefaults {
 
 @ExperimentalAnimationApi
 @Composable
-private fun ColumnScope.MastodonContentWarningInput(viewModel: ComposeViewModel) {
-  val isContentWarningEnabled by viewModel.isContentWarningEnabled.observeAsState(
-    initial = false
-  )
+private fun ColumnScope.MastodonContentWarningInput(
+  isContentWarningEnabled: Boolean,
+  cwText: TextFieldValue,
+  setContentWarningText: (TextFieldValue) -> Unit,
+) {
   AnimatedVisibility(visible = isContentWarningEnabled) {
-    val cwText by viewModel.contentWarningTextFieldValue.observeAsState(initial = TextFieldValue())
     Column {
       Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -911,7 +948,9 @@ private fun ColumnScope.MastodonContentWarningInput(viewModel: ComposeViewModel)
         Spacer(modifier = Modifier.width(MastodonContentWarningInputDefaults.IconSpacing))
         TextInput(
           value = cwText,
-          onValueChange = { viewModel.setContentWarningText(it) },
+          onValueChange = {
+            setContentWarningText(it)
+          },
           placeholder = {
             CompositionLocalProvider(
               LocalContentAlpha provides ContentAlpha.disabled,
@@ -939,24 +978,20 @@ private object MastodonContentWarningInputDefaults {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ComposeReply(
-  composeViewModel: ComposeViewModel,
   scaffoldState: BottomSheetScaffoldState,
+  state: ComposeState.Data,
 ) {
   val account = LocalActiveAccount.current ?: return
   if (account.type != PlatformType.Twitter) {
     Box(modifier = Modifier.height(16.dp))
     return
   }
-  val composeType = composeViewModel.composeType
+  val composeType = state.composeType
   if (composeType != ComposeType.Reply) {
     Box(modifier = Modifier.height(16.dp))
     return
   }
-  val viewModelStatus by composeViewModel.status.observeAsState(initial = null)
-  viewModelStatus?.let { status ->
-    val replyToUser by composeViewModel.replyToUser.observeAsState(initial = emptyList())
-    val excludedUserIds by composeViewModel.excludedReplyUserIds.observeAsState(initial = emptyList())
-    val loadingReplyUser by composeViewModel.loadingReplyUser.observeAsState(initial = false)
+  state.status?.let { status ->
     val scope = rememberCoroutineScope()
     Row(
       modifier = Modifier
@@ -983,16 +1018,15 @@ private fun ComposeReply(
       Box(
         modifier = Modifier.weight(1F)
       ) {
-        if (loadingReplyUser) {
+        if (state.loadingReplyUser) {
           LinearProgressIndicator()
         } else {
           Text(
-            text = (listOf(status.user) + replyToUser).filter {
-              !excludedUserIds.contains(
+            text = (listOf(status.user) + state.replyToUser).filter {
+              !state.excludedReplyUserIds.contains(
                 it.id
               )
-            }
-              .joinToString(",") { "@${it.screenName}" },
+            }.joinToString(",") { "@${it.screenName}" },
             color = MaterialTheme.colors.primary,
           )
         }
@@ -1065,45 +1099,29 @@ private object ComposeVoteDefaults {
 
 @Composable
 private fun ComposeActions(
-  viewModel: ComposeViewModel,
   showEmoji: Boolean = false,
   navigateForResult: suspend (String) -> Any?,
   navigate: (String) -> Unit,
   emojiButtonClicked: () -> Unit = {},
+  state: ComposeState.Data,
+  channel: Channel<ComposeEvent>,
 ) {
-  val account = LocalActiveAccount.current ?: return
-  val images by viewModel.images.observeAsState(initial = emptyList())
-  val isInVoteState by viewModel.isInVoteMode.observeAsState(initial = false)
-  val enableThreadMode by viewModel.enableThreadMode.observeAsState(initial = false)
-  val allowImage by derivedStateOf {
-    account.type == PlatformType.Twitter || (account.type == PlatformType.Mastodon && !isInVoteState)
-  }
-  val allowVote by derivedStateOf {
-    account.type == PlatformType.Mastodon && !images.any()
-  }
-  val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
 
-  val allowLocation by derivedStateOf {
-    account.type != PlatformType.Mastodon && currentPlatform == Platform.Android
-  }
   val scope = rememberCoroutineScope()
-
-  val draftCount = viewModel.draftCount.observeAsState(0)
-  val insertMode by viewModel.mediaInsertMode.observeAsState(initial = MediaInsertMode.All)
   Box {
     Row {
-      AnimatedVisibility(visible = allowImage) {
+      AnimatedVisibility(visible = state.allowImage) {
         MediaInsertMenu(
           onResult = {
-            viewModel.putImages(it)
+            channel.trySend(ComposeEvent.PutImages(it))
           },
-          supportMultipleSelect = insertMode.multiSelect,
-          disableList = insertMode.disabledInsertType,
-          librariesSupported = insertMode.librarySupportedType.toTypedArray(),
+          supportMultipleSelect = state.mediaInsertMode.multiSelect,
+          disableList = state.mediaInsertMode.disabledInsertType,
+          librariesSupported = state.mediaInsertMode.librarySupportedType.toTypedArray(),
           navigateForResult = navigateForResult,
         )
       }
-      if (account.type == PlatformType.Mastodon) {
+      if (state.account.type == PlatformType.Mastodon) {
         IconButton(
           onClick = {
             emojiButtonClicked.invoke()
@@ -1119,16 +1137,16 @@ private fun ComposeActions(
           )
         }
       }
-      AnimatedVisibility(visible = allowVote) {
+      AnimatedVisibility(visible = state.allowVote) {
         IconButton(
           onClick = {
-            viewModel.setInVoteMode(!isInVoteState)
+            channel.trySend(ComposeEvent.VoteMode(!state.isInVoteMode))
           }
         ) {
           Icon(
             painter = painterResource(res = com.twidere.twiderex.MR.files.ic_poll),
             contentDescription = null,
-            tint = if (isInVoteState) {
+            tint = if (state.isInVoteMode) {
               MaterialTheme.colors.primary
             } else {
               LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
@@ -1136,7 +1154,7 @@ private fun ComposeActions(
           )
         }
       }
-      if (account.type == PlatformType.Mastodon || account.type == PlatformType.Twitter) {
+      if (state.account.type == PlatformType.Mastodon || state.account.type == PlatformType.Twitter) {
         IconButton(
           onClick = {
             scope.launch {
@@ -1144,7 +1162,9 @@ private fun ComposeActions(
                 navigateForResult(Root.Compose.Search.User)
                   ?.toString()
               if (!result.isNullOrEmpty()) {
-                viewModel.insertText("$result ")
+                channel.trySend(
+                  ComposeEvent.InsertText("$result ")
+                )
               }
             }
           }
@@ -1157,14 +1177,16 @@ private fun ComposeActions(
           )
         }
       }
-      if (account.type == PlatformType.Mastodon) {
+      if (state.account.type == PlatformType.Mastodon) {
         IconButton(
           onClick = {
             scope.launch {
               val result = navigateForResult(Root.Mastodon.Compose.Hashtag)
                 ?.toString()
               if (!result.isNullOrEmpty()) {
-                viewModel.insertText("$result ")
+                channel.trySend(
+                  ComposeEvent.InsertText("$result ")
+                )
               }
             }
           }
@@ -1175,16 +1197,20 @@ private fun ComposeActions(
           )
         }
       }
-      if (allowLocation) {
+      if (state.allowLocation) {
         RequestLocationPermission(
           onPermissionGrantt = {
-            viewModel.trackingLocation()
+            channel.trySend(
+              ComposeEvent.TrackLocation
+            )
           },
         ) { launchRequest ->
           IconButton(
             onClick = {
-              if (locationEnabled) {
-                viewModel.disableLocation()
+              if (state.locationEnabled) {
+                channel.trySend(
+                  ComposeEvent.DisableLocation
+                )
               } else {
                 launchRequest.invoke()
               }
@@ -1193,7 +1219,7 @@ private fun ComposeActions(
             Icon(
               painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
               contentDescription = stringResource(
-                res = if (locationEnabled) {
+                res = if (state.locationEnabled) {
                   com.twidere.twiderex.MR.strings.accessibility_scene_compose_location_disable
                 } else {
                   com.twidere.twiderex.MR.strings.accessibility_scene_compose_location_enable
@@ -1205,19 +1231,21 @@ private fun ComposeActions(
       }
       IconButton(
         onClick = {
-          viewModel.setEnableThreadMode(!enableThreadMode)
+          channel.trySend(
+            ComposeEvent.EnableThreadMode(!state.enableThreadMode)
+          )
         },
       ) {
         Icon(
           painter = painterResource(res = com.twidere.twiderex.MR.files.ic_thread_mode),
           contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_compose_thread),
-          tint = if (enableThreadMode) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+          tint = if (state.enableThreadMode) MaterialTheme.colors.primary else LocalContentColor.current.copy(
             alpha = LocalContentAlpha.current
           )
         )
       }
       Spacer(modifier = Modifier.weight(1f))
-      if (draftCount.value > 0) {
+      if (state.draftCount > 0) {
         IconButton(
           onClick = {
             navigate(Root.Draft.List)
@@ -1226,7 +1254,7 @@ private fun ComposeActions(
           Box {
             Icon(
               painter = painterResource(
-                res = if (draftCount.value > 9)
+                res = if (state.draftCount > 9)
                   com.twidere.twiderex.MR.files.ic_drafts_more
                 else
                   com.twidere.twiderex.MR.files.ic_draft_number
@@ -1235,9 +1263,9 @@ private fun ComposeActions(
                 res = com.twidere.twiderex.MR.strings.accessibility_scene_compose_draft
               )
             )
-            if (draftCount.value < 9) {
+            if (state.draftCount < 9) {
               Text(
-                text = draftCount.value.toString(),
+                text = state.draftCount.toString(),
                 style = MaterialTheme.typography.overline.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier
                   .align(Alignment.Center)

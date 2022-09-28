@@ -24,12 +24,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import com.twidere.services.microblog.LookupService
@@ -41,6 +41,9 @@ import com.twidere.twiderex.extensions.getTextAfterSelection
 import com.twidere.twiderex.extensions.getTextBeforeSelection
 import com.twidere.twiderex.kmp.LocationProvider
 import com.twidere.twiderex.kmp.MediaInsertProvider
+import com.twidere.twiderex.kmp.Platform
+import com.twidere.twiderex.kmp.currentPlatform
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonVisibility
@@ -229,6 +232,25 @@ fun ComposePresenter(
   }
   val canSaveDraft = remember(textFieldValue, images) {
     textFieldValue.text.isNotEmpty() || !images.isEmpty()
+  }
+
+  val allowImage by remember {
+    derivedStateOf {
+      accountState.account.type == PlatformType.Twitter ||
+        (accountState.account.type == PlatformType.Mastodon && !isInVoteMode)
+    }
+  }
+
+  val allowVote by remember {
+    derivedStateOf {
+      accountState.account.type == PlatformType.Mastodon && !images.any()
+    }
+  }
+
+  val allowLocation by remember {
+    derivedStateOf {
+      accountState.account.type != PlatformType.Mastodon && currentPlatform == Platform.Android
+    }
   }
 
   val locationEnabled by locationProvider.locationEnabled.collectAsState(false)
@@ -474,7 +496,35 @@ fun ComposePresenter(
     }
   }
 
-  return ComposeState.Data()
+  return ComposeState.Data(
+    account = accountState.account,
+    voteState = voteState,
+    draftCount = draftCount,
+    canSaveDraft = canSaveDraft,
+    canSend = canSend,
+    contentWarningTextFieldValue = contentWarningTextFieldValue,
+    enableThreadMode = enableThreadMode,
+    locationEnabled = locationEnabled,
+    isContentWarning = isContentWarningEnabled,
+    isImageSensitive = isImageSensitive,
+    isContentWarningEnabled = isContentWarningEnabled,
+    loadingReplyUser = loadingReplyUser,
+    allowImage = allowImage,
+    allowVote = allowVote,
+    isInVoteMode = isInVoteMode,
+    allowLocation = allowLocation,
+    location = location,
+    images = images,
+    mediaInsertMode = mediaInsertMode,
+    replyToUser = replyToUser,
+    status = status,
+    textFieldValue = textFieldValue,
+    maxLength = maxContentLength,
+    composeType = composeType,
+    visibility = visibility,
+    emojis = emojis,
+    excludedReplyUserIds = excludedReplyUserIds,
+  )
 }
 
 interface ComposeEvent {
@@ -521,20 +571,33 @@ interface ComposeEvent {
 
 interface ComposeState {
   data class Data(
+    val account: AccountDetails,
     val voteState: VoteState?,
-    val draftCount: Int,
+    val draftCount: Long,
     val canSaveDraft: Boolean,
     val canSend: Boolean,
     val enableThreadMode: Boolean,
     val locationEnabled: Boolean,
     val isContentWarning: Boolean,
     val isImageSensitive: Boolean,
+    val isContentWarningEnabled: Boolean,
+    val loadingReplyUser: Boolean,
+    val allowImage: Boolean,
+    val allowVote: Boolean,
+    val isInVoteMode: Boolean,
+    val allowLocation: Boolean,
     val location: Location?,
     val status: UiStatus?,
     val textFieldValue: TextFieldValue,
+    val contentWarningTextFieldValue: TextFieldValue,
     val maxLength: Int,
-    val emojis: SnapshotStateList<UiEmojiCategory>,
-    val images: SnapshotStateList<UiMediaInsert>,
+    val composeType: ComposeType?,
+    val mediaInsertMode: MediaInsertMode,
+    val visibility: MastodonVisibility,
+    val emojis: MutableList<UiEmojiCategory>,
+    val images: MutableList<UiMediaInsert>,
+    val excludedReplyUserIds: MutableList<String>,
+    val replyToUser: List<UiUser>,
   ) : ComposeState
   object NoAccount : ComposeState
 }
