@@ -140,6 +140,7 @@ import com.twidere.twiderex.viewmodel.compose.VoteState
 import com.twitter.twittertext.TwitterTextParser
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import io.github.seiko.precompose.annotation.Path
+import io.github.seiko.precompose.annotation.Query
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -169,15 +170,19 @@ fun DraftComposeScene(
 )
 @Composable
 fun ComposeScene(
-  statusKey: MicroBlogKey? = null,
-  composeType: ComposeType = ComposeType.New,
+  @Query("statusKey") statusKey: String?,
+  @Query("composeType") composeType: String?,
   navigator: Navigator,
 ) {
+  val key = statusKey?.let {
+    MicroBlogKey.valueOf(it)
+  }
+  val type = composeType?.let { enumValueOf(it) } ?: ComposeType.New
   val statusNavigation = rememberStatusNavigationData(navigator)
   ComposeBody(
     statusNavigation = statusNavigation,
-    statusKey = statusKey,
-    composeType = composeType,
+    statusKey = key,
+    composeType = type,
   )
 }
 
