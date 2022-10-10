@@ -22,17 +22,12 @@ package com.twidere.twiderex.di.modules
 
 import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.enums.ComposeType
-import com.twidere.twiderex.model.ui.UiDraft
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import com.twidere.twiderex.viewmodel.DraftViewModel
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import com.twidere.twiderex.viewmodel.PureMediaViewModel
 import com.twidere.twiderex.viewmodel.StatusViewModel
 import com.twidere.twiderex.viewmodel.compose.ComposeSearchUserViewModel
-import com.twidere.twiderex.viewmodel.compose.ComposeViewModel
-import com.twidere.twiderex.viewmodel.compose.DraftComposeViewModel
-import com.twidere.twiderex.viewmodel.compose.DraftItemViewModel
 import com.twidere.twiderex.viewmodel.compose.MastodonComposeSearchHashtagViewModel
 import com.twidere.twiderex.viewmodel.dm.DMConversationViewModel
 import com.twidere.twiderex.viewmodel.dm.DMEventViewModel
@@ -68,35 +63,6 @@ val viewModelModule = module {
 
 private fun Module.compose() {
   viewModel { MastodonComposeSearchHashtagViewModel(get()) }
-  viewModel { (draftId: String) -> DraftItemViewModel(get(), draftId) }
-  viewModel { (draft: UiDraft) ->
-    DraftComposeViewModel(
-      get(),
-      get(),
-      get(),
-      get(),
-      get(),
-      get(),
-      get(),
-      get(),
-      get(),
-      draft
-    )
-  }
-  viewModel { (statusKey: MicroBlogKey?, composeType: ComposeType) ->
-    ComposeViewModel(
-      get(),
-      get(),
-      get(),
-      get(),
-      get(),
-      get(),
-      get(),
-      get(),
-      statusKey,
-      composeType,
-    )
-  }
   viewModel { ComposeSearchUserViewModel(get()) }
 }
 
