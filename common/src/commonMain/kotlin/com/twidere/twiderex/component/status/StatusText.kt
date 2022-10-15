@@ -37,6 +37,7 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -45,8 +46,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.painterResource
+import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.utils.ITranslationRepo
+import com.twidere.twiderex.utils.TranslationParam
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun ColumnScope.StatusText(
@@ -55,11 +61,31 @@ fun ColumnScope.StatusText(
   showMastodonPoll: Boolean = true,
   isSelectionAble: Boolean = true,
   openLink: (String) -> Unit,
+  translationRepo: ITranslationRepo = get(),
 ) {
   val expandable = status.platformType == PlatformType.Mastodon &&
     status.spoilerText != null
 
   var expanded by rememberSaveable { mutableStateOf(!expandable) }
+
+  var translation: String? by rememberSaveable {
+    mutableStateOf(null)
+  }
+
+  LaunchedEffect(Unit) {
+    launch(Dispatchers.IO) {
+      translationRepo.translation(
+        TranslationParam(
+          text = status.rawText,
+          to = "zh-cn",
+        )
+      )?.takeIf {
+        it.from != it.to
+      }?.let {
+        translation = it.result
+      }
+    }
+  }
 
   if (expandable && status.spoilerText != null) {
     Text(text = status.spoilerText)
@@ -94,6 +120,12 @@ fun ColumnScope.StatusText(
             status.resolveLink(href)
           },
           positionWrapper = it,
+          openLink = openLink,
+        )
+      }
+      translation?.let {
+        HtmlText(
+          htmlText = it,
           openLink = openLink,
         )
       }
