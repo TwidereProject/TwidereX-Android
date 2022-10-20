@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS DbStatus (
     refrenceStatus TEXT AS DbStatusReferenceList NOT NULL,
     inReplyToUserId TEXT,
     inReplyToStatusId TEXT,
-    extra TEXT
+    extra TEXT,
+    language TEXT
 );
 
 
@@ -37,7 +38,7 @@ insert:
 INSERT OR REPLACE INTO DbStatus(
     statusId, statusKey, userKey, htmlText, rawText, timestamp, metrics, sensitive,
     geo, hasMedia, source, isGap, platformType, spoilerText, card, poll, refrenceStatus,
-    inReplyToStatusId, inReplyToUserId, extra
+    inReplyToStatusId, inReplyToUserId, extra, language
 ) VALUES ?;
 
 findWithStatusKey:

@@ -212,7 +212,9 @@ class TranslationRepo : ITranslationRepo {
         }.build().toUrl()
       )
     }.build()
-    val response = translationClient.newCall(request).execute()
+    val response = translationClient.newCall(
+      request
+    ).execute()
     return if (response.isSuccessful) {
       var originLanguage = ""
       runCatching {
@@ -234,7 +236,13 @@ class TranslationRepo : ITranslationRepo {
           ?.fold(
             initial = ""
           ) { r, t ->
-            r + (t.jsonArray.firstOrNull()?.jsonPrimitive?.content ?: "")
+            r + (
+              t.jsonArray
+                .firstOrNull()
+                ?.jsonPrimitive
+                ?.content
+                ?: ""
+              )
           }
       }.getOrNull()
         ?.takeIf {

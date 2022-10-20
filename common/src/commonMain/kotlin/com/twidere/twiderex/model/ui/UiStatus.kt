@@ -56,7 +56,8 @@ data class UiStatus(
   val referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
   val inReplyToUserId: String? = null,
   val inReplyToStatusId: String? = null,
-  val extra: StatusExtra? = null
+  val extra: StatusExtra? = null,
+  val language: String? = null,
 ) {
   val mastodonExtra: MastodonStatusExtra? = if (extra is MastodonStatusExtra) extra else null
 
@@ -92,6 +93,14 @@ data class UiStatus(
     PlatformType.StatusNet -> TODO()
     PlatformType.Fanfou -> TODO()
     PlatformType.Mastodon -> "/web/statuses/$statusId"
+  }
+
+  fun translatable(lang: String): Boolean {
+    if (this.language == null) {
+      return true
+    }
+    return lang.startsWith(this.language, ignoreCase = true).not() &&
+      this.language.startsWith(lang, ignoreCase = true).not()
   }
 
   companion object {

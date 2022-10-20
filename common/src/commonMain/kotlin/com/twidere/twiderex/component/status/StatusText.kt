@@ -47,6 +47,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.icon.IcTranslate
+import com.twidere.twiderex.icon.TwidereIcons
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.utils.ITranslationRepo
@@ -127,6 +129,10 @@ fun ColumnScope.StatusText(
         HtmlText(
           htmlText = it,
           openLink = openLink,
+        )
+        Icon(
+          imageVector = TwidereIcons.IcTranslate,
+          contentDescription = ""
         )
       }
       if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.poll != null) {
