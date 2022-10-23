@@ -37,7 +37,6 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -46,15 +45,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.painterResource
-import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.icon.IcTranslate
 import com.twidere.twiderex.icon.TwidereIcons
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.utils.ITranslationRepo
 import com.twidere.twiderex.utils.TranslationParam
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.twidere.twiderex.utils.isDefaultLanguage
 
 @Composable
 fun ColumnScope.StatusText(
@@ -63,30 +59,18 @@ fun ColumnScope.StatusText(
   showMastodonPoll: Boolean = true,
   isSelectionAble: Boolean = true,
   openLink: (String) -> Unit,
-  translationRepo: ITranslationRepo = get(),
 ) {
   val expandable = status.platformType == PlatformType.Mastodon &&
     status.spoilerText != null
 
   var expanded by rememberSaveable { mutableStateOf(!expandable) }
 
-  var translation: String? by rememberSaveable {
-    mutableStateOf(null)
+  var showTranslate by rememberSaveable {
+    mutableStateOf(false)
   }
 
-  LaunchedEffect(Unit) {
-    launch(Dispatchers.IO) {
-      translationRepo.translation(
-        TranslationParam(
-          text = status.rawText,
-          to = "zh-cn",
-        )
-      )?.takeIf {
-        it.from != it.to
-      }?.let {
-        translation = it.result
-      }
-    }
+  var visibleText by rememberSaveable {
+    mutableStateOf("")
   }
 
   if (expandable && status.spoilerText != null) {
@@ -123,16 +107,30 @@ fun ColumnScope.StatusText(
           },
           positionWrapper = it,
           openLink = openLink,
+          onVisibleTextParsed = { parsed ->
+            visibleText = parsed
+          }
         )
       }
-      translation?.let {
-        HtmlText(
-          htmlText = it,
-          openLink = openLink,
+      if (showTranslate) {
+        TranslationStatus(
+          TranslationParam(
+            key = status.statusId,
+            text = visibleText,
+            from = status.language ?: "auto",
+          )
         )
+      }
+      if (
+        visibleText.isNotBlank() &&
+        status.language?.isDefaultLanguage() == false
+      ) {
         Icon(
           imageVector = TwidereIcons.IcTranslate,
-          contentDescription = ""
+          contentDescription = "",
+          modifier = Modifier.clickable {
+            showTranslate = !showTranslate
+          }
         )
       }
       if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.poll != null) {

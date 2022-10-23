@@ -95,14 +95,6 @@ data class UiStatus(
     PlatformType.Mastodon -> "/web/statuses/$statusId"
   }
 
-  fun translatable(lang: String): Boolean {
-    if (this.language == null) {
-      return true
-    }
-    return lang.startsWith(this.language, ignoreCase = true).not() &&
-      this.language.startsWith(lang, ignoreCase = true).not()
-  }
-
   companion object {
     @Composable
     fun sample() = UiStatus(

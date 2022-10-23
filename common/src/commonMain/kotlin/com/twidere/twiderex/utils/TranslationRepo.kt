@@ -20,8 +20,14 @@
  */
 package com.twidere.twiderex.utils
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import com.twidere.twiderex.http.TwidereServiceFactory
 import io.github.reactivecircus.cache4k.Cache
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -32,134 +38,50 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.Locale
 
-val languageMap by lazy {
-  mapOf(
-    "af" to "Afrikaans",
-    "sq" to "Albanian",
-    "am" to "Amharic",
-    "ar" to "Arabic",
-    "hy" to "Armenian",
-    "az" to "Azerbaijani",
-    "eu" to "Basque",
-    "be" to "Belarusian",
-    "bn" to "Bengali",
-    "bs" to "Bosnian",
-    "bg" to "Bulgarian",
-    "ca" to "Catalan",
-    "ceb" to "Cebuano",
-    "ny" to "Chichewa",
-    "zh-cn" to "Chinese Simplified",
-    "zh-tw" to "Chinese Traditional",
-    "co" to "Corsican",
-    "hr" to "Croatian",
-    "cs" to "Czech",
-    "da" to "Danish",
-    "nl" to "Dutch",
-    "en" to "English",
-    "eo" to "Esperanto",
-    "et" to "Estonian",
-    "tl" to "Filipino",
-    "fi" to "Finnish",
-    "fr" to "French",
-    "fy" to "Frisian",
-    "gl" to "Galician",
-    "ka" to "Georgian",
-    "de" to "German",
-    "el" to "Greek",
-    "gu" to "Gujarati",
-    "ht" to "Haitian Creole",
-    "ha" to "Hausa",
-    "haw" to "Hawaiian",
-    "iw" to "Hebrew",
-    "hi" to "Hindi",
-    "hmn" to "Hmong",
-    "hu" to "Hungarian",
-    "is" to "Icelandic",
-    "ig" to "Igbo",
-    "id" to "Indonesian",
-    "ga" to "Irish",
-    "it" to "Italian",
-    "ja" to "Japanese",
-    "jw" to "Javanese",
-    "kn" to "Kannada",
-    "kk" to "Kazakh",
-    "km" to "Khmer",
-    "ko" to "Korean",
-    "ku" to "Kurdish (Kurmanji)",
-    "ky" to "Kyrgyz",
-    "lo" to "Lao",
-    "la" to "Latin",
-    "lv" to "Latvian",
-    "lt" to "Lithuanian",
-    "lb" to "Luxembourgish",
-    "mk" to "Macedonian",
-    "mg" to "Malagasy",
-    "ms" to "Malay",
-    "ml" to "Malayalam",
-    "mt" to "Maltese",
-    "mi" to "Maori",
-    "mr" to "Marathi",
-    "mn" to "Mongolian",
-    "my" to "Myanmar (Burmese)",
-    "ne" to "Nepali",
-    "no" to "Norwegian",
-    "ps" to "Pashto",
-    "fa" to "Persian",
-    "pl" to "Polish",
-    "pt" to "Portuguese",
-    "ma" to "Punjabi",
-    "ro" to "Romanian",
-    "ru" to "Russian",
-    "sm" to "Samoan",
-    "gd" to "Scots Gaelic",
-    "sr" to "Serbian",
-    "st" to "Sesotho",
-    "sn" to "Shona",
-    "sd" to "Sindhi",
-    "si" to "Sinhala",
-    "sk" to "Slovak",
-    "sl" to "Slovenian",
-    "so" to "Somali",
-    "es" to "Spanish",
-    "su" to "Sundanese",
-    "sw" to "Swahili",
-    "sv" to "Swedish",
-    "tg" to "Tajik",
-    "ta" to "Tamil",
-    "te" to "Telugu",
-    "th" to "Thai",
-    "tr" to "Turkish",
-    "uk" to "Ukrainian",
-    "ur" to "Urdu",
-    "uz" to "Uzbek",
-    "vi" to "Vietnamese",
-    "cy" to "Welsh",
-    "xh" to "Xhosa",
-    "yi" to "Yiddish",
-    "yo" to "Yoruba",
-    "zu" to "Zulu",
-  )
-}
-
+@Immutable
 data class TranslationParam(
+  val key: String,
   val text: String,
   val from: String = "auto",
   val to: String =
     Locale.getDefault().language.lowercase(),
 )
 
-data class TranslationResult(
-  val result: String,
-  val origin: String,
-  val from: String,
-  val to: String,
-)
+interface TranslationState {
+  data class Success(
+    val result: String,
+    val origin: String,
+    val from: String,
+    val to: String,
+  ) : TranslationState
+  object InProgress : TranslationState
+
+  // is the same language
+  object NoNeed : TranslationState
+
+  interface Failed : TranslationState {
+    object NetWorkError : Failed
+    object DecodeError : Failed
+    object NoData : Failed
+  }
+}
 
 interface ITranslationRepo {
-  suspend fun translation(
+  fun translation(
     param: TranslationParam
-  ): TranslationResult?
+  ): MutableState<TranslationState>
 }
+
+fun isSameLang(lang1: String?, lang2: String?): Boolean {
+  return lang1?.isNotBlank() == true &&
+    lang2?.isNotBlank() == true &&
+    (
+      lang1.trim().startsWith(lang2.trim(), ignoreCase = true) ||
+        lang2.trim().startsWith(lang1.trim(), ignoreCase = true)
+      )
+}
+
+fun String.isDefaultLanguage() = isSameLang(this, Locale.getDefault().language.lowercase())
 
 class TranslationRepo : ITranslationRepo {
 
@@ -170,7 +92,15 @@ class TranslationRepo : ITranslationRepo {
       .build()
   }
 
-  private val cache: Cache<String, TranslationResult> by lazy {
+  private val loadingList: MutableList<String> by lazy {
+    mutableListOf()
+  }
+
+  private fun isInLoading(id: String): Boolean {
+    return loadingList.contains(id)
+  }
+
+  private val cache: Cache<String, MutableState<TranslationState>> by lazy {
     Cache.Builder().apply {
       maximumCacheSize(300)
     }.build()
@@ -188,10 +118,15 @@ class TranslationRepo : ITranslationRepo {
     "https://translate.google.com/translate_a/single".toHttpUrl()
   }
 
-  override suspend fun translation(
+  private val scope by lazy {
+    CoroutineScope(Dispatchers.IO)
+  }
+
+  override fun translation(
     param: TranslationParam
-  ): TranslationResult? {
-    cache.get(param.toString())?.let {
+  ): MutableState<TranslationState> {
+
+    cache.get(param.key)?.let {
       return it
     }
     val params = mapOf(
@@ -203,63 +138,80 @@ class TranslationRepo : ITranslationRepo {
       "oe" to "UTF-8",
       "q" to param.text,
     )
-    val request = Request.Builder().apply {
-      url(
-        httpUrl.newBuilder().apply {
-          params.forEach { (t, u) ->
-            addQueryParameter(t, u)
-          }
-        }.build().toUrl()
-      )
-    }.build()
-    val response = translationClient.newCall(
-      request
-    ).execute()
-    return if (response.isSuccessful) {
-      var originLanguage = ""
-      runCatching {
-        json.decodeFromString<JsonElement>(
-          response.body?.string() ?: ""
-        ).jsonArray.apply {
-          lastOrNull()
-            ?.jsonArray
-            ?.firstOrNull()
-            ?.jsonArray
-            ?.firstOrNull()
-            ?.jsonPrimitive
-            ?.content
-            ?.let {
-              originLanguage = it.lowercase()
-            }
-        }.firstOrNull()
-          ?.jsonArray
-          ?.fold(
-            initial = ""
-          ) { r, t ->
-            r + (
-              t.jsonArray
-                .firstOrNull()
+    val state = mutableStateOf<TranslationState>(TranslationState.InProgress)
+    if (!isInLoading(param.key)) {
+      scope.launch {
+        loadingList.add(param.key)
+        val request = Request.Builder().apply {
+          url(
+            httpUrl.newBuilder().apply {
+              params.forEach { (t, u) ->
+                addQueryParameter(t, u)
+              }
+            }.build().toUrl()
+          )
+        }.build()
+        val response = translationClient.newCall(
+          request
+        ).execute()
+        if (response.isSuccessful) {
+          var originLanguage = ""
+          runCatching {
+            json.decodeFromString<JsonElement>(
+              response.body?.string() ?: ""
+            ).jsonArray.apply {
+              lastOrNull()
+                ?.jsonArray
+                ?.firstOrNull()
+                ?.jsonArray
+                ?.firstOrNull()
                 ?.jsonPrimitive
                 ?.content
-                ?: ""
+                ?.let {
+                  originLanguage = it.lowercase()
+                }
+            }.firstOrNull()
+              ?.jsonArray
+              ?.fold(
+                initial = ""
+              ) { r, t ->
+                r + (
+                  t.jsonArray
+                    .firstOrNull()
+                    ?.jsonPrimitive
+                    ?.content
+                    ?: ""
+                  )
+              }
+          }.onFailure {
+            state.value = TranslationState.Failed.DecodeError
+          }.onSuccess {
+            state.value = (
+              if (it.isNullOrBlank()) {
+                TranslationState.Failed.NoData
+              } else if (isSameLang(originLanguage, param.to)) {
+                TranslationState.NoNeed
+              } else {
+                TranslationState.Success(
+                  origin = param.text,
+                  result = it,
+                  from = originLanguage,
+                  to = param.to,
+                )
+              }
+              ).apply {
+              cache.put(
+                param.key,
+                mutableStateOf(this)
               )
+            }
           }
-      }.getOrNull()
-        ?.takeIf {
-          it.isNotBlank()
-        }?.let {
-          TranslationResult(
-            origin = param.text,
-            result = it,
-            from = originLanguage,
-            to = param.to,
-          ).apply {
-            cache.put(
-              key = param.toString(),
-              value = this,
-            )
-          }
+        } else {
+          state.value = TranslationState.Failed.NetWorkError
         }
-    } else null
+        loadingList.remove(param.key)
+      }
+    }
+    return state
   }
 }
