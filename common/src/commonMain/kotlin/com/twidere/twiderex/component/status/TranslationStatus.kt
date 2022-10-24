@@ -23,6 +23,8 @@ package com.twidere.twiderex.component.status
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -44,22 +46,40 @@ fun TranslationStatus(
     with(translationState) {
       when (this) {
         TranslationState.NoNeed -> {
-          Text("No need translation")
+          Text(TranslationDefaults.NoNeedTip)
         }
         is TranslationState.Success -> {
-          Spacer(modifier = Modifier.height(16.dp))
+          Spacer(
+            modifier = Modifier.height(
+              TranslationDefaults.gap
+            )
+          )
           HtmlText(
             htmlText = result,
             openLink = {},
           )
         }
         TranslationState.InProgress -> {
-          CircularProgressIndicator()
+          CircularProgressIndicator(
+            modifier = Modifier.padding(
+              TranslationDefaults.progressPadding
+            ).size(
+              TranslationDefaults.progressSize
+            )
+          )
         }
         is TranslationState.Failed -> {
-          Text("translation failed")
+          Text(TranslationDefaults.FailedTip)
         }
       }
     }
   }
+}
+
+private object TranslationDefaults {
+  val gap = 16.dp
+  val progressPadding = 12.dp
+  val progressSize = 24.dp
+  const val FailedTip = "translation failed"
+  const val NoNeedTip = "No need translation"
 }

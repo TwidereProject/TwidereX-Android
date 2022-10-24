@@ -75,7 +75,11 @@ fun ColumnScope.StatusText(
 
   if (expandable && status.spoilerText != null) {
     Text(text = status.spoilerText)
-    Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.SpoilerSpacing))
+    Spacer(
+      modifier = Modifier.height(
+        StatusTextDefaults.Mastodon.SpoilerSpacing
+      )
+    )
     Row(
       modifier = Modifier
         .background(
@@ -88,8 +92,13 @@ fun ColumnScope.StatusText(
         },
     ) {
       Icon(
-        modifier = Modifier.size(width = StatusTextDefaults.Mastodon.MoreButton.Width, height = StatusTextDefaults.Mastodon.MoreButton.Height).padding(StatusTextDefaults.Mastodon.SpoilerButtonPadding),
-        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_expand_more),
+        modifier = Modifier.size(
+          width = StatusTextDefaults.Mastodon.MoreButton.Width,
+          height = StatusTextDefaults.Mastodon.MoreButton.Height
+        ).padding(StatusTextDefaults.Mastodon.SpoilerButtonPadding),
+        painter = painterResource(
+          res = com.twidere.twiderex.MR.files.ic_expand_more
+        ),
         contentDescription = null,
         tint = MaterialTheme.colors.primary,
       )
@@ -128,13 +137,23 @@ fun ColumnScope.StatusText(
         Icon(
           imageVector = TwidereIcons.IcTranslate,
           contentDescription = "",
-          modifier = Modifier.clickable {
+          modifier = Modifier.padding(
+            top = StatusTextDefaults.TransLateIconPadding,
+            bottom = StatusTextDefaults.TransLateIconPadding,
+          ).clickable {
             showTranslate = !showTranslate
           }
         )
       }
-      if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.poll != null) {
-        Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.PollSpacing))
+      if (showMastodonPoll &&
+        status.platformType == PlatformType.Mastodon &&
+        status.poll != null
+      ) {
+        Spacer(
+          modifier = Modifier.height(
+            StatusTextDefaults.Mastodon.PollSpacing
+          )
+        )
         MastodonPoll(status)
       }
     }
@@ -153,6 +172,7 @@ object StatusTextDefaults {
     )
     val PollSpacing = 10.dp
   }
+  val TransLateIconPadding = 8.dp
 }
 
 fun UiStatus.resolveLink(
