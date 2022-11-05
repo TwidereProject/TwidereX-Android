@@ -44,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.component.SizeChangeContent
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.icon.IcTranslate
 import com.twidere.twiderex.icon.TwidereIcons
@@ -121,30 +122,38 @@ fun ColumnScope.StatusText(
           }
         )
       }
-      if (showTranslate) {
-        TranslationStatus(
-          TranslationParam(
-            key = status.statusId,
-            text = visibleText,
-            from = status.language ?: "auto",
-          )
-        )
-      }
       if (
         visibleText.isNotBlank() &&
         status.language?.isDefaultLanguage() == false
       ) {
-        Icon(
-          imageVector = TwidereIcons.IcTranslate,
-          contentDescription = "",
-          modifier = Modifier.padding(
-            top = StatusTextDefaults.TransLateIconPadding,
-            bottom = StatusTextDefaults.TransLateIconPadding,
-          ).clickable {
+        SizeChangeContent(
+          modifier = Modifier.clickable {
             showTranslate = !showTranslate
+          },
+          expanded = showTranslate,
+          startContent = {
+            Icon(
+              modifier = Modifier.padding(
+                top = StatusTextDefaults.TransLateIconPadding,
+                bottom = StatusTextDefaults.TransLateIconPadding,
+              ),
+              imageVector = TwidereIcons.IcTranslate,
+              contentDescription = "",
+              tint = MaterialTheme.colors.primary,
+            )
+          },
+          endContent = {
+            TranslationStatus(
+              translationParam = TranslationParam(
+                key = status.statusId,
+                text = visibleText,
+                from = status.language,
+              )
+            )
           }
         )
       }
+
       if (showMastodonPoll &&
         status.platformType == PlatformType.Mastodon &&
         status.poll != null

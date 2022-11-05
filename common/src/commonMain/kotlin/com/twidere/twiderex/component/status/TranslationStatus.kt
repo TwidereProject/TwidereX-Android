@@ -38,11 +38,12 @@ import com.twidere.twiderex.utils.TranslationState
 
 @Composable
 fun TranslationStatus(
+  modifier: Modifier = Modifier,
   translationParam: TranslationParam,
   translationRepo: ITranslationRepo = get(),
 ) {
   val translationState by translationRepo.translation(translationParam)
-  Column {
+  Column(modifier = modifier) {
     with(translationState) {
       when (this) {
         TranslationState.NoNeed -> {
