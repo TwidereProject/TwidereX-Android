@@ -29,8 +29,10 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.component.DoubleLiftContent
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.utils.ITranslationRepo
 import com.twidere.twiderex.utils.TranslationParam
@@ -42,23 +44,29 @@ fun TranslationStatus(
   translationParam: TranslationParam,
   translationRepo: ITranslationRepo = get(),
 ) {
-  val translationState by translationRepo.translation(translationParam)
-  Column(modifier = modifier) {
-    with(translationState) {
-      when (this) {
+  val translationState by remember {
+    translationRepo.translation(translationParam)
+  }
+  DoubleLiftContent(
+    modifier = modifier,
+    state = translationState,
+    content = {
+      when (it) {
         TranslationState.NoNeed -> {
           Text(TranslationDefaults.NoNeedTip)
         }
         is TranslationState.Success -> {
-          Spacer(
-            modifier = Modifier.height(
-              TranslationDefaults.gap
+          Column(modifier = modifier) {
+            Spacer(
+              modifier = Modifier.height(
+                TranslationDefaults.gap
+              )
             )
-          )
-          HtmlText(
-            htmlText = result,
-            openLink = {},
-          )
+            HtmlText(
+              htmlText = it.result,
+              openLink = {},
+            )
+          }
         }
         TranslationState.InProgress -> {
           CircularProgressIndicator(
@@ -74,7 +82,7 @@ fun TranslationStatus(
         }
       }
     }
-  }
+  )
 }
 
 private object TranslationDefaults {

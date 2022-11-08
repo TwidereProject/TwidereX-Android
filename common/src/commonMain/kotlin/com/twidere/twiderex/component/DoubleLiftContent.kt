@@ -32,42 +32,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
 
-@Composable
 @OptIn(ExperimentalAnimationApi::class)
-fun SizeChangeContent(
+@Composable
+fun <T> DoubleLiftContent(
   modifier: Modifier = Modifier,
-  expanded: Boolean,
-  startContent: @Composable () -> Unit,
-  endContent: @Composable () -> Unit,
+  state: T,
+  duration: Int = 300,
+  content: @Composable (T) -> Unit,
 ) {
-
   AnimatedContent(
     modifier = modifier,
-    targetState = expanded,
+    targetState = state,
     transitionSpec = {
-      fadeIn(animationSpec = tween(150, 150)) with
-        fadeOut(animationSpec = tween(150)) using
+      fadeIn(animationSpec = tween(duration / 2, duration / 2)) with
+        fadeOut(animationSpec = tween(duration / 2)) using
         SizeTransform { initialSize, targetSize ->
-          if (targetState) {
-            keyframes {
-              // Expand horizontally first.
-              IntSize(targetSize.width, initialSize.height) at 150
-              durationMillis = 300
-            }
-          } else {
-            keyframes {
-              // Shrink vertically first.
-              IntSize(initialSize.width, targetSize.height) at 150
-              durationMillis = 300
-            }
+          keyframes {
+            if (targetSize.width > initialSize.width) {
+              IntSize(targetSize.width, initialSize.height)
+            } else {
+              IntSize(initialSize.width, targetSize.height)
+            } at duration / 2
+            durationMillis = duration
           }
         }
     }
   ) { targetExpanded ->
-    if (targetExpanded) {
-      endContent()
-    } else {
-      startContent()
-    }
+    content.invoke(targetExpanded)
   }
 }

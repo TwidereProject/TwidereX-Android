@@ -23,6 +23,7 @@ package com.twidere.twiderex.component.status
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,12 +40,13 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.component.SizeChangeContent
+import com.twidere.twiderex.component.DoubleLiftContent
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.icon.IcTranslate
 import com.twidere.twiderex.icon.TwidereIcons
@@ -126,30 +128,35 @@ fun ColumnScope.StatusText(
         visibleText.isNotBlank() &&
         status.language?.isDefaultLanguage() == false
       ) {
-        SizeChangeContent(
-          modifier = Modifier.clickable {
+        val interactionSource = remember { MutableInteractionSource() }
+        DoubleLiftContent(
+          modifier = Modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null,
+          ) {
             showTranslate = !showTranslate
           },
-          expanded = showTranslate,
-          startContent = {
-            Icon(
-              modifier = Modifier.padding(
-                top = StatusTextDefaults.TransLateIconPadding,
-                bottom = StatusTextDefaults.TransLateIconPadding,
-              ),
-              imageVector = TwidereIcons.IcTranslate,
-              contentDescription = "",
-              tint = MaterialTheme.colors.primary,
-            )
-          },
-          endContent = {
-            TranslationStatus(
-              translationParam = TranslationParam(
-                key = status.statusId,
-                text = visibleText,
-                from = status.language,
+          state = showTranslate,
+          content = {
+            if (it) {
+              TranslationStatus(
+                translationParam = TranslationParam(
+                  key = status.statusId,
+                  text = visibleText,
+                  from = status.language,
+                )
               )
-            )
+            } else {
+              Icon(
+                modifier = Modifier.padding(
+                  top = StatusTextDefaults.TransLateIconPadding,
+                  bottom = StatusTextDefaults.TransLateIconPadding,
+                ),
+                imageVector = TwidereIcons.IcTranslate,
+                contentDescription = "",
+                tint = MaterialTheme.colors.primary,
+              )
+            }
           }
         )
       }

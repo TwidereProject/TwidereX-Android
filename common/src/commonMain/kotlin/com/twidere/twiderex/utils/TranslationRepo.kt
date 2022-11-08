@@ -151,10 +151,12 @@ class TranslationRepo : ITranslationRepo {
             }.build().toUrl()
           )
         }.build()
-        val response = translationClient.newCall(
-          request
-        ).execute()
-        if (response.isSuccessful) {
+        val response = kotlin.runCatching {
+          translationClient.newCall(
+            request
+          ).execute()
+        }.getOrNull()
+        if (response?.isSuccessful == true) {
           var originLanguage = ""
           runCatching {
             json.decodeFromString<JsonElement>(
