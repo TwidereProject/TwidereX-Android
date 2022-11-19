@@ -24,7 +24,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 import com.twidere.twiderex.component.NativeWindow
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
@@ -33,6 +37,7 @@ import com.twidere.twiderex.init.TwidereServiceFactoryInitialTask
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
+import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.utils.CustomTabSignInChannel
@@ -43,7 +48,9 @@ import com.twidere.twiderex.utils.currentOperatingSystem
 import it.sauronsoftware.junique.AlreadyLockedException
 import it.sauronsoftware.junique.JUnique
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.context.startKoin
@@ -152,8 +159,19 @@ private fun startDesktopApp() {
     e.printStackTrace()
   }
   application {
+    val state = rememberWindowState()
     LaunchedEffect(Unit) {
       preferencesHolder.warmup()
+    }
+    runBlocking {
+      preferencesHolder
+        .appearancePreferences
+        .data.firstOrNull()
+        ?.windowInfo
+        ?.let {
+          state.position = WindowPosition(it.start.dp, it.top.dp)
+          state.size = DpSize(it.width.dp, it.height.dp)
+        }
     }
     Initializer.withScope(rememberCoroutineScope())
       .add(TwidereServiceFactoryInitialTask())
@@ -162,8 +180,21 @@ private fun startDesktopApp() {
       NativeWindow(
         onCloseRequest = {
           stopKoin()
+          runBlocking {
+            preferencesHolder.appearancePreferences.updateData {
+              it.copy(
+                windowInfo = AppearancePreferences.WindowInfo(
+                  top = state.position.y.value,
+                  start = state.position.x.value,
+                  width = state.size.width.value,
+                  height = state.size.height.value,
+                )
+              )
+            }
+          }
           exitApplication()
         },
+        state = state,
         title = "Twidere X",
         icon = painterResource(MR.files.ic_launcher.filePath),
       ) {

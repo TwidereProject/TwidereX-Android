@@ -31,7 +31,17 @@ data class AppearancePreferences(
   val hideFabWhenScroll: Boolean = false,
   val hideAppBarWhenScroll: Boolean = false,
   val isDarkModePureBlack: Boolean = false,
+  val windowInfo: WindowInfo = WindowInfo(),
 ) {
+
+  @Serializable
+  data class WindowInfo(
+    val top: Float = 50f,
+    val start: Float = 50f,
+    val width: Float = 400f,
+    val height: Float = 800f,
+  )
+
   @Serializable
   enum class TabPosition {
     Top,
