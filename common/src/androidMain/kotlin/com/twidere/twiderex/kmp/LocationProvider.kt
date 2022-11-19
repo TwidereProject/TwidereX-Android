@@ -110,6 +110,7 @@ actual class LocationProvider(
   }
 
   // compatibility fix for Api < 22
+  @Deprecated("Deprecated in Java")
   override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
   }
 }
