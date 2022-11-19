@@ -126,7 +126,7 @@ fun ColumnScope.StatusText(
       }
       if (
         visibleText.isNotBlank() &&
-        status.language?.isDefaultLanguage() == false
+        status.language?.isDefaultLanguage() != true
       ) {
         val interactionSource = remember { MutableInteractionSource() }
         DoubleLiftContent(
@@ -143,7 +143,7 @@ fun ColumnScope.StatusText(
                 translationParam = TranslationParam(
                   key = status.statusId,
                   text = visibleText,
-                  from = status.language,
+                  from = status.language ?: "auto",
                 )
               )
             } else {

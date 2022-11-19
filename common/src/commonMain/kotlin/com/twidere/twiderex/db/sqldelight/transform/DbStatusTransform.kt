@@ -69,7 +69,6 @@ internal fun UiStatus.toDbStatusWithAttachments(accountKey: MicroBlogKey): DbSta
       is MastodonStatusExtra -> extra.json()
       else -> extra.toString()
     },
-    language = language,
   ),
   reactions = DbStatusReactions(
     liked = liked,
@@ -113,7 +112,6 @@ internal fun DbStatusWithAttachments.toUi(): UiStatus = UiStatus(
   user = user.toUi(),
   media = medias.map { it.toUi() },
   url = urls.map { it.toUi() },
-  language = status.language,
 )
 
 private fun UiPoll.toDbPoll() = DbPoll(
