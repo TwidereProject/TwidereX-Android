@@ -480,8 +480,8 @@ class TwitterService(
           )
         },
       )
-    ).let {
-      lookupStatus(it.data?.id.orEmpty())
+    ).run {
+      lookupStatus(data?.id.orEmpty())
     }
   }
 
