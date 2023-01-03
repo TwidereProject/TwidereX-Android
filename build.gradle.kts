@@ -1,9 +1,10 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id("com.diffplug.spotless").version(Versions.spotless)
-    id("com.github.ben-manes.versions").version("0.39.0")
+    id("com.diffplug.spotless") version Versions.spotless
+    id("com.github.ben-manes.versions") version "0.44.0"
     id("com.dipien.byebyejetifier") version "1.2.2"
 }
+
 buildscript {
     repositories {
         google()
@@ -57,6 +58,16 @@ allprojects {
             force("org.objenesis:objenesis:3.2")
         }
     }
+
+    tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask> {
+        rejectVersionIf {
+            candidate.version.isNonStable() && !currentVersion.isNonStable()
+        }
+        checkForGradleUpdate = true
+        outputFormatter = "text"
+        outputDir = project.rootProject.buildDir.resolve("reports/dependency-updates").absolutePath
+        reportfileName = "report"
+    }
 }
 
 subprojects {
@@ -76,4 +87,11 @@ subprojects {
             }
         }
     }
+}
+
+fun String.isNonStable(): Boolean {
+    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { toUpperCase(java.util.Locale.US).contains(it) }
+    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+    val isStable = stableKeyword || regex.matches(this)
+    return isStable.not()
 }
