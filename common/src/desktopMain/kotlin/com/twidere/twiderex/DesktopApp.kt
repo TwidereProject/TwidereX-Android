@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -32,6 +32,8 @@ import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
 import com.twidere.twiderex.init.Initializer
 import com.twidere.twiderex.init.TwidereServiceFactoryInitialTask
+import com.twidere.twiderex.kmp.LocalPlatformWindow
+import com.twidere.twiderex.kmp.PlatformWindow
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
@@ -157,25 +159,28 @@ private fun startDesktopApp() {
     LaunchedEffect(Unit) {
       preferencesHolder.warmup()
     }
+    Initializer.withScope(rememberCoroutineScope())
+      .add(TwidereServiceFactoryInitialTask())
+      .execute()
     ProvidePreferences(preferencesHolder) {
-      PreComposeWindow(
-          onCloseRequest = {
-              stopKoin()
-              exitApplication()
-          },
-          state = rememberWindowState(
-              width = 400.dp,
-              height = 900.dp
-          ),
-          title = "Twidere X",
-          icon = painterResource(MR.files.ic_launcher.filePath),
+      NativeWindow(
+        onCloseRequest = {
+          stopKoin()
+          exitApplication()
+        },
+        state = rememberWindowState(
+          width = 400.dp,
+          height = 900.dp
+        ),
+        title = "Twidere X",
+        icon = painterResource(MR.files.ic_launcher.filePath),
       ) {
         FilePicker.init(window)
         CompositionLocalProvider(
-            LocalPlatformWindow provides PlatformWindow(),
-            LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
+          LocalPlatformWindow provides PlatformWindow(),
+          LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
         ) {
-            App(navController = navController)
+          App(navController = navController)
         }
       }
     }
