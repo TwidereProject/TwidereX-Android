@@ -1,0 +1,11 @@
+root = true
+
+[*]
+indent_style = space
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[{*.kt,*.kts}]
+indent_size = 2
+ij_kotlin_code_style_defaults = KOTLIN_OFFICIAL
