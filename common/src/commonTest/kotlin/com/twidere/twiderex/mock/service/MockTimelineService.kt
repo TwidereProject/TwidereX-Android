@@ -29,63 +29,63 @@ import kotlinx.coroutines.delay
 import org.jetbrains.annotations.TestOnly
 
 internal class MockTimelineService @TestOnly constructor() : TimelineService, MicroBlogService, ErrorService() {
-    override suspend fun favorites(
-        user_id: String,
-        count: Int,
-        since_id: String?,
-        max_id: String?
-    ): List<IStatus> {
-        checkError()
-        return generateData(count)
-    }
+  override suspend fun favorites(
+    user_id: String,
+    count: Int,
+    since_id: String?,
+    max_id: String?
+  ): List<IStatus> {
+    checkError()
+    return generateData(count)
+  }
 
-    override suspend fun homeTimeline(
-        count: Int,
-        since_id: String?,
-        max_id: String?
-    ): List<IStatus> {
-        checkError()
-        return generateData(count)
-    }
+  override suspend fun homeTimeline(
+    count: Int,
+    since_id: String?,
+    max_id: String?
+  ): List<IStatus> {
+    checkError()
+    return generateData(count)
+  }
 
-    override suspend fun listTimeline(
-        list_id: String,
-        count: Int,
-        max_id: String?,
-        since_id: String?
-    ): List<IStatus> {
-        checkError()
-        return generateData(count)
-    }
+  override suspend fun listTimeline(
+    list_id: String,
+    count: Int,
+    max_id: String?,
+    since_id: String?
+  ): List<IStatus> {
+    checkError()
+    return generateData(count)
+  }
 
-    override suspend fun mentionsTimeline(
-        count: Int,
-        since_id: String?,
-        max_id: String?
-    ): List<IStatus> {
-        checkError()
-        return generateData(count)
-    }
+  override suspend fun mentionsTimeline(
+    count: Int,
+    since_id: String?,
+    max_id: String?
+  ): List<IStatus> {
+    checkError()
+    return generateData(count)
+  }
 
-    override suspend fun userTimeline(
-        user_id: String,
-        count: Int,
-        since_id: String?,
-        max_id: String?,
-        exclude_replies: Boolean
-    ): List<IStatus> {
-        checkError()
-        return generateData(count) {
-            mockIStatus(hasMedia = true, authorId = user_id)
-        }
+  override suspend fun userTimeline(
+    user_id: String,
+    count: Int,
+    since_id: String?,
+    max_id: String?,
+    exclude_replies: Boolean
+  ): List<IStatus> {
+    checkError()
+    return generateData(count) {
+      mockIStatus(hasMedia = true, authorId = user_id)
     }
+  }
 
-    private suspend fun generateData(count: Int, create: () -> IStatus = { mockIStatus() }): List<IStatus> {
-        val list = mutableListOf<IStatus>()
-        for (i in 0 until count) {
-            delay(1)
-            list.add(create())
-        }
-        return list.reversed().toIPaging()
+  private suspend fun generateData(count: Int, create: () -> IStatus = { mockIStatus() }): List<IStatus> {
+    val list = mutableListOf<IStatus>()
+    for (i in 0 until count) {
+      delay(1)
+      list.add(create())
     }
+    return list.reversed().toIPaging()
+  }
 }

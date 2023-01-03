@@ -23,6 +23,6 @@ package com.twidere.services.nitter.model
 import moe.tlaster.hson.annotations.HtmlSerializable
 
 data class UserTimeline(
-    @HtmlSerializable(".timeline-item:not(.show-more):not(.unavailable)")
-    val statuses: List<Status>
+  @HtmlSerializable(".timeline-item:not(.show-more):not(.unavailable)")
+  val statuses: List<Status>
 )

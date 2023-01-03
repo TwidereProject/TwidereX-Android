@@ -30,90 +30,90 @@ import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TwitterListsApiTest {
-    private lateinit var listResources: ListsResources
+  private lateinit var listResources: ListsResources
 
-    @BeforeAll
-    fun setUp() {
-        listResources = mockRetrofit("https://api.twitter.com/", TwitterRequest2AssetPathConvertor())
-    }
+  @BeforeAll
+  fun setUp() {
+    listResources = mockRetrofit("https://api.twitter.com/", TwitterRequest2AssetPathConvertor())
+  }
 
-    @Test
-    fun fetchLists() {
-        runBlocking {
-            val lists = listResources.lists()
-            assertEquals("meetup-20100301", lists[0].name)
-        }
+  @Test
+  fun fetchLists() {
+    runBlocking {
+      val lists = listResources.lists()
+      assertEquals("meetup-20100301", lists[0].name)
     }
+  }
 
-    @Test
-    fun createList() {
-        runBlocking {
-            val listModel = listResources.createList(name = "Goonies")
-            assertEquals("Goonies", listModel.name)
-        }
+  @Test
+  fun createList() {
+    runBlocking {
+      val listModel = listResources.createList(name = "Goonies")
+      assertEquals("Goonies", listModel.name)
     }
+  }
 
-    @Test
-    fun updateList() {
-        runBlocking {
-            val listModel = listResources.updateList(name = "update", list_id = "58300198")
-            assertEquals("update", listModel.name)
-        }
+  @Test
+  fun updateList() {
+    runBlocking {
+      val listModel = listResources.updateList(name = "update", list_id = "58300198")
+      assertEquals("update", listModel.name)
     }
+  }
 
-    @Test
-    fun deleteList() {
-        runBlocking {
-            val listModel = listResources.destroyList(list_id = "58300198")
-            assertEquals("destroy", listModel.name)
-        }
+  @Test
+  fun deleteList() {
+    runBlocking {
+      val listModel = listResources.destroyList(list_id = "58300198")
+      assertEquals("destroy", listModel.name)
     }
+  }
 
-    @Test
-    fun fetchSubscribers() {
-        runBlocking {
-            val response = listResources.listSubscribers("8044403")
-            assertEquals("Almissen665", response.users?.get(0)?.name)
-        }
+  @Test
+  fun fetchSubscribers() {
+    runBlocking {
+      val response = listResources.listSubscribers("8044403")
+      assertEquals("Almissen665", response.users?.get(0)?.name)
     }
+  }
 
-    @Test
-    fun fetchMembers() {
-        runBlocking {
-            val response = listResources.listMembers("8044403")
-            assertEquals("Sharon Ly", response.users?.get(0)?.name)
-        }
+  @Test
+  fun fetchMembers() {
+    runBlocking {
+      val response = listResources.listMembers("8044403")
+      assertEquals("Sharon Ly", response.users?.get(0)?.name)
     }
+  }
 
-    @Test
-    fun addMember() {
-        runBlocking {
-            val listModel = listResources.addMember("58300198", user_id = "14895163", screen_name = "onesnowclimber")
-            assertEquals("58300198", listModel.idStr)
-        }
+  @Test
+  fun addMember() {
+    runBlocking {
+      val listModel = listResources.addMember("58300198", user_id = "14895163", screen_name = "onesnowclimber")
+      assertEquals("58300198", listModel.idStr)
     }
+  }
 
-    @Test
-    fun removeMember() {
-        runBlocking {
-            val listModel = listResources.removeMember("58300198", user_id = "14895163", screen_name = "onesnowclimber")
-            assertEquals("58300198", listModel.idStr)
-        }
+  @Test
+  fun removeMember() {
+    runBlocking {
+      val listModel = listResources.removeMember("58300198", user_id = "14895163", screen_name = "onesnowclimber")
+      assertEquals("58300198", listModel.idStr)
     }
+  }
 
-    @Test
-    fun unsubscribeLists() {
-        runBlocking {
-            val listModel = listResources.unsubscribeLists("58300198")
-            assertEquals("58300198", listModel.idStr)
-        }
+  @Test
+  fun unsubscribeLists() {
+    runBlocking {
+      val listModel = listResources.unsubscribeLists("58300198")
+      assertEquals("58300198", listModel.idStr)
     }
+  }
 
-    @Test
-    fun subscribeLists() {
-        runBlocking {
-            val listModel = listResources.subscribeLists("58300198")
-            assertEquals("58300198", listModel.idStr)
-        }
+  @Test
+  fun subscribeLists() {
+    runBlocking {
+      val listModel = listResources.subscribeLists("58300198")
+      assertEquals("58300198", listModel.idStr)
     }
+  }
 }

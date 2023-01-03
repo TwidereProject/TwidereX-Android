@@ -30,25 +30,25 @@ import androidx.compose.ui.Modifier
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ItemHeader(
-    modifier: Modifier = Modifier,
-    icon: @Composable (() -> Unit)? = null,
-    secondaryText: @Composable (() -> Unit)? = null,
-    singleLineSecondaryText: Boolean = true,
-    overlineText: @Composable (() -> Unit)? = null,
-    trailing: @Composable (() -> Unit)? = null,
-    text: @Composable () -> Unit
+  modifier: Modifier = Modifier,
+  icon: @Composable (() -> Unit)? = null,
+  secondaryText: @Composable (() -> Unit)? = null,
+  singleLineSecondaryText: Boolean = true,
+  overlineText: @Composable (() -> Unit)? = null,
+  trailing: @Composable (() -> Unit)? = null,
+  text: @Composable () -> Unit
 ) {
-    ListItem(
-        modifier,
-        icon,
-        secondaryText,
-        singleLineSecondaryText,
-        overlineText,
-        trailing,
-        text = {
-            ProvideTextStyle(value = MaterialTheme.typography.button) {
-                text.invoke()
-            }
-        },
-    )
+  ListItem(
+    modifier,
+    icon,
+    secondaryText,
+    singleLineSecondaryText,
+    overlineText,
+    trailing,
+    text = {
+      ProvideTextStyle(value = MaterialTheme.typography.button) {
+        text.invoke()
+      }
+    },
+  )
 }

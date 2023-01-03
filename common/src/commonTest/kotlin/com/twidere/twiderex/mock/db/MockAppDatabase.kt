@@ -28,26 +28,26 @@ import com.twidere.twiderex.mock.db.dao.MockSearchDao
 import org.jetbrains.annotations.TestOnly
 
 class MockAppDatabase @TestOnly constructor() : AppDatabase {
-    private val draftDao = MockDraftDao()
-    override fun draftDao(): DraftDao {
-        return draftDao
-    }
+  private val draftDao = MockDraftDao()
+  override fun draftDao(): DraftDao {
+    return draftDao
+  }
 
-    private val searchDao = MockSearchDao()
-    override fun searchDao(): SearchDao {
-        return searchDao
-    }
+  private val searchDao = MockSearchDao()
+  override fun searchDao(): SearchDao {
+    return searchDao
+  }
 
-    private var cleared = false
-    override suspend fun clearAllTables() {
-        cleared = true
-    }
+  private var cleared = false
+  override suspend fun clearAllTables() {
+    cleared = true
+  }
 
-    fun isAllTablesCleared(): Boolean {
-        return cleared
-    }
+  fun isAllTablesCleared(): Boolean {
+    return cleared
+  }
 
-    override suspend fun <R> withTransaction(block: suspend () -> R): R {
-        return block.invoke()
-    }
+  override suspend fun <R> withTransaction(block: suspend () -> R): R {
+    return block.invoke()
+  }
 }

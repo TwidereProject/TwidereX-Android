@@ -38,49 +38,49 @@ import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalPagingApi::class)
 class TrendMediator(
-    private val database: CacheDatabase,
-    private val service: TrendService,
-    private val accountKey: MicroBlogKey,
-    private val locationId: String
+  private val database: CacheDatabase,
+  private val service: TrendService,
+  private val accountKey: MicroBlogKey,
+  private val locationId: String
 ) : RemoteMediator<Int, UiTrend>() {
 
-    override suspend fun load(
-        loadType: LoadType,
-        state: PagingState<Int, UiTrend>
-    ): MediatorResult {
-        return try {
-            if (loadType == LoadType.REFRESH) {
-                val lists = service.trends(locationId)
-                database.withTransaction {
-                    database.trendDao().clear(accountKey)
-                    database.trendDao().insertAll(lists.map { it.toUi(accountKey) })
-                }
-            }
-            MediatorResult.Success(endOfPaginationReached = true)
-        } catch (e: Throwable) {
-            MediatorResult.Error(e)
+  override suspend fun load(
+    loadType: LoadType,
+    state: PagingState<Int, UiTrend>
+  ): MediatorResult {
+    return try {
+      if (loadType == LoadType.REFRESH) {
+        val lists = service.trends(locationId)
+        database.withTransaction {
+          database.trendDao().clear(accountKey)
+          database.trendDao().insertAll(lists.map { it.toUi(accountKey) })
         }
+      }
+      MediatorResult.Success(endOfPaginationReached = true)
+    } catch (e: Throwable) {
+      MediatorResult.Error(e)
     }
+  }
 
-    fun pager(
-        config: PagingConfig = PagingConfig(
-            pageSize = defaultLoadCount,
-            enablePlaceholders = false
-        ),
-        pagingSourceFactory: () -> PagingSource<Int, UiTrend> = {
-            database.trendDao().getPagingSource(accountKey = accountKey)
-        }
-    ): Pager<Int, UiTrend> {
-        return Pager(
-            config = config,
-            remoteMediator = this,
-            pagingSourceFactory = pagingSourceFactory,
-        )
+  fun pager(
+    config: PagingConfig = PagingConfig(
+      pageSize = defaultLoadCount,
+      enablePlaceholders = false
+    ),
+    pagingSourceFactory: () -> PagingSource<Int, UiTrend> = {
+      database.trendDao().getPagingSource(accountKey = accountKey)
     }
+  ): Pager<Int, UiTrend> {
+    return Pager(
+      config = config,
+      remoteMediator = this,
+      pagingSourceFactory = pagingSourceFactory,
+    )
+  }
 
-    companion object {
-        fun Pager<Int, UiTrend>.toUi(): Flow<PagingData<UiTrend>> {
-            return this.flow
-        }
+  companion object {
+    fun Pager<Int, UiTrend>.toUi(): Flow<PagingData<UiTrend>> {
+      return this.flow
     }
+  }
 }

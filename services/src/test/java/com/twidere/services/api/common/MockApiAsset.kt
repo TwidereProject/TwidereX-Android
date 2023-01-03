@@ -21,10 +21,10 @@
 package com.twidere.services.api.common
 import java.io.File
 object MockApiAsset {
-    private const val BaseUrl = "src/test/resources/api"
+  private const val BaseUrl = "src/test/resources/api"
 
-    fun fetchAsset(path: String): String {
-        val file = File("$BaseUrl$path")
-        return file.readText()
-    }
+  fun fetchAsset(path: String): String {
+    val file = File("$BaseUrl$path")
+    return file.readText()
+  }
 }

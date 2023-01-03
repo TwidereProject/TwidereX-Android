@@ -31,114 +31,127 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.navigation.Root
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
+import dev.icerock.moko.resources.FileResource
+import dev.icerock.moko.resources.StringResource
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
 data class SettingItem(
-    val name: String,
-    val icon: Painter,
-    val route: String,
+  val name: StringResource,
+  val icon: FileResource,
+  val route: String,
 )
 
+private val settings =
+  mapOf(
+    com.twidere.twiderex.MR.strings.scene_settings_section_header_general to listOf(
+      SettingItem(
+        com.twidere.twiderex.MR.strings.scene_settings_appearance_title,
+        com.twidere.twiderex.MR.files.ic_shirt,
+        route = Root.Settings.Appearance,
+      ),
+      SettingItem(
+        com.twidere.twiderex.MR.strings.scene_settings_display_title,
+        com.twidere.twiderex.MR.files.ic_template,
+        route = Root.Settings.Display,
+      ),
+      SettingItem(
+        com.twidere.twiderex.MR.strings.scene_settings_layout_title,
+        com.twidere.twiderex.MR.files.ic_layout_sidebar,
+        route = Root.Settings.Layout,
+      ),
+      SettingItem(
+        com.twidere.twiderex.MR.strings.scene_settings_notification_title,
+        com.twidere.twiderex.MR.files.ic_settings_notification,
+        route = Root.Settings.Notification,
+      ),
+      SettingItem(
+        com.twidere.twiderex.MR.strings.scene_settings_storage_title,
+        com.twidere.twiderex.MR.files.ic_database,
+        route = Root.Settings.Storage,
+      ),
+      SettingItem(
+        com.twidere.twiderex.MR.strings.scene_settings_misc_title,
+        com.twidere.twiderex.MR.files.ic_triangle_square_circle,
+        route = Root.Settings.Misc,
+      ),
+    ),
+    com.twidere.twiderex.MR.strings.scene_settings_section_header_about to listOf(
+      SettingItem(
+        com.twidere.twiderex.MR.strings.scene_settings_about_title,
+        com.twidere.twiderex.MR.files.ic_info_circle,
+        route = Root.Settings.About,
+      ),
+    )
+  )
+
+@NavGraphDestination(
+  route = Root.Settings.Home,
+)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SettingsScene() {
-    val settings =
-        mapOf(
-            stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_section_header_general) to listOf(
-                SettingItem(
-                    stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_appearance_title),
-                    painterResource(res = com.twidere.twiderex.MR.files.ic_shirt),
-                    route = Root.Settings.Appearance,
-                ),
-                SettingItem(
-                    stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_title),
-                    painterResource(res = com.twidere.twiderex.MR.files.ic_template),
-                    route = Root.Settings.Display,
-                ),
-                SettingItem(
-                    stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_layout_title),
-                    painterResource(res = com.twidere.twiderex.MR.files.ic_layout_sidebar),
-                    route = Root.Settings.Layout,
-                ),
-                SettingItem(
-                    stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_notification_title),
-                    painterResource(res = com.twidere.twiderex.MR.files.ic_settings_notification),
-                    route = Root.Settings.Notification,
-                ),
-                SettingItem(
-                    stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_storage_title),
-                    painterResource(res = com.twidere.twiderex.MR.files.ic_database),
-                    route = Root.Settings.Storage,
-                ),
-                SettingItem(
-                    stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_title),
-                    painterResource(res = com.twidere.twiderex.MR.files.ic_triangle_square_circle),
-                    route = Root.Settings.Misc,
-                ),
-            ),
-            stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_section_header_about) to listOf(
-                SettingItem(
-                    stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_title),
-                    painterResource(res = com.twidere.twiderex.MR.files.ic_info_circle),
-                    route = Root.Settings.About,
-                ),
+fun SettingsScene(
+  navigator: Navigator,
+) {
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
             )
+          },
+          title = {
+            Text(text = stringResource(com.twidere.twiderex.MR.strings.scene_settings_title))
+          }
         )
-
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_title))
-                    }
-                )
-            }
-        ) {
-            LazyColumn(
-                contentPadding = it
-            ) {
-                settings.forEach {
-                    item {
-                        ListItem(
-                            text = {
-                                ProvideTextStyle(value = MaterialTheme.typography.button) {
-                                    Text(text = it.key)
-                                }
-                            },
-                        )
-                    }
-                    items(it.value) {
-                        val navController = LocalNavController.current
-                        ListItem(
-                            modifier = Modifier.clickable(
-                                onClick = {
-                                    if (it.route.isNotEmpty()) {
-                                        navController.navigate(it.route)
-                                    }
-                                }
-                            ),
-                            icon = {
-                                Icon(painter = it.icon, contentDescription = it.name)
-                            },
-                            text = {
-                                Text(text = it.name)
-                            },
-                        )
-                    }
+      }
+    ) {
+      LazyColumn(
+        contentPadding = it
+      ) {
+        settings.forEach {
+          item {
+            ListItem(
+              text = {
+                ProvideTextStyle(value = MaterialTheme.typography.button) {
+                  Text(text = stringResource(it.key))
                 }
-            }
+              },
+            )
+          }
+          items(it.value) {
+            ListItem(
+              modifier = Modifier.clickable(
+                onClick = {
+                  if (it.route.isNotEmpty()) {
+                    navigator.navigate(it.route)
+                  }
+                }
+              ),
+              icon = {
+                Icon(
+                  painter = painterResource(it.icon),
+                  contentDescription = stringResource(it.name)
+                )
+              },
+              text = {
+                Text(text = stringResource(it.name))
+              },
+            )
+          }
         }
+      }
     }
+  }
 }

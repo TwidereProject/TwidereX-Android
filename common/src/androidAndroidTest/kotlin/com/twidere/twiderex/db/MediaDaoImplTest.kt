@@ -31,11 +31,11 @@ import kotlin.test.assertEquals
 
 internal class MediaDaoImplTest : CacheDatabaseDaoTest() {
 
-    @Test
-    fun findMediaByBelongToKey_ReturnsResultMatchTheBelongKey() = runBlocking {
-        val cacheDatabase = CacheDatabaseImpl(roomDatabase)
-        val belongKey = MicroBlogKey.twitter("test")
-        roomDatabase.mediaDao().insertAll(listOf(mockUiMedia(belongToKey = belongKey)).toDbMedia())
-        assertEquals(belongKey, cacheDatabase.mediaDao().findMediaByBelongToKey(belongKey).first().belongToKey)
-    }
+  @Test
+  fun findMediaByBelongToKey_ReturnsResultMatchTheBelongKey() = runBlocking {
+    val cacheDatabase = CacheDatabaseImpl(roomDatabase)
+    val belongKey = MicroBlogKey.twitter("test")
+    roomDatabase.mediaDao().insertAll(listOf(mockUiMedia(belongToKey = belongKey)).toDbMedia())
+    assertEquals(belongKey, cacheDatabase.mediaDao().findMediaByBelongToKey(belongKey).first().belongToKey)
+  }
 }

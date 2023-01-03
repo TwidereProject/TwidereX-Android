@@ -32,30 +32,30 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class StatusViewModel(
-    private val statusRepository: StatusRepository,
-    private val accountRepository: AccountRepository,
-    private val statusKey: MicroBlogKey,
+  private val statusRepository: StatusRepository,
+  private val accountRepository: AccountRepository,
+  private val statusKey: MicroBlogKey,
 ) : ViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val status by lazy {
-        account.mapNotNull { it }.flatMapLatest {
-            statusRepository.loadStatus(statusKey = statusKey, accountKey = it.accountKey)
-        }.asStateIn(viewModelScope, null)
-    }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  val status by lazy {
+    account.mapNotNull { it }.flatMapLatest {
+      statusRepository.loadStatus(statusKey = statusKey, accountKey = it.accountKey)
+    }.asStateIn(viewModelScope, null)
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val source by lazy {
-        account.mapNotNull { it }.flatMapLatest {
-            statusRepository.conversation(
-                statusKey = statusKey,
-                accountKey = it.accountKey,
-                platformType = it.type,
-                service = it.service
-            )
-        }.cachedIn(viewModelScope)
-    }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  val source by lazy {
+    account.mapNotNull { it }.flatMapLatest {
+      statusRepository.conversation(
+        statusKey = statusKey,
+        accountKey = it.accountKey,
+        platformType = it.type,
+        service = it.service
+      )
+    }.cachedIn(viewModelScope)
+  }
 }

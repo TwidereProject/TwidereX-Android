@@ -22,7 +22,6 @@ package com.twidere.twiderex.ui
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.Colors
 import androidx.compose.material.LocalElevationOverlay
@@ -48,221 +47,222 @@ import com.twidere.twiderex.preferences.model.AppearancePreferences
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TwidereTheme(
-    darkTheme: Boolean = false,
-    content: @Composable () -> Unit,
+  darkTheme: Boolean = false,
+  content: @Composable () -> Unit,
 ) {
-    val colors = provideThemeColors(darkTheme)
-    val pureDark = LocalAppearancePreferences.current.isDarkModePureBlack
-    val typography = provideTypography()
-    CompositionLocalProvider(
-        *if (pureDark && darkTheme) {
-            arrayOf(LocalElevationOverlay provides null)
-        } else {
-            emptyArray()
-        }
-    ) {
-        MaterialTheme(
-            colors = colors,
-            typography = typography,
-            shapes = shapes,
-            content = {
-                ProvideOverScrollConfiguration {
-                    content.invoke()
-                }
-            },
-        )
+  val colors = provideThemeColors(darkTheme)
+  val pureDark = LocalAppearancePreferences.current.isDarkModePureBlack
+  val typography = provideTypography()
+  CompositionLocalProvider(
+    *if (pureDark && darkTheme) {
+      arrayOf(LocalElevationOverlay provides null)
+    } else {
+      emptyArray()
     }
+  ) {
+    MaterialTheme(
+      colors = colors,
+      typography = typography,
+      shapes = shapes,
+      content = {
+        ProvideOverScrollConfiguration {
+          content.invoke()
+        }
+      },
+    )
+  }
 }
 
 @Composable
 fun TwidereDialog(
-    requireDarkTheme: Boolean = false,
-    extendViewIntoStatusBar: Boolean = false,
-    extendViewIntoNavigationBar: Boolean = false,
-    statusBarColorProvider: @Composable () -> Color = {
-        MaterialTheme.colors.surface.withElevation()
-    },
-    navigationBarColorProvider: @Composable () -> Color = {
-        MaterialTheme.colors.surface
-    },
-    content: @Composable () -> Unit,
+  requireDarkTheme: Boolean = false,
+  extendViewIntoStatusBar: Boolean = false,
+  extendViewIntoNavigationBar: Boolean = false,
+  statusBarColorProvider: @Composable () -> Color = {
+    MaterialTheme.colors.surface.withElevation()
+  },
+  navigationBarColorProvider: @Composable () -> Color = {
+    MaterialTheme.colors.surface
+  },
+  content: @Composable () -> Unit,
 ) {
-    TwidereScene(
-        requireDarkTheme,
-        extendViewIntoStatusBar,
-        extendViewIntoNavigationBar,
-        statusBarColorProvider,
-        navigationBarColorProvider,
-        content,
-    )
+  TwidereScene(
+    requireDarkTheme,
+    extendViewIntoStatusBar,
+    extendViewIntoNavigationBar,
+    statusBarColorProvider,
+    navigationBarColorProvider,
+    content,
+  )
 }
 
 @Composable
 fun TwidereScene(
-    requireDarkTheme: Boolean = false,
-    extendViewIntoStatusBar: Boolean = false,
-    extendViewIntoNavigationBar: Boolean = false,
-    statusBarColorProvider: @Composable () -> Color = {
-        MaterialTheme.colors.surface.withElevation()
-    },
-    navigationBarColorProvider: @Composable () -> Color = {
-        MaterialTheme.colors.surface
-    },
-    content: @Composable () -> Unit,
+  requireDarkTheme: Boolean = false,
+  extendViewIntoStatusBar: Boolean = false,
+  extendViewIntoNavigationBar: Boolean = false,
+  statusBarColorProvider: @Composable () -> Color = {
+    MaterialTheme.colors.surface.withElevation()
+  },
+  navigationBarColorProvider: @Composable () -> Color = {
+    MaterialTheme.colors.surface
+  },
+  content: @Composable () -> Unit,
 ) {
-    val darkTheme = isDarkTheme(requireDarkTheme)
-    TwidereTheme(darkTheme = darkTheme) {
-        val statusBarColor = statusBarColorProvider.invoke()
-        val navigationBarColor = navigationBarColorProvider.invoke().let {
-            val surface = MaterialTheme.colors.surface
-            if (isAndroidLessOreo && !darkTheme && it == surface) {
-                MaterialTheme.colors.onSurface
-            } else {
-                it
-            }
-        }
-        PlatformInsets(
-            control = NativeInsetsControl(
-                extendToTop = extendViewIntoStatusBar,
-                extendToBottom = extendViewIntoNavigationBar,
-                extendToStart = extendViewIntoNavigationBar,
-                extendToEnd = extendViewIntoNavigationBar,
-            ),
-            color = NativeInsetsColor(
-                top = statusBarColor,
-                start = navigationBarColor,
-                end = navigationBarColor,
-                bottom = navigationBarColor,
-            ),
-            content = content,
-        )
+  val darkTheme = isDarkTheme(requireDarkTheme)
+  TwidereTheme(darkTheme = darkTheme) {
+    val statusBarColor = statusBarColorProvider.invoke()
+    val navigationBarColor = navigationBarColorProvider.invoke().let {
+      val surface = MaterialTheme.colors.surface
+      if (isAndroidLessOreo && !darkTheme && it == surface) {
+        MaterialTheme.colors.onSurface
+      } else {
+        it
+      }
     }
+    PlatformInsets(
+      control = NativeInsetsControl(
+        extendToTop = extendViewIntoStatusBar,
+        extendToBottom = extendViewIntoNavigationBar,
+        extendToStart = extendViewIntoNavigationBar,
+        extendToEnd = extendViewIntoNavigationBar,
+        darkTheme = darkTheme,
+      ),
+      color = NativeInsetsColor(
+        top = statusBarColor,
+        start = navigationBarColor,
+        end = navigationBarColor,
+        bottom = navigationBarColor,
+      ),
+      content = content,
+    )
+  }
 }
 
 @Composable
 fun isDarkTheme(requireDarkTheme: Boolean = false): Boolean {
-    val appearance = LocalAppearancePreferences.current
-    val theme = appearance.theme
-    return if (requireDarkTheme) {
-        true
-    } else {
-        when (theme) {
-            AppearancePreferences.Theme.Auto -> isSystemInDarkTheme()
-            AppearancePreferences.Theme.Light -> false
-            AppearancePreferences.Theme.Dark -> true
-        }
+  val appearance = LocalAppearancePreferences.current
+  val theme = appearance.theme
+  return if (requireDarkTheme) {
+    true
+  } else {
+    when (theme) {
+      AppearancePreferences.Theme.Auto -> isSystemInDarkTheme()
+      AppearancePreferences.Theme.Light -> false
+      AppearancePreferences.Theme.Dark -> true
     }
+  }
 }
 
 @Composable
 private fun provideTypography(): Typography {
-    val display = LocalDisplayPreferences.current
-    val useSystemFontSize = display.useSystemFontSize
-    val fontScale = display.fontScale
-    val baseTypography = Typography()
-        // classical text rendering (like the old twidere)
-        .let {
-            it.copy(
-                body1 = it.body1.copy(fontSize = 14.sp, letterSpacing = 0.sp),
-                body2 = it.body2.copy(letterSpacing = 0.sp),
-                caption = it.caption.copy(letterSpacing = 0.sp),
-            )
-        }
-    return if (useSystemFontSize) {
-        baseTypography
-    } else {
-        baseTypography.let {
-            it.copy(
-                h1 = it.h1.copy(
-                    fontSize = it.h1.fontSize * fontScale,
-                ),
-                h2 = it.h2.copy(
-                    fontSize = it.h2.fontSize * fontScale,
-                ),
-                h3 = it.h3.copy(
-                    fontSize = it.h3.fontSize * fontScale,
-                ),
-                h4 = it.h4.copy(
-                    fontSize = it.h4.fontSize * fontScale,
-                ),
-                h5 = it.h5.copy(
-                    fontSize = it.h5.fontSize * fontScale,
-                ),
-                h6 = it.h6.copy(
-                    fontSize = it.h6.fontSize * fontScale,
-                ),
-                subtitle1 = it.subtitle1.copy(
-                    fontSize = it.subtitle1.fontSize * fontScale,
-                ),
-                subtitle2 = it.subtitle2.copy(
-                    fontSize = it.subtitle2.fontSize * fontScale,
-                ),
-                body1 = it.body1.copy(
-                    fontSize = it.body1.fontSize * fontScale,
-                ),
-                body2 = it.body2.copy(
-                    fontSize = it.body2.fontSize * fontScale,
-                ),
-                button = it.button.copy(
-                    fontSize = it.button.fontSize * fontScale,
-                ),
-                caption = it.caption.copy(
-                    fontSize = it.caption.fontSize * fontScale,
-                ),
-                overline = it.overline.copy(
-                    fontSize = it.overline.fontSize * fontScale,
-                ),
-            )
-        }
+  val display = LocalDisplayPreferences.current
+  val useSystemFontSize = display.useSystemFontSize
+  val fontScale = display.fontScale
+  val baseTypography = Typography()
+    // classical text rendering (like the old twidere)
+    .let {
+      it.copy(
+        body1 = it.body1.copy(fontSize = 14.sp, letterSpacing = 0.sp),
+        body2 = it.body2.copy(letterSpacing = 0.sp),
+        caption = it.caption.copy(letterSpacing = 0.sp),
+      )
     }
+  return if (useSystemFontSize) {
+    baseTypography
+  } else {
+    baseTypography.let {
+      it.copy(
+        h1 = it.h1.copy(
+          fontSize = it.h1.fontSize * fontScale,
+        ),
+        h2 = it.h2.copy(
+          fontSize = it.h2.fontSize * fontScale,
+        ),
+        h3 = it.h3.copy(
+          fontSize = it.h3.fontSize * fontScale,
+        ),
+        h4 = it.h4.copy(
+          fontSize = it.h4.fontSize * fontScale,
+        ),
+        h5 = it.h5.copy(
+          fontSize = it.h5.fontSize * fontScale,
+        ),
+        h6 = it.h6.copy(
+          fontSize = it.h6.fontSize * fontScale,
+        ),
+        subtitle1 = it.subtitle1.copy(
+          fontSize = it.subtitle1.fontSize * fontScale,
+        ),
+        subtitle2 = it.subtitle2.copy(
+          fontSize = it.subtitle2.fontSize * fontScale,
+        ),
+        body1 = it.body1.copy(
+          fontSize = it.body1.fontSize * fontScale,
+        ),
+        body2 = it.body2.copy(
+          fontSize = it.body2.fontSize * fontScale,
+        ),
+        button = it.button.copy(
+          fontSize = it.button.fontSize * fontScale,
+        ),
+        caption = it.caption.copy(
+          fontSize = it.caption.fontSize * fontScale,
+        ),
+        overline = it.overline.copy(
+          fontSize = it.overline.fontSize * fontScale,
+        ),
+      )
+    }
+  }
 }
 
 @Composable
 private fun provideThemeColors(darkTheme: Boolean): Colors {
-    val primaryColor by animateColorAsState(targetValue = currentPrimaryColor())
-    val pureDark = LocalAppearancePreferences.current.isDarkModePureBlack
-    val target = if (darkTheme) {
-        if (pureDark) {
-            darkColors(
-                primary = primaryColor,
-                primaryVariant = primaryColor,
-                secondary = primaryColor,
-                background = Color.Black,
-                surface = Color.Black,
-            )
-        } else {
-            darkColors(
-                primary = primaryColor,
-                primaryVariant = primaryColor,
-                secondary = primaryColor,
-            )
-        }
-    } else {
-        lightColors(
-            primary = primaryColor,
-            primaryVariant = primaryColor,
-            secondary = primaryColor
-        )
-    }
-    val background by animateColorAsState(targetValue = target.background)
-    val surface by animateColorAsState(targetValue = target.surface)
-    val error by animateColorAsState(targetValue = target.error)
-    val onPrimary by animateColorAsState(targetValue = target.onPrimary)
-    val onSecondary by animateColorAsState(targetValue = target.onSecondary)
-    val onBackground by animateColorAsState(targetValue = target.onBackground)
-    val onSurface by animateColorAsState(targetValue = target.onSurface)
-    val onError by animateColorAsState(targetValue = target.onError)
-    return target.copy(
+  val primaryColor by animateColorAsState(targetValue = currentPrimaryColor())
+  val pureDark = LocalAppearancePreferences.current.isDarkModePureBlack
+  val target = if (darkTheme) {
+    if (pureDark) {
+      darkColors(
         primary = primaryColor,
         primaryVariant = primaryColor,
         secondary = primaryColor,
-        background = background,
-        surface = surface,
-        error = error,
-        onPrimary = onPrimary,
-        onSecondary = onSecondary,
-        onBackground = onBackground,
-        onSurface = onSurface,
-        onError = onError,
+        background = Color.Black,
+        surface = Color.Black,
+      )
+    } else {
+      darkColors(
+        primary = primaryColor,
+        primaryVariant = primaryColor,
+        secondary = primaryColor,
+      )
+    }
+  } else {
+    lightColors(
+      primary = primaryColor,
+      primaryVariant = primaryColor,
+      secondary = primaryColor
     )
+  }
+  val background by animateColorAsState(targetValue = target.background)
+  val surface by animateColorAsState(targetValue = target.surface)
+  val error by animateColorAsState(targetValue = target.error)
+  val onPrimary by animateColorAsState(targetValue = target.onPrimary)
+  val onSecondary by animateColorAsState(targetValue = target.onSecondary)
+  val onBackground by animateColorAsState(targetValue = target.onBackground)
+  val onSurface by animateColorAsState(targetValue = target.onSurface)
+  val onError by animateColorAsState(targetValue = target.onError)
+  return target.copy(
+    primary = primaryColor,
+    primaryVariant = primaryColor,
+    secondary = primaryColor,
+    background = background,
+    surface = surface,
+    error = error,
+    onPrimary = onPrimary,
+    onSecondary = onSecondary,
+    onBackground = onBackground,
+    onSurface = onSurface,
+    onError = onError,
+  )
 }

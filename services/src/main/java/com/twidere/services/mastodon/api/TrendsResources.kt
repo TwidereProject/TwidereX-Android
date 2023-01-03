@@ -25,8 +25,8 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface TrendsResources {
-    @GET("/api/v1/trends")
-    suspend fun trends(
-        @Query("limit") limit: Int? = null,
-    ): List<Trend>
+  @GET("/api/v1/trends")
+  suspend fun trends(
+    @Query("limit") limit: Int? = null,
+  ): List<Trend>
 }

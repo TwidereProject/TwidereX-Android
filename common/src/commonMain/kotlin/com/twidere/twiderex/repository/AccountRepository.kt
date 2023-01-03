@@ -28,28 +28,31 @@ import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 expect class AccountRepository {
-    val activeAccount: Flow<AccountDetails?>
-    val accounts: Flow<List<AccountDetails>>
-    fun updateAccount(user: UiUser)
-    fun getAccounts(): List<AccountDetails>
-    fun hasAccount(): Boolean
-    fun findByAccountKey(accountKey: MicroBlogKey): AccountDetails?
-    fun setCurrentAccount(detail: AccountDetails)
-    fun addAccount(
-        displayKey: MicroBlogKey,
-        type: PlatformType,
-        accountKey: MicroBlogKey,
-        credentials_type: CredentialsType,
-        credentials_json: String,
-        extras_json: String,
-        user: AmUser,
-        lastActive: Long,
-    )
-    fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences
-    fun containsAccount(key: MicroBlogKey): Boolean
-    fun updateAccount(detail: AccountDetails)
-    fun delete(detail: AccountDetails)
-    fun getFirstByType(type: PlatformType): AccountDetails?
+  val activeAccount: Flow<AccountDetails?>
+  val accounts: Flow<List<AccountDetails>>
+  fun updateAccount(user: UiUser)
+  fun getAccounts(): List<AccountDetails>
+  fun hasAccount(): Boolean
+  fun findByAccountKey(accountKey: MicroBlogKey): AccountDetails?
+  fun setCurrentAccount(detail: AccountDetails)
+  fun addAccount(
+    displayKey: MicroBlogKey,
+    type: PlatformType,
+    accountKey: MicroBlogKey,
+    credentials_type: CredentialsType,
+    credentials_json: String,
+    extras_json: String,
+    user: AmUser,
+    lastActive: Long,
+  )
+  fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences
+  fun containsAccount(key: MicroBlogKey): Boolean
+  fun updateAccount(detail: AccountDetails)
+  fun delete(detail: AccountDetails)
+  fun getFirstByType(type: PlatformType): AccountDetails?
 }
+
+fun AccountRepository.findByAccountKeyFlow(accountKey: MicroBlogKey): Flow<AccountDetails?> = accounts.map { it.firstOrNull { it.accountKey == accountKey } }

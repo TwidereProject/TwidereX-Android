@@ -24,19 +24,19 @@ import com.twidere.twiderex.sqldelight.table.DbTrend
 import com.twidere.twiderex.sqldelight.table.DbTrendHistory
 
 object TrendAdapterFactory {
-    fun create() = MicroBlogKeyColumnAdapter().let {
-        DbTrend.Adapter(
-            trendKeyAdapter = it,
-            accountKeyAdapter = it,
-        )
-    }
+  fun create() = MicroBlogKeyColumnAdapter().let {
+    DbTrend.Adapter(
+      trendKeyAdapter = it,
+      accountKeyAdapter = it,
+    )
+  }
 }
 
 object TrendHistoryAdapterFactory {
-    fun create() = MicroBlogKeyColumnAdapter().let {
-        DbTrendHistory.Adapter(
-            trendKeyAdapter = it,
-            accountKeyAdapter = it,
-        )
-    }
+  fun create() = MicroBlogKeyColumnAdapter().let {
+    DbTrendHistory.Adapter(
+      trendKeyAdapter = it,
+      accountKeyAdapter = it,
+    )
+  }
 }

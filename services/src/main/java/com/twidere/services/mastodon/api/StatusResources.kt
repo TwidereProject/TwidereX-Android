@@ -34,46 +34,46 @@ import retrofit2.http.Part
 import retrofit2.http.Path
 
 interface StatusResources {
-    @POST("/api/v1/statuses/{id}/favourite")
-    suspend fun favourite(@Path("id") id: String): Status
+  @POST("/api/v1/statuses/{id}/favourite")
+  suspend fun favourite(@Path("id") id: String): Status
 
-    @POST("/api/v1/statuses/{id}/unfavourite")
-    suspend fun unfavourite(@Path("id") id: String): Status
+  @POST("/api/v1/statuses/{id}/unfavourite")
+  suspend fun unfavourite(@Path("id") id: String): Status
 
-    @POST("/api/v1/statuses/{id}/reblog")
-    suspend fun reblog(@Path("id") id: String): Status
+  @POST("/api/v1/statuses/{id}/reblog")
+  suspend fun reblog(@Path("id") id: String): Status
 
-    @POST("/api/v1/statuses/{id}/unreblog")
-    suspend fun unreblog(@Path("id") id: String): Status
+  @POST("/api/v1/statuses/{id}/unreblog")
+  suspend fun unreblog(@Path("id") id: String): Status
 
-    @POST("/api/v1/statuses/{id}/bookmark")
-    suspend fun bookmark(@Path("id") id: String): Status
+  @POST("/api/v1/statuses/{id}/bookmark")
+  suspend fun bookmark(@Path("id") id: String): Status
 
-    @POST("/api/v1/statuses/{id}/unbookmark")
-    suspend fun unbookmark(@Path("id") id: String): Status
+  @POST("/api/v1/statuses/{id}/unbookmark")
+  suspend fun unbookmark(@Path("id") id: String): Status
 
-    @POST("/api/v1/statuses/{id}/mute")
-    suspend fun mute(@Path("id") id: String): Status
+  @POST("/api/v1/statuses/{id}/mute")
+  suspend fun mute(@Path("id") id: String): Status
 
-    @POST("/api/v1/statuses/{id}/unmute")
-    suspend fun unmute(@Path("id") id: String): Status
+  @POST("/api/v1/statuses/{id}/unmute")
+  suspend fun unmute(@Path("id") id: String): Status
 
-    @POST("/api/v1/statuses/{id}/pin")
-    suspend fun pin(@Path("id") id: String): Status
+  @POST("/api/v1/statuses/{id}/pin")
+  suspend fun pin(@Path("id") id: String): Status
 
-    @POST("/api/v1/statuses/{id}/unpin")
-    suspend fun unpin(@Path("id") id: String): Status
+  @POST("/api/v1/statuses/{id}/unpin")
+  suspend fun unpin(@Path("id") id: String): Status
 
-    @DELETE("/api/v1/statuses/{id}")
-    suspend fun delete(@Path("id") id: String): Status
+  @DELETE("/api/v1/statuses/{id}")
+  suspend fun delete(@Path("id") id: String): Status
 
-    @POST("/api/v1/statuses")
-    suspend fun post(@Body data: PostStatus): Status
+  @POST("/api/v1/statuses")
+  suspend fun post(@Body data: PostStatus): Status
 
-    @Multipart
-    @POST("/api/v1/media")
-    suspend fun upload(@Part file: MultipartBody.Part): UploadResponse
+  @Multipart
+  @POST("/api/v1/media")
+  suspend fun upload(@Part file: MultipartBody.Part): UploadResponse
 
-    @POST("/api/v1/polls/{id}/votes")
-    suspend fun vote(@Path("id") id: String, @Body data: PostVote): Poll
+  @POST("/api/v1/polls/{id}/votes")
+  suspend fun vote(@Path("id") id: String, @Body data: PostVote): Poll
 }

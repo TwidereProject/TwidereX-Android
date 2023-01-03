@@ -22,41 +22,55 @@ package com.twidere.twiderex.scenes.search.tabs
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusImageList
+import com.twidere.twiderex.component.navigation.media
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
+import com.twidere.twiderex.extensions.rememberPresenter
 import com.twidere.twiderex.preferences.model.DisplayPreferences
+import com.twidere.twiderex.scenes.search.tabs.presenter.TwitterSearchMediaPresenter
+import com.twidere.twiderex.scenes.search.tabs.presenter.TwitterSearchMediaState
 import com.twidere.twiderex.ui.LocalVideoPlayback
-import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
-import org.koin.core.parameter.parametersOf
+import moe.tlaster.precompose.navigation.Navigator
 
 class TwitterSearchMediaItem : SearchSceneItem {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_search_tabs_media)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_search_tabs_media)
+  }
 
-    @Composable
-    override fun Content(keyword: String) {
-        val viewModel: TwitterSearchMediaViewModel = getViewModel {
-            parametersOf(keyword)
-        }
-        val source = viewModel.source.collectAsLazyPagingItems()
-        CompositionLocalProvider(
-            LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
+  @Composable
+  override fun Content(
+    keyword: String,
+    navigator: Navigator,
+  ) {
+
+    val state by rememberPresenter {
+      TwitterSearchMediaPresenter(keyword = keyword)
+    }.collectAsState()
+
+    (state as? TwitterSearchMediaState.Data)?.let {
+      CompositionLocalProvider(
+        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
+      ) {
+        SwipeToRefreshLayout(
+          refreshingState = it.data.loadState.refresh is LoadState.Loading,
+          onRefresh = {
+            it.data.refreshOrRetry()
+          }
         ) {
-            SwipeToRefreshLayout(
-                refreshingState = source.loadState.refresh is LoadState.Loading,
-                onRefresh = {
-                    source.refreshOrRetry()
-                }
-            ) {
-                LazyUiStatusImageList(items = source)
+          LazyUiStatusImageList(
+            items = it.data,
+            openMedia = { key, index ->
+              navigator.media(key, index)
             }
+          )
         }
+      }
     }
+  }
 }

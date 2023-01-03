@@ -48,96 +48,102 @@ import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.navigation.UserNavigationData
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LazyUiUserList(
-    modifier: Modifier = Modifier,
-    items: LazyPagingItems<UiUser>,
-    state: LazyListState = rememberLazyListState(),
-    key: ((item: UiUser) -> Any) = { it.userKey.hashCode() },
-    onItemClicked: (UiUser) -> Unit = {},
-    header: LazyListScope.() -> Unit = {},
-    action: @Composable (user: UiUser) -> Unit = {}
+  modifier: Modifier = Modifier,
+  items: LazyPagingItems<UiUser>,
+  state: LazyListState = rememberLazyListState(),
+  userNavigationData: UserNavigationData,
+  key: ((item: UiUser) -> Any) = { it.userKey.hashCode() },
+  onItemClicked: (UiUser) -> Unit = {},
+  header: LazyListScope.() -> Unit = {},
+  action: @Composable (user: UiUser) -> Unit = {}
 ) {
-    LazyUiList(items = items) {
-        LazyColumn(
-            modifier = modifier,
-            state = state,
-        ) {
-            header.invoke(this)
-            items(
-                items,
-                key = key
-            ) {
-                it?.let {
-                    Row(
-                        modifier = Modifier.clickable {
-                            onItemClicked.invoke(it)
-                        },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        ListItem(
-                            modifier = Modifier.weight(1f),
-                            icon = {
-                                UserAvatar(
-                                    user = it,
-                                )
-                            },
-                            text = {
-                                Row {
-                                    UserName(user = it)
-                                    Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
-                                    UserScreenName(user = it)
-                                }
-                            },
-                            secondaryText = {
-                                Row {
-                                    Text(
-                                        text = stringResource(
-                                            res = com.twidere.twiderex.MR.strings.common_controls_profile_dashboard_followers,
-                                        )
-                                    )
-                                    Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
-                                    Text(
-                                        text = it.metrics.fans.toString()
-                                    )
-                                }
-                            },
-                        )
-                        Box(modifier = Modifier.padding(end = UiUserListDefaults.TrailingRightPadding)) {
-                            action.invoke(it)
-                        }
-                    }
-                } ?: run {
-                    LoadingUserPlaceholder()
+  LazyUiList(items = items) {
+    LazyColumn(
+      modifier = modifier,
+      state = state,
+    ) {
+      header.invoke(this)
+      items(
+        items,
+        key = key
+      ) {
+        it?.let {
+          Row(
+            modifier = Modifier.clickable {
+              onItemClicked.invoke(it)
+            },
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            ListItem(
+              modifier = Modifier.weight(1f),
+              icon = {
+                UserAvatar(
+                  user = it,
+                  onClick = userNavigationData.statusNavigation.toUser,
+                )
+              },
+              text = {
+                Row {
+                  UserName(
+                    user = it,
+                    onUserNameClicked = userNavigationData.statusNavigation.openLink,
+                  )
+                  Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
+                  UserScreenName(user = it)
                 }
+              },
+              secondaryText = {
+                Row {
+                  Text(
+                    text = stringResource(
+                      res = com.twidere.twiderex.MR.strings.common_controls_profile_dashboard_followers,
+                    )
+                  )
+                  Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
+                  Text(
+                    text = it.metrics.fans.toString()
+                  )
+                }
+              },
+            )
+            Box(modifier = Modifier.padding(end = UiUserListDefaults.TrailingRightPadding)) {
+              action.invoke(it)
             }
-            loadState(items.loadState.append) {
-                items.retry()
-            }
+          }
+        } ?: run {
+          LoadingUserPlaceholder()
         }
+      }
+      loadState(items.loadState.append) {
+        items.retry()
+      }
     }
+  }
 }
 
 object UiUserListDefaults {
-    val HorizontalPadding = 8.dp
-    val TrailingRightPadding = 16.dp
+  val HorizontalPadding = 8.dp
+  val TrailingRightPadding = 16.dp
 }
 
 @Composable
 private fun LoadingUserPlaceholder() {
-    Column(
-        modifier = Modifier
-            .wrapContentHeight(
-                align = Alignment.Top,
-                unbounded = true
-            )
-    ) {
-        repeat(10) {
-            UiUserPlaceholder(
-                delayMillis = it * 50L
-            )
-        }
+  Column(
+    modifier = Modifier
+      .wrapContentHeight(
+        align = Alignment.Top,
+        unbounded = true
+      )
+  ) {
+    repeat(10) {
+      UiUserPlaceholder(
+        delayMillis = it * 50L
+      )
     }
+  }
 }

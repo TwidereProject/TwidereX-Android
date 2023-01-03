@@ -21,9 +21,9 @@
 package com.twidere.twiderex.model.ui
 
 data class UiGif(
-    val id: String,
-    val url: String,
-    val mp4: String,
-    val preview: String,
-    val type: String
+  val id: String,
+  val url: String,
+  val mp4: String,
+  val preview: String,
+  val type: String
 )

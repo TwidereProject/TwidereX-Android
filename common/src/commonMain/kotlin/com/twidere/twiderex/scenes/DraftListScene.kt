@@ -48,86 +48,96 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.navigation.Root
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.DraftViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
+@NavGraphDestination(
+  route = Root.Draft.List,
+)
 @Composable
-fun DraftListScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_drafts_title))
-                    }
-                )
-            }
-        ) {
-            DraftListSceneContent()
-        }
+fun DraftListScene(
+  navigator: Navigator,
+) {
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_drafts_title))
+          }
+        )
+      }
+    ) {
+      DraftListSceneContent(navigator = navigator)
     }
+  }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DraftListSceneContent(
-    lazyListController: LazyListController? = null,
+  lazyListController: LazyListController? = null,
+  navigator: Navigator,
 ) {
-    val viewModel: DraftViewModel = getViewModel()
-    val source by viewModel.source.observeAsState(initial = emptyList())
-    val navController = LocalNavController.current
-    val listState = rememberLazyListState()
-    LaunchedEffect(lazyListController) {
-        lazyListController?.listState = listState
-    }
-    LazyColumn(
-        state = listState
-    ) {
-        items(items = source, key = { it.draftId.hashCode() }) {
-            ListItem(
-                text = {
-                    Text(text = it.content)
-                },
-                trailing = {
-                    var expanded by remember { mutableStateOf(false) }
-                    Box {
-                        IconButton(onClick = { expanded = true }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = stringResource(
-                                    res = com.twidere.twiderex.MR.strings.accessibility_common_more
-                                )
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                        ) {
-                            DropdownMenuItem(
-                                onClick = {
-                                    navController.navigate(Root.Draft.Compose(it.draftId))
-                                }
-                            ) {
-                                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_drafts_actions_edit_draft))
-                            }
-                            DropdownMenuItem(
-                                onClick = {
-                                    viewModel.delete(it)
-                                }
-                            ) {
-                                Text(
-                                    text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_remove),
-                                    color = Color.Red,
-                                )
-                            }
-                        }
-                    }
+  val viewModel: DraftViewModel = getViewModel()
+  val source by viewModel.source.observeAsState(initial = emptyList())
+  val listState = rememberLazyListState()
+  LaunchedEffect(lazyListController) {
+    lazyListController?.listState = listState
+  }
+  LazyColumn(
+    state = listState
+  ) {
+    items(items = source, key = { it.draftId.hashCode() }) {
+      ListItem(
+        text = {
+          Text(text = it.content)
+        },
+        trailing = {
+          var expanded by remember { mutableStateOf(false) }
+          Box {
+            IconButton(onClick = { expanded = true }) {
+              Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(
+                  res = com.twidere.twiderex.MR.strings.accessibility_common_more
+                )
+              )
+            }
+            DropdownMenu(
+              expanded = expanded,
+              onDismissRequest = { expanded = false },
+            ) {
+              DropdownMenuItem(
+                onClick = {
+                  navigator.navigate(Root.Draft.Compose(it.draftId))
                 }
-            )
+              ) {
+                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_drafts_actions_edit_draft))
+              }
+              DropdownMenuItem(
+                onClick = {
+                  viewModel.delete(it)
+                }
+              ) {
+                Text(
+                  text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_remove),
+                  color = Color.Red,
+                )
+              }
+            }
+          }
         }
+      )
     }
+  }
 }

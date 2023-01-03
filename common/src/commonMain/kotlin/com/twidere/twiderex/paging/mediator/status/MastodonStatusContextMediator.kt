@@ -30,27 +30,27 @@ import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingMe
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingResult
 
 class MastodonStatusContextMediator(
-    private val service: MastodonService,
-    private val statusKey: MicroBlogKey,
-    accountKey: MicroBlogKey,
-    database: CacheDatabase,
+  private val service: MastodonService,
+  private val statusKey: MicroBlogKey,
+  accountKey: MicroBlogKey,
+  database: CacheDatabase,
 ) : CursorWithCustomOrderPagingMediator(accountKey, database) {
-    override suspend fun load(
-        pageSize: Int,
-        paging: CursorWithCustomOrderPagination?
-    ): List<IStatus> {
-        val result = service.context(statusKey.id)
-        val status = service.lookupStatus(statusKey.id)
-        return CursorWithCustomOrderPagingResult(
-            (result.ancestors ?: emptyList()) + status + (result.descendants ?: emptyList()),
-            cursor = null,
-            nextOrder = 0,
-        )
-    }
+  override suspend fun load(
+    pageSize: Int,
+    paging: CursorWithCustomOrderPagination?
+  ): List<IStatus> {
+    val result = service.context(statusKey.id)
+    val status = service.lookupStatus(statusKey.id)
+    return CursorWithCustomOrderPagingResult(
+      (result.ancestors ?: emptyList()) + status + (result.descendants ?: emptyList()),
+      cursor = null,
+      nextOrder = 0,
+    )
+  }
 
-    override val pagingKey: String = "status:$statusKey"
+  override val pagingKey: String = "status:$statusKey"
 
-    override fun hasMore(result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
-        return false
-    }
+  override fun hasMore(raw: List<IStatus>, result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
+    return false
+  }
 }

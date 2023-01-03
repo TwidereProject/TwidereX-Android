@@ -26,6 +26,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TwitterUserExtra(
-    val pinned_tweet_id: String?,
-    val url: List<UiUrlEntity>,
+  val pinned_tweet_id: String?,
+  val url: List<UiUrlEntity>,
 ) : UserExtra

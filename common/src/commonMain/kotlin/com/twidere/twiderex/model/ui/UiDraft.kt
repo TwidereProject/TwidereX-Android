@@ -24,11 +24,11 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 
 data class UiDraft(
-    val draftId: String,
-    val content: String,
-    val media: List<String>,
-    val createdAt: Long,
-    val composeType: ComposeType,
-    val statusKey: MicroBlogKey?,
-    val excludedReplyUserIds: List<String>?,
+  val draftId: String,
+  val content: String,
+  val media: List<String>,
+  val createdAt: Long,
+  val composeType: ComposeType,
+  val statusKey: MicroBlogKey?,
+  val excludedReplyUserIds: List<String>?,
 )

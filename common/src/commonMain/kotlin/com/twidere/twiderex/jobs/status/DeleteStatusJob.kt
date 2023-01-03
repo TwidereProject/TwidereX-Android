@@ -28,25 +28,25 @@ import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.utils.notifyError
 
 class DeleteStatusJob(
-    private val accountRepository: AccountRepository,
-    private val statusRepository: StatusRepository,
-    private val inAppNotification: InAppNotification
+  private val accountRepository: AccountRepository,
+  private val statusRepository: StatusRepository,
+  private val inAppNotification: InAppNotification
 ) {
-    suspend fun execute(
-        accountKey: MicroBlogKey,
-        statusKey: MicroBlogKey
-    ) {
-        val status = statusKey.let {
-            statusRepository.loadFromCache(it, accountKey = accountKey)
-        } ?: throw Error("Can't find any status matches:$statusKey")
-        val service = accountRepository.findByAccountKey(accountKey)?.let {
-            it.service as? StatusService
-        } ?: throw Error()
-        try {
-            service.delete(status.statusId)
-        } catch (e: Throwable) {
-            inAppNotification.notifyError(e)
-            throw e
-        }
+  suspend fun execute(
+    accountKey: MicroBlogKey,
+    statusKey: MicroBlogKey
+  ) {
+    val status = statusKey.let {
+      statusRepository.loadFromCache(it, accountKey = accountKey)
+    } ?: throw Error("Can't find any status matches:$statusKey")
+    val service = accountRepository.findByAccountKey(accountKey)?.let {
+      it.service as? StatusService
+    } ?: throw Error()
+    try {
+      service.delete(status.statusId)
+    } catch (e: Throwable) {
+      inAppNotification.notifyError(e)
+      throw e
     }
+  }
 }

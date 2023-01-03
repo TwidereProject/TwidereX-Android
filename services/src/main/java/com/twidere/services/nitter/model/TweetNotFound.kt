@@ -23,6 +23,6 @@ package com.twidere.services.nitter.model
 import moe.tlaster.hson.annotations.HtmlSerializable
 
 data class TweetNotFound(
-    @HtmlSerializable(".error-panel")
-    val notFound: String? = null,
+  @HtmlSerializable(".error-panel")
+  val notFound: String? = null,
 )

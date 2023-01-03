@@ -29,12 +29,12 @@ import com.twidere.twiderex.paging.crud.PagingMemoryCache
 
 @ExperimentalPagingApi
 class ListsMembersMediator(
-    memoryCache: PagingMemoryCache<UiUser>,
-    userKey: MicroBlogKey,
-    private val service: ListsService,
-    private val listId: String,
+  memoryCache: PagingMemoryCache<UiUser>,
+  userKey: MicroBlogKey,
+  private val service: ListsService,
+  private val listId: String,
 ) : ListsUserPagingMediator(userKey, memoryCache) {
-    override suspend fun loadUsers(key: String?, count: Int): List<IUser> {
-        return service.listMembers(listId = listId, count = count, key)
-    }
+  override suspend fun loadUsers(key: String?, count: Int): List<IUser> {
+    return service.listMembers(listId = listId, count = count, key)
+  }
 }

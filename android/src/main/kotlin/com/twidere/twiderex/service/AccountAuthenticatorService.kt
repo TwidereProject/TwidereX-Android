@@ -35,90 +35,90 @@ import com.twidere.twiderex.navigation.RootDeepLinks
 
 class AccountAuthenticatorService : Service() {
 
-    private lateinit var authenticator: TwidereAccountAuthenticator
+  private lateinit var authenticator: TwidereAccountAuthenticator
 
-    override fun onCreate() {
-        super.onCreate()
-        authenticator = TwidereAccountAuthenticator(this)
+  override fun onCreate() {
+    super.onCreate()
+    authenticator = TwidereAccountAuthenticator(this)
+  }
+
+  override fun onBind(intent: Intent): IBinder {
+    return authenticator.iBinder
+  }
+
+  private class TwidereAccountAuthenticator(val context: Context) :
+    AbstractAccountAuthenticator(context) {
+
+    override fun addAccount(
+      response: AccountAuthenticatorResponse,
+      accountType: String,
+      authTokenType: String?,
+      requiredFeatures: Array<String>?,
+      options: Bundle?
+    ): Bundle {
+      val intent = Intent(Intent.ACTION_VIEW, Uri.parse(RootDeepLinks.SignIn))
+      intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response)
+      return bundleOf(
+        AccountManager.KEY_INTENT to intent,
+      )
     }
 
-    override fun onBind(intent: Intent): IBinder {
-        return authenticator.iBinder
+    override fun getAuthToken(
+      response: AccountAuthenticatorResponse,
+      account: Account,
+      authTokenType: String,
+      options: Bundle?
+    ): Bundle {
+      val am = AccountManager.get(context)
+      val authToken = am.peekAuthToken(account, authTokenType)
+      if (authToken.isNullOrEmpty()) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(RootDeepLinks.SignIn))
+        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response)
+        return bundleOf(
+          AccountManager.KEY_INTENT to intent,
+        )
+      }
+      return bundleOf(
+        AccountManager.KEY_ACCOUNT_NAME to account.name,
+        AccountManager.KEY_ACCOUNT_TYPE to account.type,
+        AccountManager.KEY_AUTHTOKEN to authToken,
+      )
     }
 
-    private class TwidereAccountAuthenticator(val context: Context) :
-        AbstractAccountAuthenticator(context) {
-
-        override fun addAccount(
-            response: AccountAuthenticatorResponse,
-            accountType: String,
-            authTokenType: String?,
-            requiredFeatures: Array<String>?,
-            options: Bundle?
-        ): Bundle {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(RootDeepLinks.SignIn))
-            intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response)
-            return bundleOf(
-                AccountManager.KEY_INTENT to intent,
-            )
-        }
-
-        override fun getAuthToken(
-            response: AccountAuthenticatorResponse,
-            account: Account,
-            authTokenType: String,
-            options: Bundle?
-        ): Bundle {
-            val am = AccountManager.get(context)
-            val authToken = am.peekAuthToken(account, authTokenType)
-            if (authToken.isNullOrEmpty()) {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(RootDeepLinks.SignIn))
-                intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response)
-                return bundleOf(
-                    AccountManager.KEY_INTENT to intent,
-                )
-            }
-            return bundleOf(
-                AccountManager.KEY_ACCOUNT_NAME to account.name,
-                AccountManager.KEY_ACCOUNT_TYPE to account.type,
-                AccountManager.KEY_AUTHTOKEN to authToken,
-            )
-        }
-
-        override fun confirmCredentials(
-            response: AccountAuthenticatorResponse,
-            account: Account,
-            options: Bundle?
-        ): Bundle {
-            return bundleOf(AccountManager.KEY_BOOLEAN_RESULT to true)
-        }
-
-        override fun editProperties(
-            response: AccountAuthenticatorResponse,
-            accountType: String
-        ): Bundle {
-            return bundleOf(AccountManager.KEY_BOOLEAN_RESULT to true)
-        }
-
-        override fun getAuthTokenLabel(authTokenType: String): String {
-            return authTokenType
-        }
-
-        override fun hasFeatures(
-            response: AccountAuthenticatorResponse,
-            account: Account,
-            features: Array<String>
-        ): Bundle {
-            return bundleOf(AccountManager.KEY_BOOLEAN_RESULT to true)
-        }
-
-        override fun updateCredentials(
-            response: AccountAuthenticatorResponse,
-            account: Account,
-            authTokenType: String,
-            options: Bundle?
-        ): Bundle {
-            return bundleOf(AccountManager.KEY_BOOLEAN_RESULT to true)
-        }
+    override fun confirmCredentials(
+      response: AccountAuthenticatorResponse,
+      account: Account,
+      options: Bundle?
+    ): Bundle {
+      return bundleOf(AccountManager.KEY_BOOLEAN_RESULT to true)
     }
+
+    override fun editProperties(
+      response: AccountAuthenticatorResponse,
+      accountType: String
+    ): Bundle {
+      return bundleOf(AccountManager.KEY_BOOLEAN_RESULT to true)
+    }
+
+    override fun getAuthTokenLabel(authTokenType: String): String {
+      return authTokenType
+    }
+
+    override fun hasFeatures(
+      response: AccountAuthenticatorResponse,
+      account: Account,
+      features: Array<String>
+    ): Bundle {
+      return bundleOf(AccountManager.KEY_BOOLEAN_RESULT to true)
+    }
+
+    override fun updateCredentials(
+      response: AccountAuthenticatorResponse,
+      account: Account,
+      authTokenType: String,
+      options: Bundle?
+    ): Bundle {
+      return bundleOf(AccountManager.KEY_BOOLEAN_RESULT to true)
+    }
+  }
 }

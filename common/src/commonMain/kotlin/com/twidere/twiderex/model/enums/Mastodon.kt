@@ -21,19 +21,19 @@
 package com.twidere.twiderex.model.enums
 
 enum class MastodonStatusType {
-    Status,
-    NotificationFollow,
-    NotificationFollowRequest,
-    NotificationMention,
-    NotificationReblog,
-    NotificationFavourite,
-    NotificationPoll,
-    NotificationStatus,
+  Status,
+  NotificationFollow,
+  NotificationFollowRequest,
+  NotificationMention,
+  NotificationReblog,
+  NotificationFavourite,
+  NotificationPoll,
+  NotificationStatus,
 }
 
 enum class MastodonVisibility {
-    Public,
-    Unlisted,
-    Private,
-    Direct;
+  Public,
+  Unlisted,
+  Private,
+  Direct;
 }

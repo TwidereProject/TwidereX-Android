@@ -29,47 +29,47 @@ import com.twidere.twiderex.jobs.status.MastodonVoteJob
 import com.twidere.twiderex.model.MicroBlogKey
 
 class MastodonVoteWorker(
-    appContext: Context,
-    params: WorkerParameters,
-    private val mastodonVoteJob: MastodonVoteJob
+  appContext: Context,
+  params: WorkerParameters,
+  private val mastodonVoteJob: MastodonVoteJob
 ) : CoroutineWorker(appContext, params) {
 
-    companion object {
-        fun create(
-            statusKey: MicroBlogKey,
-            accountKey: MicroBlogKey,
-            votes: List<Int>
-        ) = OneTimeWorkRequestBuilder<MastodonVoteWorker>()
-            .setInputData(
-                workDataOf(
-                    "statusKey" to statusKey.toString(),
-                    "accountKey" to accountKey.toString(),
-                    "votes" to votes.toTypedArray(),
-                )
-            ).build()
-    }
+  companion object {
+    fun create(
+      statusKey: MicroBlogKey,
+      accountKey: MicroBlogKey,
+      votes: List<Int>
+    ) = OneTimeWorkRequestBuilder<MastodonVoteWorker>()
+      .setInputData(
+        workDataOf(
+          "statusKey" to statusKey.toString(),
+          "accountKey" to accountKey.toString(),
+          "votes" to votes.toTypedArray(),
+        )
+      ).build()
+  }
 
-    override suspend fun doWork(): Result {
-        val votes = (inputData.getIntArray("votes") ?: intArrayOf()).toList()
-        if (votes.isEmpty()) {
-            return Result.success()
-        }
-        val accountKey = inputData.getString("accountKey")?.let {
-            MicroBlogKey.valueOf(it)
-        } ?: return Result.failure()
-        val statusKey = inputData.getString("statusKey")?.let {
-            MicroBlogKey.valueOf(it)
-        } ?: return Result.failure()
-        return try {
-            mastodonVoteJob.execute(
-                votes = votes,
-                accountKey = accountKey,
-                statusKey = statusKey
-            )
-            Result.success()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            Result.failure()
-        }
+  override suspend fun doWork(): Result {
+    val votes = (inputData.getIntArray("votes") ?: intArrayOf()).toList()
+    if (votes.isEmpty()) {
+      return Result.success()
     }
+    val accountKey = inputData.getString("accountKey")?.let {
+      MicroBlogKey.valueOf(it)
+    } ?: return Result.failure()
+    val statusKey = inputData.getString("statusKey")?.let {
+      MicroBlogKey.valueOf(it)
+    } ?: return Result.failure()
+    return try {
+      mastodonVoteJob.execute(
+        votes = votes,
+        accountKey = accountKey,
+        statusKey = statusKey
+      )
+      Result.success()
+    } catch (e: Throwable) {
+      e.printStackTrace()
+      Result.failure()
+    }
+  }
 }

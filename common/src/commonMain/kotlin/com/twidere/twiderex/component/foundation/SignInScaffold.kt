@@ -52,71 +52,73 @@ import com.twidere.twiderex.ui.TwidereScene
 
 @Composable
 fun SignInScaffold(
-    countAction: (count: Int) -> Unit = {},
-    content: @Composable ColumnScope.() -> Unit,
+  popBackStack: () -> Unit,
+  countAction: (count: Int) -> Unit = {},
+  content: @Composable ColumnScope.() -> Unit,
 ) {
-    var count by remember { mutableStateOf(0) }
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton(
-                            icon = Icons.Default.Close
-                        )
-                    },
-                    elevation = 0.dp,
-                )
-            }
+  var count by remember { mutableStateOf(0) }
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton(
+              icon = Icons.Default.Close,
+              onBack = popBackStack,
+            )
+          },
+          elevation = 0.dp,
+        )
+      }
+    ) {
+      Column(
+        modifier = Modifier
+          .padding(horizontal = SignInScaffoldDefaults.ContentPadding)
+          .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+      ) {
+        Row(
+          modifier = Modifier.align(Alignment.Start),
+          verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = SignInScaffoldDefaults.ContentPadding)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Row(
-                    modifier = Modifier.align(Alignment.Start),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    LoginLogo(
-                        modifier = Modifier
-                            .size(with(LocalDensity.current) { MaterialTheme.typography.h4.fontSize.toDp() })
-                            .clickable(
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() },
-                                onClick = {
-                                    count++
-                                    countAction.invoke(count)
-                                },
-                            )
-                    )
-                    Spacer(modifier = Modifier.width(SignInScaffoldDefaults.IconSpacing))
-                    Text(
-                        text = BuildConfig.APPLICATION_NAME,
-                        style = MaterialTheme.typography.h4,
-                    )
-                }
-                Text(
-                    modifier = Modifier
-                        .weight(1F)
-                        .align(Alignment.Start),
-                    text = stringResource(res = com.twidere.twiderex.MR.strings.scene_sign_in_hello_sign_in_to_get_started),
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.h3,
-                    color = MaterialTheme.colors.primary,
-                )
-
-                content.invoke(this)
-
-                Spacer(modifier = Modifier.height(SignInScaffoldDefaults.BottomSpacing))
-            }
+          LoginLogo(
+            modifier = Modifier
+              .size(with(LocalDensity.current) { MaterialTheme.typography.h4.fontSize.toDp() })
+              .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = {
+                  count++
+                  countAction.invoke(count)
+                },
+              )
+          )
+          Spacer(modifier = Modifier.width(SignInScaffoldDefaults.IconSpacing))
+          Text(
+            text = BuildConfig.APPLICATION_NAME,
+            style = MaterialTheme.typography.h4,
+          )
         }
+        Text(
+          modifier = Modifier
+            .weight(1F)
+            .align(Alignment.Start),
+          text = stringResource(res = com.twidere.twiderex.MR.strings.scene_sign_in_hello_sign_in_to_get_started),
+          fontWeight = FontWeight.Bold,
+          style = MaterialTheme.typography.h3,
+          color = MaterialTheme.colors.primary,
+        )
+
+        content.invoke(this)
+
+        Spacer(modifier = Modifier.height(SignInScaffoldDefaults.BottomSpacing))
+      }
     }
+  }
 }
 
 object SignInScaffoldDefaults {
-    val ContentPadding = 20.dp
-    val IconSpacing = 16.dp
-    val BottomSpacing = 32.dp
+  val ContentPadding = 20.dp
+  val IconSpacing = 16.dp
+  val BottomSpacing = 32.dp
 }

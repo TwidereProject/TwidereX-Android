@@ -21,7 +21,6 @@
 package com.twidere.twiderex.scenes
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -50,7 +49,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.ExperimentalPagerApi
 import com.twidere.twiderex.component.bottomInsetsPadding
 import com.twidere.twiderex.component.foundation.VideoPlayerState
 import com.twidere.twiderex.component.foundation.rememberPagerState
@@ -63,189 +61,204 @@ import com.twidere.twiderex.kmp.LocalPlatformWindow
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.utils.video.CustomVideoControl
 import com.twidere.twiderex.viewmodel.PureMediaViewModel
+import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
 import org.koin.core.parameter.parametersOf
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
-fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
-    val viewModel = getViewModel<PureMediaViewModel> {
-        parametersOf(belongToKey)
-    }
-    val source by viewModel.source.observeAsState(null)
-    TwidereDialog(
-        requireDarkTheme = true,
-        extendViewIntoStatusBar = true,
-        extendViewIntoNavigationBar = true,
-    ) {
-        source?.let { medias ->
-            CompositionLocalProvider(
-                LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
-            ) {
-                val window = LocalPlatformWindow.current
-                var controlVisibility by remember { mutableStateOf(true) }
-                val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
-                val navController = LocalNavController.current
-                val pagerState = rememberPagerState(
-                    initialPage = selectedIndex,
-                    pageCount = medias.size,
-                )
-                val videoPlayerState = mutableStateOf<VideoPlayerState?>(null)
-                val swiperState = rememberSwiperState(
-                    onDismiss = {
-                        navController.popBackStack()
-                    },
-                )
-                val display = LocalDisplayPreferences.current
-                val isMute by remember {
-                    mutableStateOf(display.muteByDefault)
-                }
-
-                StatusMediaSceneLayout(
-                    backgroundColor = Color.Transparent,
-                    contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
-                    bottomView = {
-                        PureMediaBottomInfo(
-                            controlVisibility = controlVisibility,
-                            swiperState = swiperState,
-                            controlPanelColor = controlPanelColor,
-                            videoPlayerState = videoPlayerState.value,
-                        )
-                    },
-                    closeButton = {
-                        PureMediaControlPanel(
-                            controlVisibility = controlVisibility,
-                            swiperState = swiperState,
-                            controlPanelColor = controlPanelColor,
-                            onPopBack = {
-                                navController.popBackStack()
-                            }
-                        )
-                    },
-                    mediaView = {
-                        MediaView(
-                            media = medias.mapNotNull {
-                                it.mediaUrl?.let { it1 ->
-                                    MediaData(
-                                        it1,
-                                        it.type
-                                    )
-                                }
-                            },
-                            swiperState = swiperState,
-                            onVideoPlayerStateSet = { videoPlayerState.value = it },
-                            pagerState = pagerState,
-                            volume = if (isMute) 0f else 1f,
-                            onClick = {
-                                if (controlVisibility) {
-                                    window.hideControls()
-                                } else {
-                                    window.showControls()
-                                }
-                            },
-                            backgroundColor = MaterialTheme.colors.background
-                        )
-                        val windowBarVisibility by window.windowBarVisibility.observeAsState(true)
-                        LaunchedEffect(windowBarVisibility) {
-                            controlVisibility = windowBarVisibility
-                        }
-                        DisposableEffect(Unit) {
-                            onDispose {
-                                window.showControls()
-                            }
-                        }
-                    },
-                    backgroundView = {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
-                        )
-                    }
-                )
-            }
-        }
-    }
+fun PureMediaScene(
+  belongToKey: String,
+  selectedIndex: Int,
+  navigator: Navigator,
+) {
+  MicroBlogKey.valueOf(belongToKey).let {
+    PureMediaScene(
+      belongToKey = it,
+      selectedIndex = selectedIndex,
+      navigator = navigator
+    )
+  }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun PureMediaScene(
+  belongToKey: MicroBlogKey,
+  selectedIndex: Int,
+  navigator: Navigator,
+) {
+  val viewModel = getViewModel<PureMediaViewModel> {
+    parametersOf(belongToKey)
+  }
+  val source by viewModel.source.observeAsState(null)
+  TwidereDialog(
+    requireDarkTheme = true,
+    extendViewIntoStatusBar = true,
+    extendViewIntoNavigationBar = true,
+  ) {
+    source?.let { medias ->
+      CompositionLocalProvider(
+        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
+      ) {
+        val window = LocalPlatformWindow.current
+        var controlVisibility by remember { mutableStateOf(true) }
+        val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
+        val pagerState = rememberPagerState(
+          initialPage = selectedIndex,
+          pageCount = medias.size,
+        )
+        val videoPlayerState = mutableStateOf<VideoPlayerState?>(null)
+        val swiperState = rememberSwiperState(
+          onDismiss = {
+            navigator.popBackStack()
+          },
+        )
+        val display = LocalDisplayPreferences.current
+        val isMute by remember {
+          mutableStateOf(display.muteByDefault)
+        }
+
+        StatusMediaSceneLayout(
+          backgroundColor = Color.Transparent,
+          contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
+          bottomView = {
+            PureMediaBottomInfo(
+              controlVisibility = controlVisibility,
+              swiperState = swiperState,
+              controlPanelColor = controlPanelColor,
+              videoPlayerState = videoPlayerState.value,
+            )
+          },
+          closeButton = {
+            PureMediaControlPanel(
+              controlVisibility = controlVisibility,
+              swiperState = swiperState,
+              controlPanelColor = controlPanelColor,
+              onPopBack = {
+                navigator.popBackStack()
+              }
+            )
+          },
+          mediaView = {
+            MediaView(
+              media = medias.mapNotNull {
+                it.mediaUrl?.let { it1 ->
+                  MediaData(
+                    it1,
+                    it.type
+                  )
+                }
+              },
+              swiperState = swiperState,
+              onVideoPlayerStateSet = { videoPlayerState.value = it },
+              pagerState = pagerState,
+              volume = if (isMute) 0f else 1f,
+              onClick = {
+                if (controlVisibility) {
+                  window.hideControls()
+                } else {
+                  window.showControls()
+                }
+              },
+              backgroundColor = MaterialTheme.colors.background
+            )
+            val windowBarVisibility by window.windowBarVisibility.observeAsState(true)
+            LaunchedEffect(windowBarVisibility) {
+              controlVisibility = windowBarVisibility
+            }
+            DisposableEffect(Unit) {
+              onDispose {
+                window.showControls()
+              }
+            }
+          },
+          backgroundView = {
+            Box(
+              modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
+            )
+          }
+        )
+      }
+    }
+  }
+}
+
 @Composable
 fun PureMediaBottomInfo(
-    controlVisibility: Boolean,
-    swiperState: SwiperState,
-    controlPanelColor: Color,
-    videoPlayerState: VideoPlayerState?,
+  controlVisibility: Boolean,
+  swiperState: SwiperState,
+  controlPanelColor: Color,
+  videoPlayerState: VideoPlayerState?,
 ) {
-    AnimatedVisibility(
-        visible = controlVisibility && swiperState.progress == 0f,
-        enter = fadeIn() + expandVertically(),
-        exit = shrinkVertically() + fadeOut()
+  AnimatedVisibility(
+    visible = controlVisibility && swiperState.progress == 0f,
+    enter = fadeIn() + expandVertically(),
+    exit = shrinkVertically() + fadeOut()
+  ) {
+    Box(
+      modifier = Modifier
+        .fillMaxWidth()
+        .background(color = controlPanelColor)
+        .padding(PureMediaSceneDefaults.ContentPadding)
+        .bottomInsetsPadding(),
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = controlPanelColor)
-                .padding(PureMediaSceneDefaults.ContentPadding)
-                .bottomInsetsPadding(),
-        ) {
-            if (videoPlayerState != null) {
-                CustomVideoControl(state = videoPlayerState)
-            }
-        }
+      if (videoPlayerState != null) {
+        CustomVideoControl(state = videoPlayerState)
+      }
     }
+  }
 }
 
 private object PureMediaSceneDefaults {
-    val ContentPadding = PaddingValues(8.dp)
+  val ContentPadding = PaddingValues(8.dp)
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun PureMediaControlPanel(
-    controlVisibility: Boolean,
-    swiperState: SwiperState,
-    controlPanelColor: Color,
-    onPopBack: () -> Unit
+  controlVisibility: Boolean,
+  swiperState: SwiperState,
+  controlPanelColor: Color,
+  onPopBack: () -> Unit
 ) {
-    AnimatedVisibility(
-        visible = controlVisibility && swiperState.progress == 0f,
-        enter = fadeIn() + expandVertically(),
-        exit = shrinkVertically() + fadeOut()
+  AnimatedVisibility(
+    visible = controlVisibility && swiperState.progress == 0f,
+    enter = fadeIn() + expandVertically(),
+    exit = shrinkVertically() + fadeOut()
+  ) {
+    Box(
+      modifier = Modifier
+        .topInsetsPadding()
+        .padding(16.dp),
     ) {
-        Box(
-            modifier = Modifier
-                .topInsetsPadding()
-                .padding(16.dp),
+      Box(
+        modifier = Modifier
+          .align(Alignment.TopStart)
+          .clip(MaterialTheme.shapes.small)
+          .background(
+            color = controlPanelColor,
+            shape = MaterialTheme.shapes.small
+          )
+          .clipToBounds()
+      ) {
+        IconButton(
+          onClick = {
+            onPopBack.invoke()
+          }
         ) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .clip(MaterialTheme.shapes.small)
-                    .background(
-                        color = controlPanelColor,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .clipToBounds()
-            ) {
-                IconButton(
-                    onClick = {
-                        onPopBack.invoke()
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
-                        contentDescription = stringResource(
-                            res = com.twidere.twiderex.MR.strings.accessibility_common_close
-                        )
-                    )
-                }
-            }
+          Icon(
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
+            contentDescription = stringResource(
+              res = com.twidere.twiderex.MR.strings.accessibility_common_close
+            )
+          )
         }
+      }
     }
+  }
 }

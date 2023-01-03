@@ -51,90 +51,98 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
-import moe.tlaster.precompose.navigation.NavController
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
+@NavGraphDestination(
+  route = Root.SignIn.Mastodon,
+)
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MastodonSignInScene() {
-    val viewModel: MastodonSignInViewModel = getViewModel()
-    val host by viewModel.host.observeAsState(initial = TextFieldValue())
-    val loading by viewModel.loading.observeAsState(initial = false)
-    val navController = LocalNavController.current
-    SignInScaffold {
-        if (loading) {
-            CircularProgressIndicator()
-        } else {
-            val focusRequester = remember { FocusRequester() }
-            LaunchedEffect(focusRequester) {
-                focusRequester.requestFocus()
-            }
-            OutlinedTextField(
-                modifier = Modifier
-                    .focusRequester(focusRequester)
-                    .fillMaxWidth(),
-                value = host,
-                onValueChange = { viewModel.setHost(it) },
-                keyboardOptions = KeyboardOptions(
-                    autoCorrect = false,
-                    keyboardType = KeyboardType.Uri,
-                    imeAction = ImeAction.Go,
-                ),
-                keyboardActions = KeyboardActions(
-                    onGo = {
-                        signin(viewModel, host, navController)
-                    }
-                )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            SignInButton(
-                onClick = {
-                    signin(viewModel, host, navController)
-                }
-            ) {
-                ListItem(
-                    icon = {
-                        Icon(
-                            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_mastodon_logo_white),
-                            contentDescription = stringResource(
-                                res = com.twidere.twiderex.MR.strings.accessibility_common_logo_mastodon
-                            )
-                        )
-                    },
-                    text = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_sign_in_sign_in_with_mastodon))
-                    },
-                    trailing = {
-                        IconButton(
-                            enabled = false,
-                            onClick = {},
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.KeyboardArrowRight,
-                                contentDescription = stringResource(
-                                    res = com.twidere.twiderex.MR.strings.scene_sign_in_sign_in_with_mastodon
-                                )
-                            )
-                        }
-                    }
-                )
-            }
-        }
+fun MastodonSignInScene(
+  navigator: Navigator,
+) {
+  val viewModel: MastodonSignInViewModel = getViewModel()
+  val host by viewModel.host.observeAsState(initial = TextFieldValue())
+  val loading by viewModel.loading.observeAsState(initial = false)
+  SignInScaffold(
+    popBackStack = {
+      navigator.popBackStack()
     }
+  ) {
+    if (loading) {
+      CircularProgressIndicator()
+    } else {
+      val focusRequester = remember { FocusRequester() }
+      LaunchedEffect(focusRequester) {
+        focusRequester.requestFocus()
+      }
+      OutlinedTextField(
+        modifier = Modifier
+          .focusRequester(focusRequester)
+          .fillMaxWidth(),
+        value = host,
+        onValueChange = { viewModel.setHost(it) },
+        keyboardOptions = KeyboardOptions(
+          autoCorrect = false,
+          keyboardType = KeyboardType.Uri,
+          imeAction = ImeAction.Go,
+        ),
+        keyboardActions = KeyboardActions(
+          onGo = {
+            signin(viewModel, host, navigator)
+          }
+        )
+      )
+      Spacer(modifier = Modifier.height(16.dp))
+      SignInButton(
+        onClick = {
+          signin(viewModel, host, navigator)
+        }
+      ) {
+        ListItem(
+          icon = {
+            Icon(
+              painter = painterResource(res = com.twidere.twiderex.MR.files.ic_mastodon_logo_white),
+              contentDescription = stringResource(
+                res = com.twidere.twiderex.MR.strings.accessibility_common_logo_mastodon
+              )
+            )
+          },
+          text = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_sign_in_sign_in_with_mastodon))
+          },
+          trailing = {
+            IconButton(
+              enabled = false,
+              onClick = {},
+            ) {
+              Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = stringResource(
+                  res = com.twidere.twiderex.MR.strings.scene_sign_in_sign_in_with_mastodon
+                )
+              )
+            }
+          }
+        )
+      }
+    }
+  }
 }
 
 private fun signin(
-    viewModel: MastodonSignInViewModel,
-    host: TextFieldValue,
-    navController: NavController,
+  viewModel: MastodonSignInViewModel,
+  host: TextFieldValue,
+  navController: Navigator,
 ) {
-    viewModel.beginOAuth(
-        host.text,
-        { success ->
-            if (success) {
-                navController.goBackWith(success)
-            }
-        },
-    )
+  viewModel.beginOAuth(
+    host.text,
+  ) { success ->
+    if (success) {
+      navController.goBackWith(success)
+    }
+  }
 }

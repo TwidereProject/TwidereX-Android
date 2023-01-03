@@ -25,7 +25,7 @@ import androidx.work.WorkerParameters
 import com.twidere.twiderex.jobs.status.LikeStatusJob
 
 class LikeWorker(
-    appContext: Context,
-    params: WorkerParameters,
-    likeStatusJob: LikeStatusJob,
+  appContext: Context,
+  params: WorkerParameters,
+  likeStatusJob: LikeStatusJob,
 ) : StatusWorker(appContext, params, likeStatusJob)

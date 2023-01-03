@@ -34,24 +34,24 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface UsersResources {
-    @GET("/1.1/account/verify_credentials.json")
-    suspend fun verifyCredentials(): User?
+  @GET("/1.1/account/verify_credentials.json")
+  suspend fun verifyCredentials(): User?
 
-    @GET("/1.1/users/profile_banner.json")
-    suspend fun profileBanners(@Query("screen_name") screenName: String): ProfileBanner
+  @GET("/1.1/users/profile_banner.json")
+  suspend fun profileBanners(@Query("screen_name") screenName: String): ProfileBanner
 
-    @GET("/1.1/friendships/show.json")
-    suspend fun showFriendships(@Query("target_id") target_id: String): RelationshipResponse
+  @GET("/1.1/friendships/show.json")
+  suspend fun showFriendships(@Query("target_id") target_id: String): RelationshipResponse
 
-    @POST("/2/users/{sourceId}/blocking")
-    suspend fun block(
-        @Path(value = "sourceId") sourceId: String,
-        @Body target: BlockV2Request
-    ): TwitterResponseV2<BlockV2>
+  @POST("/2/users/{sourceId}/blocking")
+  suspend fun block(
+    @Path(value = "sourceId") sourceId: String,
+    @Body target: BlockV2Request
+  ): TwitterResponseV2<BlockV2>
 
-    @DELETE("/2/users/{sourceId}/blocking/{targetId}")
-    suspend fun unblock(
-        @Path(value = "sourceId") sourceId: String,
-        @Path(value = "targetId") targetId: String,
-    ): TwitterResponseV2<BlockV2>
+  @DELETE("/2/users/{sourceId}/blocking/{targetId}")
+  suspend fun unblock(
+    @Path(value = "sourceId") sourceId: String,
+    @Path(value = "targetId") targetId: String,
+  ): TwitterResponseV2<BlockV2>
 }

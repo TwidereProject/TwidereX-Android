@@ -24,44 +24,44 @@ import com.twidere.twiderex.model.MicroBlogKey
 
 @Immutable
 data class UiList(
-    val id: String,
-    val ownerId: String,
-    val title: String,
-    val descriptions: String,
-    val mode: String,
-    val replyPolicy: String,
-    val accountKey: MicroBlogKey,
-    val listKey: MicroBlogKey,
-    val isFollowed: Boolean,
-    val allowToSubscribe: Boolean
+  val id: String,
+  val ownerId: String,
+  val title: String,
+  val descriptions: String,
+  val mode: String,
+  val replyPolicy: String,
+  val accountKey: MicroBlogKey,
+  val listKey: MicroBlogKey,
+  val isFollowed: Boolean,
+  val allowToSubscribe: Boolean
 ) {
 
-    fun isOwner(userId: String): Boolean {
-        return ownerId == userId
-    }
+  fun isOwner(userId: String): Boolean {
+    return ownerId == userId
+  }
 
-    val isPrivate: Boolean
-        get() = mode == ListsMode.PRIVATE.value
+  val isPrivate: Boolean
+    get() = mode == ListsMode.PRIVATE.value
 
-    companion object {
+  companion object {
 
-        fun sample(isFollowed: Boolean = true) = UiList(
-            id = "1",
-            ownerId = "1",
-            title = "Sample List",
-            descriptions = "Sample List",
-            mode = "private",
-            replyPolicy = "",
-            accountKey = MicroBlogKey.Empty,
-            listKey = MicroBlogKey.Empty,
-            isFollowed = isFollowed,
-            allowToSubscribe = true,
-        )
-    }
+    fun sample(isFollowed: Boolean = true) = UiList(
+      id = "1",
+      ownerId = "1",
+      title = "Sample List",
+      descriptions = "Sample List",
+      mode = "private",
+      replyPolicy = "",
+      accountKey = MicroBlogKey.Empty,
+      listKey = MicroBlogKey.Empty,
+      isFollowed = isFollowed,
+      allowToSubscribe = true,
+    )
+  }
 }
 
 enum class ListsMode(val value: String) {
-    PRIVATE("private"),
-    PUBLIC("public"),
-    DEFAULT("")
+  PRIVATE("private"),
+  PUBLIC("public"),
+  DEFAULT("")
 }

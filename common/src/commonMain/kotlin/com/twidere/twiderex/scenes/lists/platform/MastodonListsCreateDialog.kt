@@ -33,56 +33,62 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.navigation.Root
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.Navigator
 
+@NavGraphDestination(
+  route = Root.Lists.MastodonCreateDialog,
+  functionName = "dialog"
+)
 @Composable
-fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
-    val navController = LocalNavController.current
-    val scope = rememberCoroutineScope()
-    var showMastodonComponent by remember {
-        mutableStateOf(true)
-    }
-    val dismiss = {
-        onDismissRequest.invoke()
-        showMastodonComponent = true
-    }
-    var name by remember {
-        mutableStateOf("")
-    }
-    val listsCreateViewModel: ListsCreateViewModel = getViewModel()
-    val loading by listsCreateViewModel.loading.observeAsState(initial = false)
+fun MastodonListsCreateDialog(
+  navigator: Navigator,
+) {
+  val scope = rememberCoroutineScope()
+  var showMastodonComponent by remember {
+    mutableStateOf(true)
+  }
+  val dismiss = {
+    navigator.goBack()
+    showMastodonComponent = true
+  }
+  var name by remember {
+    mutableStateOf("")
+  }
+  val listsCreateViewModel: ListsCreateViewModel = getViewModel()
+  val loading by listsCreateViewModel.loading.observeAsState(initial = false)
 
-    if (loading) {
-        Dialog(
-            onDismissRequest = {
-                dismiss()
-            }
-        ) {
-            LoadingProgress()
-        }
-        return
+  if (loading) {
+    Dialog(
+      onDismissRequest = {
+        dismiss()
+      }
+    ) {
+      LoadingProgress()
     }
+    return
+  }
 
-    if (showMastodonComponent) {
-        MastodonListsModifyComponent(
-            onDismissRequest = { dismiss() },
-            title = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_dialog_create),
-            name = name,
-            onNameChanged = { name = it }
-        ) {
-            scope.launch {
-                val result = listsCreateViewModel.createList(
-                    title = it
-                )
-                dismiss()
-                if (result != null) {
-                    navController.navigate(
-                        Root.Lists.Timeline(result.listKey),
-                    )
-                }
-            }
+  if (showMastodonComponent) {
+    MastodonListsModifyComponent(
+      onDismissRequest = { dismiss() },
+      title = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_dialog_create),
+      name = name,
+      onNameChanged = { name = it }
+    ) {
+      scope.launch {
+        val result = listsCreateViewModel.createList(
+          title = it
+        )
+        dismiss()
+        if (result != null) {
+          navigator.navigate(
+            Root.Lists.Timeline(result.listKey),
+          )
         }
+      }
     }
+  }
 }

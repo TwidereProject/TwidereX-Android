@@ -24,14 +24,14 @@ import com.squareup.sqldelight.EnumColumnAdapter
 import com.twidere.twiderex.sqldelight.table.DbDMEvent
 
 object DMEventAdapterFactory {
-    fun create() = MicroBlogKeyColumnAdapter().let {
-        DbDMEvent.Adapter(
-            accountKeyAdapter = it,
-            conversationKeyAdapter = it,
-            messageKeyAdapter = it,
-            senderAccountKeyAdapter = it,
-            recipientAccountKeyAdapter = it,
-            sendStatusAdapter = EnumColumnAdapter()
-        )
-    }
+  fun create() = MicroBlogKeyColumnAdapter().let {
+    DbDMEvent.Adapter(
+      accountKeyAdapter = it,
+      conversationKeyAdapter = it,
+      messageKeyAdapter = it,
+      senderAccountKeyAdapter = it,
+      recipientAccountKeyAdapter = it,
+      sendStatusAdapter = EnumColumnAdapter()
+    )
+  }
 }

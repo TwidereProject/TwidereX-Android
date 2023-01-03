@@ -27,28 +27,28 @@ import com.twidere.services.mastodon.model.Hashtag
 import com.twidere.twiderex.defaultLoadCount
 
 class MastodonSearchHashtagPagingSource(
-    private val query: String,
-    private val service: MastodonService
+  private val query: String,
+  private val service: MastodonService
 ) : PagingSource<Int, Hashtag>() {
-    override fun getRefreshKey(state: PagingState<Int, Hashtag>): Int? {
-        return null
-    }
+  override fun getRefreshKey(state: PagingState<Int, Hashtag>): Int? {
+    return null
+  }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Hashtag> {
-        return try {
-            val offset = params.key ?: 0
-            val result = service.searchHashTag(query, offset = offset, count = defaultLoadCount)
-            LoadResult.Page(
-                data = result,
-                prevKey = null,
-                nextKey = if (result.size == defaultLoadCount) {
-                    result.size + offset
-                } else {
-                    null
-                }
-            )
-        } catch (e: Exception) {
-            LoadResult.Error(e)
+  override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Hashtag> {
+    return try {
+      val offset = params.key ?: 0
+      val result = service.searchHashTag(query, offset = offset, count = defaultLoadCount)
+      LoadResult.Page(
+        data = result,
+        prevKey = null,
+        nextKey = if (result.size == defaultLoadCount) {
+          result.size + offset
+        } else {
+          null
         }
+      )
+    } catch (e: Exception) {
+      LoadResult.Error(e)
     }
+  }
 }

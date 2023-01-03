@@ -56,40 +56,40 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 internal actual val platformModule = module {
-    single {
-        ResLoader(get())
-    }
-    single { AccountRepository(get(), get()) }
-    single { AccountPreferencesFactory(get()) }
-    single<AccountManager> { AccountManager.get(get()) }
-    single { get<Context>().getSystemService(Context.LOCATION_SERVICE) as LocationManager }
-    single { get<Context>().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
-    single { get<Context>().contentResolver }
-    single { NotificationManagerCompat.from(get()) }
-    single { WorkManager.getInstance(get()) }
-    single { TwidereHttpConfigProvider(get<PreferencesHolder>().miscPreferences) }
-    single { InAppNotification() }
-    single { PlatformResolver(get()) }
-    workManager()
+  single {
+    ResLoader(get())
+  }
+  single { AccountRepository(get(), get()) }
+  single { AccountPreferencesFactory(get()) }
+  single<AccountManager> { AccountManager.get(get()) }
+  single { get<Context>().getSystemService(Context.LOCATION_SERVICE) as LocationManager }
+  single { get<Context>().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
+  single { get<Context>().contentResolver }
+  single { NotificationManagerCompat.from(get()) }
+  single { WorkManager.getInstance(get()) }
+  single { TwidereHttpConfigProvider(get<PreferencesHolder>().miscPreferences) }
+  single { InAppNotification() }
+  single { PlatformResolver(get()) }
+  workManager()
 }
 
 private fun Module.workManager() {
-    worker { ShareMediaWorker(get(), get(), get()) }
-    worker { NotificationWorker(get(), get(), get<PreferencesHolder>().notificationPreferences, get()) }
-    worker { DownloadMediaWorker(get(), get(), get()) }
-    worker { DeleteStatusWorker(get(), get(), get()) }
-    worker { LikeWorker(get(), get(), get()) }
-    worker { MastodonVoteWorker(get(), get(), get()) }
-    worker { RetweetWorker(get(), get(), get()) }
-    worker { UnLikeWorker(get(), get(), get()) }
-    worker { UnRetweetWorker(get(), get(), get()) }
-    worker { UpdateStatusWorker(get(), get(), get()) }
-    worker { RemoveDraftWorker(get(), get(), get()) }
-    worker { SaveDraftWorker(get(), get(), get()) }
-    worker { DirectMessageDeleteWorker(get(), get(), get()) }
-    worker { DirectMessageFetchWorker(get(), get(), get()) }
-    worker { TwitterDirectMessageSendWorker(get(), get(), get()) }
-    worker { DeleteDbStatusWorker(get(), get(), get()) }
-    worker { MastodonComposeWorker(get(), get(), get()) }
-    worker { TwitterComposeWorker(get(), get(), get()) }
+  worker { ShareMediaWorker(get(), get(), get()) }
+  worker { NotificationWorker(get(), get(), get<PreferencesHolder>().notificationPreferences, get()) }
+  worker { DownloadMediaWorker(get(), get(), get()) }
+  worker { DeleteStatusWorker(get(), get(), get()) }
+  worker { LikeWorker(get(), get(), get()) }
+  worker { MastodonVoteWorker(get(), get(), get()) }
+  worker { RetweetWorker(get(), get(), get()) }
+  worker { UnLikeWorker(get(), get(), get()) }
+  worker { UnRetweetWorker(get(), get(), get()) }
+  worker { UpdateStatusWorker(get(), get(), get()) }
+  worker { RemoveDraftWorker(get(), get(), get()) }
+  worker { SaveDraftWorker(get(), get(), get()) }
+  worker { DirectMessageDeleteWorker(get(), get(), get()) }
+  worker { DirectMessageFetchWorker(get(), get(), get()) }
+  worker { TwitterDirectMessageSendWorker(get(), get(), get()) }
+  worker { DeleteDbStatusWorker(get(), get(), get()) }
+  worker { MastodonComposeWorker(get(), get(), get()) }
+  worker { TwitterComposeWorker(get(), get(), get()) }
 }

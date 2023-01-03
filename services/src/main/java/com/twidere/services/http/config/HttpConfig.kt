@@ -23,5 +23,5 @@ package com.twidere.services.http.config
 import com.twidere.services.proxy.ProxyConfig
 
 data class HttpConfig(
-    val proxyConfig: ProxyConfig = ProxyConfig()
+  val proxyConfig: ProxyConfig = ProxyConfig()
 )

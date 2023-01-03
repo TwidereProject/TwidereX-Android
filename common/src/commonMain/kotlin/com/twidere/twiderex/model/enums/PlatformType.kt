@@ -21,8 +21,8 @@
 package com.twidere.twiderex.model.enums
 
 enum class PlatformType {
-    Twitter,
-    StatusNet,
-    Fanfou,
-    Mastodon,
+  Twitter,
+  StatusNet,
+  Fanfou,
+  Mastodon,
 }

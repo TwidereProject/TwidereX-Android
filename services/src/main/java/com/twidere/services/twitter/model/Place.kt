@@ -25,6 +25,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Place(
-    @SerialName("full_name")
-    val fullName: String? = null,
+  @SerialName("full_name")
+  val fullName: String? = null,
 )

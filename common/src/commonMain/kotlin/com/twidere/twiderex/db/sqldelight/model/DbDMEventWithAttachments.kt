@@ -27,32 +27,32 @@ import com.twidere.twiderex.sqldelight.table.DbUrlEntity
 import com.twidere.twiderex.sqldelight.table.DbUser
 
 internal data class DbDMEventWithAttachments(
-    val event: DbDMEvent,
-    val media: List<DbMedia>,
-    val url: List<DbUrlEntity>,
-    val sender: DbUser
+  val event: DbDMEvent,
+  val media: List<DbMedia>,
+  val url: List<DbUrlEntity>,
+  val sender: DbUser
 ) {
-    companion object {
-        fun DbDMEvent.withAttachments(database: SqlDelightCacheDatabase): DbDMEventWithAttachments {
-            return database.transactionWithResult {
-                DbDMEventWithAttachments(
-                    event = this@withAttachments,
-                    url = database.urlEntityQueries.findByBelongToKey(messageKey).executeAsList(),
-                    media = database.mediaQueries.findMediaByBelongToKey(messageKey).executeAsList(),
-                    sender = database.userQueries.findWithUserKey(senderAccountKey).executeAsOne()
-                )
-            }
-        }
-
-        fun List<DbDMEventWithAttachments>.saveToDb(database: SqlDelightCacheDatabase) {
-            database.transaction {
-                forEach {
-                    database.dMEventQueries.insert(it.event)
-                    it.media.forEach { media -> database.mediaQueries.insert(media) }
-                    database.userQueries.insert(it.sender)
-                    it.url.forEach { url -> database.urlEntityQueries.insert(url) }
-                }
-            }
-        }
+  companion object {
+    fun DbDMEvent.withAttachments(database: SqlDelightCacheDatabase): DbDMEventWithAttachments {
+      return database.transactionWithResult {
+        DbDMEventWithAttachments(
+          event = this@withAttachments,
+          url = database.urlEntityQueries.findByBelongToKey(messageKey).executeAsList(),
+          media = database.mediaQueries.findMediaByBelongToKey(messageKey).executeAsList(),
+          sender = database.userQueries.findWithUserKey(senderAccountKey).executeAsOne()
+        )
+      }
     }
+
+    fun List<DbDMEventWithAttachments>.saveToDb(database: SqlDelightCacheDatabase) {
+      database.transaction {
+        forEach {
+          database.dMEventQueries.insert(it.event)
+          it.media.forEach { media -> database.mediaQueries.insert(media) }
+          database.userQueries.insert(it.sender)
+          it.url.forEach { url -> database.urlEntityQueries.insert(url) }
+        }
+      }
+    }
+  }
 }

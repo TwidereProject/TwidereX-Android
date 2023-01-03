@@ -31,36 +31,36 @@ import com.twidere.services.twitter.api.TwitterResources
 import okhttp3.OkHttpClient
 
 class MockClientFactory : HttpClientFactory {
-    override fun createHttpClientBuilder(): OkHttpClient.Builder {
-        TODO("Not yet implemented")
-    }
+  override fun createHttpClientBuilder(): OkHttpClient.Builder {
+    TODO("Not yet implemented")
+  }
 
-    @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
-    override fun <T> createResources(clazz: Class<T>, baseUrl: String, authorization: Authorization, useCache: Boolean): T {
-        return when (clazz) {
-            MastodonResources::class.java -> mockRetrofit<MastodonResources>(
-                "https://test.mastodon.com/",
-                MastodonRequest2AssetPathConvertor()
-            )
-            TwitterResources::class.java -> mockRetrofit<TwitterResources>(
-                "https://api.twitter.com/",
-                TwitterRequest2AssetPathConvertor()
-            )
-            else -> throw NotImplementedError()
-        } as T
-    }
+  @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
+  override fun <T> createResources(clazz: Class<T>, baseUrl: String, authorization: Authorization, useCache: Boolean): T {
+    return when (clazz) {
+      MastodonResources::class.java -> mockRetrofit<MastodonResources>(
+        "https://test.mastodon.com/",
+        MastodonRequest2AssetPathConvertor()
+      )
+      TwitterResources::class.java -> mockRetrofit<TwitterResources>(
+        "https://api.twitter.com/",
+        TwitterRequest2AssetPathConvertor()
+      )
+      else -> throw NotImplementedError()
+    } as T
+  }
 }
 
 fun mockMastodonService(): MastodonService {
-    return MastodonService(
-        "", "",
-        httpClientFactory = MockClientFactory()
-    )
+  return MastodonService(
+    "", "",
+    httpClientFactory = MockClientFactory()
+  )
 }
 
 fun mockTwitterService(): TwitterService {
-    return TwitterService(
-        "", "", "", "",
-        httpClientFactory = MockClientFactory()
-    )
+  return TwitterService(
+    "", "", "", "",
+    httpClientFactory = MockClientFactory()
+  )
 }

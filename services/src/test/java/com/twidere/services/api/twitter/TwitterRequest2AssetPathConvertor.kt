@@ -24,11 +24,11 @@ import com.twidere.services.api.common.Request2AssetPathConvertor
 import okhttp3.Request
 
 class TwitterRequest2AssetPathConvertor : Request2AssetPathConvertor {
-    companion object {
-        private const val PathPrefix = "/twitter"
-    }
+  companion object {
+    private const val PathPrefix = "/twitter"
+  }
 
-    override fun url2Path(request: Request): String {
-        return "$PathPrefix${request.url.encodedPath}"
-    }
+  override fun url2Path(request: Request): String {
+    return "$PathPrefix${request.url.encodedPath}"
+  }
 }

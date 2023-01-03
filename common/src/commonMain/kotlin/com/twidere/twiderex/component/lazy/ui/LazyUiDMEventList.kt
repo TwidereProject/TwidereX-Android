@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.component.lazy.ui
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -77,275 +76,301 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.kmp.TimeUtils
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMedia
+import com.twidere.twiderex.navigation.DMNavigationData
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.preferences.model.DisplayPreferences
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LazyUiDMEventList(
-    modifier: Modifier = Modifier,
-    items: LazyPagingItems<UiDMEvent>,
-    state: LazyListState = rememberLazyListState(),
-    key: ((item: UiDMEvent) -> Any) = { it.messageKey.hashCode() },
-    header: LazyListScope.() -> Unit = {},
-    onResend: (event: UiDMEvent) -> Unit = {},
-    onItemLongClick: (event: UiDMEvent) -> Unit = {}
+  modifier: Modifier = Modifier,
+  items: LazyPagingItems<UiDMEvent>,
+  state: LazyListState = rememberLazyListState(),
+  key: ((item: UiDMEvent) -> Any) = { it.messageKey.hashCode() },
+  header: LazyListScope.() -> Unit = {},
+  onResend: (event: UiDMEvent) -> Unit = {},
+  onItemLongClick: (event: UiDMEvent) -> Unit = {},
+  dmNavigationData: DMNavigationData,
 ) {
-    LazyUiList(items = items) {
-        LazyColumn(
-            modifier = modifier,
-            state = state,
-            reverseLayout = true
-        ) {
-            header.invoke(this)
-            items(
-                items,
-                key = key
-            ) {
-                it?.let {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(LazyUiDMEventListDefaults.ContentPadding)
-                    ) {
-                        if (it.isInCome)
-                            DMInComeEvent(it, onItemLongClick)
-                        else
-                            DMOutComeEvent(onResend, it, onItemLongClick)
-                    }
-                } ?: run {
-                    LoadingEventPlaceholder()
-                }
-            }
-            loadState(items.loadState.append) {
-                items.retry()
-            }
+  LazyUiList(items = items) {
+    LazyColumn(
+      modifier = modifier,
+      state = state,
+      reverseLayout = true
+    ) {
+      header.invoke(this)
+      items(
+        items,
+        key = key
+      ) {
+        it?.let {
+          Box(
+            modifier = Modifier
+              .fillMaxSize()
+              .padding(LazyUiDMEventListDefaults.ContentPadding)
+          ) {
+            if (it.isInCome)
+              DMInComeEvent(
+                it,
+                onItemLongClick,
+                dmNavigationData = dmNavigationData,
+              )
+            else
+              DMOutComeEvent(onResend, it, onItemLongClick, dmNavigationData)
+          }
+        } ?: run {
+          LoadingEventPlaceholder()
         }
+      }
+      loadState(items.loadState.append) {
+        items.retry()
+      }
     }
+  }
 }
 
 private object LazyUiDMEventListDefaults {
-    val ContentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+  val ContentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
 }
 
 @Composable
 private fun DMOutComeEvent(
-    onResend: (event: UiDMEvent) -> Unit = {},
-    event: UiDMEvent,
-    onItemLongClick: (event: UiDMEvent) -> Unit
+  onResend: (event: UiDMEvent) -> Unit = {},
+  event: UiDMEvent,
+  onItemLongClick: (event: UiDMEvent) -> Unit,
+  dmNavigationData: DMNavigationData,
 ) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-        Column(horizontalAlignment = Alignment.End) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                when (event.sendStatus) {
-                    UiDMEvent.SendStatus.PENDING -> {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(DMOutComeEventDefaults.Loading.size),
-                            strokeWidth = DMOutComeEventDefaults.Loading.width,
-                            color = MaterialTheme.colors.primary
-                        )
-                    }
-                    UiDMEvent.SendStatus.SUCCESS -> {}
-                    UiDMEvent.SendStatus.FAILED -> {
-                        Box(
-                            modifier = Modifier
-                                .clip(shape = CircleShape)
-                                .clickable { onResend(event) }
-                                .padding(DMOutComeEventDefaults.Error.ContentPadding)
-                        ) {
-                            Icon(
-                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_alert),
-                                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_icon_failed),
-                                tint = Color.Unspecified,
-                                modifier = Modifier.size(DMOutComeEventDefaults.Error.size)
-                            )
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.width(DMEventDefaults.ContentSpacing))
-                MessageBody(event, onItemLongClick)
-            }
-            ChatTime(
-                modifier = Modifier.padding(
-                    top = DMEventDefaults.Time.paddingTop
-                ),
-                time = event.createdTimestamp
+  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+    Column(horizontalAlignment = Alignment.End) {
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        when (event.sendStatus) {
+          UiDMEvent.SendStatus.PENDING -> {
+            CircularProgressIndicator(
+              modifier = Modifier.size(DMOutComeEventDefaults.Loading.size),
+              strokeWidth = DMOutComeEventDefaults.Loading.width,
+              color = MaterialTheme.colors.primary
             )
+          }
+          UiDMEvent.SendStatus.SUCCESS -> {}
+          UiDMEvent.SendStatus.FAILED -> {
+            Box(
+              modifier = Modifier
+                .clip(shape = CircleShape)
+                .clickable { onResend(event) }
+                .padding(DMOutComeEventDefaults.Error.ContentPadding)
+            ) {
+              Icon(
+                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_alert),
+                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_icon_failed),
+                tint = Color.Unspecified,
+                modifier = Modifier.size(DMOutComeEventDefaults.Error.size)
+              )
+            }
+          }
         }
+        Spacer(modifier = Modifier.width(DMEventDefaults.ContentSpacing))
+        MessageBody(
+          event,
+          onItemLongClick,
+          openLink = dmNavigationData.statusNavigation.openLink,
+          navigate = dmNavigationData.statusNavigation.navigate,
+        )
+      }
+      ChatTime(
+        modifier = Modifier.padding(
+          top = DMEventDefaults.Time.paddingTop
+        ),
+        time = event.createdTimestamp
+      )
     }
+  }
 }
 
 private object DMOutComeEventDefaults {
-    object Loading {
-        val size = 24.dp
-        val width = 2.dp
-    }
+  object Loading {
+    val size = 24.dp
+    val width = 2.dp
+  }
 
-    object Error {
-        val size = 24.dp
-        val ContentPadding = PaddingValues(3.dp)
-    }
+  object Error {
+    val size = 24.dp
+    val ContentPadding = PaddingValues(3.dp)
+  }
 }
 
 @Composable
-private fun DMInComeEvent(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) -> Unit) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-        Column {
-            Row(verticalAlignment = Alignment.Bottom) {
-                UserAvatar(user = event.sender)
-                Spacer(modifier = Modifier.width(DMEventDefaults.ContentSpacing))
-                MessageBody(event, onItemLongClick)
-            }
-            ChatTime(
-                modifier = Modifier.padding(
-                    top = DMEventDefaults.Time.paddingTop,
-                    start = DMEventDefaults.Time.paddingStart
-                ),
-                time = event.createdTimestamp
-            )
-        }
+private fun DMInComeEvent(
+  event: UiDMEvent,
+  onItemLongClick: (event: UiDMEvent) -> Unit,
+  dmNavigationData: DMNavigationData,
+) {
+  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+    Column {
+      Row(verticalAlignment = Alignment.Bottom) {
+        UserAvatar(
+          user = event.sender,
+          onClick = dmNavigationData.statusNavigation.toUser,
+        )
+        Spacer(modifier = Modifier.width(DMEventDefaults.ContentSpacing))
+        MessageBody(
+          event,
+          onItemLongClick,
+          openLink = dmNavigationData.statusNavigation.openLink,
+          navigate = dmNavigationData.statusNavigation.navigate
+        )
+      }
+      ChatTime(
+        modifier = Modifier.padding(
+          top = DMEventDefaults.Time.paddingTop,
+          start = DMEventDefaults.Time.paddingStart
+        ),
+        time = event.createdTimestamp
+      )
     }
+  }
 }
 
 private object DMEventDefaults {
-    val ContentSpacing = 10.dp
+  val ContentSpacing = 10.dp
 
-    object Time {
-        val paddingTop = 8.dp
-        val paddingStart = UserAvatarDefaults.AvatarSize + ContentSpacing
-    }
+  object Time {
+    val paddingTop = 8.dp
+    val paddingStart = UserAvatarDefaults.AvatarSize + ContentSpacing
+  }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun MessageBody(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) -> Unit) {
-    val navController = LocalNavController.current
-    Box(
-        modifier = Modifier
-            .clip(
-                RoundedCornerShape(
-                    topStart = MessageBodyDefaults.cornerRadius,
-                    topEnd = MessageBodyDefaults.cornerRadius,
-                    bottomStart = if (event.isInCome) MessageBodyDefaults.pointCornerRadius else MessageBodyDefaults.cornerRadius,
-                    bottomEnd = if (event.isInCome) MessageBodyDefaults.cornerRadius else MessageBodyDefaults.pointCornerRadius
-                )
-            )
-            .combinedClickable(
-                onLongClick = {
-                    onItemLongClick(event)
-                }
-            ) { }
-            .background(
-                if (event.isInCome)
-                    MaterialTheme.colors.primary.copy(alpha = 0.15f)
-                else
-                    MaterialTheme.colors.primary
-            )
-            .padding(MessageBodyDefaults.ContentPadding)
-    ) {
-        Column {
-            MediaMessage(
-                media = event.media.firstOrNull(),
-                onClick = {
-                    navController.navigate(Root.Media.Pure(event.messageKey, 0))
-                }
-            )
-            if (event.media.isNotEmpty() && event.htmlText.isNotEmpty()) Spacer(
-                modifier = Modifier.height(
-                    MessageBodyDefaults.ContentSpacing
-                )
-            )
-            val textColor = if (event.isInCome) MaterialTheme.colors.onSurface else MaterialTheme.colors.onPrimary
-            val textStyle = MaterialTheme.typography.body1.copy(textColor)
-            val linkStyle = textStyle.copy(
-                color = if (event.isInCome) MaterialTheme.colors.primary else MaterialTheme.colors.onPrimary,
-                textDecoration = TextDecoration.Underline
-            )
-            CompositionLocalProvider(LocalContentColor provides textColor) {
-                HtmlText(
-                    htmlText = event.htmlText,
-                    textStyle = textStyle,
-                    linkStyle = linkStyle,
-                    linkResolver = { href -> event.resolveLink(href) }
-                )
-            }
+private fun MessageBody(
+  event: UiDMEvent,
+  onItemLongClick: (event: UiDMEvent) -> Unit,
+  openLink: (String) -> Unit,
+  navigate: (String) -> Unit,
+) {
+  Box(
+    modifier = Modifier
+      .clip(
+        RoundedCornerShape(
+          topStart = MessageBodyDefaults.cornerRadius,
+          topEnd = MessageBodyDefaults.cornerRadius,
+          bottomStart = if (event.isInCome) MessageBodyDefaults.pointCornerRadius else MessageBodyDefaults.cornerRadius,
+          bottomEnd = if (event.isInCome) MessageBodyDefaults.cornerRadius else MessageBodyDefaults.pointCornerRadius
+        )
+      )
+      .combinedClickable(
+        onLongClick = {
+          onItemLongClick(event)
         }
+      ) { }
+      .background(
+        if (event.isInCome)
+          MaterialTheme.colors.primary.copy(alpha = 0.15f)
+        else
+          MaterialTheme.colors.primary
+      )
+      .padding(MessageBodyDefaults.ContentPadding)
+  ) {
+    Column {
+      MediaMessage(
+        media = event.media.firstOrNull(),
+        onClick = {
+          navigate(Root.Media.Pure(event.messageKey, 0))
+        }
+      )
+      if (event.media.isNotEmpty() && event.htmlText.isNotEmpty()) Spacer(
+        modifier = Modifier.height(
+          MessageBodyDefaults.ContentSpacing
+        )
+      )
+      val textColor = if (event.isInCome) MaterialTheme.colors.onSurface else MaterialTheme.colors.onPrimary
+      val textStyle = MaterialTheme.typography.body1.copy(textColor)
+      val linkStyle = textStyle.copy(
+        color = if (event.isInCome) MaterialTheme.colors.primary else MaterialTheme.colors.onPrimary,
+        textDecoration = TextDecoration.Underline
+      )
+      CompositionLocalProvider(LocalContentColor provides textColor) {
+        HtmlText(
+          htmlText = event.htmlText,
+          textStyle = textStyle,
+          linkStyle = linkStyle,
+          linkResolver = { href -> event.resolveLink(href) },
+          openLink = openLink,
+        )
+      }
     }
+  }
 }
 
 private object MessageBodyDefaults {
-    val cornerRadius = 8.dp
-    val pointCornerRadius = 2.dp
-    val ContentPadding = PaddingValues(12.dp)
-    val ContentSpacing = 10.dp
+  val cornerRadius = 8.dp
+  val pointCornerRadius = 2.dp
+  val ContentPadding = PaddingValues(12.dp)
+  val ContentSpacing = 10.dp
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun MediaMessage(media: UiMedia?, onClick: (UiMedia) -> Unit) {
-    media?.let { item ->
-        val aspectRatio = (item.width.toFloat() / item.height.toFloat()).let {
-            if (it.isNaN()) {
-                StatusMediaDefaults.DefaultAspectRatio
-            } else {
-                it
-            }
-        }
-        CompositionLocalProvider(LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off) {
-            StatusMediaPreviewItem(
-                media = item,
-                modifier = Modifier
-                    .heightIn(max = StatusMediaDefaults.DefaultMaxHeight)
-                    .aspectRatio(aspectRatio),
-                onClick = onClick
-            )
-        }
+  media?.let { item ->
+    val aspectRatio = (item.width.toFloat() / item.height.toFloat()).let {
+      if (it.isNaN()) {
+        StatusMediaDefaults.DefaultAspectRatio
+      } else {
+        it
+      }
     }
+    CompositionLocalProvider(LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off) {
+      StatusMediaPreviewItem(
+        media = item,
+        modifier = Modifier
+          .heightIn(max = StatusMediaDefaults.DefaultMaxHeight)
+          .aspectRatio(aspectRatio),
+        onClick = onClick
+      )
+    }
+  }
 }
 
 @Composable
 private fun ChatTime(modifier: Modifier = Modifier, time: Long) {
-    val timeString = remember(time) {
-        TimeUtils.humanizedDateTime(time)
-    }
-    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-        Text(modifier = modifier, text = timeString, style = MaterialTheme.typography.caption)
-    }
+  val timeString = remember(time) {
+    TimeUtils.humanizedDateTime(time)
+  }
+  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+    Text(modifier = modifier, text = timeString, style = MaterialTheme.typography.caption)
+  }
 }
 
 @Composable
 private fun LoadingEventPlaceholder() {
-    Column(
-        modifier = Modifier
-            .wrapContentHeight(
-                align = Alignment.Top,
-                unbounded = true
-            )
-    ) {
-        repeat(10) {
-            UiUserPlaceholder(
-                delayMillis = it * 50L
-            )
-        }
+  Column(
+    modifier = Modifier
+      .wrapContentHeight(
+        align = Alignment.Top,
+        unbounded = true
+      )
+  ) {
+    repeat(10) {
+      UiUserPlaceholder(
+        delayMillis = it * 50L
+      )
     }
+  }
 }
 
 private fun UiDMEvent.resolveLink(
-    href: String,
+  href: String,
 ): ResolvedLink {
-    val entity = urlEntity.firstOrNull { it.url == href }
-    val media = media.firstOrNull { it.url == href }
-    return when {
-        media != null -> {
-            ResolvedLink(expanded = null, skip = true)
-        }
-        entity != null -> {
-            ResolvedLink(expanded = entity.expandedUrl, display = entity.displayUrl)
-        }
-        else -> {
-            ResolvedLink(expanded = null)
-        }
+  val entity = urlEntity.firstOrNull { it.url == href }
+  val media = media.firstOrNull { it.url == href }
+  return when {
+    media != null -> {
+      ResolvedLink(expanded = null, skip = true)
     }
+    entity != null -> {
+      ResolvedLink(expanded = entity.expandedUrl, display = entity.displayUrl)
+    }
+    else -> {
+      ResolvedLink(expanded = null)
+    }
+  }
 }

@@ -46,173 +46,218 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.navigation.ProvideUserPlatform
+import com.twidere.twiderex.navigation.RequirePlatformAccount
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.RootDeepLinks
+import com.twidere.twiderex.navigation.rememberUserNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMNewConversationViewModel
-import com.twidere.twiderex.viewmodel.user.UserViewModel
-import org.koin.core.parameter.parametersOf
+import com.twidere.twiderex.viewmodel.user.UserEvent
+import com.twidere.twiderex.viewmodel.user.UserPresenter
+import com.twidere.twiderex.viewmodel.user.UserState
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
+
+@NavGraphDestination(
+  route = Root.User.route,
+  deepLink = [RootDeepLinks.User.route]
+)
 
 @Composable
 fun UserScene(
-    userKey: MicroBlogKey,
+  @Path("userKey") key: String,
+  navigator: Navigator,
 ) {
-    val account = LocalActiveAccount.current ?: return
-    val viewModel: UserViewModel = getViewModel {
-        parametersOf(userKey)
+  val account = LocalActiveAccount.current ?: return
+  MicroBlogKey.valueOf(key).let { userKey ->
+    ProvideUserPlatform(userKey = userKey) { platformType ->
+      RequirePlatformAccount(platformType = platformType) {
+        UserScene(
+          userKey = userKey,
+          navigator = navigator,
+          account = account,
+        )
+      }
     }
-    val conversationViewModel: DMNewConversationViewModel = getViewModel()
-    val user by viewModel.user.observeAsState(initial = null)
-    val navController = LocalNavController.current
-    var expanded by remember { mutableStateOf(false) }
-    var showBlockAlert by remember { mutableStateOf(false) }
-    val relationship by viewModel.relationship.observeAsState(initial = null)
-    val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
-    TwidereScene {
-        InAppNotificationScaffold(
-            // TODO: Show top bar with actions
-            topBar = {
-                AppBar(
-                    backgroundColor = MaterialTheme.colors.surface.withElevation(),
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    actions = {
-                        if (account.type == PlatformType.Twitter && user?.platformType == PlatformType.Twitter) {
-                            user?.let {
-                                if (userKey != account.accountKey) {
-                                    IconButton(
-                                        onClick = {
-                                            conversationViewModel.createNewConversation(
-                                                it,
-                                                onResult = { conversationKey ->
-                                                    conversationKey?.let {
-                                                        navController.navigate(Root.Messages.Conversation(it))
-                                                    }
-                                                }
-                                            )
-                                        }
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_mail),
-                                            contentDescription = stringResource(
-                                                res = com.twidere.twiderex.MR.strings.scene_messages_title
-                                            ),
-                                            tint = MaterialTheme.colors.onSurface
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        Box {
-                            if (userKey != account.accountKey) {
-                                IconButton(
-                                    onClick = {
-                                        expanded = true
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.MoreHoriz,
-                                        contentDescription = stringResource(
-                                            res = MR.strings.accessibility_common_more
-                                        ),
-                                        tint = MaterialTheme.colors.onSurface
-                                    )
-                                }
-                            }
+  }
+}
 
-                            DropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false },
-                            ) {
-                                relationship.takeIf { !loadingRelationship }
-                                    ?.blocking?.let { blocking ->
-                                        DropdownMenuItem(
-                                            onClick = {
-                                                if (blocking)
-                                                    viewModel.unblock()
-                                                else
-                                                    showBlockAlert = true
-                                                expanded = false
-                                            }
-                                        ) {
-                                            Text(
-                                                text = stringResource(
-                                                    res = if (blocking) MR.strings.common_controls_friendship_actions_unblock
-                                                    else MR.strings.common_controls_friendship_actions_block
-                                                )
-                                            )
-                                        }
-                                    }
-                            }
+@Composable
+fun UserScene(
+  userKey: MicroBlogKey,
+  navigator: Navigator,
+  account: AccountDetails,
+) {
+  val (state, channel) = rememberPresenterState<UserState, UserEvent> {
+    UserPresenter(it, userKey = userKey)
+  }
+  if (state !is UserState.Data) {
+    return
+  }
+  val conversationViewModel: DMNewConversationViewModel = getViewModel()
+  var expanded by remember { mutableStateOf(false) }
+  var showBlockAlert by remember { mutableStateOf(false) }
+  val userNavigationData = rememberUserNavigationData(navigator)
+  TwidereScene {
+    InAppNotificationScaffold(
+      // TODO: Show top bar with actions
+      topBar = {
+        AppBar(
+          backgroundColor = MaterialTheme.colors.surface.withElevation(),
+          navigationIcon = {
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
+          },
+          actions = {
+            if (account.type == PlatformType.Twitter && state.user?.platformType == PlatformType.Twitter) {
+              state.user.let {
+                if (userKey != account.accountKey) {
+                  IconButton(
+                    onClick = {
+                      conversationViewModel.createNewConversation(
+                        it,
+                        onResult = { conversationKey ->
+                          conversationKey?.let {
+                            navigator.navigate(Root.Messages.Conversation(it))
+                          }
                         }
-                    },
-                    elevation = 0.dp,
-                    title = {
-                        user?.let {
-                            UserName(user = it)
-                        }
+                      )
                     }
-                )
-            }
-        ) {
-            Box {
-                UserComponent(userKey)
-                if (showBlockAlert) {
-                    user?.let {
-                        BlockAlert(
-                            screenName = it.getDisplayScreenName(it.userKey.host),
-                            onDismissRequest = { showBlockAlert = false },
-                            onConfirm = {
-                                viewModel.block()
-                            }
-                        )
-                    }
+                  ) {
+                    Icon(
+                      painter = painterResource(res = com.twidere.twiderex.MR.files.ic_mail),
+                      contentDescription = stringResource(
+                        res = com.twidere.twiderex.MR.strings.scene_messages_title
+                      ),
+                      tint = MaterialTheme.colors.onSurface
+                    )
+                  }
                 }
+              }
             }
+            Box {
+              if (userKey != account.accountKey) {
+                IconButton(
+                  onClick = {
+                    expanded = true
+                  }
+                ) {
+                  Icon(
+                    imageVector = Icons.Default.MoreHoriz,
+                    contentDescription = stringResource(
+                      res = MR.strings.accessibility_common_more
+                    ),
+                    tint = MaterialTheme.colors.onSurface
+                  )
+                }
+              }
+
+              DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+              ) {
+                state.relationship.takeIf { !state.loadingRelationship }
+                  ?.blocking?.let { blocking ->
+                    DropdownMenuItem(
+                      onClick = {
+                        if (blocking)
+                          channel.trySend(UserEvent.UnBlock)
+                        else
+                          showBlockAlert = true
+                        expanded = false
+                      }
+                    ) {
+                      Text(
+                        text = stringResource(
+                          res = if (blocking) MR.strings.common_controls_friendship_actions_unblock
+                          else MR.strings.common_controls_friendship_actions_block
+                        )
+                      )
+                    }
+                  }
+              }
+            }
+          },
+          elevation = 0.dp,
+          title = {
+            state.user?.let {
+              UserName(
+                user = it,
+                onUserNameClicked = userNavigationData.statusNavigation.openLink,
+              )
+            }
+          }
+        )
+      }
+    ) {
+      Box {
+        UserComponent(
+          userKey = userKey,
+          state = state,
+          channel = channel,
+          userNavigationData = userNavigationData,
+        )
+        if (showBlockAlert) {
+          state.user?.let {
+            BlockAlert(
+              screenName = it.getDisplayScreenName(it.userKey.host),
+              onDismissRequest = { showBlockAlert = false },
+              onConfirm = {
+                channel.trySend(UserEvent.Block)
+              }
+            )
+          }
         }
+      }
     }
+  }
 }
 
 @Composable
 fun BlockAlert(
-    screenName: String,
-    onDismissRequest: () -> Unit,
-    onConfirm: () -> Unit
+  screenName: String,
+  onDismissRequest: () -> Unit,
+  onConfirm: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = {
-            onDismissRequest.invoke()
-        },
-        title = {
-            Text(
-                text = stringResource(res = MR.strings.common_alerts_block_user_confirm_title, screenName),
-                style = MaterialTheme.typography.subtitle1
-            )
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest.invoke()
-                }
-            ) {
-                Text(text = stringResource(res = MR.strings.common_controls_actions_cancel))
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirm()
-                    onDismissRequest.invoke()
-                }
-            ) {
-                Text(text = stringResource(res = MR.strings.common_controls_actions_yes))
-            }
-        },
-    )
+  AlertDialog(
+    onDismissRequest = {
+      onDismissRequest.invoke()
+    },
+    title = {
+      Text(
+        text = stringResource(res = MR.strings.common_alerts_block_user_confirm_title, screenName),
+        style = MaterialTheme.typography.subtitle1
+      )
+    },
+    dismissButton = {
+      TextButton(
+        onClick = {
+          onDismissRequest.invoke()
+        }
+      ) {
+        Text(text = stringResource(res = MR.strings.common_controls_actions_cancel))
+      }
+    },
+    confirmButton = {
+      TextButton(
+        onClick = {
+          onConfirm()
+          onDismissRequest.invoke()
+        }
+      ) {
+        Text(text = stringResource(res = MR.strings.common_controls_actions_yes))
+      }
+    },
+  )
 }

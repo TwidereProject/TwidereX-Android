@@ -28,12 +28,12 @@ import com.twidere.twiderex.MR
 
 @Composable
 fun LoginLogo(
-    modifier: Modifier = Modifier,
+  modifier: Modifier = Modifier,
 ) {
-    Image(
-        modifier = modifier,
-        contentScale = ContentScale.FillWidth,
-        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_login_logo),
-        contentDescription = stringResource(res = MR.strings.accessibility_common_logo_twidere)
-    )
+  Image(
+    modifier = modifier,
+    contentScale = ContentScale.FillWidth,
+    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_login_logo),
+    contentDescription = stringResource(res = MR.strings.accessibility_common_logo_twidere)
+  )
 }

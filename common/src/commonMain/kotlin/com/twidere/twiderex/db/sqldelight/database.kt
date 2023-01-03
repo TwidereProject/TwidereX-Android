@@ -40,30 +40,30 @@ import com.twidere.twiderex.sqldelight.SqlDelightAppDatabase
 import com.twidere.twiderex.sqldelight.SqlDelightCacheDatabase
 
 internal fun createAppDataBase(driver: SqlDriver): SqlDelightAppDatabase {
-    SqlDelightAppDatabase.Schema.create(driver)
-    return SqlDelightAppDatabase(
-        driver = driver,
-        draftAdapter = DraftAdapterFactory.create(),
-        searchAdapter = SearchAdapterFactory.create(),
-        DbAccountAdapter = AccountAdapterFactory.create()
-    )
+  SqlDelightAppDatabase.Schema.create(driver)
+  return SqlDelightAppDatabase(
+    driver = driver,
+    draftAdapter = DraftAdapterFactory.create(),
+    searchAdapter = SearchAdapterFactory.create(),
+    DbAccountAdapter = AccountAdapterFactory.create()
+  )
 }
 
 internal fun createCacheDataBase(driver: SqlDriver): SqlDelightCacheDatabase {
-    SqlDelightCacheDatabase.Schema.create(driver)
-    return SqlDelightCacheDatabase(
-        driver = driver,
-        DbDMEventAdapter = DMEventAdapterFactory.create(),
-        DbMediaAdapter = MediaAdapterFactory.create(),
-        DbUrlEntityAdapter = UrlEntityAdapterFactory.create(),
-        DbUserAdapter = UserAdapterFactory.create(),
-        DbDMConversationAdapter = DMConversationAdapterFactory.create(),
-        DbTrendAdapter = TrendAdapterFactory.create(),
-        DbTrendHistoryAdapter = TrendHistoryAdapterFactory.create(),
-        DbNotificationCursorAdapter = NotificationCursorAdapterFactory.create(),
-        DbListAdapter = ListAdapterFactory.create(),
-        DbStatusAdapter = StatusAdapterFactory.create(),
-        DbStatusReactionsAdapter = StatusReactionsFactory.create(),
-        DbPagingTimelineAdapter = PagingTimelineAdapterFactory.create()
-    )
+  SqlDelightCacheDatabase.Schema.create(driver)
+  return SqlDelightCacheDatabase(
+    driver = driver,
+    DbDMEventAdapter = DMEventAdapterFactory.create(),
+    DbMediaAdapter = MediaAdapterFactory.create(),
+    DbUrlEntityAdapter = UrlEntityAdapterFactory.create(),
+    DbUserAdapter = UserAdapterFactory.create(),
+    DbDMConversationAdapter = DMConversationAdapterFactory.create(),
+    DbTrendAdapter = TrendAdapterFactory.create(),
+    DbTrendHistoryAdapter = TrendHistoryAdapterFactory.create(),
+    DbNotificationCursorAdapter = NotificationCursorAdapterFactory.create(),
+    DbListAdapter = ListAdapterFactory.create(),
+    DbStatusAdapter = StatusAdapterFactory.create(),
+    DbStatusReactionsAdapter = StatusReactionsFactory.create(),
+    DbPagingTimelineAdapter = PagingTimelineAdapterFactory.create()
+  )
 }

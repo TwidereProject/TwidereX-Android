@@ -30,18 +30,18 @@ import com.twidere.twiderex.paging.mediator.paging.CursorPagingMediator
 import com.twidere.twiderex.paging.mediator.paging.CursorPagingResult
 
 class SearchStatusMediator(
-    private val query: String,
-    database: CacheDatabase,
-    accountKey: MicroBlogKey,
-    private val service: SearchService,
+  private val query: String,
+  database: CacheDatabase,
+  accountKey: MicroBlogKey,
+  private val service: SearchService,
 ) : CursorPagingMediator(accountKey, database) {
-    override val pagingKey = "search:$query:status"
-    override suspend fun load(pageSize: Int, paging: CursorPagination?): List<IStatus> {
-        val result = service.searchTweets(query, count = pageSize, nextPage = paging?.cursor)
-        return CursorPagingResult(result.status, result.nextPage)
-    }
+  override val pagingKey = "search:$query:status"
+  override suspend fun load(pageSize: Int, paging: CursorPagination?): List<IStatus> {
+    val result = service.searchTweets(query, count = pageSize, nextPage = paging?.cursor)
+    return CursorPagingResult(result.status, result.nextPage)
+  }
 
-    override fun hasMore(result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
-        return result.size == pageSize
-    }
+  override fun hasMore(raw: List<IStatus>, result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
+    return result.size == pageSize
+  }
 }

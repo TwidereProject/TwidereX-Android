@@ -25,30 +25,30 @@ import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.StatusRepository
 
 class UpdateStatusJob(
-    private val repository: ReactionRepository,
-    private val statusRepository: StatusRepository,
+  private val repository: ReactionRepository,
+  private val statusRepository: StatusRepository,
 ) {
-    suspend fun execute(
-        accountKey: MicroBlogKey,
-        statusKey: MicroBlogKey,
-        liked: Boolean? = null,
-        likeCount: Long? = null,
-        retweeted: Boolean? = null,
-        retweetCount: Long? = null,
-    ) {
-        repository.updateReaction(
-            accountKey = accountKey,
-            statusKey = statusKey,
-            liked = liked,
-            retweet = retweeted
+  suspend fun execute(
+    accountKey: MicroBlogKey,
+    statusKey: MicroBlogKey,
+    liked: Boolean? = null,
+    likeCount: Long? = null,
+    retweeted: Boolean? = null,
+    retweetCount: Long? = null,
+  ) {
+    repository.updateReaction(
+      accountKey = accountKey,
+      statusKey = statusKey,
+      liked = liked,
+      retweet = retweeted
+    )
+    statusRepository.updateStatus(statusKey = statusKey, accountKey = accountKey) {
+      it.copy(
+        metrics = it.metrics.copy(
+          retweet = retweetCount ?: it.metrics.retweet,
+          like = likeCount ?: it.metrics.like
         )
-        statusRepository.updateStatus(statusKey = statusKey, accountKey = accountKey) {
-            it.copy(
-                metrics = it.metrics.copy(
-                    retweet = retweetCount ?: it.metrics.retweet,
-                    like = likeCount ?: it.metrics.like
-                )
-            )
-        }
+      )
     }
+  }
 }

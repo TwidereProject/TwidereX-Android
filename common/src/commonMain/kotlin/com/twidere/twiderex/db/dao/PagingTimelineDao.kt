@@ -26,14 +26,14 @@ import com.twidere.twiderex.model.paging.PagingTimeLine
 import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 
 interface PagingTimelineDao {
-    fun getPagingSource(
-        pagingKey: String,
-        accountKey: MicroBlogKey
-    ): PagingSource<Int, PagingTimeLineWithStatus>
+  fun getPagingSource(
+    pagingKey: String,
+    accountKey: MicroBlogKey
+  ): PagingSource<Int, PagingTimeLineWithStatus>
 
-    suspend fun clearAll(pagingKey: String, accountKey: MicroBlogKey)
-    suspend fun getLatest(pagingKey: String, accountKey: MicroBlogKey): PagingTimeLineWithStatus?
-    suspend fun findWithStatusKey(maxStatusKey: MicroBlogKey, accountKey: MicroBlogKey): PagingTimeLine?
-    suspend fun insertAll(listOf: List<PagingTimeLine>)
-    suspend fun delete(statusKey: MicroBlogKey)
+  suspend fun clearAll(pagingKey: String, accountKey: MicroBlogKey)
+  suspend fun getLatest(pagingKey: String, accountKey: MicroBlogKey): PagingTimeLineWithStatus?
+  suspend fun findWithStatusKey(maxStatusKey: MicroBlogKey, accountKey: MicroBlogKey): PagingTimeLine?
+  suspend fun insertAll(listOf: List<PagingTimeLine>)
+  suspend fun delete(statusKey: MicroBlogKey)
 }

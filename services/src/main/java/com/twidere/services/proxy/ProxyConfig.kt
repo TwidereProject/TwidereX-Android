@@ -21,16 +21,17 @@
 package com.twidere.services.proxy
 
 data class ProxyConfig(
-    val enable: Boolean = false,
-    val server: String = "",
-    val port: Int = 0,
-    val userName: String = "",
-    val password: String = "",
-    val type: Type = Type.HTTP,
+  val enable: Boolean = false,
+  val server: String = "",
+  val port: Int = 0,
+  val userName: String = "",
+  val password: String = "",
+  val type: Type = Type.HTTP,
 ) {
 
-    enum class Type {
-        HTTP,
-        REVERSE
-    }
+  enum class Type {
+    HTTP,
+    SOCKS,
+    REVERSE
+  }
 }

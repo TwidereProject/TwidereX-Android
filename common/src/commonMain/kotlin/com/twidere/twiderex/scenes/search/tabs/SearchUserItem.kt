@@ -21,40 +21,52 @@
 package com.twidere.twiderex.scenes.search.tabs
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
-import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.component.navigation.user
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.viewmodel.search.SearchUserViewModel
-import org.koin.core.parameter.parametersOf
+import com.twidere.twiderex.extensions.rememberPresenter
+import com.twidere.twiderex.navigation.rememberUserNavigationData
+import com.twidere.twiderex.scenes.search.tabs.presenter.SearchUserPresenter
+import com.twidere.twiderex.scenes.search.tabs.presenter.SearchUserState
+import moe.tlaster.precompose.navigation.Navigator
 
 class SearchUserItem : SearchSceneItem {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_search_tabs_users)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_search_tabs_users)
+  }
 
-    @Composable
-    override fun Content(keyword: String) {
-        val viewModel: SearchUserViewModel = getViewModel {
-            parametersOf(keyword)
+  @Composable
+  override fun Content(
+    keyword: String,
+    navigator: Navigator,
+  ) {
+
+    val state by rememberPresenter {
+      SearchUserPresenter(keyword = keyword)
+    }.collectAsState()
+
+    (state as? SearchUserState.Data)?.let {
+      val userNavigationData = rememberUserNavigationData(navigator)
+      SwipeToRefreshLayout(
+        refreshingState = it.data.loadState.refresh is LoadState.Loading,
+        onRefresh = {
+          it.data.refreshOrRetry()
         }
-        val source = viewModel.source.collectAsLazyPagingItems()
-        val navigator = LocalNavigator.current
-        SwipeToRefreshLayout(
-            refreshingState = source.loadState.refresh is LoadState.Loading,
-            onRefresh = {
-                source.refreshOrRetry()
-            }
-        ) {
-            LazyUiUserList(
-                items = source,
-                onItemClicked = { navigator.user(it) },
-            )
-        }
+      ) {
+        LazyUiUserList(
+          items = it.data,
+          onItemClicked = {
+            navigator.user(it)
+          },
+          userNavigationData = userNavigationData,
+        )
+      }
     }
+  }
 }

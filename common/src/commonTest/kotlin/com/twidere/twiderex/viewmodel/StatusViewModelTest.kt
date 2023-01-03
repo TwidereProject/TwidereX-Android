@@ -36,43 +36,43 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 internal class StatusViewModelTest : AccountViewModelTestBase() {
-    override val mockService: MicroBlogService = mockk()
+  override val mockService: MicroBlogService = mockk()
 
-    @MockK
-    private lateinit var repository: StatusRepository
-    private lateinit var viewModel: StatusViewModel
-    override fun setUp() {
-        super.setUp()
-        every { repository.conversation(any(), any(), any(), any()) }.returns(
-            flowOf(
-                PagingData.from(
-                    (0..4).map {
-                        mockk {
-                            every { statusKey }.returns(MicroBlogKey.twitter(it.toString()))
-                            every { statusId }.returns(it.toString())
-                        }
-                    }
-                )
-            )
+  @MockK
+  private lateinit var repository: StatusRepository
+  private lateinit var viewModel: StatusViewModel
+  override fun setUp() {
+    super.setUp()
+    every { repository.conversation(any(), any(), any(), any()) }.returns(
+      flowOf(
+        PagingData.from(
+          (0..4).map {
+            mockk {
+              every { statusKey }.returns(MicroBlogKey.twitter(it.toString()))
+              every { statusId }.returns(it.toString())
+            }
+          }
         )
-        viewModel = StatusViewModel(repository, mockAccountRepository, MicroBlogKey.twitter("2"))
-    }
+      )
+    )
+    viewModel = StatusViewModel(repository, mockAccountRepository, MicroBlogKey.twitter("2"))
+  }
 
-    @Test
-    fun source_loadConversation(): Unit = runBlocking {
-        viewModel.source.first().let {
-            val data = it.collectDataForTest()
-            assertEquals(5, data.size)
-            assertTrue {
-                data.any {
-                    it.statusId == "2"
-                }
-            }
-            assertTrue {
-                data.indexOfFirst {
-                    it.statusId == "2"
-                } == 2
-            }
+  @Test
+  fun source_loadConversation(): Unit = runBlocking {
+    viewModel.source.first().let {
+      val data = it.collectDataForTest()
+      assertEquals(5, data.size)
+      assertTrue {
+        data.any {
+          it.statusId == "2"
         }
+      }
+      assertTrue {
+        data.indexOfFirst {
+          it.statusId == "2"
+        } == 2
+      }
     }
+  }
 }

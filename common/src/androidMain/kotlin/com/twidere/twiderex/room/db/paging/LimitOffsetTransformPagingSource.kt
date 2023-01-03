@@ -27,39 +27,39 @@ import com.twidere.twiderex.paging.crud.LimitOffsetPagingSource
 import kotlinx.coroutines.Dispatchers
 
 internal class LimitOffsetTransformPagingSource<Value : Any>(
-    /**
-     * returns items from database matches offset and limit
-     */
-    private val loadPagingList: suspend (offset: Int, limit: Int) -> List<Value>,
-    /**
-     * returns count of requested items to calculate itemsAfter and itemsBefore for use in creating
-     * LoadResult.Page<>
-     */
-    private val queryItemCount: suspend () -> Int,
-    private val db: RoomDatabase,
-    vararg tables: String
+  /**
+   * returns items from database matches offset and limit
+   */
+  private val loadPagingList: suspend (offset: Int, limit: Int) -> List<Value>,
+  /**
+   * returns count of requested items to calculate itemsAfter and itemsBefore for use in creating
+   * LoadResult.Page<>
+   */
+  private val queryItemCount: suspend () -> Int,
+  private val db: RoomDatabase,
+  tables: Array<String>,
 ) : LimitOffsetPagingSource<Value>(Dispatchers.IO) {
 
-    private val observer = object : InvalidationTracker.Observer(tables) {
-        override fun onInvalidated(tables: MutableSet<String>) {
-            invalidate()
-        }
+  private val observer = object : InvalidationTracker.Observer(tables) {
+    override fun onInvalidated(tables: Set<String>) {
+      invalidate()
     }
+  }
 
-    @SuppressLint("RestrictedApi")
-    override fun registerInvalidateObserver() {
-        db.invalidationTracker.addWeakObserver(observer)
-    }
+  @SuppressLint("RestrictedApi")
+  override fun registerInvalidateObserver() {
+    db.invalidationTracker.addWeakObserver(observer)
+  }
 
-    override suspend fun queryItemCount() = queryItemCount.invoke()
+  override suspend fun queryItemCount() = queryItemCount.invoke()
 
-    override suspend fun queryData(offset: Int, limit: Int) = loadPagingList(offset, limit)
+  override suspend fun queryData(offset: Int, limit: Int) = loadPagingList(offset, limit)
 
-    @SuppressLint("RestrictedApi")
-    override suspend fun processResult(result: LoadResult<Int, Value>): LoadResult<Int, Value> {
-        // manually check if database has been updated. If so, the observers's
-        // invalidation callback will invalidate this paging source
-        db.invalidationTracker.refreshVersionsSync()
-        return result
-    }
+  @SuppressLint("RestrictedApi")
+  override suspend fun processResult(result: LoadResult<Int, Value>): LoadResult<Int, Value> {
+    // manually check if database has been updated. If so, the observers's
+    // invalidation callback will invalidate this paging source
+    db.invalidationTracker.refreshVersionsSync()
+    return result
+  }
 }

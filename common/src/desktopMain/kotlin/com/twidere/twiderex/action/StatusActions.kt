@@ -35,99 +35,99 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
 actual class StatusActions(
-    private val deleteStatusJob: DeleteStatusJob,
-    private val deleteDbStatusJob: DeleteDbStatusJob,
-    private val updateStatusJob: UpdateStatusJob,
-    private val likeStatusJob: LikeStatusJob,
-    private val unlikeStatusJob: UnlikeStatusJob,
-    private val retweetStatusJob: RetweetStatusJob,
-    private val unRetweetStatusJob: UnRetweetStatusJob,
-    private val mastodonVoteJob: MastodonVoteJob,
+  private val deleteStatusJob: DeleteStatusJob,
+  private val deleteDbStatusJob: DeleteDbStatusJob,
+  private val updateStatusJob: UpdateStatusJob,
+  private val likeStatusJob: LikeStatusJob,
+  private val unlikeStatusJob: UnlikeStatusJob,
+  private val retweetStatusJob: RetweetStatusJob,
+  private val unRetweetStatusJob: UnRetweetStatusJob,
+  private val mastodonVoteJob: MastodonVoteJob,
 ) : IStatusActions {
-    private val scope = CoroutineScope(Dispatchers.IO)
+  private val scope = CoroutineScope(Dispatchers.IO)
 
-    actual override fun delete(status: UiStatus, account: AccountDetails) {
-        scope.launchCatching {
-            deleteStatusJob.execute(accountKey = account.accountKey, statusKey = status.statusKey)
-            deleteDbStatusJob.execute(statusKey = status.statusKey)
-        }
+  actual override fun delete(status: UiStatus, account: AccountDetails) {
+    scope.launchCatching {
+      deleteStatusJob.execute(accountKey = account.accountKey, statusKey = status.statusKey)
+      deleteDbStatusJob.execute(statusKey = status.statusKey)
     }
+  }
 
-    actual override fun like(status: UiStatus, account: AccountDetails) {
-        scope.launchCatching {
-            updateStatusJob.execute(
-                accountKey = account.accountKey,
-                statusKey = status.statusKey,
-                liked = !status.liked
-            )
-            val (
-                _,
-                _,
-                retweeted,
-                liked,
-                retweetCount,
-                likeCount,
-            ) = if (status.liked) {
-                unlikeStatusJob.execute(
-                    accountKey = account.accountKey,
-                    statusKey = status.statusKey,
-                )
-            } else {
-                likeStatusJob.execute(
-                    accountKey = account.accountKey,
-                    statusKey = status.statusKey,
-                )
-            }
-            updateStatusJob.execute(
-                accountKey = account.accountKey,
-                statusKey = status.statusKey,
-                liked = liked,
-                likeCount = likeCount,
-                retweeted = retweeted,
-                retweetCount = retweetCount,
-            )
-        }
+  actual override fun like(status: UiStatus, account: AccountDetails) {
+    scope.launchCatching {
+      updateStatusJob.execute(
+        accountKey = account.accountKey,
+        statusKey = status.statusKey,
+        liked = !status.liked
+      )
+      val (
+        _,
+        _,
+        retweeted,
+        liked,
+        retweetCount,
+        likeCount,
+      ) = if (status.liked) {
+        unlikeStatusJob.execute(
+          accountKey = account.accountKey,
+          statusKey = status.statusKey,
+        )
+      } else {
+        likeStatusJob.execute(
+          accountKey = account.accountKey,
+          statusKey = status.statusKey,
+        )
+      }
+      updateStatusJob.execute(
+        accountKey = account.accountKey,
+        statusKey = status.statusKey,
+        liked = liked,
+        likeCount = likeCount,
+        retweeted = retweeted,
+        retweetCount = retweetCount,
+      )
     }
+  }
 
-    actual override fun retweet(status: UiStatus, account: AccountDetails) {
-        scope.launchCatching {
-            updateStatusJob.execute(
-                accountKey = account.accountKey,
-                statusKey = status.statusKey,
-                retweeted = !status.retweeted
-            )
-            val (
-                _,
-                _,
-                retweeted,
-                liked,
-                retweetCount,
-                likeCount,
-            ) = if (status.retweeted) {
-                unRetweetStatusJob.execute(
-                    accountKey = account.accountKey,
-                    statusKey = status.statusKey,
-                )
-            } else {
-                retweetStatusJob.execute(
-                    accountKey = account.accountKey,
-                    statusKey = status.statusKey,
-                )
-            }
-            updateStatusJob.execute(
-                accountKey = account.accountKey,
-                statusKey = status.statusKey,
-                liked = liked,
-                likeCount = likeCount,
-                retweeted = retweeted,
-                retweetCount = retweetCount,
-            )
-        }
+  actual override fun retweet(status: UiStatus, account: AccountDetails) {
+    scope.launchCatching {
+      updateStatusJob.execute(
+        accountKey = account.accountKey,
+        statusKey = status.statusKey,
+        retweeted = !status.retweeted
+      )
+      val (
+        _,
+        _,
+        retweeted,
+        liked,
+        retweetCount,
+        likeCount,
+      ) = if (status.retweeted) {
+        unRetweetStatusJob.execute(
+          accountKey = account.accountKey,
+          statusKey = status.statusKey,
+        )
+      } else {
+        retweetStatusJob.execute(
+          accountKey = account.accountKey,
+          statusKey = status.statusKey,
+        )
+      }
+      updateStatusJob.execute(
+        accountKey = account.accountKey,
+        statusKey = status.statusKey,
+        liked = liked,
+        likeCount = likeCount,
+        retweeted = retweeted,
+        retweetCount = retweetCount,
+      )
     }
+  }
 
-    actual override fun vote(status: UiStatus, account: AccountDetails, votes: List<Int>) {
-        scope.launchCatching {
-            mastodonVoteJob.execute(votes, account.accountKey, status.statusKey)
-        }
+  actual override fun vote(status: UiStatus, account: AccountDetails, votes: List<Int>) {
+    scope.launchCatching {
+      mastodonVoteJob.execute(votes, account.accountKey, status.statusKey)
     }
+  }
 }

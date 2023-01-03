@@ -24,24 +24,24 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AppearancePreferences(
-    val primaryColorIndex: Int = 0,
-    val tabPosition: TabPosition = TabPosition.Bottom,
-    val theme: Theme = Theme.Auto,
-    val hideTabBarWhenScroll: Boolean = false,
-    val hideFabWhenScroll: Boolean = false,
-    val hideAppBarWhenScroll: Boolean = false,
-    val isDarkModePureBlack: Boolean = false,
+  val primaryColorIndex: Int = 0,
+  val tabPosition: TabPosition = TabPosition.Bottom,
+  val theme: Theme = Theme.Auto,
+  val hideTabBarWhenScroll: Boolean = false,
+  val hideFabWhenScroll: Boolean = false,
+  val hideAppBarWhenScroll: Boolean = false,
+  val isDarkModePureBlack: Boolean = false,
 ) {
-    @Serializable
-    enum class TabPosition {
-        Top,
-        Bottom,
-    }
+  @Serializable
+  enum class TabPosition {
+    Top,
+    Bottom,
+  }
 
-    @Serializable
-    enum class Theme {
-        Auto,
-        Light,
-        Dark,
-    }
+  @Serializable
+  enum class Theme {
+    Auto,
+    Light,
+    Dark,
+  }
 }

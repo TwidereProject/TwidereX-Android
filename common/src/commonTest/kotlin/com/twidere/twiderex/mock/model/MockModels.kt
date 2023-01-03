@@ -58,192 +58,192 @@ import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiSearch
 import com.twidere.twiderex.model.ui.UiUrlEntity
 import org.jetbrains.annotations.TestOnly
-import java.util.Date
+import org.joda.time.DateTime
 import java.util.UUID
 
 @TestOnly
 fun mockUiMedia(url: String = "", belongToKey: MicroBlogKey = MicroBlogKey.Empty, order: Int = 0) = UiMedia(
-    url = url,
-    belongToKey = belongToKey,
-    mediaUrl = url,
-    previewUrl = url,
-    type = MediaType.photo,
-    width = 100,
-    height = 100,
-    pageUrl = "",
-    altText = "",
-    order = order
+  url = url,
+  belongToKey = belongToKey,
+  mediaUrl = url,
+  previewUrl = url,
+  type = MediaType.photo,
+  width = 100,
+  height = 100,
+  pageUrl = "",
+  altText = "",
+  order = order
 )
 
 @TestOnly
 fun mockUiDraft(
-    draftId: String = UUID.randomUUID().toString(),
-    content: String = "",
-    composeType: ComposeType = ComposeType.New,
-    statusKey: MicroBlogKey = MicroBlogKey.twitter(UUID.randomUUID().toString())
+  draftId: String = UUID.randomUUID().toString(),
+  content: String = "",
+  composeType: ComposeType = ComposeType.New,
+  statusKey: MicroBlogKey = MicroBlogKey.twitter(UUID.randomUUID().toString())
 ) = UiDraft(
-    draftId = draftId,
-    content = content,
-    media = emptyList(),
-    createdAt = System.currentTimeMillis(),
-    composeType = composeType,
-    statusKey = statusKey,
-    excludedReplyUserIds = null
+  draftId = draftId,
+  content = content,
+  media = emptyList(),
+  createdAt = System.currentTimeMillis(),
+  composeType = composeType,
+  statusKey = statusKey,
+  excludedReplyUserIds = null
 )
 
 @TestOnly
 fun mockUiSearch(content: String = "", accountKey: MicroBlogKey = MicroBlogKey.Empty, saved: Boolean = false) = UiSearch(
-    content = content,
-    lastActive = System.currentTimeMillis(),
-    saved = saved,
-    accountKey = accountKey
+  content = content,
+  lastActive = System.currentTimeMillis(),
+  saved = saved,
+  accountKey = accountKey
 )
 
 fun <T> List<T>.toIPaging(nextPaging: String? = UUID.randomUUID().toString()) = TwitterPaging(
-    data = this,
-    nextPage = nextPaging
+  data = this,
+  nextPage = nextPaging
 )
 
 @TestOnly
 fun mockIUser(id: String = UUID.randomUUID().toString(), name: String = ""): IUser {
-    return UserV2(
-        id = id,
-        name = name
-    )
+  return UserV2(
+    id = id,
+    name = name
+  )
 }
 
 @TestOnly
 fun mockITrend(name: String = "trend timestamp:${System.currentTimeMillis()}"): ITrend {
-    return Trend(
-        name = name,
-        url = "https://trend",
+  return Trend(
+    name = name,
+    url = "https://trend",
 
-        history = mutableListOf(
-            TrendHistory(
-                accounts = "1",
-                uses = "1",
-                day = System.currentTimeMillis().toString()
-            )
-        )
+    history = mutableListOf(
+      TrendHistory(
+        accounts = "1",
+        uses = "1",
+        day = System.currentTimeMillis().toString()
+      )
     )
+  )
 }
 
 @TestOnly
 fun mockIListModel(
-    name: String = "",
-    mode: String? = null,
-    description: String? = "",
+  name: String = "",
+  mode: String? = null,
+  description: String? = "",
 ): IListModel {
-    val id = UUID.randomUUID().hashCode().toLong()
-    return TwitterList(
-        id = id,
-        idStr = id.toString(),
-        name = name,
-        mode = mode,
-        description = description,
-        createdAt = Date().apply { time = System.currentTimeMillis() }
-    )
+  val id = UUID.randomUUID().hashCode().toLong()
+  return TwitterList(
+    id = id,
+    idStr = id.toString(),
+    name = name,
+    mode = mode,
+    description = description,
+    createdAt = DateTime.now(),
+  )
 }
 
 @TestOnly
 fun mockIStatus(
-    id: String = UUID.randomUUID().toString(),
-    hasMedia: Boolean = false,
-    authorId: String = UUID.randomUUID().toString(),
-    hasReference: Boolean = false,
-    text: String = "text"
+  id: String = UUID.randomUUID().toString(),
+  hasMedia: Boolean = false,
+  authorId: String = UUID.randomUUID().toString(),
+  hasReference: Boolean = false,
+  text: String = "text"
 ): IStatus {
-    return StatusV2(
-        id = id,
-        authorID = authorId,
-        createdAt = Date().apply { time = System.currentTimeMillis() },
-        attachments = if (hasMedia) AttachmentsV2(mediaKeys = listOf("mediaKey")).apply {
-            media = listOf(MediaV2(url = "mediaUrl", type = "photo"))
-        } else null,
+  return StatusV2(
+    id = id,
+    authorID = authorId,
+    createdAt = DateTime.now(),
+    attachments = if (hasMedia) AttachmentsV2(mediaKeys = listOf("mediaKey")).apply {
+      media = listOf(MediaV2(url = "mediaUrl", type = "photo"))
+    } else null,
 
-        referencedTweets = if (hasReference) listOf(
-            ReferencedTweetV2(
-                type = ReferencedTweetType.retweeted,
-                id = UUID.randomUUID().toString()
-            ).apply { status = mockIStatus() as StatusV2 }
-        ) else emptyList(),
-        text = text
-    ).apply {
-        user = UserV2(
-            id = authorId,
-        )
-    }
+    referencedTweets = if (hasReference) listOf(
+      ReferencedTweetV2(
+        type = ReferencedTweetType.retweeted,
+        id = UUID.randomUUID().toString()
+      ).apply { status = mockIStatus() as StatusV2 }
+    ) else emptyList(),
+    text = text
+  ).apply {
+    user = UserV2(
+      id = authorId,
+    )
+  }
 }
 
 @TestOnly
 fun mockINotification(id: String = UUID.randomUUID().toString()): INotification {
-    val account = Account(
-        id = UUID.randomUUID().toString(),
-        username = "",
-        displayName = "",
-        acct = ""
+  val account = Account(
+    id = UUID.randomUUID().toString(),
+    username = "",
+    displayName = "",
+    acct = ""
+  )
+  return Notification(
+    id = id,
+    type = NotificationTypes.status,
+    createdAt = DateTime.now(),
+    account = account,
+    status = Status(
+      id = id,
+      account = account
     )
-    return Notification(
-        id = id,
-        type = NotificationTypes.status,
-        createdAt = Date().apply { time = System.currentTimeMillis() },
-        account = account,
-        status = Status(
-            id = id,
-            account = account
-        )
-    )
+  )
 }
 
 @TestOnly
 fun mockIDirectMessage(id: String = UUID.randomUUID().toString(), accountId: String, otherUserID: String = UUID.randomUUID().toString(), inCome: Boolean = true): IDirectMessage {
-    return DirectMessageEvent(
-        createdTimestamp = System.currentTimeMillis().toString(),
-        id = id,
-        type = "message_create",
-        messageCreate = MessageCreate(
-            messageData = MessageData(
-                text = "mock message",
-                entities = Entities(
-                    urls = listOf(
-                        EntitiesURL(
-                            display_url = "http://test.com",
-                            url = "http://test.com",
-                            expanded_url = "http://test.com",
-                        )
-                    )
-                ),
-                attachment = Attachment(
-                    type = "media",
-                    media = PurpleMedia()
-                )
-            ),
-            senderId = if (inCome) otherUserID else accountId,
-            target = MessageTarget(
-                recipientId = if (inCome) accountId else otherUserID
+  return DirectMessageEvent(
+    createdTimestamp = System.currentTimeMillis().toString(),
+    id = id,
+    type = "message_create",
+    messageCreate = MessageCreate(
+      messageData = MessageData(
+        text = "mock message",
+        entities = Entities(
+          urls = listOf(
+            EntitiesURL(
+              display_url = "http://test.com",
+              url = "http://test.com",
+              expanded_url = "http://test.com",
             )
+          )
+        ),
+        attachment = Attachment(
+          type = "media",
+          media = PurpleMedia()
         )
+      ),
+      senderId = if (inCome) otherUserID else accountId,
+      target = MessageTarget(
+        recipientId = if (inCome) accountId else otherUserID
+      )
     )
+  )
 }
 
 @TestOnly
 fun mockUiUrlEntity(url: String = "") = UiUrlEntity(
-    url = url,
-    displayUrl = "displayUrl",
-    expandedUrl = "expandedUrl",
-    title = "title",
-    description = "description",
-    image = "image"
+  url = url,
+  displayUrl = "displayUrl",
+  expandedUrl = "expandedUrl",
+  title = "title",
+  description = "description",
+  image = "image"
 )
 
 @TestOnly
 fun UiDMEvent.toConversation() = UiDMConversation(
-    accountKey = accountKey,
-    conversationId = conversationKey.id,
-    conversationKey = conversationKey,
-    conversationAvatar = sender.profileImage.toString(),
-    conversationName = sender.name,
-    conversationSubName = sender.screenName,
-    conversationType = UiDMConversation.Type.ONE_TO_ONE,
-    recipientKey = conversationUserKey
+  accountKey = accountKey,
+  conversationId = conversationKey.id,
+  conversationKey = conversationKey,
+  conversationAvatar = sender.profileImage,
+  conversationName = sender.name,
+  conversationSubName = sender.screenName,
+  conversationType = UiDMConversation.Type.ONE_TO_ONE,
+  recipientKey = conversationUserKey
 )

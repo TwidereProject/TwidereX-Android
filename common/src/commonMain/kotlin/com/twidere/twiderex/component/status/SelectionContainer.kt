@@ -22,11 +22,13 @@ package com.twidere.twiderex.component.status
 
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.currentPlatform
 import kotlinx.coroutines.cancel
@@ -35,61 +37,69 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class PositionWrapper {
-    var action: ((Offset) -> Unit)? = null
-    fun onchange(offset: Offset) {
-        action?.invoke(offset)
-    }
+  var action: ((Offset) -> Unit)? = null
+  fun onchange(offset: Offset) {
+    action?.invoke(offset)
+  }
 }
 
 // FIXME: 2021/11/26  workaround for https://github.com/JetBrains/compose-jb/issues/1450
 @Composable
 fun SelectionContainer(
-    modifier: Modifier = Modifier,
-    enable: Boolean = true,
-    content: @Composable (PositionWrapper?) -> Unit,
+  modifier: Modifier = Modifier,
+  enable: Boolean = true,
+  content: @Composable (PositionWrapper?) -> Unit,
 ) {
-    if (!enable) {
-        content.invoke(null)
-        return
+  if (!enable) {
+    content.invoke(null)
+    return
+  }
+  val focusManager = LocalFocusManager.current
+  DisposableEffect(Unit) {
+    onDispose {
+      // clear focus after ui hide, otherwise:
+      // java.lang.IllegalStateException: KeyEvent can't be processed because this key input node is not active.
+      focusManager.clearFocus()
     }
-    val positionWrapper = remember {
-        if (currentPlatform != Platform.Android) PositionWrapper() else null
-    }
-    androidx.compose.foundation.text.selection.SelectionContainer(
-        modifier = if (currentPlatform != Platform.Android) {
-            modifier.pointerInput(Unit) {
-                forEachGesture {
-                    coroutineScope {
-                        awaitPointerEventScope {
-                            awaitPointerEvent().apply {
-                                this.takeIf {
-                                    it.type == PointerEventType.Press
-                                }?.let {
-                                    launch {
-                                        for (i in 0 until 15) {
-                                            delay(10)
-                                            if (
-                                                currentEvent.type == PointerEventType.Release
-                                            ) {
-                                                if (
-                                                    currentEvent.changes[0].position.minus(it.changes[0].position).getDistance() < viewConfiguration.touchSlop
-                                                ) {
-                                                    positionWrapper?.onchange(it.changes[0].position)
-                                                }
-                                                cancel()
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+  }
+  val positionWrapper = remember {
+    if (currentPlatform != Platform.Android) PositionWrapper() else null
+  }
+  androidx.compose.foundation.text.selection.SelectionContainer(
+    modifier = if (currentPlatform != Platform.Android) {
+      modifier.pointerInput(Unit) {
+        forEachGesture {
+          coroutineScope {
+            awaitPointerEventScope {
+              awaitPointerEvent().apply {
+                this.takeIf {
+                  it.type == PointerEventType.Press
+                }?.let {
+                  launch {
+                    for (i in 0 until 15) {
+                      delay(10)
+                      if (
+                        currentEvent.type == PointerEventType.Release
+                      ) {
+                        if (
+                          currentEvent.changes[0].position.minus(it.changes[0].position).getDistance() < viewConfiguration.touchSlop
+                        ) {
+                          positionWrapper?.onchange(it.changes[0].position)
                         }
+                        cancel()
+                      }
                     }
+                  }
                 }
+              }
             }
-        } else {
-            modifier
+          }
         }
-    ) {
-        content.invoke(positionWrapper)
+      }
+    } else {
+      modifier
     }
+  ) {
+    content.invoke(positionWrapper)
+  }
 }

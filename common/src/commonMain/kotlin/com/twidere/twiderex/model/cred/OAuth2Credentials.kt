@@ -24,5 +24,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OAuth2Credentials(
-    val access_token: String,
+  val access_token: String,
 ) : Credentials

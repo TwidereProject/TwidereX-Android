@@ -25,12 +25,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BlockV2(
-    @SerialName("blocking")
-    val blocking: Boolean? = null
+  @SerialName("blocking")
+  val blocking: Boolean? = null
 )
 
 @Serializable
 data class BlockV2Request(
-    @SerialName("target_user_id")
-    val targetUserId: String
+  @SerialName("target_user_id")
+  val targetUserId: String
 )

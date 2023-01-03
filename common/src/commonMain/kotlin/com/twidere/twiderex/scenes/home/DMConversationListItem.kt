@@ -28,30 +28,32 @@ import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.scenes.dm.DMConversationListSceneContent
 import com.twidere.twiderex.scenes.dm.DMConversationListSceneFab
+import moe.tlaster.precompose.navigation.Navigator
 
 class DMConversationListItem : HomeNavigationItem() {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_title)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_title)
+  }
 
-    override val route: String
-        get() = Root.Messages.Home
+  override val route: String
+    get() = Root.Messages.Home
 
-    @Composable
-    override fun icon(): Painter {
-        return painterResource(res = com.twidere.twiderex.MR.files.ic_mail)
-    }
+  @Composable
+  override fun icon(): Painter {
+    return painterResource(res = com.twidere.twiderex.MR.files.ic_mail)
+  }
 
-    @Composable
-    override fun Fab() {
-        DMConversationListSceneFab()
-    }
+  @Composable
+  override fun Fab(navigator: Navigator) {
+    DMConversationListSceneFab(navigator)
+  }
 
-    @Composable
-    override fun Content() {
-        DMConversationListSceneContent(
-            lazyListController
-        )
-    }
+  @Composable
+  override fun Content(navigator: Navigator) {
+    DMConversationListSceneContent(
+      lazyListController,
+      navigator = navigator,
+    )
+  }
 }

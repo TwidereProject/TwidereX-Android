@@ -32,22 +32,22 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class ListsTimelineViewModel(
-    repository: TimelineRepository,
-    private val accountRepository: AccountRepository,
-    listKey: MicroBlogKey,
+  repository: TimelineRepository,
+  private val accountRepository: AccountRepository,
+  listKey: MicroBlogKey,
 ) : ViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val source by lazy {
-        account.flatMapLatest {
-            repository.listTimeline(
-                listKey = listKey,
-                accountKey = it.accountKey,
-                service = it.service as TimelineService
-            )
-        }.cachedIn(viewModelScope)
-    }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  val source by lazy {
+    account.flatMapLatest {
+      repository.listTimeline(
+        listKey = listKey,
+        accountKey = it.accountKey,
+        service = it.service as TimelineService
+      )
+    }.cachedIn(viewModelScope)
+  }
 }

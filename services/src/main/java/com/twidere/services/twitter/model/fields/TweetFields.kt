@@ -21,21 +21,21 @@
 package com.twidere.services.twitter.model.fields
 
 enum class TweetFields(val value: String) {
-    attachments("attachments"),
-    author_id("author_id"),
-    context_annotations("context_annotations"),
-    conversation_id("conversation_id"),
-    created_at("created_at"),
-    entities("entities"),
-    geo("geo"),
-    id("id"),
-    in_reply_to_user_id("in_reply_to_user_id"),
-    lang("lang"),
-    public_metrics("public_metrics"),
-    possibly_sensitive("possibly_sensitive"),
-    referenced_tweets("referenced_tweets"),
-    source("source"),
-    text("text"),
-    withheld("withheld"),
-    reply_settings("reply_settings")
+  attachments("attachments"),
+  author_id("author_id"),
+  context_annotations("context_annotations"),
+  conversation_id("conversation_id"),
+  created_at("created_at"),
+  entities("entities"),
+  geo("geo"),
+  id("id"),
+  in_reply_to_user_id("in_reply_to_user_id"),
+  lang("lang"),
+  public_metrics("public_metrics"),
+  possibly_sensitive("possibly_sensitive"),
+  referenced_tweets("referenced_tweets"),
+  source("source"),
+  text("text"),
+  withheld("withheld"),
+  reply_settings("reply_settings")
 }

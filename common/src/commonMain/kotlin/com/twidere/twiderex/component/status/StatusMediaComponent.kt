@@ -59,13 +59,13 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.foundation.rememberVideoPlayerState
 import com.twidere.twiderex.component.image.ImageBlur
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.extensions.playEnable
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.navigation.StatusNavigationData
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.TwidereTheme
 import moe.tlaster.placeholder.Placeholder
@@ -73,282 +73,281 @@ import moe.tlaster.placeholder.Placeholder
 @OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun StatusMediaComponent(
-    status: UiStatus,
+  status: UiStatus,
+  statusNavigation: StatusNavigationData,
 ) {
-    val navigator = LocalNavigator.current
-    val media = status.media
-    if (!media.any() || media.any { it.type == MediaType.audio }) {
-        return
+  val media = status.media
+  if (!media.any() || media.any { it.type == MediaType.audio }) {
+    return
+  }
+  val onItemClick = { it: UiMedia ->
+    val index = media.indexOf(it)
+    statusNavigation.toMediaWithIndex(status.statusKey, index)
+  }
+  var sensitive by rememberSaveable(status.statusKey.toString()) {
+    mutableStateOf(status.sensitive)
+  }
+
+  val aspectRatio = when (media.size) {
+    in 2..4 -> {
+      StatusMediaDefaults.DefaultAspectRatio
     }
-    val onItemClick = { it: UiMedia ->
-        val index = media.indexOf(it)
-        navigator.media(statusKey = status.statusKey, selectedIndex = index)
+    1 -> {
+      val first = media.first()
+      (first.width.toFloat() / first.height.toFloat()).let {
+        if (it.isNaN()) {
+          StatusMediaDefaults.DefaultAspectRatio
+        } else {
+          it
+        }
+      }
     }
-    var sensitive by rememberSaveable(status.statusKey.toString()) {
-        mutableStateOf(status.sensitive)
+    else -> {
+      null
+    }
+  }
+  Box(
+    modifier = Modifier
+      .let {
+        if (media.size == 1) {
+          it.heightIn(max = StatusMediaDefaults.DefaultMaxHeight)
+        } else {
+          it
+        }
+      }
+      .let { modifier ->
+        aspectRatio?.let {
+          modifier.aspectRatio(aspectRatio)
+        } ?: modifier
+      }
+      .clip(MaterialTheme.shapes.medium)
+  ) {
+    when (media.size) {
+      3 -> {
+        Row {
+          media.firstOrNull()?.let {
+            StatusMediaPreviewItem(
+              media = it,
+              modifier = Modifier
+                .weight(1f)
+                .fillMaxSize(),
+              sensitive = sensitive,
+              onClick = onItemClick,
+            )
+          }
+          Spacer(
+            modifier = Modifier
+              .width(StatusMediaDefaults.MediaSpacing)
+          )
+          Column(
+            modifier = Modifier.weight(1f),
+          ) {
+            media.drop(1).forEach {
+              StatusMediaPreviewItem(
+                media = it,
+                modifier = Modifier
+                  .weight(1f)
+                  .fillMaxSize(),
+                sensitive = sensitive,
+                onClick = onItemClick,
+              )
+              if (it != media.last()) {
+                Spacer(
+                  modifier = Modifier
+                    .height(StatusMediaDefaults.MediaSpacing)
+                )
+              }
+            }
+          }
+        }
+      }
+      else -> {
+        GridLayout(
+          spacing = StatusMediaDefaults.MediaSpacing
+        ) {
+          media.forEach {
+            StatusMediaPreviewItem(
+              media = it,
+              onClick = onItemClick,
+              sensitive = sensitive
+            )
+          }
+        }
+      }
     }
 
-    val aspectRatio = when (media.size) {
-        in 2..4 -> {
-            StatusMediaDefaults.DefaultAspectRatio
-        }
-        1 -> {
-            val first = media.first()
-            (first.width.toFloat() / first.height.toFloat()).let {
-                if (it.isNaN()) {
-                    StatusMediaDefaults.DefaultAspectRatio
-                } else {
-                    it
-                }
+    if (status.platformType == PlatformType.Mastodon && status.mastodonExtra != null) {
+      TwidereTheme(darkTheme = true) {
+        AnimatedVisibility(
+          modifier = Modifier
+            .matchParentSize(),
+          visible = sensitive,
+        ) {
+          Box(
+            modifier = Modifier
+              .clickable {
+                sensitive = false
+              },
+            contentAlignment = Alignment.Center,
+          ) {
+            Box(
+              modifier = Modifier
+                .background(
+                  MaterialTheme.colors.surface.copy(alpha = 0.25f),
+                  shape = CircleShape
+                )
+                .size(StatusMediaDefaults.Sensitive.BackgroundSize)
+            ) {
+              Icon(
+                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_alert_triangle),
+                contentDescription = null,
+                tint = MaterialTheme.colors.onSurface,
+                modifier = Modifier
+                  .size(StatusMediaDefaults.Sensitive.IconSize)
+                  .align(Alignment.Center)
+              )
             }
+          }
         }
-        else -> {
-            null
+        AnimatedVisibility(
+          visible = !sensitive,
+          enter = fadeIn(),
+          exit = fadeOut()
+        ) {
+          Box(
+            modifier = Modifier
+              .padding(StatusMediaDefaults.Mastodon.IconSpacing)
+              .alpha(0.5f),
+          ) {
+            Box(
+              modifier = Modifier
+                .background(
+                  MaterialTheme.colors.surface,
+                  shape = MaterialTheme.shapes.small,
+                )
+                .align(Alignment.TopStart)
+                .clickable { sensitive = true }
+                .padding(StatusMediaDefaults.Icon.ContentPadding),
+            ) {
+              Icon(
+                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_eye_off),
+                contentDescription = null,
+                tint = MaterialTheme.colors.onSurface,
+              )
+            }
+          }
         }
+      }
     }
-    Box(
-        modifier = Modifier
-            .let {
-                if (media.size == 1) {
-                    it.heightIn(max = StatusMediaDefaults.DefaultMaxHeight)
-                } else {
-                    it
-                }
-            }
-            .let { modifier ->
-                aspectRatio?.let {
-                    modifier.aspectRatio(aspectRatio)
-                } ?: modifier
-            }
-            .clip(MaterialTheme.shapes.medium)
-    ) {
-        when (media.size) {
-            3 -> {
-                Row {
-                    media.firstOrNull()?.let {
-                        StatusMediaPreviewItem(
-                            media = it,
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxSize(),
-                            sensitive = sensitive,
-                            onClick = onItemClick,
-                        )
-                    }
-                    Spacer(
-                        modifier = Modifier
-                            .width(StatusMediaDefaults.MediaSpacing)
-                    )
-                    Column(
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        media.drop(1).forEach {
-                            StatusMediaPreviewItem(
-                                media = it,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxSize(),
-                                sensitive = sensitive,
-                                onClick = onItemClick,
-                            )
-                            if (it != media.last()) {
-                                Spacer(
-                                    modifier = Modifier
-                                        .height(StatusMediaDefaults.MediaSpacing)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-            else -> {
-                GridLayout(
-                    spacing = StatusMediaDefaults.MediaSpacing
-                ) {
-                    media.forEach {
-                        StatusMediaPreviewItem(
-                            media = it,
-                            onClick = onItemClick,
-                            sensitive = sensitive
-                        )
-                    }
-                }
-            }
-        }
-
-        if (status.platformType == PlatformType.Mastodon && status.mastodonExtra != null) {
-            TwidereTheme(darkTheme = true) {
-                AnimatedVisibility(
-                    modifier = Modifier
-                        .matchParentSize(),
-                    visible = sensitive,
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .clickable {
-                                sensitive = false
-                            },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    MaterialTheme.colors.surface.copy(alpha = 0.25f),
-                                    shape = CircleShape
-                                )
-                                .size(StatusMediaDefaults.Sensitive.BackgroundSize)
-                        ) {
-                            Icon(
-                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_alert_triangle),
-                                contentDescription = null,
-                                tint = MaterialTheme.colors.onSurface,
-                                modifier = Modifier
-                                    .size(StatusMediaDefaults.Sensitive.IconSize)
-                                    .align(Alignment.Center)
-                            )
-                        }
-                    }
-                }
-                AnimatedVisibility(
-                    visible = !sensitive,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .padding(StatusMediaDefaults.Mastodon.IconSpacing)
-                            .alpha(0.5f),
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    MaterialTheme.colors.surface,
-                                    shape = MaterialTheme.shapes.small,
-                                )
-                                .align(Alignment.TopStart)
-                                .clickable { sensitive = true }
-                                .padding(StatusMediaDefaults.Icon.ContentPadding),
-                        ) {
-                            Icon(
-                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_eye_off),
-                                contentDescription = null,
-                                tint = MaterialTheme.colors.onSurface,
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
+  }
 }
 
 object StatusMediaDefaults {
-    val MediaSpacing = 8.dp
-    val DefaultAspectRatio = 270f / 162f
-    val DefaultMaxHeight = 400.dp
+  val MediaSpacing = 8.dp
+  val DefaultAspectRatio = 270f / 162f
+  val DefaultMaxHeight = 400.dp
 
-    object Mastodon {
-        val IconSpacing = 8.dp
-    }
+  object Mastodon {
+    val IconSpacing = 8.dp
+  }
 
-    object Icon {
-        val ContentPadding = 6.dp
-    }
+  object Icon {
+    val ContentPadding = 6.dp
+  }
 
-    object Sensitive {
-        val BackgroundSize = 48.dp
-        val IconSize = 30.dp
-    }
+  object Sensitive {
+    val BackgroundSize = 48.dp
+    val IconSize = 30.dp
+  }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun StatusMediaPreviewItem(
-    media: UiMedia,
-    modifier: Modifier = Modifier,
-    sensitive: Boolean = false,
-    onClick: (UiMedia) -> Unit,
+  media: UiMedia,
+  modifier: Modifier = Modifier,
+  sensitive: Boolean = false,
+  onClick: (UiMedia) -> Unit,
 ) {
-    Box(
-        modifier = modifier
-            .clip(MaterialTheme.shapes.medium)
-    ) {
-        when (media.type) {
-            MediaType.photo ->
-                media.previewUrl?.let {
-                    NetworkImage(
-                        data = it,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clickable(
-                                onClick = {
-                                    onClick(media)
-                                }
-                            ),
-                        effects = { if (sensitive) blur(ImageBlur.Sensitive) },
-                        placeholder = {
-                            Placeholder(modifier = Modifier.fillMaxSize())
-                        },
-                    )
+  Box(
+    modifier = modifier
+      .clip(MaterialTheme.shapes.medium)
+  ) {
+    when (media.type) {
+      MediaType.photo ->
+        media.previewUrl?.let {
+          NetworkImage(
+            data = it,
+            modifier = Modifier
+              .fillMaxSize()
+              .clickable(
+                onClick = {
+                  onClick(media)
                 }
-            MediaType.video, MediaType.animated_gif -> media.mediaUrl?.let {
-                val previewUrl = media.previewUrl
-                if (sensitive && previewUrl != null) {
-                    NetworkImage(
-                        data = previewUrl,
-                        effects = { blur(ImageBlur.Sensitive) },
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        placeholder = {
-                            Placeholder(modifier = Modifier.fillMaxSize())
-                        },
-                    )
-                } else {
-                    MostCenterInListLayout(
-                        videoKey = it
-                    ) { isMostCenter ->
-                        VideoPlayer(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clickable(
-                                    onClick = {
-                                        onClick(media)
-                                    }
-                                ),
-                            videoState = rememberVideoPlayerState(
-                                url = it,
-                                isMute = true
-                            ),
-                            playEnable = LocalVideoPlayback.current.playEnable() && isMostCenter,
-                            thumb = {
-                                previewUrl?.let {
-                                    NetworkImage(
-                                        data = it,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clickable(
-                                                onClick = {
-                                                    onClick(media)
-                                                }
-                                            ),
-                                        placeholder = {
-                                            Placeholder(modifier = Modifier.fillMaxSize())
-                                        },
-                                    )
-                                }
-                            },
-                            backgroundColor = MaterialTheme.colors.background
-                        )
-                    }
-                }
-                if (media.type == MediaType.animated_gif) {
-                    GifTag(Modifier.align(Alignment.BottomStart))
-                }
-            }
-            MediaType.audio -> {
-            }
-            MediaType.other -> {
-            }
+              ),
+            effects = { if (sensitive) blur(ImageBlur.Sensitive) },
+            placeholder = {
+              Placeholder(modifier = Modifier.fillMaxSize())
+            },
+          )
         }
+      MediaType.video, MediaType.animated_gif -> media.mediaUrl?.let {
+        val previewUrl = media.previewUrl
+        if (sensitive && previewUrl != null) {
+          NetworkImage(
+            data = previewUrl,
+            effects = { blur(ImageBlur.Sensitive) },
+            modifier = Modifier
+              .fillMaxSize(),
+            placeholder = {
+              Placeholder(modifier = Modifier.fillMaxSize())
+            },
+          )
+        } else {
+          MostCenterInListLayout(
+            videoKey = it
+          ) { isMostCenter ->
+            VideoPlayer(
+              modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                  onClick = {
+                    onClick(media)
+                  }
+                ),
+              videoState = rememberVideoPlayerState(
+                url = it,
+                isMute = true
+              ),
+              playEnable = LocalVideoPlayback.current.playEnable() && isMostCenter,
+              thumb = {
+                previewUrl?.let {
+                  NetworkImage(
+                    data = it,
+                    modifier = Modifier
+                      .fillMaxWidth()
+                      .clickable(
+                        onClick = {
+                          onClick(media)
+                        }
+                      ),
+                    placeholder = {
+                      Placeholder(modifier = Modifier.fillMaxSize())
+                    },
+                  )
+                }
+              },
+              backgroundColor = MaterialTheme.colors.background
+            )
+          }
+        }
+        if (media.type == MediaType.animated_gif) {
+          GifTag(Modifier.align(Alignment.BottomStart))
+        }
+      }
+      MediaType.audio -> {
+      }
+      MediaType.other -> {
+      }
     }
+  }
 }

@@ -27,25 +27,27 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.scenes.DraftListSceneContent
+import moe.tlaster.precompose.navigation.Navigator
 
 class DraftNavigationItem : HomeNavigationItem() {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_drafts_title)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_drafts_title)
+  }
 
-    override val route: String
-        get() = Root.Draft.List
+  override val route: String
+    get() = Root.Draft.List
 
-    @Composable
-    override fun icon(): Painter {
-        return painterResource(res = com.twidere.twiderex.MR.files.ic_note)
-    }
+  @Composable
+  override fun icon(): Painter {
+    return painterResource(res = com.twidere.twiderex.MR.files.ic_note)
+  }
 
-    @Composable
-    override fun Content() {
-        DraftListSceneContent(
-            lazyListController = lazyListController,
-        )
-    }
+  @Composable
+  override fun Content(navigator: Navigator) {
+    DraftListSceneContent(
+      lazyListController = lazyListController,
+      navigator = navigator,
+    )
+  }
 }

@@ -27,24 +27,24 @@ import com.twidere.twiderex.utils.json
 import kotlinx.serialization.KSerializer
 
 internal class StringListColumnAdapter(private val separator: String = ",") : ColumnAdapter<List<String>, String> {
-    override fun decode(databaseValue: String) =
-        if (databaseValue.isEmpty()) {
-            listOf()
-        } else {
-            databaseValue.split(separator)
-        }
+  override fun decode(databaseValue: String) =
+    if (databaseValue.isEmpty()) {
+      listOf()
+    } else {
+      databaseValue.split(separator)
+    }
 
-    override fun encode(value: List<String>) = value.joinToString(separator = separator) { it }
+  override fun encode(value: List<String>) = value.joinToString(separator = separator) { it }
 }
 
 internal class MicroBlogKeyColumnAdapter : ColumnAdapter<MicroBlogKey, String> {
-    override fun decode(databaseValue: String) = MicroBlogKey.valueOf(databaseValue)
+  override fun decode(databaseValue: String) = MicroBlogKey.valueOf(databaseValue)
 
-    override fun encode(value: MicroBlogKey) = value.toString()
+  override fun encode(value: MicroBlogKey) = value.toString()
 }
 
 internal class JsonColumnAdapter<T : Any>(private val serializer: KSerializer<T>) : ColumnAdapter<T, String> {
-    override fun decode(databaseValue: String) = databaseValue.fromJson(serializer)
+  override fun decode(databaseValue: String) = databaseValue.fromJson(serializer)
 
-    override fun encode(value: T) = value.json(serializer)
+  override fun encode(value: T) = value.json(serializer)
 }

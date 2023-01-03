@@ -24,10 +24,10 @@ import androidx.work.Data
 import androidx.work.hasKeyWithValueOfType
 
 fun Data.getNullableLong(name: String) =
-    takeIf { hasKeyWithValueOfType<Long>(name) }?.getLong(name, 0)
+  takeIf { hasKeyWithValueOfType<Long>(name) }?.getLong(name, 0)
 
 fun Data.getNullableDouble(name: String) =
-    takeIf { hasKeyWithValueOfType<Double>(name) }?.getDouble(name, 0.0)
+  takeIf { hasKeyWithValueOfType<Double>(name) }?.getDouble(name, 0.0)
 
 fun Data.getNullableBoolean(name: String) =
-    takeIf { hasKeyWithValueOfType<Boolean>(name) }?.getBoolean(name, false)
+  takeIf { hasKeyWithValueOfType<Boolean>(name) }?.getBoolean(name, false)

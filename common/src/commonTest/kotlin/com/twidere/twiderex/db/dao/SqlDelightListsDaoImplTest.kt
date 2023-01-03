@@ -31,94 +31,94 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class SqlDelightListsDaoImplTest : BaseCacheDatabaseTest() {
-    private lateinit var dao: SqlDelightListsDaoImpl
-    private val accountKey = MicroBlogKey.twitter("account")
-    override fun setUp() {
-        super.setUp()
-        dao = SqlDelightListsDaoImpl(
-            listQueries = database.listQueries
-        )
+  private lateinit var dao: SqlDelightListsDaoImpl
+  private val accountKey = MicroBlogKey.twitter("account")
+  override fun setUp() {
+    super.setUp()
+    dao = SqlDelightListsDaoImpl(
+      listQueries = database.listQueries
+    )
+  }
+
+  @Test
+  fun insertAll_InsertAllUiList() = runBlocking {
+    val list = listOf(
+      mockIListModel(name = "1").toUi(accountKey),
+      mockIListModel(name = "2").toUi(accountKey),
+      mockIListModel(name = "3").toUi(accountKey),
+    )
+    dao.insertAll(list)
+    assertEquals(3, database.listQueries.getPagingCount(accountKey = accountKey).executeAsOne())
+  }
+
+  @Test
+  fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
+    val list = listOf(
+      mockIListModel(name = "1").toUi(accountKey),
+      mockIListModel(name = "2").toUi(accountKey),
+      mockIListModel(name = "3").toUi(accountKey),
+    )
+    dao.insertAll(list)
+    val pagingSource = dao.getPagingSource(
+      accountKey = accountKey,
+    )
+    val limit = 2
+    val result = pagingSource.load(params = PagingSource.LoadParams.Refresh(0, limit, false))
+    assert(result is PagingSource.LoadResult.Page)
+    assertEquals(limit, (result as PagingSource.LoadResult.Page).nextKey)
+    assertEquals(limit, result.data.size)
+
+    val loadMoreResult = pagingSource.load(params = PagingSource.LoadParams.Append(result.nextKey ?: 0, limit, false))
+    assert(loadMoreResult is PagingSource.LoadResult.Page)
+    assertEquals(null, (loadMoreResult as PagingSource.LoadResult.Page).nextKey)
+  }
+
+  @Test
+  fun getPagingSource_pagingSourceInvalidateAfterDbUpdate() = runBlocking {
+    val trend = mockIListModel(name = "list1").toUi(accountKey)
+    var invalidate = false
+    dao.getPagingSource(
+      accountKey = accountKey,
+    ).apply {
+      registerInvalidatedCallback {
+        invalidate = true
+      }
+      load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
     }
-
-    @Test
-    fun insertAll_InsertAllUiList() = runBlocking {
-        val list = listOf(
-            mockIListModel(name = "1").toUi(accountKey),
-            mockIListModel(name = "2").toUi(accountKey),
-            mockIListModel(name = "3").toUi(accountKey),
-        )
-        dao.insertAll(list)
-        assertEquals(3, database.listQueries.getPagingCount(accountKey = accountKey).executeAsOne())
+    dao.insertAll(listOf(trend))
+    val start = System.currentTimeMillis()
+    while (!invalidate && System.currentTimeMillis() - start < 3000) {
+      continue
     }
+    assert(invalidate)
+  }
 
-    @Test
-    fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
-        val list = listOf(
-            mockIListModel(name = "1").toUi(accountKey),
-            mockIListModel(name = "2").toUi(accountKey),
-            mockIListModel(name = "3").toUi(accountKey),
-        )
-        dao.insertAll(list)
-        val pagingSource = dao.getPagingSource(
-            accountKey = accountKey,
-        )
-        val limit = 2
-        val result = pagingSource.load(params = PagingSource.LoadParams.Refresh(0, limit, false))
-        assert(result is PagingSource.LoadResult.Page)
-        assertEquals(limit, (result as PagingSource.LoadResult.Page).nextKey)
-        assertEquals(limit, result.data.size)
+  @Test
+  fun update_UpdateWithGivenList() = runBlocking {
+    val list = listOf(
+      mockIListModel(name = "1").toUi(accountKey),
+      mockIListModel(name = "2").toUi(accountKey),
+      mockIListModel(name = "3").toUi(accountKey),
+    )
+    dao.insertAll(list)
 
-        val loadMoreResult = pagingSource.load(params = PagingSource.LoadParams.Append(result.nextKey ?: 0, limit, false))
-        assert(loadMoreResult is PagingSource.LoadResult.Page)
-        assertEquals(null, (loadMoreResult as PagingSource.LoadResult.Page).nextKey)
+    dao.update(list.map { it.copy(title = "update") })
+    assertEquals(3, database.listQueries.getPagingCount(accountKey = accountKey).executeAsOne())
+    list.forEach {
+      assertEquals("update", dao.findWithListKey(accountKey = it.accountKey, listKey = it.listKey)?.title)
     }
+  }
 
-    @Test
-    fun getPagingSource_pagingSourceInvalidateAfterDbUpdate() = runBlocking {
-        val trend = mockIListModel(name = "list1").toUi(accountKey)
-        var invalidate = false
-        dao.getPagingSource(
-            accountKey = accountKey,
-        ).apply {
-            registerInvalidatedCallback {
-                invalidate = true
-            }
-            load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
-        }
-        dao.insertAll(listOf(trend))
-        val start = System.currentTimeMillis()
-        while (!invalidate && System.currentTimeMillis() - start < 3000) {
-            continue
-        }
-        assert(invalidate)
-    }
-
-    @Test
-    fun update_UpdateWithGivenList() = runBlocking {
-        val list = listOf(
-            mockIListModel(name = "1").toUi(accountKey),
-            mockIListModel(name = "2").toUi(accountKey),
-            mockIListModel(name = "3").toUi(accountKey),
-        )
-        dao.insertAll(list)
-
-        dao.update(list.map { it.copy(title = "update") })
-        assertEquals(3, database.listQueries.getPagingCount(accountKey = accountKey).executeAsOne())
-        list.forEach {
-            assertEquals("update", dao.findWithListKey(accountKey = it.accountKey, listKey = it.listKey)?.title)
-        }
-    }
-
-    @Test
-    fun delete_DeleteWithGivenList() = runBlocking {
-        val list = listOf(
-            mockIListModel(name = "1").toUi(accountKey),
-            mockIListModel(name = "2").toUi(accountKey),
-            mockIListModel(name = "3").toUi(accountKey),
-        )
-        dao.insertAll(list)
-        assertEquals(3, database.listQueries.getPagingCount(accountKey = accountKey).executeAsOne())
-        dao.delete(list.subList(0, 2))
-        assertEquals(1, database.listQueries.getPagingCount(accountKey = accountKey).executeAsOne())
-    }
+  @Test
+  fun delete_DeleteWithGivenList() = runBlocking {
+    val list = listOf(
+      mockIListModel(name = "1").toUi(accountKey),
+      mockIListModel(name = "2").toUi(accountKey),
+      mockIListModel(name = "3").toUi(accountKey),
+    )
+    dao.insertAll(list)
+    assertEquals(3, database.listQueries.getPagingCount(accountKey = accountKey).executeAsOne())
+    dao.delete(list.subList(0, 2))
+    assertEquals(1, database.listQueries.getPagingCount(accountKey = accountKey).executeAsOne())
+  }
 }

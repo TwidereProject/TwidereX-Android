@@ -24,39 +24,39 @@ import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.serializer.DateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.util.Date
+import org.joda.time.DateTime
 
 @Serializable
 data class TwitterList(
-    @SerialName("created_at")
-    @Serializable(with = DateSerializer::class)
-    val createdAt: Date? = null,
+  @SerialName("created_at")
+  @Serializable(with = DateSerializer::class)
+  val createdAt: DateTime? = null,
 
-    val id: Long? = null,
+  val id: Long? = null,
 
-    val description: String? = null,
+  val description: String? = null,
 
-    val following: Boolean? = null,
+  val following: Boolean? = null,
 
-    @SerialName("full_name")
-    val fullName: String? = null,
+  @SerialName("full_name")
+  val fullName: String? = null,
 
-    @SerialName("id_str")
-    val idStr: String? = null,
+  @SerialName("id_str")
+  val idStr: String? = null,
 
-    @SerialName("member_count")
-    val memberCount: Int? = null,
+  @SerialName("member_count")
+  val memberCount: Int? = null,
 
-    val mode: String? = null,
+  val mode: String? = null,
 
-    val name: String? = null,
+  val name: String? = null,
 
-    val slug: String? = null,
+  val slug: String? = null,
 
-    @SerialName("subscriber_count")
-    val subscriberCount: Int? = null,
+  @SerialName("subscriber_count")
+  val subscriberCount: Int? = null,
 
-    val uri: String? = null,
+  val uri: String? = null,
 
-    val user: User? = null
+  val user: User? = null
 ) : IListModel

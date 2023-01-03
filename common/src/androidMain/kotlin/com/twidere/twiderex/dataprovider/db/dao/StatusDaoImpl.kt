@@ -32,52 +32,52 @@ import kotlinx.coroutines.flow.map
 import java.util.UUID
 
 internal class StatusDaoImpl(
-    private val roomCacheDatabase: RoomCacheDatabase
+  private val roomCacheDatabase: RoomCacheDatabase
 ) : StatusDao {
-    override suspend fun insertAll(listOf: List<UiStatus>, accountKey: MicroBlogKey) {
-        listOf.map { it.toDbStatusWithReference(accountKey) }
-            .saveToDb(roomCacheDatabase)
+  override suspend fun insertAll(listOf: List<UiStatus>, accountKey: MicroBlogKey) {
+    listOf.map { it.toDbStatusWithReference(accountKey) }
+      .saveToDb(roomCacheDatabase)
+  }
+
+  override suspend fun findWithStatusKey(
+    statusKey: MicroBlogKey,
+    accountKey: MicroBlogKey
+  ) = roomCacheDatabase.statusDao().findWithStatusKeyWithReference(statusKey)?.toUi(accountKey)
+
+  override fun findWithStatusKeyWithFlow(
+    statusKey: MicroBlogKey,
+    accountKey: MicroBlogKey
+  ) = roomCacheDatabase.statusDao().findWithStatusKeyWithReferenceFlow(statusKey).map { it?.toUi(accountKey) }
+
+  override suspend fun delete(statusKey: MicroBlogKey) {
+    roomCacheDatabase.statusDao().delete(statusKey)
+    roomCacheDatabase.statusReferenceDao().delete(statusKey)
+    roomCacheDatabase.reactionDao().delete(statusKey)
+  }
+
+  override suspend fun updateAction(
+    statusKey: MicroBlogKey,
+    accountKey: MicroBlogKey,
+    liked: Boolean?,
+    retweet: Boolean?
+  ) {
+    roomCacheDatabase.reactionDao().findWithStatusKey(statusKey, accountKey).let {
+      it ?: DbStatusReaction(
+        _id = UUID.randomUUID().toString(),
+        statusKey = statusKey,
+        accountKey = accountKey,
+        liked = false,
+        retweeted = false,
+      )
+    }.let {
+      roomCacheDatabase.reactionDao().insertAll(
+        listOf(
+          it.copy(
+            liked = liked ?: it.liked,
+            retweeted = retweet ?: it.retweeted
+          )
+        )
+      )
     }
-
-    override suspend fun findWithStatusKey(
-        statusKey: MicroBlogKey,
-        accountKey: MicroBlogKey
-    ) = roomCacheDatabase.statusDao().findWithStatusKeyWithReference(statusKey)?.toUi(accountKey)
-
-    override fun findWithStatusKeyWithFlow(
-        statusKey: MicroBlogKey,
-        accountKey: MicroBlogKey
-    ) = roomCacheDatabase.statusDao().findWithStatusKeyWithReferenceFlow(statusKey).map { it?.toUi(accountKey) }
-
-    override suspend fun delete(statusKey: MicroBlogKey) {
-        roomCacheDatabase.statusDao().delete(statusKey)
-        roomCacheDatabase.statusReferenceDao().delete(statusKey)
-        roomCacheDatabase.reactionDao().delete(statusKey)
-    }
-
-    override suspend fun updateAction(
-        statusKey: MicroBlogKey,
-        accountKey: MicroBlogKey,
-        liked: Boolean?,
-        retweet: Boolean?
-    ) {
-        roomCacheDatabase.reactionDao().findWithStatusKey(statusKey, accountKey).let {
-            it ?: DbStatusReaction(
-                _id = UUID.randomUUID().toString(),
-                statusKey = statusKey,
-                accountKey = accountKey,
-                liked = false,
-                retweeted = false,
-            )
-        }.let {
-            roomCacheDatabase.reactionDao().insertAll(
-                listOf(
-                    it.copy(
-                        liked = liked ?: it.liked,
-                        retweeted = retweet ?: it.retweeted
-                    )
-                )
-            )
-        }
-    }
+  }
 }

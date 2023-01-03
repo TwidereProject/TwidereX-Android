@@ -34,83 +34,83 @@ import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 internal class RoomAppDatabaseMigrationTest {
-    private val TEST_DB = "migration-test"
+  private val TEST_DB = "migration-test"
 
-    @get:Rule
-    val helper: MigrationTestHelper = MigrationTestHelper(
-        InstrumentationRegistry.getInstrumentation(),
-        RoomAppDatabase::class.java,
-    )
+  @get:Rule
+  val helper: MigrationTestHelper = MigrationTestHelper(
+    InstrumentationRegistry.getInstrumentation(),
+    RoomAppDatabase::class.java,
+  )
 
-    @Test
-    @Throws(IOException::class)
-    fun migrate1To2() {
-        val id = UUID.randomUUID().toString()
-        val content = "Content"
-        val createdAt = 1000L
-        val composeType = ComposeType.New
-        helper.createDatabase(TEST_DB, 1).apply {
-            execSQL(
-                "INSERT INTO draft (_id, content, createdAt, composeType, media) VALUES (?, ?, ?, ?, ?)",
-                arrayOf(id, content, createdAt, composeType, "")
-            )
-            close()
-        }
-
-        helper.runMigrationsAndValidate(
-            TEST_DB, 2, true,
-            com.twidere.twiderex.room.db.AppDatabase_Migration_1_2
-        ).apply {
-            query(SimpleSQLiteQuery("SELECT * FROM draft WHERE _id = ?", arrayOf(id))).apply {
-                moveToFirst()
-                getString(getColumnIndex("_id")).also {
-                    assert(it == id)
-                }
-                getString(getColumnIndex("content")).also {
-                    assert(it == content)
-                }
-                getLong(getColumnIndex("createdAt")).also {
-                    assert(it == createdAt)
-                }
-            }
-            close()
-        }
+  @Test
+  @Throws(IOException::class)
+  fun migrate1To2() {
+    val id = UUID.randomUUID().toString()
+    val content = "Content"
+    val createdAt = 1000L
+    val composeType = ComposeType.New
+    helper.createDatabase(TEST_DB, 1).apply {
+      execSQL(
+        "INSERT INTO draft (_id, content, createdAt, composeType, media) VALUES (?, ?, ?, ?, ?)",
+        arrayOf(id, content, createdAt, composeType, "")
+      )
+      close()
     }
 
-    @Test
-    @Throws(IOException::class)
-    fun migrate2To3() {
-        val id = UUID.randomUUID().toString()
-        val content = "Content"
-        val lastActive = 1000L
-        helper.createDatabase(TEST_DB, 2).apply {
-            execSQL(
-                "INSERT INTO search (_id, content, lastActive) VALUES (?, ?, ?)",
-                arrayOf(id, content, lastActive)
-            )
-            close()
+    helper.runMigrationsAndValidate(
+      TEST_DB, 2, true,
+      com.twidere.twiderex.room.db.AppDatabase_Migration_1_2
+    ).apply {
+      query(SimpleSQLiteQuery("SELECT * FROM draft WHERE _id = ?", arrayOf(id))).apply {
+        moveToFirst()
+        getString(getColumnIndex("_id")).also {
+          assert(it == id)
         }
-
-        helper.runMigrationsAndValidate(
-            TEST_DB, 3, true,
-            com.twidere.twiderex.room.db.AppDatabase_Migration_2_3
-        ).apply {
-            query(SimpleSQLiteQuery("SELECT * FROM search WHERE _id = ?", arrayOf(id))).apply {
-                moveToFirst()
-                getString(getColumnIndex("_id")).also {
-                    assert(it == id)
-                }
-                getString(getColumnIndex("content")).also {
-                    assert(it == content)
-                }
-                getLong(getColumnIndex("lastActive")).also {
-                    assert(it == lastActive)
-                }
-                getInt(getColumnIndex("saved")).also {
-                    assert(it == 0)
-                }
-            }
-            close()
+        getString(getColumnIndex("content")).also {
+          assert(it == content)
         }
+        getLong(getColumnIndex("createdAt")).also {
+          assert(it == createdAt)
+        }
+      }
+      close()
     }
+  }
+
+  @Test
+  @Throws(IOException::class)
+  fun migrate2To3() {
+    val id = UUID.randomUUID().toString()
+    val content = "Content"
+    val lastActive = 1000L
+    helper.createDatabase(TEST_DB, 2).apply {
+      execSQL(
+        "INSERT INTO search (_id, content, lastActive) VALUES (?, ?, ?)",
+        arrayOf(id, content, lastActive)
+      )
+      close()
+    }
+
+    helper.runMigrationsAndValidate(
+      TEST_DB, 3, true,
+      com.twidere.twiderex.room.db.AppDatabase_Migration_2_3
+    ).apply {
+      query(SimpleSQLiteQuery("SELECT * FROM search WHERE _id = ?", arrayOf(id))).apply {
+        moveToFirst()
+        getString(getColumnIndex("_id")).also {
+          assert(it == id)
+        }
+        getString(getColumnIndex("content")).also {
+          assert(it == content)
+        }
+        getLong(getColumnIndex("lastActive")).also {
+          assert(it == lastActive)
+        }
+        getInt(getColumnIndex("saved")).also {
+          assert(it == 0)
+        }
+      }
+      close()
+    }
+  }
 }

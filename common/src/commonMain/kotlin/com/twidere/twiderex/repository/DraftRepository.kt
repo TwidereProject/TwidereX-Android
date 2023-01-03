@@ -27,48 +27,48 @@ import com.twidere.twiderex.model.ui.UiDraft
 import java.util.UUID
 
 class DraftRepository(
-    private val database: AppDatabase
+  private val database: AppDatabase
 ) {
-    val source by lazy {
-        database.draftDao().getAll()
-    }
+  val source by lazy {
+    database.draftDao().getAll()
+  }
 
-    val sourceCount by lazy {
-        database.draftDao().getDraftCount()
-    }
+  val sourceCount by lazy {
+    database.draftDao().getDraftCount()
+  }
 
-    suspend fun addOrUpgrade(
-        content: String,
-        media: List<String>,
-        composeType: ComposeType,
-        statusKey: MicroBlogKey?,
-        draftId: String = UUID.randomUUID().toString(),
-        excludedReplyUserIds: List<String>? = null,
-    ) {
-        UiDraft(
-            draftId = draftId,
-            content = content,
-            composeType = composeType,
-            media = media,
-            statusKey = statusKey,
-            createdAt = System.currentTimeMillis(),
-            excludedReplyUserIds = excludedReplyUserIds
-        ).let {
-            database.draftDao().insert(it)
-        }
+  suspend fun addOrUpgrade(
+    content: String,
+    media: List<String>,
+    composeType: ComposeType,
+    statusKey: MicroBlogKey?,
+    draftId: String = UUID.randomUUID().toString(),
+    excludedReplyUserIds: List<String>? = null,
+  ) {
+    UiDraft(
+      draftId = draftId,
+      content = content,
+      composeType = composeType,
+      media = media,
+      statusKey = statusKey,
+      createdAt = System.currentTimeMillis(),
+      excludedReplyUserIds = excludedReplyUserIds
+    ).let {
+      database.draftDao().insert(it)
     }
+  }
 
-    suspend fun get(draftId: String): UiDraft? {
-        return database.draftDao().get(draftId)
-    }
+  suspend fun get(draftId: String): UiDraft? {
+    return database.draftDao().get(draftId)
+  }
 
-    suspend fun remove(draftId: String) {
-        database.draftDao().get(draftId)?.let {
-            remove(it)
-        }
+  suspend fun remove(draftId: String) {
+    database.draftDao().get(draftId)?.let {
+      remove(it)
     }
+  }
 
-    suspend fun remove(draft: UiDraft) {
-        database.draftDao().remove(draft)
-    }
+  suspend fun remove(draft: UiDraft) {
+    database.draftDao().remove(draft)
+  }
 }

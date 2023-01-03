@@ -343,6 +343,7 @@
     <string name="scene_settings_misc_proxy_enable_description">Use proxy for all network requests</string>
     <string name="scene_settings_misc_proxy_enable_title">Proxy</string>
     <string name="scene_settings_misc_proxy_title">Proxy settings</string>
+    <string name="scene_settings_misc_proxy_type_socks">SOCKS</string>
     <string name="scene_settings_misc_proxy_type_http">HTTP</string>
     <string name="scene_settings_misc_proxy_type_title">Proxy type</string>
     <string name="scene_settings_misc_proxy_type_reverse">Reverse</string>

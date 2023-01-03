@@ -25,12 +25,12 @@ import com.twidere.twiderex.model.job.DirectMessageDeleteData
 import com.twidere.twiderex.model.job.DirectMessageSendData
 
 expect class DirectMessageAction {
-    fun send(
-        platformType: PlatformType,
-        data: DirectMessageSendData,
-    )
+  fun send(
+    platformType: PlatformType,
+    data: DirectMessageSendData,
+  )
 
-    fun delete(
-        data: DirectMessageDeleteData
-    )
+  fun delete(
+    data: DirectMessageDeleteData
+  )
 }

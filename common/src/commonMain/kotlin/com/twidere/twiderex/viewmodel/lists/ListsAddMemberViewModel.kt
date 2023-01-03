@@ -36,60 +36,60 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class ListsAddMemberViewModel(
-    private val listsUsersRepository: ListsUsersRepository,
-    private val inAppNotification: InAppNotification,
-    private val accountRepository: AccountRepository,
-    private val listId: String,
+  private val listsUsersRepository: ListsUsersRepository,
+  private val inAppNotification: InAppNotification,
+  private val accountRepository: AccountRepository,
+  private val listId: String,
 ) : ViewModel() {
-    private val account by lazy {
-        accountRepository.activeAccount.mapNotNull { it }
-    }
+  private val account by lazy {
+    accountRepository.activeAccount.mapNotNull { it }
+  }
 
-    val loading = MutableStateFlow(false)
-    val pendingMap = mutableStateMapOf<MicroBlogKey, UiUser>()
+  val loading = MutableStateFlow(false)
+  val pendingMap = mutableStateMapOf<MicroBlogKey, UiUser>()
 
-    fun addToOrRemove(user: UiUser) {
-        if (pendingMap[user.userKey] == null) {
-            loading.value = true
-            loadingRequest {
-                account.firstOrNull()?.let { account ->
-                    listsUsersRepository.addMember(
-                        listId = listId,
-                        user = user,
-                        service = account.service as ListsService,
-                    )
-                    pendingMap[user.userKey] = user
-                }
-            }
-        } else {
-            loadingRequest {
-                account.firstOrNull()?.let { account ->
-                    listsUsersRepository.removeMember(
-                        service = account.service as ListsService,
-                        listId = listId,
-                        user = user
-                    )
-                    pendingMap.remove(user.userKey)
-                }
-            }
+  fun addToOrRemove(user: UiUser) {
+    if (pendingMap[user.userKey] == null) {
+      loading.value = true
+      loadingRequest {
+        account.firstOrNull()?.let { account ->
+          listsUsersRepository.addMember(
+            listId = listId,
+            user = user,
+            service = account.service as ListsService,
+          )
+          pendingMap[user.userKey] = user
         }
-    }
-
-    fun isInPendingList(user: UiUser): Boolean {
-        return pendingMap[user.userKey] != null
-    }
-
-    private fun loadingRequest(request: suspend () -> Unit) {
-        loading.value = true
-        viewModelScope.launch {
-            runCatching {
-                request()
-            }.onFailure {
-                inAppNotification.notifyError(it)
-                loading.value = false
-            }.onSuccess {
-                loading.value = false
-            }
+      }
+    } else {
+      loadingRequest {
+        account.firstOrNull()?.let { account ->
+          listsUsersRepository.removeMember(
+            service = account.service as ListsService,
+            listId = listId,
+            user = user
+          )
+          pendingMap.remove(user.userKey)
         }
+      }
     }
+  }
+
+  fun isInPendingList(user: UiUser): Boolean {
+    return pendingMap[user.userKey] != null
+  }
+
+  private fun loadingRequest(request: suspend () -> Unit) {
+    loading.value = true
+    viewModelScope.launch {
+      runCatching {
+        request()
+      }.onFailure {
+        inAppNotification.notifyError(it)
+        loading.value = false
+      }.onSuccess {
+        loading.value = false
+      }
+    }
+  }
 }

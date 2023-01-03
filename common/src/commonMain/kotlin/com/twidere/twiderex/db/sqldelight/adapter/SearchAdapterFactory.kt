@@ -23,7 +23,7 @@ package com.twidere.twiderex.db.sqldelight.adapter
 import com.twidere.twiderex.sqldelight.table.Search
 
 internal object SearchAdapterFactory {
-    fun create() = Search.Adapter(
-        accountKeyAdapter = MicroBlogKeyColumnAdapter()
-    )
+  fun create() = Search.Adapter(
+    accountKeyAdapter = MicroBlogKeyColumnAdapter()
+  )
 }

@@ -11,7 +11,6 @@ buildscript {
     dependencies {
         classpath(kotlin("gradle-plugin", version = Versions.Kotlin.lang))
         classpath("com.android.tools.build:gradle:${Versions.agp}")
-        classpath("com.squareup.sqldelight:gradle-plugin:${Versions.sqlDelight}")
     }
 }
 
@@ -22,9 +21,10 @@ allprojects {
         kotlinOptions {
             jvmTarget = Versions.Java.jvmTarget
             allWarningsAsErrors = true
-            freeCompilerArgs = listOf(
-                "-Xopt-in=kotlin.RequiresOptIn",
+            freeCompilerArgs = freeCompilerArgs + listOf(
+                "-opt-in=kotlin.RequiresOptIn",
                 "-Xjvm-default=all",
+                "-Xskip-prerelease-check",
             )
         }
     }
@@ -33,7 +33,12 @@ allprojects {
         kotlin {
             target("**/*.kt")
             targetExclude("$buildDir/**/*.kt", "bin/**/*.kt", "buildSrc/**/*.kt")
-            ktlint(Versions.ktlint)
+            ktlint(Versions.ktlint).editorConfigOverride(
+                mapOf(
+                    "indent_size" to 2,
+                    "continuation_indent_size" to 2
+                )
+            )
             licenseHeaderFile(rootProject.file("spotless/license"))
         }
         kotlinGradle {
@@ -50,6 +55,25 @@ allprojects {
     configurations.all {
         resolutionStrategy {
             force("org.objenesis:objenesis:3.2")
+        }
+    }
+}
+
+subprojects {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            if (project.findProperty("myapp.enableComposeCompilerReports") == "true") {
+                freeCompilerArgs = freeCompilerArgs + listOf(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
+                        project.buildDir.absolutePath + "/compose_metrics"
+                )
+                freeCompilerArgs = freeCompilerArgs + listOf(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
+                        project.buildDir.absolutePath + "/compose_metrics"
+                )
+            }
         }
     }
 }

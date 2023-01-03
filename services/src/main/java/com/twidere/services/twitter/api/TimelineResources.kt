@@ -25,63 +25,67 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface TimelineResources {
-    @GET("/1.1/statuses/home_timeline.json")
-    suspend fun homeTimeline(
-        @Query("count") count: Int = 20,
-        @Query("since_id") since_id: String? = null,
-        @Query("max_id") max_id: String? = null,
-        @Query("trim_user") trim_user: Boolean? = null,
-        @Query("exclude_replies") exclude_replies: Boolean? = null,
-        @Query("include_entities") include_entities: Boolean? = null,
-        @Query("tweet_mode") tweet_mode: String = "extended",
-        @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
-    ): List<Status>
+  @GET("/1.1/statuses/home_timeline.json")
+  suspend fun homeTimeline(
+    @Query("count") count: Int = 20,
+    @Query("since_id") since_id: String? = null,
+    @Query("max_id") max_id: String? = null,
+    @Query("trim_user") trim_user: Boolean? = null,
+    @Query("exclude_replies") exclude_replies: Boolean? = null,
+    @Query("include_entities") include_entities: Boolean? = null,
+    @Query("tweet_mode") tweet_mode: String = "extended",
+    @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
+  ): List<Status>
 
-    @GET("/1.1/statuses/mentions_timeline.json")
-    suspend fun mentionsTimeline(
-        @Query("count") count: Int = 20,
-        @Query("since_id") since_id: String? = null,
-        @Query("max_id") max_id: String? = null,
-        @Query("trim_user") trim_user: Boolean? = null,
-        @Query("exclude_replies") exclude_replies: Boolean? = null,
-        @Query("include_entities") include_entities: Boolean? = null,
-    ): List<Status>
+  @GET("/1.1/statuses/mentions_timeline.json")
+  suspend fun mentionsTimeline(
+    @Query("count") count: Int = 20,
+    @Query("since_id") since_id: String? = null,
+    @Query("max_id") max_id: String? = null,
+    @Query("trim_user") trim_user: Boolean? = null,
+    @Query("exclude_replies") exclude_replies: Boolean? = null,
+    @Query("include_entities") include_entities: Boolean? = null,
+    @Query("tweet_mode") tweet_mode: String = "extended",
+    @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
+  ): List<Status>
 
-    @GET("/1.1/statuses/user_timeline.json")
-    suspend fun userTimeline(
-        @Query("user_id") user_id: String,
-        @Query("count") count: Int = 20,
-        @Query("since_id") since_id: String? = null,
-        @Query("max_id") max_id: String? = null,
-        @Query("trim_user") trim_user: Boolean? = null,
-        @Query("exclude_replies") exclude_replies: Boolean? = null,
-        @Query("include_entities") include_entities: Boolean? = null,
-        @Query("include_rts") include_rts: Boolean? = null,
-        @Query("tweet_mode") tweet_mode: String = "extended",
-        @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
-    ): List<Status>
+  @GET("/1.1/statuses/user_timeline.json")
+  suspend fun userTimeline(
+    @Query("user_id") user_id: String,
+    @Query("count") count: Int = 20,
+    @Query("since_id") since_id: String? = null,
+    @Query("max_id") max_id: String? = null,
+    @Query("trim_user") trim_user: Boolean? = null,
+    @Query("exclude_replies") exclude_replies: Boolean? = null,
+    @Query("include_entities") include_entities: Boolean? = null,
+    @Query("include_rts") include_rts: Boolean? = null,
+    @Query("tweet_mode") tweet_mode: String = "extended",
+    @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
+  ): List<Status>
 
-    @GET("/1.1/favorites/list.json")
-    suspend fun favoritesList(
-        @Query("user_id") user_id: String,
-        @Query("count") count: Int = 20,
-        @Query("since_id") since_id: String? = null,
-        @Query("max_id") max_id: String? = null,
-        @Query("include_entities") include_entities: Boolean? = null,
-        @Query("tweet_mode") tweet_mode: String = "extended",
-        @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
-    ): List<Status>
+  @GET("/1.1/favorites/list.json")
+  suspend fun favoritesList(
+    @Query("user_id") user_id: String,
+    @Query("count") count: Int = 20,
+    @Query("since_id") since_id: String? = null,
+    @Query("max_id") max_id: String? = null,
+    @Query("include_entities") include_entities: Boolean? = null,
+    @Query("tweet_mode") tweet_mode: String = "extended",
+    @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
+  ): List<Status>
 
-    @GET("/1.1/lists/statuses.json")
-    suspend fun listTimeline(
-        @Query("list_id") list_id: String,
-        @Query("slug") slug: String? = null,
-        @Query("owner_screen_name") owner_screen_name: String? = null,
-        @Query("owner_id") owner_id: String? = null,
-        @Query("count") count: Int = 20,
-        @Query("since_id") since_id: String? = null,
-        @Query("max_id") max_id: String? = null,
-        @Query("include_entities") include_entities: Boolean? = null,
-        @Query("include_rts") include_rts: Boolean? = null,
-    ): List<Status>
+  @GET("/1.1/lists/statuses.json")
+  suspend fun listTimeline(
+    @Query("list_id") list_id: String,
+    @Query("slug") slug: String? = null,
+    @Query("owner_screen_name") owner_screen_name: String? = null,
+    @Query("owner_id") owner_id: String? = null,
+    @Query("count") count: Int = 20,
+    @Query("since_id") since_id: String? = null,
+    @Query("max_id") max_id: String? = null,
+    @Query("include_entities") include_entities: Boolean? = null,
+    @Query("include_rts") include_rts: Boolean? = null,
+    @Query("tweet_mode") tweet_mode: String = "extended",
+    @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
+  ): List<Status>
 }

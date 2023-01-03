@@ -24,8 +24,8 @@ import com.twidere.twiderex.MainThreadTestBase
 import io.mockk.MockKAnnotations
 
 internal abstract class ViewModelTestBase : MainThreadTestBase() {
-    override fun setUp() {
-        super.setUp()
-        MockKAnnotations.init(this, relaxUnitFun = true)
-    }
+  override fun setUp() {
+    super.setUp()
+    MockKAnnotations.init(this, relaxUnitFun = true)
+  }
 }

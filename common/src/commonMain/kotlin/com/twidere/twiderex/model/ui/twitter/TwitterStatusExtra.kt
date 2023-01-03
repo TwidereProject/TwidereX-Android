@@ -26,6 +26,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TwitterStatusExtra(
-    val reply_settings: TwitterReplySettings,
-    val quoteCount: Long? = null,
+  val reply_settings: TwitterReplySettings,
+  val quoteCount: Long? = null,
 ) : StatusExtra

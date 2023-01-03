@@ -34,29 +34,29 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface RoomStatusDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(status: List<DbStatusV2>)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertAll(status: List<DbStatusV2>)
 
-    @Query("SELECT * FROM status")
-    suspend fun getAll(): List<DbStatusV2>
+  @Query("SELECT * FROM status")
+  suspend fun getAll(): List<DbStatusV2>
 
-    @Query("SELECT * FROM status WHERE statusKey == :key")
-    suspend fun findWithStatusKey(key: MicroBlogKey): DbStatusV2?
+  @Query("SELECT * FROM status WHERE statusKey == :key")
+  suspend fun findWithStatusKey(key: MicroBlogKey): DbStatusV2?
 
-    @Transaction
-    @Query("SELECT * FROM status WHERE statusKey == :key")
-    suspend fun findWithStatusKeyWithReference(key: MicroBlogKey): DbStatusWithReference?
+  @Transaction
+  @Query("SELECT * FROM status WHERE statusKey == :key")
+  suspend fun findWithStatusKeyWithReference(key: MicroBlogKey): DbStatusWithReference?
 
-    @Transaction
-    @Query("SELECT * FROM status WHERE statusKey == :key")
-    fun findWithStatusKeyWithReferenceFlow(key: MicroBlogKey): Flow<DbStatusWithReference?>
+  @Transaction
+  @Query("SELECT * FROM status WHERE statusKey == :key")
+  fun findWithStatusKeyWithReferenceFlow(key: MicroBlogKey): Flow<DbStatusWithReference?>
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(status: List<DbStatusV2>)
+  @Update(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun update(status: List<DbStatusV2>)
 
-    @Delete
-    suspend fun delete(status: List<DbStatusV2>)
+  @Delete
+  suspend fun delete(status: List<DbStatusV2>)
 
-    @Query("DELETE FROM status WHERE statusKey == :key")
-    suspend fun delete(key: MicroBlogKey)
+  @Query("DELETE FROM status WHERE statusKey == :key")
+  suspend fun delete(key: MicroBlogKey)
 }

@@ -30,19 +30,19 @@ import kotlinx.coroutines.SupervisorJob
 import java.io.File
 
 actual class AccountPreferencesFactory {
-    actual fun create(accountKey: MicroBlogKey): AccountPreferences {
-        val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-        return AccountPreferences(
-            dataStore = PreferenceDataStoreFactory.create(
-                corruptionHandler = null,
-                migrations = listOf(),
-                scope = scope
-            ) {
-                File(
-                    get<StorageProvider>().appFiles.dataStoreFile("$accountKey.preferences_pb"),
-                )
-            },
-            scope = scope
+  actual fun create(accountKey: MicroBlogKey): AccountPreferences {
+    val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    return AccountPreferences(
+      dataStore = PreferenceDataStoreFactory.create(
+        corruptionHandler = null,
+        migrations = listOf(),
+        scope = scope
+      ) {
+        File(
+          get<StorageProvider>().appFiles.dataStoreFile("$accountKey.preferences_pb"),
         )
-    }
+      },
+      scope = scope
+    )
+  }
 }

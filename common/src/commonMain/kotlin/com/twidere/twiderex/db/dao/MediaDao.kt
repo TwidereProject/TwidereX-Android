@@ -24,5 +24,5 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 
 interface MediaDao {
-    suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey): List<UiMedia>
+  suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey): List<UiMedia>
 }

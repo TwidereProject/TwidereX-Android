@@ -29,21 +29,21 @@ import com.twidere.twiderex.preferences.model.NotificationPreferences
 import kotlinx.coroutines.flow.first
 
 class NotificationWorker(
-    appContext: Context,
-    params: WorkerParameters,
-    private val notificationPreferences: DataStore<NotificationPreferences>,
-    private val notificationJob: NotificationJob
+  appContext: Context,
+  params: WorkerParameters,
+  private val notificationPreferences: DataStore<NotificationPreferences>,
+  private val notificationJob: NotificationJob
 
 ) : CoroutineWorker(appContext, params) {
-    override suspend fun doWork(): Result {
-        return try {
-            if (notificationPreferences.data.first().enableNotification) {
-                notificationJob.execute()
-            }
-            Result.success()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            Result.failure()
-        }
+  override suspend fun doWork(): Result {
+    return try {
+      if (notificationPreferences.data.first().enableNotification) {
+        notificationJob.execute()
+      }
+      Result.success()
+    } catch (e: Throwable) {
+      e.printStackTrace()
+      Result.failure()
     }
+  }
 }

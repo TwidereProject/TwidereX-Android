@@ -30,12 +30,12 @@ import com.twidere.twiderex.room.db.transform.toDbCursor
 import com.twidere.twiderex.room.db.transform.toUi
 
 internal class NotificationCursorDaoImpl(private val database: RoomCacheDatabase) : NotificationCursorDao {
-    override suspend fun find(
-        accountKey: MicroBlogKey,
-        type: NotificationCursorType
-    ) = database.notificationCursorDao().find(accountKey, type.toDb())?.toUi()
+  override suspend fun find(
+    accountKey: MicroBlogKey,
+    type: NotificationCursorType
+  ) = database.notificationCursorDao().find(accountKey, type.toDb())?.toUi()
 
-    override suspend fun add(notificationCursor: NotificationCursor) {
-        database.notificationCursorDao().add(notificationCursor.toDbCursor())
-    }
+  override suspend fun add(notificationCursor: NotificationCursor) {
+    database.notificationCursorDao().add(notificationCursor.toDbCursor())
+  }
 }

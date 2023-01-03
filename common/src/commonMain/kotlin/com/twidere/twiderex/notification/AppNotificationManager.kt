@@ -25,80 +25,80 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 expect class AppNotificationManager {
-    fun notify(notificationId: Int, appNotification: AppNotification)
+  fun notify(notificationId: Int, appNotification: AppNotification)
 
-    @OptIn(ExperimentalTime::class)
-    fun notifyTransient(
-        notificationId: Int,
-        appNotification: AppNotification,
-        duration: Duration = 5.seconds,
-    )
+  @OptIn(ExperimentalTime::class)
+  fun notifyTransient(
+    notificationId: Int,
+    appNotification: AppNotification,
+    duration: Duration = 5.seconds,
+  )
 }
 
 class AppNotification(
-    val channelId: String,
-    val title: CharSequence? = null,
-    val content: CharSequence? = null,
-    val largeIcon: String? = null,
-    val deepLink: String? = null,
-    val ongoing: Boolean = false,
-    val progress: Int = 0,
-    val progressMax: Int = 0,
-    val progressIndeterminate: Boolean = false,
-    val silent: Boolean = false,
+  val channelId: String,
+  val title: CharSequence? = null,
+  val content: CharSequence? = null,
+  val largeIcon: String? = null,
+  val deepLink: String? = null,
+  val ongoing: Boolean = false,
+  val progress: Int = 0,
+  val progressMax: Int = 0,
+  val progressIndeterminate: Boolean = false,
+  val silent: Boolean = false,
 ) {
-    class Builder(private var channelId: String) {
-        private var title: CharSequence? = null
-        private var content: CharSequence? = null
-        private var largeIcon: String? = null
-        private var deepLink: String? = null
-        private var ongoing: Boolean = false
-        private var progress: Int = 0
-        private var progressMax: Int = 0
-        private var progressIndeterminate: Boolean = false
-        private var silent: Boolean = false
+  class Builder(private var channelId: String) {
+    private var title: CharSequence? = null
+    private var content: CharSequence? = null
+    private var largeIcon: String? = null
+    private var deepLink: String? = null
+    private var ongoing: Boolean = false
+    private var progress: Int = 0
+    private var progressMax: Int = 0
+    private var progressIndeterminate: Boolean = false
+    private var silent: Boolean = false
 
-        fun setContentTitle(title: CharSequence?) = this.apply {
-            this.title = title
-        }
-
-        fun setContentText(content: CharSequence?) = this.apply {
-            this.content = content
-        }
-
-        fun setLargeIcon(largeIcon: String?) = this.apply {
-            this.largeIcon = largeIcon
-        }
-
-        fun setDeepLink(deepLink: String?) = this.apply {
-            this.deepLink = deepLink
-        }
-
-        fun setOngoing(ongoing: Boolean) = this.apply {
-            this.ongoing = ongoing
-        }
-
-        fun setSilent(silent: Boolean) = this.apply {
-            this.silent = silent
-        }
-
-        fun setProgress(max: Int, progress: Int, indeterminate: Boolean) = this.apply {
-            this.progress = progress
-            this.progressMax = max
-            this.progressIndeterminate = indeterminate
-        }
-
-        fun build() = AppNotification(
-            title = title,
-            channelId = channelId,
-            content = content,
-            largeIcon = largeIcon,
-            deepLink = deepLink,
-            ongoing = ongoing,
-            progress = progress,
-            progressMax = progressMax,
-            progressIndeterminate = progressIndeterminate,
-            silent = silent
-        )
+    fun setContentTitle(title: CharSequence?) = this.apply {
+      this.title = title
     }
+
+    fun setContentText(content: CharSequence?) = this.apply {
+      this.content = content
+    }
+
+    fun setLargeIcon(largeIcon: String?) = this.apply {
+      this.largeIcon = largeIcon
+    }
+
+    fun setDeepLink(deepLink: String?) = this.apply {
+      this.deepLink = deepLink
+    }
+
+    fun setOngoing(ongoing: Boolean) = this.apply {
+      this.ongoing = ongoing
+    }
+
+    fun setSilent(silent: Boolean) = this.apply {
+      this.silent = silent
+    }
+
+    fun setProgress(max: Int, progress: Int, indeterminate: Boolean) = this.apply {
+      this.progress = progress
+      this.progressMax = max
+      this.progressIndeterminate = indeterminate
+    }
+
+    fun build() = AppNotification(
+      title = title,
+      channelId = channelId,
+      content = content,
+      largeIcon = largeIcon,
+      deepLink = deepLink,
+      ongoing = ongoing,
+      progress = progress,
+      progressMax = progressMax,
+      progressIndeterminate = progressIndeterminate,
+      silent = silent
+    )
+  }
 }

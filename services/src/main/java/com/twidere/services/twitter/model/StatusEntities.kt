@@ -26,13 +26,13 @@ import kotlinx.serialization.json.JsonArray
 
 @Serializable
 data class StatusEntities(
-    val hashtags: List<Hashtags>? = null,
-    val symbols: JsonArray? = null,
+  val hashtags: List<Hashtags>? = null,
+  val symbols: JsonArray? = null,
 
-    @SerialName("user_mentions")
-    val userMentions: List<UserMention>? = null,
+  @SerialName("user_mentions")
+  val userMentions: List<UserMention>? = null,
 
-    val media: List<PurpleMedia>? = null,
-    val urls: List<URL>? = null,
-    val description: Description? = null
+  val media: List<PurpleMedia>? = null,
+  val urls: List<URL>? = null,
+  val description: Description? = null
 )

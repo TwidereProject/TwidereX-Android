@@ -26,15 +26,15 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 
 class PlatformResolver(
-    private val database: CacheDatabase,
+  private val database: CacheDatabase,
 ) {
-    suspend fun resolveStatus(statusKey: MicroBlogKey, accountKey: MicroBlogKey): PlatformType? {
-        return database.statusDao().findWithStatusKey(statusKey = statusKey, accountKey = accountKey)?.platformType
-    }
+  suspend fun resolveStatus(statusKey: MicroBlogKey, accountKey: MicroBlogKey): PlatformType? {
+    return database.statusDao().findWithStatusKey(statusKey = statusKey, accountKey = accountKey)?.platformType
+  }
 
-    suspend fun resolveUser(userKey: MicroBlogKey): PlatformType? {
-        return database.userDao().findWithUserKey(userKey = userKey)?.platformType
-    }
+  suspend fun resolveUser(userKey: MicroBlogKey): PlatformType? {
+    return database.userDao().findWithUserKey(userKey = userKey)?.platformType
+  }
 }
 
 val LocalPlatformResolver = staticCompositionLocalOf<PlatformResolver> { error("") }

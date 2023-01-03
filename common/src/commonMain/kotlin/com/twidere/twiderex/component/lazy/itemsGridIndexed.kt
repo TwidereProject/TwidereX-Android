@@ -37,51 +37,51 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 
 fun <T> LazyListScope.itemsGridIndexed(
-    data: List<T>,
-    rowSize: Int,
-    spacing: Dp = 0.dp,
-    padding: Dp = 0.dp,
-    itemContent: @Composable BoxScope.(Int, T) -> Unit,
+  data: List<T>,
+  rowSize: Int,
+  spacing: Dp = 0.dp,
+  padding: Dp = 0.dp,
+  itemContent: @Composable BoxScope.(Int, T) -> Unit,
 ) {
-    val rows = data.windowed(rowSize, rowSize, true)
-    itemsIndexed(rows) { index, row ->
-        Column(
-            modifier = Modifier
-                .fillParentMaxWidth()
-                .padding(horizontal = padding)
-        ) {
-            Row {
-                for (i in row.indices) {
-                    val item = row[i]
-                    Box(modifier = Modifier.weight(1f)) {
-                        itemContent(data.indexOf(item), item)
-                    }
-                    if (i != row.lastIndex) {
-                        Spacer(modifier = Modifier.width(spacing))
-                    }
-                }
-            }
-            if (index != rows.lastIndex) {
-                Spacer(modifier = Modifier.height(spacing))
-            }
+  val rows = data.windowed(rowSize, rowSize, true)
+  itemsIndexed(rows) { index, row ->
+    Column(
+      modifier = Modifier
+        .fillParentMaxWidth()
+        .padding(horizontal = padding)
+    ) {
+      Row {
+        for (i in row.indices) {
+          val item = row[i]
+          Box(modifier = Modifier.weight(1f)) {
+            itemContent(data.indexOf(item), item)
+          }
+          if (i != row.lastIndex) {
+            Spacer(modifier = Modifier.width(spacing))
+          }
         }
+      }
+      if (index != rows.lastIndex) {
+        Spacer(modifier = Modifier.height(spacing))
+      }
     }
+  }
 }
 
 fun <T : Any> LazyListScope.itemsPagingGridIndexed(
-    data: LazyPagingItems<T>,
-    rowSize: Int,
-    spacing: Dp = 0.dp,
-    padding: Dp = 0.dp,
-    itemContent: @Composable BoxScope.(Int, T?) -> Unit,
+  data: LazyPagingItems<T>,
+  rowSize: Int,
+  spacing: Dp = 0.dp,
+  padding: Dp = 0.dp,
+  itemContent: @Composable BoxScope.(Int, T?) -> Unit,
 ) {
-    loadState(data.loadState.refresh) {
-        data.retry()
-    }
-    itemsGridIndexed((0 until data.itemCount).toList(), rowSize = rowSize, spacing = spacing, padding = padding) { _, index ->
-        itemContent.invoke(this, index, data[index])
-    }
-    loadState(data.loadState.append) {
-        data.retry()
-    }
+  loadState(data.loadState.refresh) {
+    data.retry()
+  }
+  itemsGridIndexed((0 until data.itemCount).toList(), rowSize = rowSize, spacing = spacing, padding = padding) { _, index ->
+    itemContent.invoke(this, index, data[index])
+  }
+  loadState(data.loadState.append) {
+    data.retry()
+  }
 }

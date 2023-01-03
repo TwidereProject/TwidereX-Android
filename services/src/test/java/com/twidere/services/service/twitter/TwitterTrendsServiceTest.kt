@@ -30,20 +30,20 @@ import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TwitterTrendsServiceTest {
-    private lateinit var trendsService: TrendService
+  private lateinit var trendsService: TrendService
 
-    @BeforeAll
-    fun setUp() {
-        trendsService = mockTwitterService()
-    }
+  @BeforeAll
+  fun setUp() {
+    trendsService = mockTwitterService()
+  }
 
-    @Test
-    fun trends_limitCount(): Unit = runBlocking {
-        var result = trendsService.trends("1", limit = 1)
-        assertEquals(1, result.size)
-        result = trendsService.trends("1", limit = 2)
-        assertEquals(2, result.size)
-        result = trendsService.trends("1", limit = 100)
-        assertEquals(10, result.size)
-    }
+  @Test
+  fun trends_limitCount(): Unit = runBlocking {
+    var result = trendsService.trends("1", limit = 1)
+    assertEquals(1, result.size)
+    result = trendsService.trends("1", limit = 2)
+    assertEquals(2, result.size)
+    result = trendsService.trends("1", limit = 100)
+    assertEquals(10, result.size)
+  }
 }

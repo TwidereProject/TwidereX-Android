@@ -31,51 +31,51 @@ import org.jetbrains.annotations.TestOnly
 import java.util.UUID
 
 internal class MockSearchService @TestOnly constructor(var searchUser: List<IUser>? = null) : SearchService, ErrorService() {
-    override suspend fun searchTweets(
-        query: String,
-        count: Int,
-        nextPage: String?
-    ): ISearchResponse {
-        checkError()
-        val list = mutableListOf<IStatus>()
-        val nextKey = UUID.randomUUID().toString()
+  override suspend fun searchTweets(
+    query: String,
+    count: Int,
+    nextPage: String?
+  ): ISearchResponse {
+    checkError()
+    val list = mutableListOf<IStatus>()
+    val nextKey = UUID.randomUUID().toString()
+    for (i in 0 until count) {
+      list.add(mockIStatus())
+    }
+    return MockSearchResponse(
+      nextPage = nextKey,
+      status = list
+    )
+  }
+
+  override suspend fun searchMedia(
+    query: String,
+    count: Int,
+    nextPage: String?
+  ): ISearchResponse {
+    return searchTweets(query, count, nextPage)
+  }
+
+  override suspend fun searchUsers(
+    query: String,
+    page: Int?,
+    count: Int,
+    following: Boolean
+  ): List<IUser> {
+    checkError()
+    return (
+      searchUser ?: let {
+        val list = mutableListOf<IUser>()
         for (i in 0 until count) {
-            list.add(mockIStatus())
+          list.add(mockIUser())
         }
-        return MockSearchResponse(
-            nextPage = nextKey,
-            status = list
-        )
-    }
-
-    override suspend fun searchMedia(
-        query: String,
-        count: Int,
-        nextPage: String?
-    ): ISearchResponse {
-        return searchTweets(query, count, nextPage)
-    }
-
-    override suspend fun searchUsers(
-        query: String,
-        page: Int?,
-        count: Int,
-        following: Boolean
-    ): List<IUser> {
-        checkError()
-        return (
-            searchUser ?: let {
-                val list = mutableListOf<IUser>()
-                for (i in 0 until count) {
-                    list.add(mockIUser())
-                }
-                list
-            }
-            ).toIPaging()
-    }
+        list
+      }
+      ).toIPaging()
+  }
 }
 
 internal class MockSearchResponse @TestOnly constructor(
-    override val nextPage: String?,
-    override val status: List<IStatus>
+  override val nextPage: String?,
+  override val status: List<IStatus>
 ) : ISearchResponse

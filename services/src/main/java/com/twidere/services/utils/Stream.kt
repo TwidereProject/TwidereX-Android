@@ -24,14 +24,14 @@ import java.io.InputStream
 import java.io.OutputStream
 
 fun InputStream.copyToInLength(output: OutputStream, length: Int) {
-    val buffer = ByteArray(1024)
-    var bytesRead = 0
-    do {
-        val read = read(buffer)
-        if (read == -1) {
-            break
-        }
-        output.write(buffer, 0, read)
-        bytesRead += read
-    } while (bytesRead <= length)
+  val buffer = ByteArray(1024)
+  var bytesRead = 0
+  do {
+    val read = read(buffer)
+    if (read == -1) {
+      break
+    }
+    output.write(buffer, 0, read)
+    bytesRead += read
+  } while (bytesRead <= length)
 }

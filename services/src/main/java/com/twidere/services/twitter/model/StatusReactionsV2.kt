@@ -24,6 +24,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class StatusReactionsV2(
-    val retweeted: Boolean? = null,
-    val liked: Boolean? = null
+  val retweeted: Boolean? = null,
+  val liked: Boolean? = null
 )

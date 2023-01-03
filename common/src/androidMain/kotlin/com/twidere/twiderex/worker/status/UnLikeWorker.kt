@@ -25,7 +25,7 @@ import androidx.work.WorkerParameters
 import com.twidere.twiderex.jobs.status.UnlikeStatusJob
 
 class UnLikeWorker(
-    appContext: Context,
-    params: WorkerParameters,
-    unlikeStatusJob: UnlikeStatusJob,
+  appContext: Context,
+  params: WorkerParameters,
+  unlikeStatusJob: UnlikeStatusJob,
 ) : StatusWorker(appContext, params, unlikeStatusJob)

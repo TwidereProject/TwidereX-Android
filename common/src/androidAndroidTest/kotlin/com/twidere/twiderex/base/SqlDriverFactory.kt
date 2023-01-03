@@ -25,7 +25,7 @@ import com.squareup.sqldelight.android.AndroidSqliteDriver
 import com.squareup.sqldelight.db.SqlDriver
 
 actual object SqlDriverFactory {
-    actual fun create(schema: SqlDriver.Schema): SqlDriver {
-        return AndroidSqliteDriver(schema, ApplicationProvider.getApplicationContext(), "sqldelight_test.db")
-    }
+  actual fun create(schema: SqlDriver.Schema): SqlDriver {
+    return AndroidSqliteDriver(schema, ApplicationProvider.getApplicationContext(), "sqldelight_test.db")
+  }
 }

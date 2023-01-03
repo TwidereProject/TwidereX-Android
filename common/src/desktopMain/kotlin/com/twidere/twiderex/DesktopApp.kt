@@ -27,12 +27,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.twidere.twiderex.component.NativeWindow
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
 import com.twidere.twiderex.init.Initializer
 import com.twidere.twiderex.init.TwidereServiceFactoryInitialTask
-import com.twidere.twiderex.kmp.LocalPlatformWindow
-import com.twidere.twiderex.kmp.PlatformWindow
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
@@ -48,8 +47,7 @@ import it.sauronsoftware.junique.JUnique
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
-import moe.tlaster.precompose.PreComposeWindow
-import moe.tlaster.precompose.navigation.NavController
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.logger.Level
@@ -59,140 +57,137 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.io.path.absolutePathString
 
-private val navController = NavController()
+private val navController = Navigator()
 private val mainScope = MainScope()
 private const val lockId = "b5b887ec-7fc0-45c9-b32d-47f37cb02f9f"
 private const val entryFileName = "twiderex.desktop"
 
 fun runDesktopApp(
-    args: Array<String>,
+  args: Array<String>,
 ) {
-    when (currentOperatingSystem) {
-        OperatingSystem.Windows -> {
-            ensureWindowsDatastore()
-            ensureWindowsRegistry()
-            ensureSingleAppInstance(args)
-        }
-        OperatingSystem.Linux -> {
-            ensureDesktopEntry()
-            ensureMimeInfo()
-            ensureSingleAppInstance(args)
-        }
-        else -> startDesktopApp()
+  when (currentOperatingSystem) {
+    OperatingSystem.Windows -> {
+      ensureWindowsDatastore()
+      ensureWindowsRegistry()
+      ensureSingleAppInstance(args)
     }
+    OperatingSystem.Linux -> {
+      ensureDesktopEntry()
+      ensureMimeInfo()
+      ensureSingleAppInstance(args)
+    }
+    else -> startDesktopApp()
+  }
 }
 
 fun ensureWindowsDatastore() {
-    WindowsDatastoreModifier.ensureWindowsDatastore()
+  WindowsDatastoreModifier.ensureWindowsDatastore()
 }
 
 private fun ensureSingleAppInstance(args: Array<String>) {
-    val start = try {
-        JUnique.acquireLock(lockId) {
-            onDeeplink(it)
-            null
-        }
-        true
-    } catch (e: AlreadyLockedException) {
-        false
+  val start = try {
+    JUnique.acquireLock(lockId) {
+      onDeeplink(it)
+      null
     }
-    if (start) {
-        startDesktopApp()
-    } else {
-        args.forEach {
-            JUnique.sendMessage(lockId, it)
-        }
+    true
+  } catch (e: AlreadyLockedException) {
+    false
+  }
+  if (start) {
+    startDesktopApp()
+  } else {
+    args.forEach {
+      JUnique.sendMessage(lockId, it)
     }
+  }
 }
 
 private fun ensureDesktopEntry() {
-    val entryFile = File("${System.getProperty("user.home")}/.local/share/applications/$entryFileName")
-    if (!entryFile.exists()) {
-        entryFile.createNewFile()
-    }
-    val path = Files.readSymbolicLink(Paths.get("/proc/self/exe"))
-    entryFile.writeText(
-        "[Desktop Entry]${System.lineSeparator()}" +
-            "Type=Application${System.lineSeparator()}" +
-            "Name=Twidere X${System.lineSeparator()}" +
-            "Icon=\"${path.parent.parent.absolutePathString() + "/lib/Twidere X.png" + "\""}${System.lineSeparator()}" +
-            "Exec=\"${path.absolutePathString() + "\" %u"}${System.lineSeparator()}" +
-            "Terminal=false${System.lineSeparator()}" +
-            "MimeType=x-scheme-handler/$twidereXSchema;"
-    )
+  val entryFile = File("${System.getProperty("user.home")}/.local/share/applications/$entryFileName")
+  if (!entryFile.exists()) {
+    entryFile.createNewFile()
+  }
+  val path = Files.readSymbolicLink(Paths.get("/proc/self/exe"))
+  entryFile.writeText(
+    "[Desktop Entry]${System.lineSeparator()}" +
+      "Type=Application${System.lineSeparator()}" +
+      "Name=Twidere X${System.lineSeparator()}" +
+      "Icon=\"${path.parent.parent.absolutePathString() + "/lib/Twidere X.png" + "\""}${System.lineSeparator()}" +
+      "Exec=\"${path.absolutePathString() + "\" %u"}${System.lineSeparator()}" +
+      "Terminal=false${System.lineSeparator()}" +
+      "MimeType=x-scheme-handler/$twidereXSchema;"
+  )
 }
 
 private fun ensureMimeInfo() {
-    val file = File("${System.getProperty("user.home")}/.local/share/applications/mimeinfo.cache")
-    if (!file.exists()) {
-        file.createNewFile()
-    }
-    val text = file.readText()
-    if (text.isEmpty() || text.isBlank()) {
-        file.writeText("[MIME Cache]${System.lineSeparator()}")
-    }
-    if (!file.readText().contains("x-scheme-handler/$twidereXSchema=$entryFileName;")) {
-        file.appendText("${System.lineSeparator()}x-scheme-handler/$twidereXSchema=$entryFileName;")
-    }
+  val file = File("${System.getProperty("user.home")}/.local/share/applications/mimeinfo.cache")
+  if (!file.exists()) {
+    file.createNewFile()
+  }
+  val text = file.readText()
+  if (text.isEmpty() || text.isBlank()) {
+    file.writeText("[MIME Cache]${System.lineSeparator()}")
+  }
+  if (!file.readText().contains("x-scheme-handler/$twidereXSchema=$entryFileName;")) {
+    file.appendText("${System.lineSeparator()}x-scheme-handler/$twidereXSchema=$entryFileName;")
+  }
 }
 
 private fun ensureWindowsRegistry() {
-    val protocol = WindowsRegistry.readRegistry("HKCR\\TwidereX", "URL Protocol")
-    if (protocol?.contains(twidereXSchema) == true) return
-    WindowsRegistry.registryUrlProtocol(twidereXSchema)
+  val protocol = WindowsRegistry.readRegistry("HKCR\\TwidereX", "URL Protocol")
+  if (protocol?.contains(twidereXSchema) == true) return
+  WindowsRegistry.registryUrlProtocol(twidereXSchema)
 }
 
 private fun startDesktopApp() {
-    startKoin {
-        printLogger(Level.NONE)
-        setupModules()
+  startKoin {
+    printLogger(Level.NONE)
+    setupModules()
+  }
+  val preferencesHolder = get<PreferencesHolder>()
+  try {
+    Desktop.getDesktop().setOpenURIHandler { event ->
+      onDeeplink(url = event.uri.toString())
     }
-    val preferencesHolder = get<PreferencesHolder>()
-    try {
-        Desktop.getDesktop().setOpenURIHandler { event ->
-            onDeeplink(url = event.uri.toString())
-        }
-    } catch (e: UnsupportedOperationException) {
-        e.printStackTrace()
+  } catch (e: UnsupportedOperationException) {
+    e.printStackTrace()
+  }
+  application {
+    LaunchedEffect(Unit) {
+      preferencesHolder.warmup()
     }
-    application {
-        LaunchedEffect(Unit) {
-            preferencesHolder.warmup()
+    ProvidePreferences(preferencesHolder) {
+      PreComposeWindow(
+          onCloseRequest = {
+              stopKoin()
+              exitApplication()
+          },
+          state = rememberWindowState(
+              width = 400.dp,
+              height = 900.dp
+          ),
+          title = "Twidere X",
+          icon = painterResource(MR.files.ic_launcher.filePath),
+      ) {
+        FilePicker.init(window)
+        CompositionLocalProvider(
+            LocalPlatformWindow provides PlatformWindow(),
+            LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
+        ) {
+            App(navController = navController)
         }
-        Initializer.withScope(rememberCoroutineScope())
-            .add(TwidereServiceFactoryInitialTask())
-            .execute()
-        ProvidePreferences(preferencesHolder) {
-            PreComposeWindow(
-                onCloseRequest = {
-                    stopKoin()
-                    exitApplication()
-                },
-                state = rememberWindowState(
-                    width = 400.dp,
-                    height = 900.dp
-                ),
-                title = "Twidere X",
-                icon = painterResource(MR.files.ic_launcher.filePath),
-            ) {
-                FilePicker.init(window)
-                CompositionLocalProvider(
-                    LocalPlatformWindow provides PlatformWindow(),
-                    LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
-                ) {
-                    App(navController = navController)
-                }
-            }
-        }
+      }
     }
+  }
 }
 
 private fun onDeeplink(url: String) {
-    if (CustomTabSignInChannel.canHandle(url)) {
-        mainScope.launch {
-            CustomTabSignInChannel.send(url)
-        }
-    } else {
-        navController.navigate(url)
+  if (CustomTabSignInChannel.canHandle(url)) {
+    mainScope.launch {
+      CustomTabSignInChannel.send(url)
     }
+  } else {
+    navController.navigate(url)
+  }
 }

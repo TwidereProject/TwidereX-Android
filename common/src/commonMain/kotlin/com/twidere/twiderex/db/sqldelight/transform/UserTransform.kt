@@ -31,60 +31,60 @@ import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
 
 fun UiUser.toDbUser() = DbUser(
-    id = id,
-    userKey = userKey,
-    acct = acct,
-    name = name,
-    screenName = screenName,
-    profileImage = profileImage.toString(),
-    profileBackgroundImage = profileBackgroundImage,
-    fans = metrics.fans,
-    follow = metrics.follow,
-    status = metrics.status,
-    listed = metrics.listed,
-    rawDesc = rawDesc,
-    htmlDesc = htmlDesc,
-    website = website,
-    location = location,
-    verified = verified,
-    protected_ = protected,
-    platformType = platformType,
-    extra = extra?.toDbUserExtra()
+  id = id,
+  userKey = userKey,
+  acct = acct,
+  name = name,
+  screenName = screenName,
+  profileImage = profileImage.toString(),
+  profileBackgroundImage = profileBackgroundImage,
+  fans = metrics.fans,
+  follow = metrics.follow,
+  status = metrics.status,
+  listed = metrics.listed,
+  rawDesc = rawDesc,
+  htmlDesc = htmlDesc,
+  website = website,
+  location = location,
+  verified = verified,
+  protected_ = protected,
+  platformType = platformType,
+  extra = extra?.toDbUserExtra()
 )
 
 fun UserExtra.toDbUserExtra(): String {
-    return when (this) {
-        is TwitterUserExtra -> { json() }
-        is MastodonUserExtra -> { json() }
-        else -> toString()
-    }
+  return when (this) {
+    is TwitterUserExtra -> { json() }
+    is MastodonUserExtra -> { json() }
+    else -> toString()
+  }
 }
 
 fun DbUser.toUi() = UiUser(
-    id = id,
-    userKey = userKey,
-    acct = acct,
-    name = name,
-    screenName = screenName,
-    profileImage = profileImage,
-    profileBackgroundImage = profileBackgroundImage,
-    metrics = UserMetrics(
-        fans = fans,
-        follow = follow,
-        status = status,
-        listed = listed,
-    ),
-    rawDesc = rawDesc,
-    htmlDesc = htmlDesc,
-    website = website,
-    location = location,
-    verified = verified,
-    protected = protected_,
-    platformType = platformType,
-    extra = when (platformType) {
-        PlatformType.Twitter -> extra?.fromJson<TwitterUserExtra>()
-        PlatformType.StatusNet -> TODO()
-        PlatformType.Fanfou -> TODO()
-        PlatformType.Mastodon -> extra?.fromJson<MastodonUserExtra>()
-    }
+  id = id,
+  userKey = userKey,
+  acct = acct,
+  name = name,
+  screenName = screenName,
+  profileImage = profileImage,
+  profileBackgroundImage = profileBackgroundImage,
+  metrics = UserMetrics(
+    fans = fans,
+    follow = follow,
+    status = status,
+    listed = listed,
+  ),
+  rawDesc = rawDesc,
+  htmlDesc = htmlDesc,
+  website = website,
+  location = location,
+  verified = verified,
+  protected = protected_,
+  platformType = platformType,
+  extra = when (platformType) {
+    PlatformType.Twitter -> extra?.fromJson<TwitterUserExtra>()
+    PlatformType.StatusNet -> TODO()
+    PlatformType.Fanfou -> TODO()
+    PlatformType.Mastodon -> extra?.fromJson<MastodonUserExtra>()
+  }
 )

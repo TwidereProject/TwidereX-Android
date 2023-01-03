@@ -32,93 +32,116 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
-import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.component.navigation.compose
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.StatusNavigationData
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
+import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
 class HomeTimelineItem : HomeNavigationItem() {
 
-    @Composable
-    override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_timeline_title)
-    override val route: String
-        get() = Root.HomeTimeline
+  @Composable
+  override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_timeline_title)
+  override val route: String
+    get() = Root.HomeTimeline
 
-    @Composable
-    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_home)
+  @Composable
+  override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_home)
 
-    @Composable
-    override fun Content() {
-        HomeTimelineSceneContent(
-            lazyListController = lazyListController
-        )
-    }
+  @Composable
+  override fun Content(navigator: Navigator) {
+    val statusNavigation = rememberStatusNavigationData(navigator)
+    HomeTimelineSceneContent(
+      lazyListController = lazyListController,
+      statusNavigation = statusNavigation,
+    )
+  }
 
-    @Composable
-    override fun Fab() {
-        HomeTimelineFab()
-    }
+  @Composable
+  override fun Fab(navigator: Navigator) {
+    HomeTimelineFab(
+      navigator = navigator,
+    )
+  }
 
-    override val fabSize: Dp
-        get() = HomeTimeLineItemDefaults.FabSize
+  override val fabSize: Dp
+    get() = HomeTimeLineItemDefaults.FabSize
 }
 
+@NavGraphDestination(
+  route = Root.HomeTimeline,
+)
 @Composable
-fun HomeTimelineScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_timeline_title))
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    }
-                )
-            },
-            floatingActionButton = {
-                HomeTimelineFab()
-            }
-        ) {
-            HomeTimelineSceneContent()
-        }
-    }
-}
-
-@Composable
-private fun HomeTimelineFab() {
-    val navigator = LocalNavigator.current
-    FloatingActionButton(
-        onClick = {
-            navigator.compose(ComposeType.New)
-        }
-    ) {
-        Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_feather),
-            contentDescription = stringResource(
-                res = com.twidere.twiderex.MR.strings.accessibility_scene_home_compose
+fun HomeTimelineScene(
+  navigator: Navigator,
+) {
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_timeline_title))
+          },
+          navigationIcon = {
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
             )
+          }
         )
+      },
+      floatingActionButton = {
+        HomeTimelineFab(
+          navigator = navigator,
+        )
+      }
+    ) {
+      val statusNavigation = rememberStatusNavigationData(navigator)
+      HomeTimelineSceneContent(
+        statusNavigation = statusNavigation,
+      )
     }
+  }
+}
+
+@Composable
+private fun HomeTimelineFab(
+  navigator: Navigator,
+) {
+  FloatingActionButton(
+    onClick = {
+      navigator.compose(ComposeType.New)
+    }
+  ) {
+    Icon(
+      painter = painterResource(res = com.twidere.twiderex.MR.files.ic_feather),
+      contentDescription = stringResource(
+        res = com.twidere.twiderex.MR.strings.accessibility_scene_home_compose
+      )
+    )
+  }
 }
 
 @Composable
 fun HomeTimelineSceneContent(
-    lazyListController: LazyListController? = null
+  lazyListController: LazyListController? = null,
+  statusNavigation: StatusNavigationData,
 ) {
-    val viewModel: HomeTimelineViewModel = getViewModel()
-    TimelineComponent(
-        viewModel = viewModel,
-        lazyListController = lazyListController,
-    )
+  TimelineComponent(
+    lazyListController = lazyListController,
+    savedStateKeyType = SavedStateKeyType.HOME,
+    statusNavigation = statusNavigation,
+  )
 }
 
 private object HomeTimeLineItemDefaults {
-    val FabSize = 56.dp
+  val FabSize = 56.dp
 }

@@ -28,14 +28,14 @@ import java.util.Locale
 import java.util.TimeZone
 
 class DateSerializer : HtmlSerializer<Date> {
-    override fun decode(element: Element, wholeText: String): Date {
-        return getDateFormat().parse(wholeText)
-    }
+  override fun decode(element: Element, wholeText: String): Date {
+    return getDateFormat().parse(wholeText)
+  }
 
-    private fun getDateFormat(): SimpleDateFormat {
-        val format = SimpleDateFormat("dd/MM/yyyy, HH:mm:ss", Locale.ENGLISH)
-        format.isLenient = true
-        format.timeZone = TimeZone.getTimeZone("UTC")
-        return format
-    }
+  private fun getDateFormat(): SimpleDateFormat {
+    val format = SimpleDateFormat("dd/MM/yyyy, HH:mm:ss", Locale.ENGLISH)
+    format.isLenient = true
+    format.timeZone = TimeZone.getTimeZone("UTC")
+    return format
+  }
 }

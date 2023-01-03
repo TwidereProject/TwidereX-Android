@@ -21,17 +21,17 @@
 package com.twidere.twiderex.utils
 
 import android.webkit.JavascriptInterface
-import moe.tlaster.precompose.navigation.NavController
+import moe.tlaster.precompose.navigation.Navigator
 
 class TwitterWebJavascriptInterface(
-    val navController: NavController,
+  private val navController: Navigator,
 ) {
-    @JavascriptInterface
-    fun tryPinCode(content: String?) {
-        if (!content.isNullOrEmpty()) {
-            content.toIntOrNull()?.let {
-                navController.goBackWith(content)
-            }
-        }
+  @JavascriptInterface
+  fun tryPinCode(content: String?) {
+    if (!content.isNullOrEmpty()) {
+      content.toIntOrNull()?.let {
+        navController.goBackWith(content)
+      }
     }
+  }
 }

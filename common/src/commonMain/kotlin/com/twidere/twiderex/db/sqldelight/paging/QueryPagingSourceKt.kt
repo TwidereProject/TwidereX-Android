@@ -28,41 +28,41 @@ import kotlinx.coroutines.Dispatchers
 import kotlin.properties.Delegates
 
 internal abstract class QueryPagingSource<Key : Any, RowType : Any> :
-    PagingSource<Key, RowType>(),
-    Query.Listener {
+  PagingSource<Key, RowType>(),
+  Query.Listener {
 
-    protected val relationQueryRegister = object : RelationQueryRegister {
-        override fun addRelationQuery(query: Query<Any>) {
-            query.addListener(this@QueryPagingSource)
-            relationQueries.add(query)
-        }
+  protected val relationQueryRegister = object : RelationQueryRegister {
+    override fun addRelationQuery(query: Query<Any>) {
+      query.addListener(this@QueryPagingSource)
+      relationQueries.add(query)
     }
+  }
 
-    private val relationQueries = mutableListOf<Query<Any>>()
+  private val relationQueries = mutableListOf<Query<Any>>()
 
-    protected var currentQuery: Query<RowType>? by Delegates.observable(null) { _, old, new ->
-        old?.removeListener(this)
-        new?.addListener(this)
-        relationQueries.forEach {
-            it.removeListener(this)
-        }
-        relationQueries.clear()
+  protected var currentQuery: Query<RowType>? by Delegates.observable(null) { _, old, new ->
+    old?.removeListener(this)
+    new?.addListener(this)
+    relationQueries.forEach {
+      it.removeListener(this)
     }
+    relationQueries.clear()
+  }
 
-    init {
-        registerInvalidatedCallback {
-            currentQuery?.removeListener(this)
-            currentQuery = null
-        }
+  init {
+    registerInvalidatedCallback {
+      currentQuery?.removeListener(this)
+      currentQuery = null
     }
+  }
 
-    final override fun queryResultsChanged() {
-        invalidate()
-    }
+  final override fun queryResultsChanged() {
+    invalidate()
+  }
 }
 
 interface RelationQueryRegister {
-    fun addRelationQuery(query: Query<Any>)
+  fun addRelationQuery(query: Query<Any>)
 }
 
 /**
@@ -82,13 +82,13 @@ interface RelationQueryRegister {
  */
 @Suppress("FunctionName")
 fun <RowType : Any> QueryPagingSource(
-    countQuery: Query<Long>,
-    transacter: Transacter,
-    dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    queryProvider: (limit: Long, offset: Long, relationQueryRegister: RelationQueryRegister) -> Query<RowType>,
+  countQuery: Query<Long>,
+  transacter: Transacter,
+  dispatcher: CoroutineDispatcher = Dispatchers.IO,
+  queryProvider: (limit: Long, offset: Long, relationQueryRegister: RelationQueryRegister) -> Query<RowType>,
 ): PagingSource<Int, RowType> = OffsetQueryPagingSource(
-    queryProvider,
-    countQuery,
-    transacter,
-    dispatcher
+  queryProvider,
+  countQuery,
+  transacter,
+  dispatcher
 )

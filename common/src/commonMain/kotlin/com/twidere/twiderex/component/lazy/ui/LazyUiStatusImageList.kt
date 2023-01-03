@@ -38,9 +38,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.placeholder.UiImagePlaceholder
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.model.DisplayPreferences
@@ -48,78 +48,79 @@ import com.twidere.twiderex.ui.LocalVideoPlayback
 
 @Composable
 fun LazyUiStatusImageList(
-    items: LazyPagingItems<Pair<UiMedia, UiStatus>>,
+  items: LazyPagingItems<Pair<UiMedia, UiStatus>>,
+  openMedia: (MicroBlogKey, Int) -> Unit,
 ) {
-    LazyUiList(
-        items = items,
-        loading = { LoadingImagePlaceholder() }
-    ) {
-        LazyColumn {
-            item {
-                Box(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
-            }
-            itemsPagingGridIndexed(
-                items,
-                rowSize = 2,
-                spacing = LazyUiStatusImageListDefaults.Spacing,
-                padding = LazyUiStatusImageListDefaults.Spacing
-            ) { index, pair ->
-                pair?.let { item ->
-                    val navigator = LocalNavigator.current
-                    CompositionLocalProvider(
-                        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
-                    ) {
-                        StatusMediaPreviewItem(
-                            item.first,
-                            modifier = Modifier
-                                .aspectRatio(1F)
-                                .clip(
-                                    MaterialTheme.shapes.medium
-                                ),
-                            onClick = {
-                                navigator.media(item.second.statusKey, index)
-                            }
-                        )
-                    }
-                } ?: run {
-                    UiImagePlaceholder()
-                }
-            }
-            item {
-                Box(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
-            }
+  LazyUiList(
+    items = items,
+    loading = { LoadingImagePlaceholder() }
+  ) {
+    LazyColumn {
+      item {
+        Box(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
+      }
+      itemsPagingGridIndexed(
+        items,
+        rowSize = 2,
+        spacing = LazyUiStatusImageListDefaults.Spacing,
+        padding = LazyUiStatusImageListDefaults.Spacing
+      ) { index, pair ->
+        pair?.let { item ->
+          CompositionLocalProvider(
+            LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
+          ) {
+            StatusMediaPreviewItem(
+              item.first,
+              modifier = Modifier
+                .aspectRatio(1F)
+                .clip(
+                  MaterialTheme.shapes.medium
+                ),
+              onClick = {
+                // media
+                openMedia(item.second.statusKey, index)
+              }
+            )
+          }
+        } ?: run {
+          UiImagePlaceholder()
         }
+      }
+      item {
+        Box(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
+      }
     }
+  }
 }
 
 object LazyUiStatusImageListDefaults {
-    val Spacing = 8.dp
+  val Spacing = 8.dp
 }
 
 @Composable
 private fun LoadingImagePlaceholder() {
-    Column(
-        modifier = Modifier
-            .wrapContentHeight(
-                align = Alignment.Top,
-                unbounded = true,
-            )
-    ) {
-        repeat(10) {
-            Row {
-                Spacer(modifier = Modifier.width(LazyUiStatusImageListDefaults.Spacing))
-                UiImagePlaceholder(
-                    modifier = Modifier.weight(1f),
-                    delayMillis = it * 50L
-                )
-                Spacer(modifier = Modifier.width(LazyUiStatusImageListDefaults.Spacing))
-                UiImagePlaceholder(
-                    modifier = Modifier.weight(1f),
-                    delayMillis = it * 50L
-                )
-                Spacer(modifier = Modifier.width(LazyUiStatusImageListDefaults.Spacing))
-            }
-            Spacer(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
-        }
+  Column(
+    modifier = Modifier
+      .wrapContentHeight(
+        align = Alignment.Top,
+        unbounded = true,
+      )
+  ) {
+    repeat(10) {
+      Row {
+        Spacer(modifier = Modifier.width(LazyUiStatusImageListDefaults.Spacing))
+        UiImagePlaceholder(
+          modifier = Modifier.weight(1f),
+          delayMillis = it * 50L
+        )
+        Spacer(modifier = Modifier.width(LazyUiStatusImageListDefaults.Spacing))
+        UiImagePlaceholder(
+          modifier = Modifier.weight(1f),
+          delayMillis = it * 50L
+        )
+        Spacer(modifier = Modifier.width(LazyUiStatusImageListDefaults.Spacing))
+      }
+      Spacer(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
     }
+  }
 }

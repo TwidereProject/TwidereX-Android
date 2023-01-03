@@ -38,84 +38,84 @@ import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 
 @Composable
 fun IconTabsComponent(
-    modifier: Modifier = Modifier,
-    divider: @Composable () -> Unit = @Composable {
-        TabRowDefaults.Divider()
-    },
-    items: List<Pair<Painter, String>>,
-    selectedItem: Int,
-    onItemSelected: (Int) -> Unit,
+  modifier: Modifier = Modifier,
+  divider: @Composable () -> Unit = @Composable {
+    TabRowDefaults.Divider()
+  },
+  items: List<Pair<Painter, String>>,
+  selectedItem: Int,
+  onItemSelected: (Int) -> Unit,
 ) {
-    TabsComponent(
-        modifier = modifier,
-        count = items.count(),
-        selectedItem = selectedItem,
-        divider = divider,
-        onItemSelected = onItemSelected,
+  TabsComponent(
+    modifier = modifier,
+    count = items.count(),
+    selectedItem = selectedItem,
+    divider = divider,
+    onItemSelected = onItemSelected,
+  ) {
+    Box(
+      modifier = Modifier.padding(16.dp)
     ) {
-        Box(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Icon(painter = items[it].first, contentDescription = items[it].second)
-        }
+      Icon(painter = items[it].first, contentDescription = items[it].second)
     }
+  }
 }
 
 @Composable
 fun TextTabsComponent(
-    modifier: Modifier = Modifier,
-    items: List<String>,
-    selectedItem: Int,
-    onItemSelected: (Int) -> Unit,
+  modifier: Modifier = Modifier,
+  items: List<String>,
+  selectedItem: Int,
+  onItemSelected: (Int) -> Unit,
 ) {
-    TabsComponent(
-        modifier = modifier,
-        count = items.count(),
-        selectedItem = selectedItem,
-        onItemSelected = onItemSelected
+  TabsComponent(
+    modifier = modifier,
+    count = items.count(),
+    selectedItem = selectedItem,
+    onItemSelected = onItemSelected
+  ) {
+    Box(
+      modifier = Modifier.padding(16.dp)
     ) {
-        Box(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(text = items[it])
-        }
+      Text(text = items[it])
     }
+  }
 }
 
 @Composable
 fun TabsComponent(
-    modifier: Modifier = Modifier,
-    count: Int,
-    selectedItem: Int,
-    divider: @Composable () -> Unit = @Composable {
-        TabRowDefaults.Divider()
-    },
-    onItemSelected: (Int) -> Unit,
-    tabContent: @Composable (Int) -> Unit,
+  modifier: Modifier = Modifier,
+  count: Int,
+  selectedItem: Int,
+  divider: @Composable () -> Unit = @Composable {
+    TabRowDefaults.Divider()
+  },
+  onItemSelected: (Int) -> Unit,
+  tabContent: @Composable (Int) -> Unit,
 ) {
-    TabRow(
-        modifier = modifier,
-        selectedTabIndex = selectedItem,
-        backgroundColor = MaterialTheme.colors.surface.withElevation(),
-        indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
-                modifier = Modifier.tabIndicatorOffset(tabPositions[selectedItem]),
-                color = MaterialTheme.colors.primary,
-            )
+  TabRow(
+    modifier = modifier,
+    selectedTabIndex = selectedItem,
+    backgroundColor = MaterialTheme.colors.surface.withElevation(),
+    indicator = { tabPositions ->
+      TabRowDefaults.Indicator(
+        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedItem]),
+        color = MaterialTheme.colors.primary,
+      )
+    },
+    divider = divider
+  ) {
+    for (i in 0 until count) {
+      Tab(
+        selected = selectedItem == i,
+        onClick = {
+          onItemSelected(i)
         },
-        divider = divider
-    ) {
-        for (i in 0 until count) {
-            Tab(
-                selected = selectedItem == i,
-                onClick = {
-                    onItemSelected(i)
-                },
-                selectedContentColor = MaterialTheme.colors.primary,
-                unselectedContentColor = mediumEmphasisContentContentColor,
-            ) {
-                tabContent.invoke(i)
-            }
-        }
+        selectedContentColor = MaterialTheme.colors.primary,
+        unselectedContentColor = mediumEmphasisContentContentColor,
+      ) {
+        tabContent.invoke(i)
+      }
     }
+  }
 }

@@ -30,20 +30,20 @@ import com.twidere.twiderex.component.foundation.loading
 
 @OptIn(ExperimentalMaterialApi::class)
 fun LazyListScope.loadState(
-    state: LoadState,
-    onReloadRequested: () -> Unit = {},
+  state: LoadState,
+  onReloadRequested: () -> Unit = {},
 ) {
-    when (state) {
-        is LoadState.Loading -> loading()
-        is LoadState.Error -> item {
-            ListItem(
-                modifier = Modifier.clickable(onClick = { onReloadRequested.invoke() }),
-                text = {
+  when (state) {
+    is LoadState.Loading -> loading()
+    is LoadState.Error -> item {
+      ListItem(
+        modifier = Modifier.clickable(onClick = { onReloadRequested.invoke() }),
+        text = {
 //                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.list_load_state_error))
-                }
-            )
         }
-        else -> {
-        }
+      )
     }
+    else -> {
+    }
+  }
 }

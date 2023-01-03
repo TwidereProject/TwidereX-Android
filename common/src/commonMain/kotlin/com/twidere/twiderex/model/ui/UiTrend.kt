@@ -23,25 +23,25 @@ package com.twidere.twiderex.model.ui
 import com.twidere.twiderex.model.MicroBlogKey
 
 data class UiTrend(
-    val accountKey: MicroBlogKey,
-    val trendKey: MicroBlogKey,
-    val displayName: String,
-    val url: String,
-    val query: String,
-    val volume: Long,
-    val history: List<UiTrendHistory>,
+  val accountKey: MicroBlogKey,
+  val trendKey: MicroBlogKey,
+  val displayName: String,
+  val url: String,
+  val query: String,
+  val volume: Long,
+  val history: List<UiTrendHistory>,
 ) {
-    val sortedHistory = history.sortedByDescending { it.day }
-    val dailyAccounts: Long
-        get() = if (sortedHistory.isNotEmpty()) sortedHistory[0].accounts else 0L
+  val sortedHistory = history.sortedByDescending { it.day }
+  val dailyAccounts: Long
+    get() = if (sortedHistory.isNotEmpty()) sortedHistory[0].accounts else 0L
 
-    val dailyUses: Long
-        get() = if (sortedHistory.isNotEmpty()) sortedHistory[0].uses else 0L
+  val dailyUses: Long
+    get() = if (sortedHistory.isNotEmpty()) sortedHistory[0].uses else 0L
 }
 
 data class UiTrendHistory(
-    val trendKey: MicroBlogKey,
-    val day: Long,
-    val uses: Long,
-    val accounts: Long
+  val trendKey: MicroBlogKey,
+  val day: Long,
+  val uses: Long,
+  val accounts: Long
 )

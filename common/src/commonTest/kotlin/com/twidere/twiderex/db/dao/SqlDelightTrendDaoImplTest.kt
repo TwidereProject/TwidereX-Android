@@ -31,85 +31,85 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class SqlDelightTrendDaoImplTest : BaseCacheDatabaseTest() {
-    private lateinit var dao: SqlDelightTrendDaoImpl
-    private val accountKey = MicroBlogKey.twitter("account")
-    override fun setUp() {
-        super.setUp()
-        dao = SqlDelightTrendDaoImpl(
-            database = database
-        )
-    }
+  private lateinit var dao: SqlDelightTrendDaoImpl
+  private val accountKey = MicroBlogKey.twitter("account")
+  override fun setUp() {
+    super.setUp()
+    dao = SqlDelightTrendDaoImpl(
+      database = database
+    )
+  }
 
-    @Test
-    fun insertAll_InsertBothTrendAndHistoryToDb() = runBlocking {
-        val list = listOf(
-            mockITrend(name = "trend1").toUi(accountKey),
-            mockITrend(name = "trend2").toUi(accountKey),
-            mockITrend(name = "trend3").toUi(accountKey),
-        )
-        dao.insertAll(list)
-        val trends = database.trendQueries.getTrendPagingList(accountKey = accountKey, limit = 10, offset = 0).executeAsList()
-        assertEquals(3, trends.size)
-        trends.forEach {
-            val histories = database.trendHistoryQueries.findWithTrendKey(trendKey = it.trendKey, accountKey = accountKey).executeAsList()
-            assert(histories.isNotEmpty())
-        }
+  @Test
+  fun insertAll_InsertBothTrendAndHistoryToDb() = runBlocking {
+    val list = listOf(
+      mockITrend(name = "trend1").toUi(accountKey),
+      mockITrend(name = "trend2").toUi(accountKey),
+      mockITrend(name = "trend3").toUi(accountKey),
+    )
+    dao.insertAll(list)
+    val trends = database.trendQueries.getTrendPagingList(accountKey = accountKey, limit = 10, offset = 0).executeAsList()
+    assertEquals(3, trends.size)
+    trends.forEach {
+      val histories = database.trendHistoryQueries.findWithTrendKey(trendKey = it.trendKey, accountKey = accountKey).executeAsList()
+      assert(histories.isNotEmpty())
     }
+  }
 
-    @Test
-    fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
-        val list = listOf(
-            mockITrend(name = "trend1").toUi(accountKey),
-            mockITrend(name = "trend2").toUi(accountKey),
-            mockITrend(name = "trend3").toUi(accountKey),
-        )
-        dao.insertAll(list)
-        val pagingSource = dao.getPagingSource(
-            accountKey = accountKey,
-        )
-        val limit = 2
-        val result = pagingSource.load(params = PagingSource.LoadParams.Refresh(0, limit, false))
-        assert(result is PagingSource.LoadResult.Page)
-        assertEquals(limit, (result as PagingSource.LoadResult.Page).nextKey)
-        assertEquals(limit, result.data.size)
+  @Test
+  fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
+    val list = listOf(
+      mockITrend(name = "trend1").toUi(accountKey),
+      mockITrend(name = "trend2").toUi(accountKey),
+      mockITrend(name = "trend3").toUi(accountKey),
+    )
+    dao.insertAll(list)
+    val pagingSource = dao.getPagingSource(
+      accountKey = accountKey,
+    )
+    val limit = 2
+    val result = pagingSource.load(params = PagingSource.LoadParams.Refresh(0, limit, false))
+    assert(result is PagingSource.LoadResult.Page)
+    assertEquals(limit, (result as PagingSource.LoadResult.Page).nextKey)
+    assertEquals(limit, result.data.size)
 
-        val loadMoreResult = pagingSource.load(params = PagingSource.LoadParams.Append(result.nextKey ?: 0, limit, false))
-        assert(loadMoreResult is PagingSource.LoadResult.Page)
-        assertEquals(null, (loadMoreResult as PagingSource.LoadResult.Page).nextKey)
+    val loadMoreResult = pagingSource.load(params = PagingSource.LoadParams.Append(result.nextKey ?: 0, limit, false))
+    assert(loadMoreResult is PagingSource.LoadResult.Page)
+    assertEquals(null, (loadMoreResult as PagingSource.LoadResult.Page).nextKey)
+  }
+
+  @Test
+  fun getPagingSource_pagingSourceInvalidateAfterDbUpdate() = runBlocking {
+    val trend = mockITrend(name = "trend1").toUi(accountKey)
+    var invalidate = false
+    dao.getPagingSource(
+      accountKey = accountKey,
+    ).apply {
+      registerInvalidatedCallback {
+        invalidate = true
+      }
+      load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
     }
-
-    @Test
-    fun getPagingSource_pagingSourceInvalidateAfterDbUpdate() = runBlocking {
-        val trend = mockITrend(name = "trend1").toUi(accountKey)
-        var invalidate = false
-        dao.getPagingSource(
-            accountKey = accountKey,
-        ).apply {
-            registerInvalidatedCallback {
-                invalidate = true
-            }
-            load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
-        }
-        dao.insertAll(listOf(trend))
-        val start = System.currentTimeMillis()
-        while (!invalidate && System.currentTimeMillis() - start < 3000) {
-            continue
-        }
-        assert(invalidate)
+    dao.insertAll(listOf(trend))
+    val start = System.currentTimeMillis()
+    while (!invalidate && System.currentTimeMillis() - start < 3000) {
+      continue
     }
+    assert(invalidate)
+  }
 
-    @Test
-    fun clearAll_ClearAllTrendAndTrendHistoryWithMatchesGivenAccountKey() = runBlocking {
-        val list = listOf(
-            mockITrend(name = "trend1").toUi(accountKey),
-            mockITrend(name = "trend2").toUi(accountKey),
-            mockITrend(name = "trend3").toUi(accountKey),
-        )
-        dao.insertAll(list)
-        dao.clear(accountKey)
-        list.forEach {
-            assert(database.trendHistoryQueries.findWithTrendKey(trendKey = it.trendKey, accountKey = accountKey).executeAsList().isEmpty())
-        }
-        assertEquals(0, database.trendQueries.getTrendPagingCount(accountKey = accountKey).executeAsOne())
+  @Test
+  fun clearAll_ClearAllTrendAndTrendHistoryWithMatchesGivenAccountKey() = runBlocking {
+    val list = listOf(
+      mockITrend(name = "trend1").toUi(accountKey),
+      mockITrend(name = "trend2").toUi(accountKey),
+      mockITrend(name = "trend3").toUi(accountKey),
+    )
+    dao.insertAll(list)
+    dao.clear(accountKey)
+    list.forEach {
+      assert(database.trendHistoryQueries.findWithTrendKey(trendKey = it.trendKey, accountKey = accountKey).executeAsList().isEmpty())
     }
+    assertEquals(0, database.trendQueries.getTrendPagingCount(accountKey = accountKey).executeAsOne())
+  }
 }

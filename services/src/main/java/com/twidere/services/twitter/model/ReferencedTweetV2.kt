@@ -25,16 +25,16 @@ import kotlinx.serialization.Transient
 
 @Serializable
 data class ReferencedTweetV2(
-    val type: ReferencedTweetType? = null,
-    val id: String? = null
+  val type: ReferencedTweetType? = null,
+  val id: String? = null
 ) {
-    internal fun setExtra(includesV2: IncludesV2) {
-        if (id != null) {
-            status = includesV2.tweets?.firstOrNull { it.id == id }
-        }
-        status?.setExtra(includesV2)
+  internal fun setExtra(includesV2: IncludesV2) {
+    if (id != null) {
+      status = includesV2.tweets?.firstOrNull { it.id == id }
     }
+    status?.setExtra(includesV2)
+  }
 
-    @Transient
-    var status: StatusV2? = null
+  @Transient
+  var status: StatusV2? = null
 }

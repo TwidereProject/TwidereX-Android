@@ -20,34 +20,39 @@
  */
 package com.twidere.twiderex.navigation
 
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.component.navigation.Navigator
-import com.twidere.twiderex.kmp.LocalRemoteNavigator
-import com.twidere.twiderex.ui.LocalNavController
-import moe.tlaster.precompose.navigation.NavController
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.repository.AccountRepository
 import moe.tlaster.precompose.navigation.NavHost
-import moe.tlaster.precompose.navigation.rememberNavController
+import moe.tlaster.precompose.navigation.Navigator
+import moe.tlaster.precompose.navigation.rememberNavigator
 
 @Composable
 fun Router(
-    navController: NavController = rememberNavController(),
-    isDebug: Boolean = false
+  navController: Navigator = rememberNavigator(),
+  isDebug: Boolean = false,
 ) {
-    val remoteNavigator = LocalRemoteNavigator.current
-    CompositionLocalProvider(
-        LocalNavController provides navController,
-        LocalNavigator provides Navigator(navController, remoteNavigator),
+  val accountRepository: AccountRepository = get()
+  val hasAccount = remember { mutableStateOf<Boolean?>(null) }
+  LaunchedEffect(Unit) {
+    hasAccount.value = accountRepository.hasAccount()
+  }
+  hasAccount.value?.let {
+    NavHost(
+      navigator = navController,
+      initialRoute = if (it)
+        Root.Home
+      else
+        Root.SignIn.General
     ) {
-        BoxWithConstraints {
-            NavHost(navController = navController, initialRoute = initialRoute) {
-                route(constraints)
-            }
-        }
-        if (isDebug) {
-            ComposeDebugTool(navController)
-        }
+      twidereRoute(navigator = navController)
+      complexRoute(navigator = navController)
     }
+    if (isDebug) {
+      ComposeDebugTool(navController)
+    }
+  }
 }

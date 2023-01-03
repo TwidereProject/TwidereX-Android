@@ -42,56 +42,58 @@ import com.twidere.twiderex.model.ui.UiStatus
 
 @Composable
 fun RetweetHeader(
-    data: UiStatus,
+  data: UiStatus,
+  openLink: (String) -> Unit,
 ) {
-    TweetHeader(
-        icon = {
-            Icon(
-                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_repeat),
-                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_retweeted),
-                tint = Color(0xFF4C9EEB)
-            )
-        },
-        text = {
-            HtmlText(
-                textStyle = MaterialTheme.typography.caption,
-                htmlText = stringResource(
-                    res = com.twidere.twiderex.MR.strings.common_controls_status_user_retweeted,
-                    data.user.displayName
-                ),
-            )
-        },
-    )
+  TweetHeader(
+    icon = {
+      Icon(
+        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_repeat),
+        contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_retweeted),
+        tint = Color(0xFF4C9EEB)
+      )
+    },
+    text = {
+      HtmlText(
+        textStyle = MaterialTheme.typography.caption,
+        htmlText = stringResource(
+          res = com.twidere.twiderex.MR.strings.common_controls_status_user_retweeted,
+          data.user.displayName
+        ),
+        openLink = openLink,
+      )
+    },
+  )
 }
 
 @Composable
 fun TweetHeader(
-    icon: @Composable () -> Unit,
-    text: @Composable () -> Unit,
+  icon: @Composable () -> Unit,
+  text: @Composable () -> Unit,
 ) {
-    ProvideTextStyle(value = MaterialTheme.typography.caption) {
-        CompositionLocalProvider(
-            LocalContentAlpha provides ContentAlpha.medium
+  ProvideTextStyle(value = MaterialTheme.typography.caption) {
+    CompositionLocalProvider(
+      LocalContentAlpha provides ContentAlpha.medium
+    ) {
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Box(
+          modifier = Modifier
+            .width(UserAvatarDefaults.AvatarSize),
+          contentAlignment = Alignment.CenterEnd,
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .width(UserAvatarDefaults.AvatarSize),
-                    contentAlignment = Alignment.CenterEnd,
-                ) {
-                    Box(modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp)) {
-                        icon.invoke()
-                    }
-                }
-                Spacer(modifier = Modifier.width(TweetHeaderDefaults.IconSpacing))
-                text.invoke()
-            }
+          Box(modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp)) {
+            icon.invoke()
+          }
         }
+        Spacer(modifier = Modifier.width(TweetHeaderDefaults.IconSpacing))
+        text.invoke()
+      }
     }
+  }
 }
 
 object TweetHeaderDefaults {
-    val IconSpacing = 8.dp
+  val IconSpacing = 8.dp
 }

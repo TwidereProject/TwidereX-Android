@@ -25,21 +25,21 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MediaV2(
-    val url: String? = null,
-    val height: Long? = null,
+  val url: String? = null,
+  val height: Long? = null,
 
-    @SerialName("media_key")
-    val mediaKey: String? = null,
+  @SerialName("media_key")
+  val mediaKey: String? = null,
 
-    val type: String? = null,
-    val width: Long? = null,
+  val type: String? = null,
+  val width: Long? = null,
 
-    @SerialName("public_metrics")
-    val publicMetrics: MediaPublicMetrics? = null,
+  @SerialName("public_metrics")
+  val publicMetrics: MediaPublicMetrics? = null,
 
-    @SerialName("duration_ms")
-    val durationMS: Long? = null,
+  @SerialName("duration_ms")
+  val durationMS: Long? = null,
 
-    @SerialName("preview_image_url")
-    val previewImageURL: String? = null
+  @SerialName("preview_image_url")
+  val previewImageURL: String? = null
 )

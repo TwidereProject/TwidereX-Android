@@ -22,24 +22,58 @@ package com.twidere.twiderex.scenes
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.enums.MediaType
+import com.twidere.twiderex.navigation.Root
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
+import io.github.seiko.precompose.annotation.Query
+import moe.tlaster.precompose.navigation.Navigator
 
+@NavGraphDestination(
+  route = Root.Media.Status.route,
+)
 @Composable
-expect fun PlatformStatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int)
+expect fun PlatformStatusMediaScene(
+  @Path("statusKey") statusKey: String,
+  @Query("selectedIndex") selectedIndex: Int?,
+  navigator: Navigator,
+)
 
+@NavGraphDestination(
+  route = Root.Media.Raw.route,
+  functionName = "dialog",
+)
 @Composable
-expect fun PlatformRawMediaScene(url: String, type: MediaType)
+expect fun PlatformRawMediaScene(
+  @Path("url") url: String,
+  @Path("type") type: String,
+  navigator: Navigator,
+)
 
+@NavGraphDestination(
+  route = Root.Media.Pure.route,
+)
 @Composable
-expect fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int)
+expect fun PlatformPureMediaScene(
+  @Path("belongToKey") belongToKey: String,
+  @Query("selectedIndex") selectedIndex: Int?,
+  navigator: Navigator,
+)
+
+@NavGraphDestination(
+  route = Root.SignIn.Web.Twitter.route,
+)
+@Composable
+expect fun PlatformScene(
+  @Path("target") target: String,
+  navigator: Navigator,
+)
 
 @Composable
 expect fun StatusMediaSceneLayout(
-    backgroundColor: Color,
-    contentColor: Color,
-    closeButton: @Composable () -> Unit,
-    bottomView: @Composable () -> Unit,
-    mediaView: @Composable () -> Unit,
-    backgroundView: @Composable () -> Unit,
+  backgroundColor: Color,
+  contentColor: Color,
+  closeButton: @Composable () -> Unit,
+  bottomView: @Composable () -> Unit,
+  mediaView: @Composable () -> Unit,
+  backgroundView: @Composable () -> Unit,
 )

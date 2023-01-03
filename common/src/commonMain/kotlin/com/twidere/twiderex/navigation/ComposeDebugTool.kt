@@ -32,71 +32,70 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import moe.tlaster.precompose.navigation.NavController
-import moe.tlaster.precompose.navigation.currentBackStackEntryAsState
+import moe.tlaster.precompose.navigation.Navigator
 import kotlin.math.roundToInt
 
 @Composable
 fun ComposeDebugTool(
-    rootNavController: NavController,
+  rootNavController: Navigator,
 ) {
 
-    var showDebug by remember {
-        mutableStateOf(false)
-    }
+  var showDebug by remember {
+    mutableStateOf(false)
+  }
 
-    LaunchedEffect(Unit) {
-        delay(3000)
-        showDebug = true
-    }
+  LaunchedEffect(Unit) {
+    delay(3000)
+    showDebug = true
+  }
 
-    if (!showDebug) {
-        return
-    }
-    val state by rootNavController.currentBackStackEntryAsState()!!
-    var debugOpen by remember {
-        mutableStateOf(false)
-    }
+  if (!showDebug) {
+    return
+  }
+  val state by rootNavController.currentEntry.collectAsState(null)
+  var debugOpen by remember {
+    mutableStateOf(false)
+  }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        var offsetX by remember { mutableStateOf(0f) }
-        var offsetY by remember { mutableStateOf(0f) }
-        Column(
-            modifier = Modifier
-                .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
-                .pointerInput(Unit) {
-                    detectDragGestures { change, dragAmount ->
-                        change.consumeAllChanges()
-                        offsetX += dragAmount.x
-                        offsetY += dragAmount.y
-                    }
-                }
-        ) {
-            Button(
-                modifier = Modifier.padding(top = 56.dp),
-                onClick = {
-                    debugOpen = !debugOpen
-                }
-            ) {
-                Text("Debug")
-            }
-            if (debugOpen) {
-                Text(
-                    modifier = Modifier.background(MaterialTheme.colors.surface),
-                    text = state?.route?.route ?: "UnKnow route",
-                    color = MaterialTheme.colors.primary
-                )
-            }
+  Box(modifier = Modifier.fillMaxSize()) {
+    var offsetX by remember { mutableStateOf(0f) }
+    var offsetY by remember { mutableStateOf(0f) }
+    Column(
+      modifier = Modifier
+        .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
+        .pointerInput(Unit) {
+          detectDragGestures { change, dragAmount ->
+            change.consume()
+            offsetX += dragAmount.x
+            offsetY += dragAmount.y
+          }
         }
+    ) {
+      Button(
+        modifier = Modifier.padding(top = 56.dp),
+        onClick = {
+          debugOpen = !debugOpen
+        }
+      ) {
+        Text("Debug")
+      }
+      if (debugOpen) {
+        Text(
+          modifier = Modifier.background(MaterialTheme.colors.surface),
+          text = state?.route?.route ?: "UnKnow route",
+          color = MaterialTheme.colors.primary
+        )
+      }
     }
+  }
 }

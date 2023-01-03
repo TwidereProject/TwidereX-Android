@@ -23,10 +23,10 @@ package com.twidere.twiderex.db.sqldelight.adapter
 import com.twidere.twiderex.sqldelight.table.DbPagingTimeline
 
 internal object PagingTimelineAdapterFactory {
-    fun create() = MicroBlogKeyColumnAdapter().let {
-        DbPagingTimeline.Adapter(
-            statusKeyAdapter = it,
-            accountKeyAdapter = it,
-        )
-    }
+  fun create() = MicroBlogKeyColumnAdapter().let {
+    DbPagingTimeline.Adapter(
+      statusKeyAdapter = it,
+      accountKeyAdapter = it,
+    )
+  }
 }

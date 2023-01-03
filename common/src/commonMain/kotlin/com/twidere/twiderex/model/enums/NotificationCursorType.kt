@@ -21,7 +21,7 @@
 package com.twidere.twiderex.model.enums
 
 enum class NotificationCursorType {
-    General,
-    Mentions,
-    Follower,
+  General,
+  Mentions,
+  Follower,
 }

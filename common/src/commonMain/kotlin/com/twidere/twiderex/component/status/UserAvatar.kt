@@ -34,7 +34,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
@@ -43,54 +42,53 @@ import com.twidere.twiderex.preferences.model.DisplayPreferences
 
 @Composable
 fun UserAvatar(
-    modifier: Modifier = Modifier,
-    user: UiUser,
-    size: Dp = UserAvatarDefaults.AvatarSize,
-    withPlatformIcon: Boolean = false,
-    onClick: (() -> Unit)? = null,
+  modifier: Modifier = Modifier,
+  user: UiUser,
+  size: Dp = UserAvatarDefaults.AvatarSize,
+  withPlatformIcon: Boolean = false,
+  onClick: (UiUser) -> Unit,
 ) {
-    val navigator = LocalNavigator.current
-    Box(
-        contentAlignment = Alignment.BottomEnd
-    ) {
-        RoundAvatar(
-            modifier = modifier,
-            avatar = user.profileImage.takeIf { it.isNotEmpty() } ?: painterResource(com.twidere.twiderex.MR.images.ic_profile_image_twidere),
-            size = size,
-            onClick = {
-                onClick?.invoke() ?: run { navigator.user(user) }
-            }
-        )
-        if (withPlatformIcon) {
-            val icon = when (user.platformType) {
-                PlatformType.Twitter -> painterResource(res = com.twidere.twiderex.MR.files.ic_twitter_badge)
-                PlatformType.StatusNet -> TODO()
-                PlatformType.Fanfou -> TODO()
-                PlatformType.Mastodon -> painterResource(res = com.twidere.twiderex.MR.files.ic_mastodon_badge)
-            }
-            Image(
-                painter = icon,
-                contentDescription = user.platformType.name,
-                modifier = Modifier.size(24.dp)
-            )
-        }
+  Box(
+    contentAlignment = Alignment.BottomEnd
+  ) {
+    RoundAvatar(
+      modifier = modifier,
+      avatar = user.profileImage.takeIf { it.isNotEmpty() } ?: painterResource(com.twidere.twiderex.MR.images.ic_profile_image_twidere),
+      size = size,
+      onClick = {
+        onClick.invoke(user)
+      }
+    )
+    if (withPlatformIcon) {
+      val icon = when (user.platformType) {
+        PlatformType.Twitter -> painterResource(res = com.twidere.twiderex.MR.files.ic_twitter_badge)
+        PlatformType.StatusNet -> TODO()
+        PlatformType.Fanfou -> TODO()
+        PlatformType.Mastodon -> painterResource(res = com.twidere.twiderex.MR.files.ic_mastodon_badge)
+      }
+      Image(
+        painter = icon,
+        contentDescription = user.platformType.name,
+        modifier = Modifier.size(24.dp)
+      )
     }
+  }
 }
 
 fun Modifier.withAvatarClip(): Modifier {
-    return composed {
-        val transition =
-            updateTransition(targetState = LocalDisplayPreferences.current.avatarStyle)
-        val percent by transition.animateInt {
-            when (it) {
-                DisplayPreferences.AvatarStyle.Round -> 50
-                DisplayPreferences.AvatarStyle.Square -> 10
-            }
-        }
-        this.clip(RoundedCornerShape(percent = percent))
+  return composed {
+    val transition =
+      updateTransition(targetState = LocalDisplayPreferences.current.avatarStyle)
+    val percent by transition.animateInt {
+      when (it) {
+        DisplayPreferences.AvatarStyle.Round -> 50
+        DisplayPreferences.AvatarStyle.Square -> 10
+      }
     }
+    this.clip(RoundedCornerShape(percent = percent))
+  }
 }
 
 object UserAvatarDefaults {
-    val AvatarSize = 44.dp
+  val AvatarSize = 44.dp
 }

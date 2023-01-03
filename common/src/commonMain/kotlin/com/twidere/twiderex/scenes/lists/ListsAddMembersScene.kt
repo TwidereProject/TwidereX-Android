@@ -52,7 +52,6 @@ import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
@@ -61,149 +60,176 @@ import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.UserNavigationData
+import com.twidere.twiderex.navigation.rememberUserNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsAddMemberViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsSearchUserViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
+
+@NavGraphDestination(
+  route = Root.Lists.AddMembers.route,
+)
+@Composable
+fun ListsAddMembersScene(
+  @Path("listKey") listKey: String,
+  navigator: Navigator,
+) {
+  ListsAddMembersScene(
+    listKey = MicroBlogKey.valueOf(listKey),
+    navigator = navigator,
+  )
+}
 
 @Composable
 fun ListsAddMembersScene(
-    listKey: MicroBlogKey,
+  listKey: MicroBlogKey,
+  navigator: Navigator,
 ) {
-    val account = LocalActiveAccount.current ?: return
-    val viewModel: ListsAddMemberViewModel = getViewModel {
-        parametersOf(listKey.id)
-    }
+  val account = LocalActiveAccount.current ?: return
+  val viewModel: ListsAddMemberViewModel = getViewModel {
+    parametersOf(listKey.id)
+  }
 
-    val loading by viewModel.loading.observeAsState(initial = false)
+  val loading by viewModel.loading.observeAsState(initial = false)
 
-    val onlySearchFollowing = when (account.type) {
-        PlatformType.Mastodon -> true
-        else -> false
-    }
+  val onlySearchFollowing = when (account.type) {
+    PlatformType.Mastodon -> true
+    else -> false
+  }
 
-    val searchViewModel: ListsSearchUserViewModel = getViewModel {
-        parametersOf(onlySearchFollowing)
-    }
+  val searchViewModel: ListsSearchUserViewModel = getViewModel {
+    parametersOf(onlySearchFollowing)
+  }
 
-    val keyword by searchViewModel.text.observeAsState(initial = "")
-    val searchSource = searchViewModel.source.collectAsLazyPagingItems()
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                Surface(elevation = AppBarDefaults.TopAppBarElevation) {
-                    Column {
-                        AppBar(
-                            navigationIcon = {
-                                val navController = LocalNavController.current
-                                IconButton(
-                                    onClick = {
-                                        navController.goBackWith(viewModel.pendingMap.values.toList())
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_back)
-                                    )
-                                }
-                            },
-                            title = {
-                                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_users_add_title))
-                            },
-                            elevation = 0.dp,
-                        )
-                        Row(
-                            modifier = Modifier.padding(ListsAddMembersSceneDefaults.SearchInput.ContentPadding),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
-                                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_title),
-                                modifier = Modifier.padding(ListsAddMembersSceneDefaults.SearchInput.Icon.Padding)
-                            )
-                            TextInput(
-                                value = keyword,
-                                placeholder = {
-                                    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_users_add_search))
-                                },
-                                onValueChange = {
-                                    searchViewModel.text.value = it
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
+  val userNavigationData = rememberUserNavigationData(navigator)
+
+  val keyword by searchViewModel.text.observeAsState(initial = "")
+  val searchSource = searchViewModel.source.collectAsLazyPagingItems()
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        Surface(elevation = AppBarDefaults.TopAppBarElevation) {
+          Column {
+            AppBar(
+              navigationIcon = {
+                IconButton(
+                  onClick = {
+                    navigator.goBackWith(viewModel.pendingMap.values.toList())
+                  }
+                ) {
+                  Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_back)
+                  )
                 }
-            },
-        ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                // search result
-                SearchResultsContent(
-                    source = searchSource,
-                    onAction = {
-                        viewModel.addToOrRemove(it)
-                    },
-                    statusChecker = { viewModel.isInPendingList(it) }
-                )
-
-                if (loading) {
-                    Dialog(onDismissRequest = { }) {
-                        LoadingProgress()
-                    }
-                }
+              },
+              title = {
+                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_users_add_title))
+              },
+              elevation = 0.dp,
+            )
+            Row(
+              modifier = Modifier.padding(ListsAddMembersSceneDefaults.SearchInput.ContentPadding),
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Icon(
+                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
+                contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_title),
+                modifier = Modifier.padding(ListsAddMembersSceneDefaults.SearchInput.Icon.Padding)
+              )
+              TextInput(
+                value = keyword,
+                placeholder = {
+                  Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_users_add_search))
+                },
+                onValueChange = {
+                  searchViewModel.text.value = it
+                },
+                modifier = Modifier.fillMaxWidth()
+              )
             }
+          }
         }
+      },
+    ) {
+      Box(modifier = Modifier.fillMaxSize()) {
+        // search result
+        SearchResultsContent(
+          source = searchSource,
+          onAction = {
+            viewModel.addToOrRemove(it)
+          },
+          statusChecker = { viewModel.isInPendingList(it) },
+          userNavigationData = userNavigationData,
+        )
+
+        if (loading) {
+          Dialog(onDismissRequest = { }) {
+            LoadingProgress()
+          }
+        }
+      }
     }
+  }
 }
 
 @Composable
-private fun SearchResultsContent(source: LazyPagingItems<UiUser>, onAction: (user: UiUser) -> Unit, statusChecker: (user: UiUser) -> Boolean) {
-    val navigator = LocalNavigator.current
-    SwipeToRefreshLayout(
-        refreshingState = source.loadState.refresh is LoadState.Loading,
-        onRefresh = {
-            source.refreshOrRetry()
-        }
-    ) {
-        LazyUiUserList(
-            items = source,
-            onItemClicked = { navigator.user(it) },
-            action = {
-                TextButton(
-                    onClick = {
-                        onAction(it)
-                    }
-                ) {
-                    val pending = statusChecker(it)
-                    if (pending) {
-                        Text(
-                            text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_users_menu_actions_remove),
-                            style = MaterialTheme.typography.button,
-                            color = Color(0xFFFF3B30),
-                        )
-                    } else {
-                        Text(
-                            text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_users_menu_actions_add),
-                            style = MaterialTheme.typography.button,
-                            color = MaterialTheme.colors.primary,
-                        )
-                    }
-                }
-            }
-        )
+private fun SearchResultsContent(
+  source: LazyPagingItems<UiUser>,
+  onAction: (user: UiUser) -> Unit,
+  statusChecker: (user: UiUser) -> Boolean,
+  userNavigationData: UserNavigationData,
+) {
+  SwipeToRefreshLayout(
+    refreshingState = source.loadState.refresh is LoadState.Loading,
+    onRefresh = {
+      source.refreshOrRetry()
     }
+  ) {
+    LazyUiUserList(
+      items = source,
+      onItemClicked = { userNavigationData.statusNavigation.toUser.invoke(it) },
+      action = {
+        TextButton(
+          onClick = {
+            onAction(it)
+          }
+        ) {
+          val pending = statusChecker(it)
+          if (pending) {
+            Text(
+              text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_users_menu_actions_remove),
+              style = MaterialTheme.typography.button,
+              color = Color(0xFFFF3B30),
+            )
+          } else {
+            Text(
+              text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_users_menu_actions_add),
+              style = MaterialTheme.typography.button,
+              color = MaterialTheme.colors.primary,
+            )
+          }
+        }
+      },
+      userNavigationData = userNavigationData,
+    )
+  }
 }
 
 private object ListsAddMembersSceneDefaults {
-    object SearchInput {
-        val ContentPadding = PaddingValues(
-            horizontal = 16.dp,
-            vertical = 16.dp
-        )
-        object Icon {
-            val Padding = PaddingValues(end = 23.dp)
-        }
+  object SearchInput {
+    val ContentPadding = PaddingValues(
+      horizontal = 16.dp,
+      vertical = 16.dp
+    )
+    object Icon {
+      val Padding = PaddingValues(end = 23.dp)
     }
+  }
 }

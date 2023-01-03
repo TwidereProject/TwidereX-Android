@@ -32,18 +32,18 @@ import kotlin.test.assertEquals
 
 internal class SqlDelightNotificationCursorImplTest : BaseCacheDatabaseTest() {
 
-    @Test
-    fun find_transformToUiData() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("account")
-        val cursor = NotificationCursor(
-            _id = UUID.randomUUID().toString(),
-            accountKey = accountKey,
-            type = NotificationCursorType.Mentions,
-            value = "value",
-            timestamp = System.currentTimeMillis()
-        )
-        val dao = SqlDelightNotificationCursorDaoImpl(database.notificationCursorQueries)
-        dao.add(cursor)
-        assertEquals(cursor, dao.find(accountKey = accountKey, type = cursor.type))
-    }
+  @Test
+  fun find_transformToUiData() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("account")
+    val cursor = NotificationCursor(
+      _id = UUID.randomUUID().toString(),
+      accountKey = accountKey,
+      type = NotificationCursorType.Mentions,
+      value = "value",
+      timestamp = System.currentTimeMillis()
+    )
+    val dao = SqlDelightNotificationCursorDaoImpl(database.notificationCursorQueries)
+    dao.add(cursor)
+    assertEquals(cursor, dao.find(accountKey = accountKey, type = cursor.type))
+  }
 }

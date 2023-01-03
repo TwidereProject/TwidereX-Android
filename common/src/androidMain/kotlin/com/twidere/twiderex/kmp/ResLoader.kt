@@ -32,36 +32,36 @@ import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.StringResource
 
 actual class ResLoader(
-    private val context: Context,
+  private val context: Context,
 ) {
-    actual fun getString(
-        res: StringResource,
-        vararg args: Any
-    ): String {
-        return context.getString(res.resourceId, *args)
-    }
+  actual fun getString(
+    res: StringResource,
+    vararg args: Any
+  ): String {
+    return context.getString(res.resourceId, *args)
+  }
 
-    @OptIn(coil.annotation.ExperimentalCoilApi::class)
-    @Composable
-    actual fun getSvg(res: FileResource): Painter {
-        val data = "android.resource://${context.packageName}/raw/${context.resources.getResourceEntryName(res.rawResId)}"
-        return rememberAsyncImagePainter(
-            model = data,
-            imageLoader = LocalContext.current.imageLoader.newBuilder()
-                .components { add(SvgDecoder.Factory()) }
-                .build(),
-        )
-    }
+  @OptIn(coil.annotation.ExperimentalCoilApi::class)
+  @Composable
+  actual fun getSvg(res: FileResource): Painter {
+    val data = "android.resource://${context.packageName}/raw/${context.resources.getResourceEntryName(res.rawResId)}"
+    return rememberAsyncImagePainter(
+      model = data,
+      imageLoader = LocalContext.current.imageLoader.newBuilder()
+        .components { add(SvgDecoder.Factory()) }
+        .build(),
+    )
+  }
 
-    @OptIn(coil.annotation.ExperimentalCoilApi::class)
-    @Composable
-    actual fun getImage(res: ImageResource): Painter {
-        val data = "android.resource://${context.packageName}/drawable/${context.resources.getResourceEntryName(res.drawableResId)}"
-        return rememberAsyncImagePainter(
-            model = data,
-            imageLoader = LocalContext.current.imageLoader.newBuilder()
-                .components { add(SvgDecoder.Factory()) }
-                .build(),
-        )
-    }
+  @OptIn(coil.annotation.ExperimentalCoilApi::class)
+  @Composable
+  actual fun getImage(res: ImageResource): Painter {
+    val data = "android.resource://${context.packageName}/drawable/${context.resources.getResourceEntryName(res.drawableResId)}"
+    return rememberAsyncImagePainter(
+      model = data,
+      imageLoader = LocalContext.current.imageLoader.newBuilder()
+        .components { add(SvgDecoder.Factory()) }
+        .build(),
+    )
+  }
 }

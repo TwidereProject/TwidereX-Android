@@ -39,61 +39,61 @@ import com.twidere.twiderex.component.stringResource
 
 @Composable
 fun MastodonListsModifyComponent(
-    onDismissRequest: () -> Unit,
-    title: String,
-    name: String,
-    onNameChanged: (name: String) -> Unit,
-    onConfirm: (name: String) -> Unit
+  onDismissRequest: () -> Unit,
+  title: String,
+  name: String,
+  onNameChanged: (name: String) -> Unit,
+  onConfirm: (name: String) -> Unit
 ) {
-    // var name by remember { mutableStateOf(initName) }
-    AlertDialog(
-        onDismissRequest = {
-            onDismissRequest.invoke()
-        },
+  // var name by remember { mutableStateOf(initName) }
+  AlertDialog(
+    onDismissRequest = {
+      onDismissRequest.invoke()
+    },
 
-        text = {
-            Column {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.subtitle1
-                )
-                Spacer(modifier = Modifier.padding(top = MastodonListsModifyComponentDefaults.VerticalPadding),)
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    value = name,
-                    onValueChange = onNameChanged,
-                    placeholder = {
-                        Text(
-                            text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_name),
-                            style = MaterialTheme.typography.subtitle1,
-                        )
-                    },
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest.invoke()
-                }
-            ) {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_cancel))
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirm(name)
-                }
-            ) {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_ok))
-            }
-        },
-        shape = RoundedCornerShape(0.dp)
-    )
+    text = {
+      Column {
+        Text(
+          text = title,
+          style = MaterialTheme.typography.subtitle1
+        )
+        Spacer(modifier = Modifier.padding(top = MastodonListsModifyComponentDefaults.VerticalPadding),)
+        OutlinedTextField(
+          modifier = Modifier
+            .fillMaxWidth(),
+          value = name,
+          onValueChange = onNameChanged,
+          placeholder = {
+            Text(
+              text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_name),
+              style = MaterialTheme.typography.subtitle1,
+            )
+          },
+        )
+      }
+    },
+    dismissButton = {
+      TextButton(
+        onClick = {
+          onDismissRequest.invoke()
+        }
+      ) {
+        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_cancel))
+      }
+    },
+    confirmButton = {
+      TextButton(
+        onClick = {
+          onConfirm(name)
+        }
+      ) {
+        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_ok))
+      }
+    },
+    shape = RoundedCornerShape(0.dp)
+  )
 }
 
 private object MastodonListsModifyComponentDefaults {
-    val VerticalPadding = 20.dp
+  val VerticalPadding = 20.dp
 }

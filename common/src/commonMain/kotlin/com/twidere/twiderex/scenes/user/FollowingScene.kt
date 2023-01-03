@@ -27,33 +27,65 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.rememberUserNavigationData
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.user.FollowingViewModel
-import org.koin.core.parameter.parametersOf
+import com.twidere.twiderex.viewmodel.user.UserListEvent
+import com.twidere.twiderex.viewmodel.user.UserListPresenter
+import com.twidere.twiderex.viewmodel.user.UserListState
+import com.twidere.twiderex.viewmodel.user.UserListType
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
 
+@NavGraphDestination(
+  route = Root.Following.route,
+)
 @Composable
 fun FollowingScene(
-    userKey: MicroBlogKey,
+  @Path("userKey") userKey: String,
+  navigator: Navigator,
 ) {
-    val viewModel: FollowingViewModel = getViewModel {
-        parametersOf(userKey)
-    }
+  FollowingScene(
+    userKey = MicroBlogKey.valueOf(userKey),
+    navigator = navigator,
+  )
+}
+
+@Composable
+private fun FollowingScene(
+  userKey: MicroBlogKey,
+  navigator: Navigator,
+) {
+  val (state) = rememberPresenterState<UserListState, UserListEvent> {
+    UserListPresenter(it, userType = UserListType.Following(userKey = userKey))
+  }
+  val userNavigationData = rememberUserNavigationData(navigator)
+  (state as? UserListState.Data)?.let { data ->
     TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(stringResource(res = com.twidere.twiderex.MR.strings.scene_following_title))
-                    }
-                )
+      InAppNotificationScaffold(
+        topBar = {
+          AppBar(
+            navigationIcon = {
+              AppBarNavigationButton(
+                onBack = {
+                  navigator.popBackStack()
+                }
+              )
             },
-        ) {
-            UserListComponent(viewModel)
-        }
+            title = {
+              Text(stringResource(res = com.twidere.twiderex.MR.strings.scene_following_title))
+            }
+          )
+        },
+      ) {
+        UserListComponent(
+          source = data.source,
+          userNavigationData = userNavigationData,
+        )
+      }
     }
+  }
 }

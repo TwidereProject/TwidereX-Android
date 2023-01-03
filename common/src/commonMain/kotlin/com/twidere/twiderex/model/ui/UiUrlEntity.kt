@@ -26,10 +26,10 @@ import kotlinx.serialization.Serializable
 @Immutable
 @Serializable
 data class UiUrlEntity(
-    val url: String,
-    val expandedUrl: String,
-    val displayUrl: String,
-    val title: String?,
-    val description: String?,
-    val image: String?,
+  val url: String,
+  val expandedUrl: String,
+  val displayUrl: String,
+  val title: String?,
+  val description: String?,
+  val image: String?,
 )

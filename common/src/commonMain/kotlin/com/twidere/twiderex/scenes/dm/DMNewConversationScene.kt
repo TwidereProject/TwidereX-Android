@@ -51,100 +51,117 @@ import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Root
-import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.navigation.UserNavigationData
+import com.twidere.twiderex.navigation.rememberUserNavigationData
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMNewConversationViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
 import moe.tlaster.precompose.navigation.NavOptions
+import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.PopUpTo
 
+@NavGraphDestination(
+  route = Root.Messages.NewConversation,
+)
 @Composable
-fun DMNewConversationScene() {
-    val navController = LocalNavController.current
-    val viewModel: DMNewConversationViewModel = getViewModel()
-    val keyWord by viewModel.input.observeAsState("")
-    val source = viewModel.sourceFlow.collectAsLazyPagingItems()
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                Column {
-                    AppBar(
-                        navigationIcon = {
-                            AppBarNavigationButton(
-                                icon = Icons.Default.Close
-                            )
-                        },
-                        title = {
-                            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_new_conversation_title))
-                        },
-                        elevation = 0.dp
-                    )
-                    SearchInput(
-                        modifier = Modifier.fillMaxWidth(),
-                        input = keyWord,
-                        onValueChanged = { viewModel.input.value = it },
-                    )
-                    Divider()
+fun DMNewConversationScene(
+  navigator: Navigator,
+) {
+  val viewModel: DMNewConversationViewModel = getViewModel()
+  val keyWord by viewModel.input.observeAsState("")
+  val source = viewModel.sourceFlow.collectAsLazyPagingItems()
+  val userNavigationData = rememberUserNavigationData(navigator)
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        Column {
+          AppBar(
+            navigationIcon = {
+              AppBarNavigationButton(
+                icon = Icons.Default.Close,
+                onBack = {
+                  navigator.popBackStack()
                 }
+              )
             },
-        ) {
-            SearchResult(
-                source,
-                onItemClick = { user ->
-                    viewModel.createNewConversation(
-                        user,
-                        onResult = { key ->
-                            key?.let {
-                                navController.navigate(
-                                    Root.Messages.Conversation(it),
-                                    NavOptions(popUpTo = PopUpTo(Root.Messages.Home))
-                                )
-                            }
-                        }
-                    )
-                }
-            )
+            title = {
+              Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_new_conversation_title))
+            },
+            elevation = 0.dp
+          )
+          SearchInput(
+            modifier = Modifier.fillMaxWidth(),
+            input = keyWord,
+            onValueChanged = { viewModel.input.value = it },
+          )
+          Divider()
         }
+      },
+    ) {
+      SearchResult(
+        source,
+        onItemClick = { user ->
+          viewModel.createNewConversation(
+            user,
+            onResult = { key ->
+              key?.let {
+                navigator.navigate(
+                  Root.Messages.Conversation(it),
+                  NavOptions(popUpTo = PopUpTo(Root.Messages.Home))
+                )
+              }
+            }
+          )
+        },
+        userNavigationData = userNavigationData,
+      )
     }
+  }
 }
 
 @Composable
 fun SearchInput(
-    modifier: Modifier = Modifier,
-    input: String,
-    onValueChanged: (value: String) -> Unit
+  modifier: Modifier = Modifier,
+  input: String,
+  onValueChanged: (value: String) -> Unit
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.padding(SearchInputDefaults.ContentPadding)
-    ) {
-        Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
-            contentDescription = stringResource(
-                res = com.twidere.twiderex.MR.strings.scene_search_title
-            )
-        )
-        Spacer(modifier = Modifier.width(SearchInputDefaults.ContentSpacing))
-        TextInput(
-            value = input,
-            onValueChange = onValueChanged, modifier = Modifier.weight(1f),
-            placeholder = {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_new_conversation_search))
-            },
-            maxLines = 1
-        )
-    }
+  Row(
+    verticalAlignment = Alignment.CenterVertically,
+    modifier = modifier.padding(SearchInputDefaults.ContentPadding)
+  ) {
+    Icon(
+      painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
+      contentDescription = stringResource(
+        res = com.twidere.twiderex.MR.strings.scene_search_title
+      )
+    )
+    Spacer(modifier = Modifier.width(SearchInputDefaults.ContentSpacing))
+    TextInput(
+      value = input,
+      onValueChange = onValueChanged, modifier = Modifier.weight(1f),
+      placeholder = {
+        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_new_conversation_search))
+      },
+      maxLines = 1
+    )
+  }
 }
 
 private object SearchInputDefaults {
-    val ContentPadding = PaddingValues(16.dp)
-    val ContentSpacing = 16.dp
+  val ContentPadding = PaddingValues(16.dp)
+  val ContentSpacing = 16.dp
 }
 
 @Composable
-fun SearchResult(source: LazyPagingItems<UiUser>, onItemClick: (user: UiUser) -> Unit) {
-    LazyUiUserList(
-        items = source,
-        onItemClicked = onItemClick,
-        modifier = Modifier.fillMaxSize()
-    )
+fun SearchResult(
+  source: LazyPagingItems<UiUser>,
+  userNavigationData: UserNavigationData,
+  onItemClick: (user: UiUser) -> Unit,
+) {
+  LazyUiUserList(
+    items = source,
+    onItemClicked = onItemClick,
+    userNavigationData = userNavigationData,
+    modifier = Modifier.fillMaxSize()
+  )
 }

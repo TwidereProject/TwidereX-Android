@@ -42,46 +42,46 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 val jobsModule = module {
-    common()
-    compose()
-    database()
-    dm()
-    draft()
-    status()
+  common()
+  compose()
+  database()
+  dm()
+  draft()
+  status()
 }
 
 private fun Module.status() {
-    single { DeleteStatusJob(get(), get(), get()) }
-    single { LikeStatusJob(get(), get(), get()) }
-    single { MastodonVoteJob(get(), get(), get()) }
-    single { RetweetStatusJob(get(), get(), get()) }
-    single { UnlikeStatusJob(get(), get(), get()) }
-    single { UnRetweetStatusJob(get(), get(), get()) }
-    single { UpdateStatusJob(get(), get()) }
+  single { DeleteStatusJob(get(), get(), get()) }
+  single { LikeStatusJob(get(), get(), get()) }
+  single { MastodonVoteJob(get(), get(), get()) }
+  single { RetweetStatusJob(get(), get(), get()) }
+  single { UnlikeStatusJob(get(), get(), get()) }
+  single { UnRetweetStatusJob(get(), get(), get()) }
+  single { UpdateStatusJob(get(), get()) }
 }
 
 private fun Module.draft() {
-    single { RemoveDraftJob(get()) }
-    single { SaveDraftJob(get(), get()) }
+  single { RemoveDraftJob(get()) }
+  single { SaveDraftJob(get(), get()) }
 }
 
 private fun Module.dm() {
-    single { DirectMessageDeleteJob(get(), get()) }
-    single { DirectMessageFetchJob(get(), get(), get(), get()) }
-    single { TwitterDirectMessageSendJob(get(), get(), get(), get(), get()) }
+  single { DirectMessageDeleteJob(get(), get()) }
+  single { DirectMessageFetchJob(get(), get(), get(), get()) }
+  single { TwitterDirectMessageSendJob(get(), get(), get(), get(), get()) }
 }
 
 private fun Module.database() {
-    single { DeleteDbStatusJob(get()) }
+  single { DeleteDbStatusJob(get()) }
 }
 
 private fun Module.compose() {
-    single { MastodonComposeJob(get(), get(), get(), get(), get(), get(), get()) }
-    single { TwitterComposeJob(get(), get(), get(), get(), get(), get(), get(), get()) }
+  single { MastodonComposeJob(get(), get(), get(), get(), get(), get(), get()) }
+  single { TwitterComposeJob(get(), get(), get(), get(), get(), get(), get(), get()) }
 }
 
 private fun Module.common() {
-    single { DownloadMediaJob(get(), get(), get(), get()) }
-    single { NotificationJob(get(), get(), get(), get()) }
-    single { ShareMediaJob(get(), get()) }
+  single { DownloadMediaJob(get(), get(), get(), get()) }
+  single { NotificationJob(get(), get(), get(), get()) }
+  single { ShareMediaJob(get(), get()) }
 }

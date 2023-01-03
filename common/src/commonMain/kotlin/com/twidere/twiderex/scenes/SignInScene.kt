@@ -54,208 +54,246 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.navigation.Root
-import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.navigation.RootDeepLinks
+import io.github.seiko.precompose.annotation.NavGraphDestination
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.NavOptions
+import moe.tlaster.precompose.navigation.Navigator
+import moe.tlaster.precompose.navigation.PopUpTo
 
-@OptIn(ExperimentalMaterialApi::class)
+@NavGraphDestination(
+  route = Root.SignIn.General,
+  deepLink = [RootDeepLinks.SignIn]
+)
 @Composable
-fun SignInScene() {
-    SignInScaffold {
-        TwitterSignIn()
-        Spacer(modifier = Modifier.height(SignInSceneDefaults.ButtonSpacing))
-        MastodonSignIn()
+fun SignInScene(
+  navigator: Navigator,
+) {
+  val toHome = remember {
+    {
+      navigator.navigate(
+        Root.Home,
+        NavOptions(
+          popUpTo = PopUpTo(
+            route = Root.SignIn.General,
+            inclusive = true,
+          )
+        )
+      )
     }
+  }
+
+  SignInScaffold(popBackStack = {
+    navigator.popBackStack()
+  }) {
+    TwitterSignIn(
+      clickSignIn = {
+        navigator.navigateForResult(
+          Root.SignIn.Twitter(
+            BuildConfig.CONSUMERKEY,
+            BuildConfig.CONSUMERSECRET,
+          )
+        )?.let {
+          it as Boolean
+        }?.let {
+          if (it) {
+            toHome.invoke()
+          }
+        }
+      },
+      clickCustomKeySignIn = {
+        navigator.navigateForResult(
+          it
+        )?.let {
+          it as Boolean
+        }?.let {
+          if (it) {
+            toHome.invoke()
+          }
+        }
+      },
+
+    )
+    Spacer(modifier = Modifier.height(SignInSceneDefaults.ButtonSpacing))
+    MastodonSignIn {
+      navigator.navigateForResult(Root.SignIn.Mastodon)
+        ?.let {
+          it as Boolean
+        }?.let {
+          if (it) {
+            toHome.invoke()
+          }
+        }
+    }
+  }
 }
 
 object SignInSceneDefaults {
-    val ButtonSpacing = 16.dp
+  val ButtonSpacing = 16.dp
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun MastodonSignIn() {
-    val scope = rememberCoroutineScope()
-    val navController = LocalNavController.current
-    SignInButton(
-        onClick = {
-            scope.launch {
-                navController.navigateForResult(Root.SignIn.Mastodon)
-                    ?.let {
-                        it as Boolean
-                    }?.let {
-                        if (it) {
-                            navController.goBackWith(true)
-                        }
-                    }
-            }
-        },
-        border = ButtonDefaults.outlinedBorder,
-        color = MaterialTheme.colors.surface,
-        contentColor = MaterialTheme.colors.primary,
-    ) {
-        ListItem(
-            icon = {
-                Icon(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_mastodon_logo_blue),
-                    contentDescription = stringResource(
-                        res = com.twidere.twiderex.MR.strings.accessibility_common_logo_mastodon
-                    )
-                )
-            },
-            text = {
-                Text(
-                    text = stringResource(res = com.twidere.twiderex.MR.strings.scene_sign_in_sign_in_with_mastodon)
-                )
-            },
-            trailing = {
-                IconButton(
-                    enabled = false,
-                    onClick = {},
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowRight,
-                        contentDescription = stringResource(
-                            res = com.twidere.twiderex.MR.strings.scene_sign_in_sign_in_with_mastodon
-                        )
-                    )
-                }
-            }
+private fun MastodonSignIn(
+  clickSignIn: suspend () -> Unit,
+) {
+  val scope = rememberCoroutineScope()
+  SignInButton(
+    onClick = {
+      scope.launch {
+        clickSignIn.invoke()
+      }
+    },
+    border = ButtonDefaults.outlinedBorder,
+    color = MaterialTheme.colors.surface,
+    contentColor = MaterialTheme.colors.primary,
+  ) {
+    ListItem(
+      icon = {
+        Icon(
+          painter = painterResource(res = com.twidere.twiderex.MR.files.ic_mastodon_logo_blue),
+          contentDescription = stringResource(
+            res = com.twidere.twiderex.MR.strings.accessibility_common_logo_mastodon
+          )
         )
-    }
+      },
+      text = {
+        Text(
+          text = stringResource(res = com.twidere.twiderex.MR.strings.scene_sign_in_sign_in_with_mastodon)
+        )
+      },
+      trailing = {
+        IconButton(
+          enabled = false,
+          onClick = {},
+        ) {
+          Icon(
+            imageVector = Icons.Default.KeyboardArrowRight,
+            contentDescription = stringResource(
+              res = com.twidere.twiderex.MR.strings.scene_sign_in_sign_in_with_mastodon
+            )
+          )
+        }
+      }
+    )
+  }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun TwitterSignIn() {
-    val scope = rememberCoroutineScope()
-    val navController = LocalNavController.current
-    var showKeyConfiguration by remember { mutableStateOf(false) }
-    if (showKeyConfiguration) {
-        TwitterCustomKeySignIn(
-            onDismissRequest = {
-                showKeyConfiguration = false
-            }
+private fun TwitterSignIn(
+  clickSignIn: suspend () -> Unit,
+  clickCustomKeySignIn: suspend (String) -> Unit,
+) {
+  val scope = rememberCoroutineScope()
+  var showKeyConfiguration by remember { mutableStateOf(false) }
+  if (showKeyConfiguration) {
+    TwitterCustomKeySignIn(
+      onDismissRequest = {
+        showKeyConfiguration = false
+      },
+      clickCustomKeySignIn = clickCustomKeySignIn,
+    )
+  }
+  SignInButton(
+    onClick = {
+      scope.launch {
+        clickSignIn.invoke()
+      }
+    },
+  ) {
+    ListItem(
+      icon = {
+        Icon(
+          painter = painterResource(res = com.twidere.twiderex.MR.files.ic_twitter_logo_white),
+          contentDescription = stringResource(
+            res = com.twidere.twiderex.MR.strings.accessibility_common_logo_twitter
+          )
         )
-    }
-    SignInButton(
-        onClick = {
-            scope.launch {
-                navController.navigateForResult(
-                    Root.SignIn.Twitter(
-                        BuildConfig.CONSUMERKEY,
-                        BuildConfig.CONSUMERSECRET,
-                    )
-                )?.let {
-                    it as Boolean
-                }?.let {
-                    if (it) {
-                        navController.goBackWith(true)
-                    }
-                }
-            }
-        },
-    ) {
-        ListItem(
-            icon = {
-                Icon(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_twitter_logo_white),
-                    contentDescription = stringResource(
-                        res = com.twidere.twiderex.MR.strings.accessibility_common_logo_twitter
-                    )
-                )
-            },
-            text = {
-                Text(
-                    text = stringResource(res = com.twidere.twiderex.MR.strings.scene_sign_in_sign_in_with_twitter)
-                )
-            },
-            trailing = if (currentPlatform == Platform.Android) {
-                {
-                    IconButton(
-                        onClick = {
-                            showKeyConfiguration = true
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.MoreHoriz,
-                            contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_more)
-                        )
-                    }
-                }
-            } else {
-                null
-            }
+      },
+      text = {
+        Text(
+          text = stringResource(res = com.twidere.twiderex.MR.strings.scene_sign_in_sign_in_with_twitter)
         )
-    }
+      },
+      trailing = if (currentPlatform == Platform.Android) {
+        {
+          IconButton(
+            onClick = {
+              showKeyConfiguration = true
+            }
+          ) {
+            Icon(
+              imageVector = Icons.Default.MoreHoriz,
+              contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_more)
+            )
+          }
+        }
+      } else {
+        null
+      }
+    )
+  }
 }
 
 @Composable
 private fun TwitterCustomKeySignIn(
-    onDismissRequest: () -> Unit,
+  onDismissRequest: () -> Unit,
+  clickCustomKeySignIn: suspend (String) -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
-    val navController = LocalNavController.current
-    var apiKey by remember { mutableStateOf("") }
-    var apiSecret by remember { mutableStateOf("") }
-    AlertDialog(
-        onDismissRequest = {
-            onDismissRequest.invoke()
+  val scope = rememberCoroutineScope()
+  var apiKey by remember { mutableStateOf("") }
+  var apiSecret by remember { mutableStateOf("") }
+  AlertDialog(
+    onDismissRequest = {
+      onDismissRequest.invoke()
+    },
+    title = {
+      Text(text = stringResource(res = MR.strings.scene_sign_in_twitter_options_sign_in_with_custom_twitter_key))
+    },
+    text = {
+      Column {
+        Text(text = stringResource(res = MR.strings.scene_sign_in_twitter_options_twitter_api_v2_access_is_required))
+        OutlinedTextField(
+          modifier = Modifier.fillMaxWidth(),
+          value = apiKey,
+          onValueChange = { apiKey = it },
+          placeholder = {
+            Text(text = "API key")
+          }
+        )
+        OutlinedTextField(
+          modifier = Modifier.fillMaxWidth(),
+          value = apiSecret,
+          onValueChange = { apiSecret = it },
+          placeholder = {
+            Text(text = "API secret key")
+          }
+        )
+      }
+    },
+    dismissButton = {
+      TextButton(
+        onClick = {
+          onDismissRequest.invoke()
+        }
+      ) {
+        Text(text = stringResource(res = MR.strings.common_controls_actions_cancel))
+      }
+    },
+    confirmButton = {
+      TextButton(
+        onClick = {
+          scope.launch {
+            clickCustomKeySignIn(
+              Root.SignIn.Twitter(apiKey, apiSecret)
+            )
+          }
         },
-        title = {
-            Text(text = stringResource(res = MR.strings.scene_sign_in_twitter_options_sign_in_with_custom_twitter_key))
-        },
-        text = {
-            Column {
-                Text(text = stringResource(res = MR.strings.scene_sign_in_twitter_options_twitter_api_v2_access_is_required))
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = apiKey,
-                    onValueChange = { apiKey = it },
-                    placeholder = {
-                        Text(text = "API key")
-                    }
-                )
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = apiSecret,
-                    onValueChange = { apiSecret = it },
-                    placeholder = {
-                        Text(text = "API secret key")
-                    }
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest.invoke()
-                }
-            ) {
-                Text(text = stringResource(res = MR.strings.common_controls_actions_cancel))
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    scope.launch {
-                        navController.navigateForResult(
-                            Root.SignIn.Twitter(
-                                apiKey,
-                                apiSecret,
-                            )
-                        )?.let {
-                            it as Boolean
-                        }?.let {
-                            if (it) {
-                                navController.goBackWith(true)
-                            }
-                        }
-                    }
-                },
-                enabled = apiKey.isNotEmpty() && apiSecret.isNotEmpty()
-            ) {
-                Text(text = stringResource(res = MR.strings.scene_drawer_sign_in))
-            }
-        },
-    )
+        enabled = apiKey.isNotEmpty() && apiSecret.isNotEmpty()
+      ) {
+        Text(text = stringResource(res = MR.strings.scene_drawer_sign_in))
+      }
+    },
+  )
 }

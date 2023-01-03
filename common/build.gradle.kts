@@ -1,5 +1,4 @@
 
-import org.jetbrains.compose.compose
 import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import org.jetbrains.kotlin.konan.properties.loadProperties
 
@@ -10,7 +9,7 @@ plugins {
     id("com.android.library")
     id("com.google.devtools.ksp").version(Versions.ksp)
     id("dev.icerock.mobile.multiplatform-resources") version Versions.moko
-    id("com.squareup.sqldelight")
+    id("com.squareup.sqldelight") version Versions.sqlDelight
     id("com.codingfeline.buildkonfig") version "0.11.0"
 }
 
@@ -65,6 +64,9 @@ kotlin {
                 implementation("ca.gosyer:accompanist-pager:${Versions.accompanist_jb}")
                 implementation("ca.gosyer:accompanist-pager-indicators:${Versions.accompanist_jb}")
                 api("com.github.Tlaster.KFilePicker:KFilePicker:${Versions.kFilePicker}")
+                implementation("io.github.reactivecircus.cache4k:cache4k:${Versions.cache4k}")
+                api("moe.tlaster:precompose:${Versions.precompose}")
+                api("io.github.qdsfdhvh:precompose-annotation:${Versions.precomposeKsp}")
             }
         }
         val commonTest by getting {
@@ -73,13 +75,17 @@ kotlin {
                 implementation("io.insert-koin:koin-test:${Versions.koin}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.coroutines}")
                 implementation("io.mockk:mockk:1.12.1")
+                implementation("joda-time:joda-time:${Versions.jodaTime}")
             }
         }
         val androidMain by getting {
             dependencies {
+                api("androidx.compose.runtime:runtime:${Versions.compose}")
+                api("androidx.compose.foundation:foundation:${Versions.compose}")
+                api("androidx.compose.material:material:${Versions.compose}")
+                api("androidx.compose.material:material-icons-extended:${Versions.compose}")
                 implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
-                implementation("androidx.savedstate:savedstate-ktx:1.1.0")
-                implementation("androidx.core:core-ktx:1.8.0-alpha02")
+                implementation("androidx.core:core-ktx:1.9.0-alpha05")
                 implementation("io.insert-koin:koin-android:${Versions.koin}")
                 implementation("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
                 implementation("androidx.work:work-runtime-ktx:${Versions.work}")
@@ -97,9 +103,8 @@ kotlin {
                 implementation("androidx.datastore:datastore-preferences:${Versions.datastore}")
                 implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
                 implementation("androidx.startup:startup-runtime:${Versions.startup}")
-                implementation("com.google.accompanist:accompanist-insets:${Versions.accompanist}")
                 implementation("androidx.browser:browser:${Versions.browser}")
-                implementation("androidx.vectordrawable:vectordrawable:1.2.0-alpha02")
+                implementation("androidx.vectordrawable:vectordrawable:1.2.0-beta01")
                 implementation("androidx.activity:activity-compose:${Versions.activity}")
                 implementation("com.github.android:renderscript-intrinsics-replacement-toolkit:b6363490c3")
             }
@@ -127,10 +132,17 @@ kotlin {
                 implementation("de.huxhorn.lilith:de.huxhorn.lilith.3rdparty.junique:1.0.4")
                 implementation("org.javassist:javassist:3.28.0-GA")
                 implementation("org.ocpsoft.prettytime:prettytime:5.0.2.Final")
+                implementation("com.mayakapps.compose:window-styler:0.3.2")
             }
         }
         val desktopTest by getting
     }
+}
+
+dependencies {
+    add("kspCommonMainMetadata", "io.github.qdsfdhvh:precompose-ksp:${Versions.precomposeKsp}")
+    add("kspAndroid", "io.github.qdsfdhvh:precompose-ksp:${Versions.precomposeKsp}")
+    add("kspDesktop", "io.github.qdsfdhvh:precompose-ksp:${Versions.precomposeKsp}")
 }
 
 buildkonfig {

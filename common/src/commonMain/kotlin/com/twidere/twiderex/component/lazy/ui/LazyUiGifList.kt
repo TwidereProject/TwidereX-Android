@@ -47,58 +47,58 @@ import com.twidere.twiderex.model.ui.UiGif
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LazyUiGifList(
-    modifier: Modifier = Modifier,
-    items: LazyPagingItems<UiGif>,
-    selectedItem: UiGif?,
-    state: LazyListState = rememberLazyListState(),
-    onItemSelected: (UiGif) -> Unit = {},
-    header: LazyListScope.() -> Unit = {},
+  modifier: Modifier = Modifier,
+  items: LazyPagingItems<UiGif>,
+  selectedItem: UiGif?,
+  state: LazyListState = rememberLazyListState(),
+  onItemSelected: (UiGif) -> Unit = {},
+  header: LazyListScope.() -> Unit = {},
 ) {
-    LazyUiList(items = items) {
-        LazyColumn(
-            modifier = modifier,
-            state = state,
-        ) {
-            header.invoke(this)
-            itemsPagingGridIndexed(
-                data = items,
-                rowSize = 2,
-                spacing = LazyUiGifListDefaults.Spacing
-            ) { _, item ->
-                item?.let {
-                    val selected = selectedItem?.url == it.url
-                    Box(
-                        modifier = Modifier.clip(MaterialTheme.shapes.medium)
-                            .clickable { onItemSelected(item) }
-                            .then(
-                                if (selected) Modifier.border(
-                                    LazyUiGifListDefaults.Border, color = MaterialTheme.colors.primary,
-                                    shape = MaterialTheme.shapes.medium
-                                ) else Modifier
-                            )
-                    ) {
-                        NetworkImage(
-                            data = it.preview,
-                            Modifier.fillMaxWidth()
-                                .aspectRatio(1f)
-                        )
-                        GifTag(Modifier.align(Alignment.BottomEnd))
-                    }
-                }
-            }
-            loadState(items.loadState.append) {
-                items.retry()
-            }
+  LazyUiList(items = items) {
+    LazyColumn(
+      modifier = modifier,
+      state = state,
+    ) {
+      header.invoke(this)
+      itemsPagingGridIndexed(
+        data = items,
+        rowSize = 2,
+        spacing = LazyUiGifListDefaults.Spacing
+      ) { _, item ->
+        item?.let {
+          val selected = selectedItem?.url == it.url
+          Box(
+            modifier = Modifier.clip(MaterialTheme.shapes.medium)
+              .clickable { onItemSelected(item) }
+              .then(
+                if (selected) Modifier.border(
+                  LazyUiGifListDefaults.Border, color = MaterialTheme.colors.primary,
+                  shape = MaterialTheme.shapes.medium
+                ) else Modifier
+              )
+          ) {
+            NetworkImage(
+              data = it.preview,
+              Modifier.fillMaxWidth()
+                .aspectRatio(1f)
+            )
+            GifTag(Modifier.align(Alignment.BottomEnd))
+          }
         }
+      }
+      loadState(items.loadState.append) {
+        items.retry()
+      }
     }
+  }
 }
 
 private object LazyUiGifListDefaults {
-    object Tag {
-        val Width = 25.dp
-        val Height = 16.dp
-        val Padding = PaddingValues(end = 8.dp, bottom = 8.dp)
-    }
-    val Spacing = 16.dp
-    val Border = 3.dp
+  object Tag {
+    val Width = 25.dp
+    val Height = 16.dp
+    val Padding = PaddingValues(end = 8.dp, bottom = 8.dp)
+  }
+  val Spacing = 16.dp
+  val Border = 3.dp
 }

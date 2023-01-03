@@ -42,81 +42,81 @@ import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalPagingApi::class)
 class TimelineRepository(
-    private val database: CacheDatabase,
+  private val database: CacheDatabase,
 ) {
-    fun favouriteTimeline(
-        userKey: MicroBlogKey,
-        accountKey: MicroBlogKey,
-        platformType: PlatformType,
-        service: TimelineService,
-    ): Flow<PagingData<UiStatus>> {
-        val mediator = UserFavouriteMediator(
-            userKey = userKey,
-            platformType = platformType,
-            database = database,
-            accountKey = accountKey,
-            service = service,
-        )
-        return mediator.pager().toUi()
-    }
+  fun favouriteTimeline(
+    userKey: MicroBlogKey,
+    accountKey: MicroBlogKey,
+    platformType: PlatformType,
+    service: TimelineService,
+  ): Flow<PagingData<UiStatus>> {
+    val mediator = UserFavouriteMediator(
+      userKey = userKey,
+      platformType = platformType,
+      database = database,
+      accountKey = accountKey,
+      service = service,
+    )
+    return mediator.pager().toUi()
+  }
 
-    fun userTimeline(
-        userKey: MicroBlogKey,
-        accountKey: MicroBlogKey,
-        service: TimelineService,
-        exclude_replies: Boolean,
-    ): Flow<PagingData<UiStatus>> {
-        return UserStatusMediator(
-            userKey = userKey,
-            database = database,
-            accountKey = accountKey,
-            service = service,
-            exclude_replies = exclude_replies,
-        ).pager().toUi()
-    }
+  fun userTimeline(
+    userKey: MicroBlogKey,
+    accountKey: MicroBlogKey,
+    service: TimelineService,
+    exclude_replies: Boolean,
+  ): Flow<PagingData<UiStatus>> {
+    return UserStatusMediator(
+      userKey = userKey,
+      database = database,
+      accountKey = accountKey,
+      service = service,
+      exclude_replies = exclude_replies,
+    ).pager().toUi()
+  }
 
-    fun listTimeline(
-        accountKey: MicroBlogKey,
-        service: TimelineService,
-        listKey: MicroBlogKey,
-    ): Flow<PagingData<UiStatus>> {
-        return ListsTimelineMediator(
-            accountKey = accountKey,
-            database = database,
-            listKey = listKey,
-            service = service
-        ).pager().toUi()
-    }
+  fun listTimeline(
+    accountKey: MicroBlogKey,
+    service: TimelineService,
+    listKey: MicroBlogKey,
+  ): Flow<PagingData<UiStatus>> {
+    return ListsTimelineMediator(
+      accountKey = accountKey,
+      database = database,
+      listKey = listKey,
+      service = service
+    ).pager().toUi()
+  }
 
-    fun mastodonHashtagTimeline(
-        keyword: String,
-        accountKey: MicroBlogKey,
-        service: MastodonService,
-    ): Flow<PagingData<UiStatus>> {
-        val mediator = MastodonHashtagTimelineMediator(
-            keyword = keyword,
-            service = service,
-            accountKey = accountKey,
-            database = database
-        )
-        return mediator.pager().toUi()
-    }
+  fun mastodonHashtagTimeline(
+    keyword: String,
+    accountKey: MicroBlogKey,
+    service: MastodonService,
+  ): Flow<PagingData<UiStatus>> {
+    val mediator = MastodonHashtagTimelineMediator(
+      keyword = keyword,
+      service = service,
+      accountKey = accountKey,
+      database = database
+    )
+    return mediator.pager().toUi()
+  }
 
-    fun mediaTimeline(
-        userKey: MicroBlogKey,
-        accountKey: MicroBlogKey,
-        service: TimelineService
-    ): Flow<PagingData<Pair<UiMedia, UiStatus>>> {
-        val mediator = UserMediaMediator(
-            userKey = userKey,
-            database = database,
-            accountKey = accountKey,
-            service = service
-        )
-        return mediator.pager().toUi().map {
-            it.flatMap {
-                it.media.map { media -> media to it }
-            }
-        }
+  fun mediaTimeline(
+    userKey: MicroBlogKey,
+    accountKey: MicroBlogKey,
+    service: TimelineService
+  ): Flow<PagingData<Pair<UiMedia, UiStatus>>> {
+    val mediator = UserMediaMediator(
+      userKey = userKey,
+      database = database,
+      accountKey = accountKey,
+      service = service
+    )
+    return mediator.pager().toUi().map {
+      it.flatMap {
+        it.media.map { media -> media to it }
+      }
     }
+  }
 }

@@ -24,5 +24,5 @@ import com.twidere.twiderex.kmp.StorageProvider
 import org.koin.dsl.module
 
 val storageProviderModule = module {
-    single { StorageProvider.create() }
+  single { StorageProvider.create() }
 }

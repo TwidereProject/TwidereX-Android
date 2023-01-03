@@ -29,31 +29,32 @@ import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.scenes.lists.ListsSceneContent
 import com.twidere.twiderex.scenes.lists.ListsSceneFab
+import moe.tlaster.precompose.navigation.Navigator
 
 class ListsNavigationItem : HomeNavigationItem() {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_title)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_title)
+  }
 
-    override val route: String
-        get() = Root.Lists.Home
+  override val route: String
+    get() = Root.Lists.Home
 
-    @Composable
-    override fun icon(): Painter {
-        return painterResource(res = com.twidere.twiderex.MR.files.ic_lists)
-    }
+  @Composable
+  override fun icon(): Painter {
+    return painterResource(res = com.twidere.twiderex.MR.files.ic_lists)
+  }
 
-    @Composable
-    override fun Fab() {
-        ListsSceneFab()
-    }
+  @Composable
+  override fun Fab(navigator: Navigator) {
+    ListsSceneFab(navigator)
+  }
 
-    override val floatingActionButtonPosition: FabPosition
-        get() = FabPosition.Center
+  override val floatingActionButtonPosition: FabPosition
+    get() = FabPosition.Center
 
-    @Composable
-    override fun Content() {
-        ListsSceneContent()
-    }
+  @Composable
+  override fun Content(navigator: Navigator) {
+    ListsSceneContent(navigator)
+  }
 }

@@ -31,27 +31,27 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.ComposeData
 
 class TwitterComposeWorker(
-    context: Context,
-    workerParams: WorkerParameters,
-    twitterComposeJob: TwitterComposeJob,
+  context: Context,
+  workerParams: WorkerParameters,
+  twitterComposeJob: TwitterComposeJob,
 ) : ComposeWorker<TwitterService>(
-    context,
-    workerParams,
-    twitterComposeJob
+  context,
+  workerParams,
+  twitterComposeJob
 ) {
-    companion object {
-        fun create(
-            accountKey: MicroBlogKey,
-            data: ComposeData,
-        ) = OneTimeWorkRequestBuilder<TwitterComposeWorker>()
-            .setInputData(
-                Data.Builder()
-                    .putAll(data.toWorkData())
-                    .putString("accountKey", accountKey.toString())
-                    .let { data.lat?.let { it1 -> it.putDouble("lat", it1) } ?: it }
-                    .let { data.long?.let { it1 -> it.putDouble("long", it1) } ?: it }
-                    .build()
-            )
-            .build()
-    }
+  companion object {
+    fun create(
+      accountKey: MicroBlogKey,
+      data: ComposeData,
+    ) = OneTimeWorkRequestBuilder<TwitterComposeWorker>()
+      .setInputData(
+        Data.Builder()
+          .putAll(data.toWorkData())
+          .putString("accountKey", accountKey.toString())
+          .let { data.lat?.let { it1 -> it.putDouble("lat", it1) } ?: it }
+          .let { data.long?.let { it1 -> it.putDouble("long", it1) } ?: it }
+          .build()
+      )
+      .build()
+  }
 }

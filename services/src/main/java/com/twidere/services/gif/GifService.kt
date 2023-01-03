@@ -24,7 +24,7 @@ import com.twidere.services.gif.model.GifPaging
 import com.twidere.services.microblog.DownloadMediaService
 
 interface GifService : DownloadMediaService {
-    suspend fun trending(nextPage: String?, limit: Int = 25): GifPaging
+  suspend fun trending(nextPage: String?, limit: Int = 25): GifPaging
 
-    suspend fun search(query: String, lang: String = "en", nextPage: String?, limit: Int = 25): GifPaging
+  suspend fun search(query: String, lang: String = "en", nextPage: String?, limit: Int = 25): GifPaging
 }

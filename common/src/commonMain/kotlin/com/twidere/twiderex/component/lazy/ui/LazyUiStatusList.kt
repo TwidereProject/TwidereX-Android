@@ -77,246 +77,249 @@ import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.navigation.StatusNavigationData
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapNotNull
 
 @Stable
 class LazyUiStatusListState(
-    initialStatusKey: MicroBlogKey? = null,
-    initialShowCursor: Boolean = false,
-    initialIsAutoLoadMore: Boolean = false,
+  initialStatusKey: MicroBlogKey? = null,
+  initialShowCursor: Boolean = false,
+  initialIsAutoLoadMore: Boolean = false,
 ) {
-    private var _statusKey: MicroBlogKey? by mutableStateOf(initialStatusKey)
-    private var _showCursor: Boolean by mutableStateOf(initialShowCursor)
+  private var _statusKey: MicroBlogKey? by mutableStateOf(initialStatusKey)
+  private var _showCursor: Boolean by mutableStateOf(initialShowCursor)
 
-    val showCursor get() = _showCursor
-    val statusKey get() = _statusKey
+  val showCursor get() = _showCursor
+  val statusKey get() = _statusKey
 
-    var isAutoLoadMore: Boolean = initialIsAutoLoadMore
-        private set
+  var isAutoLoadMore: Boolean = initialIsAutoLoadMore
+    private set
 
-    fun update(newKey: MicroBlogKey) {
-        if (!showCursor) {
-            _showCursor = statusKey != null && statusKey != newKey
-            _statusKey = newKey
-        }
+  fun update(newKey: MicroBlogKey) {
+    if (!showCursor) {
+      _showCursor = statusKey != null && statusKey != newKey
+      _statusKey = newKey
     }
+  }
 
-    fun hide() {
-        _showCursor = false
-    }
+  fun hide() {
+    _showCursor = false
+  }
 
-    fun autoLoadMore() {
-        isAutoLoadMore = true
-    }
+  fun autoLoadMore() {
+    isAutoLoadMore = true
+  }
 
-    companion object {
-        val Saver: Saver<LazyUiStatusListState, *> = listSaver(
-            save = {
-                listOfNotNull<Any>(
-                    it.showCursor,
-                    it.isAutoLoadMore,
-                    it.statusKey?.toString()
-                )
-            },
-            restore = {
-                LazyUiStatusListState(
-                    initialShowCursor = it[0] as Boolean,
-                    initialIsAutoLoadMore = it[1] as Boolean,
-                    initialStatusKey = it.getOrNull(2)?.let { key ->
-                        MicroBlogKey.valueOf(key.toString())
-                    }
-                )
-            }
+  companion object {
+    val Saver: Saver<LazyUiStatusListState, *> = listSaver(
+      save = {
+        listOfNotNull<Any>(
+          it.showCursor,
+          it.isAutoLoadMore,
+          it.statusKey?.toString()
         )
-    }
+      },
+      restore = {
+        LazyUiStatusListState(
+          initialShowCursor = it[0] as Boolean,
+          initialIsAutoLoadMore = it[1] as Boolean,
+          initialStatusKey = it.getOrNull(2)?.let { key ->
+            MicroBlogKey.valueOf(key.toString())
+          }
+        )
+      }
+    )
+  }
 }
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun LazyUiStatusList(
-    modifier: Modifier = Modifier,
-    items: LazyPagingItems<UiStatus>,
-    state: LazyListState = rememberLazyListState(),
-    loadingBetween: List<MicroBlogKey> = emptyList(),
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
-    key: ((index: Int, item: UiStatus) -> Any) = { _, item -> item.statusKey.hashCode() },
-    header: LazyListScope.() -> Unit = {},
+  modifier: Modifier = Modifier,
+  items: LazyPagingItems<UiStatus>,
+  state: LazyListState = rememberLazyListState(),
+  loadingBetween: List<MicroBlogKey> = emptyList(),
+  contentPadding: PaddingValues = PaddingValues(0.dp),
+  statusNavigation: StatusNavigationData,
+  onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
+  key: ((index: Int, item: UiStatus) -> Any) = { _, item -> item.statusKey.hashCode() },
+  header: LazyListScope.() -> Unit = {},
 ) {
-    val listState = rememberSaveable(saver = LazyUiStatusListState.Saver) {
-        LazyUiStatusListState()
-    }
-    LaunchedEffect(Unit) {
-        snapshotFlow { items.itemCount }
-            .filter { it > 0 }
-            .mapNotNull { items.peek(0)?.statusKey }
-            .distinctUntilChanged()
-            .collect {
-                listState.update(it)
-            }
-    }
-    LaunchedEffect(Unit) {
-        snapshotFlow { state.firstVisibleItemIndex }
-            .distinctUntilChanged()
-            .collect {
-                if (it == 0) {
-                    listState.hide()
-                }
-            }
-    }
-    LazyUiList(
-        items = items,
-        empty = { EmptyStatusList() },
-        loading = { LoadingStatusPlaceholder() }
-    ) {
-        Box {
-            LazyColumn(
-                modifier = modifier,
-                state = state,
-                contentPadding = contentPadding,
-            ) {
-                header.invoke(this)
-                itemsIndexed(
-                    items,
-                    key = key
-                ) { index, item ->
-                    if (item == null) {
-                        UiStatusPlaceholder()
-                        StatusDivider()
-                    } else {
-                        Column {
-                            TimelineStatusComponent(
-                                item,
-                                threadStyle = StatusThreadStyle.WITH_AVATAR,
-                                lineUp = index > 0 && items.peek(index - 1)?.statusId == item.inReplyToStatusId,
-                                lineDown = index < items.itemCount - 1 && items.peek(index + 1)?.inReplyToStatusId == item.statusId,
-                            )
-                            when {
-                                loadingBetween.contains(item.statusKey) -> {
-                                    Divider()
-                                    LoadingProgress(
-                                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                                    )
-                                    Divider()
-                                }
-                                item.isGap -> {
-                                    fun onLoadBetweenClicked() {
-                                        items.peek(index + 1)?.let { next ->
-                                            onLoadBetweenClicked(item.statusKey, next.statusKey)
-                                        }
-                                    }
-
-                                    if (listState.isAutoLoadMore) {
-                                        LaunchedEffect(item.statusKey) {
-                                            onLoadBetweenClicked()
-                                        }
-                                    } else {
-                                        LoadMoreButton {
-                                            onLoadBetweenClicked()
-                                            listState.autoLoadMore()
-                                        }
-                                    }
-                                }
-                                else -> {
-                                    StatusDivider()
-                                }
-                            }
-                        }
-                    }
-                }
-                loadState(items.loadState.append) {
-                    items.retry()
-                }
-            }
-            Box(
-                modifier = Modifier.align(Alignment.TopEnd),
-            ) {
-                AnimatedVisibility(
-                    visible = listState.showCursor,
-                    enter = fadeIn() + slideInHorizontally(initialOffsetX = { it / 2 }),
-                    exit = slideOutHorizontally(targetOffsetX = { it / 2 }) + fadeOut(),
-                ) {
-                    Box(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Surface(
-                            color = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
-                            shape = MaterialTheme.shapes.small,
-                            contentColor = MaterialTheme.colors.background,
-                        ) {
-                            Text(
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                text = state.firstVisibleItemIndex.toString(),
-                                style = MaterialTheme.typography.caption,
-                            )
-                        }
-                    }
-                }
-            }
+  val listState = rememberSaveable(saver = LazyUiStatusListState.Saver) {
+    LazyUiStatusListState()
+  }
+  LaunchedEffect(Unit) {
+    snapshotFlow { items.itemCount }
+      .filter { it > 0 }
+      .mapNotNull { items.peek(0)?.statusKey }
+      .distinctUntilChanged()
+      .collect {
+        listState.update(it)
+      }
+  }
+  LaunchedEffect(Unit) {
+    snapshotFlow { state.firstVisibleItemIndex }
+      .distinctUntilChanged()
+      .collect {
+        if (it == 0) {
+          listState.hide()
         }
+      }
+  }
+  LazyUiList(
+    items = items,
+    empty = { EmptyStatusList() },
+    loading = { LoadingStatusPlaceholder() }
+  ) {
+    Box {
+      LazyColumn(
+        modifier = modifier,
+        state = state,
+        contentPadding = contentPadding,
+      ) {
+        header.invoke(this)
+        itemsIndexed(
+          items,
+          key = key
+        ) { index, item ->
+          if (item == null) {
+            UiStatusPlaceholder()
+            StatusDivider()
+          } else {
+            Column {
+              TimelineStatusComponent(
+                item,
+                threadStyle = StatusThreadStyle.WITH_AVATAR,
+                lineUp = index > 0 && items.peek(index - 1)?.statusId == item.inReplyToStatusId,
+                lineDown = index < items.itemCount - 1 && items.peek(index + 1)?.inReplyToStatusId == item.statusId,
+                statusNavigation = statusNavigation,
+              )
+              when {
+                loadingBetween.contains(item.statusKey) -> {
+                  Divider()
+                  LoadingProgress(
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                  )
+                  Divider()
+                }
+                item.isGap -> {
+                  fun onLoadBetweenClicked() {
+                    items.peek(index + 1)?.let { next ->
+                      onLoadBetweenClicked(item.statusKey, next.statusKey)
+                    }
+                  }
+
+                  if (listState.isAutoLoadMore) {
+                    LaunchedEffect(item.statusKey) {
+                      onLoadBetweenClicked()
+                    }
+                  } else {
+                    LoadMoreButton {
+                      onLoadBetweenClicked()
+                      listState.autoLoadMore()
+                    }
+                  }
+                }
+                else -> {
+                  StatusDivider()
+                }
+              }
+            }
+          }
+        }
+        loadState(items.loadState.append) {
+          items.retry()
+        }
+      }
+      Box(
+        modifier = Modifier.align(Alignment.TopEnd),
+      ) {
+        AnimatedVisibility(
+          visible = listState.showCursor,
+          enter = fadeIn() + slideInHorizontally(initialOffsetX = { it / 2 }),
+          exit = slideOutHorizontally(targetOffsetX = { it / 2 }) + fadeOut(),
+        ) {
+          Box(
+            modifier = Modifier.padding(16.dp)
+          ) {
+            Surface(
+              color = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
+              shape = MaterialTheme.shapes.small,
+              contentColor = MaterialTheme.colors.background,
+            ) {
+              Text(
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                text = state.firstVisibleItemIndex.toString(),
+                style = MaterialTheme.typography.caption,
+              )
+            }
+          }
+        }
+      }
     }
+  }
 }
 
 @Composable
 private fun LoadMoreButton(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .background(LocalContentColor.current.copy(alpha = 0.04f))
-            .clickable { onClick() }
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            modifier = Modifier.padding(12.dp),
-            text = stringResource(
-                res = com.twidere.twiderex.MR.strings.common_controls_timeline_load_more
-            ),
-            color = MaterialTheme.colors.primary,
-        )
-    }
+  Box(
+    modifier = Modifier
+      .background(LocalContentColor.current.copy(alpha = 0.04f))
+      .clickable { onClick() }
+      .fillMaxWidth(),
+    contentAlignment = Alignment.Center,
+  ) {
+    Text(
+      modifier = Modifier.padding(12.dp),
+      text = stringResource(
+        res = com.twidere.twiderex.MR.strings.common_controls_timeline_load_more
+      ),
+      color = MaterialTheme.colors.primary,
+    )
+  }
 }
 
 @Composable
 private fun EmptyStatusList() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_empty_status),
-            contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_no_tweets_found_title)
-        )
-        Spacer(modifier = Modifier.height(EmptyStatusListDefaults.VerticalPadding))
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
-            Text(
-                text = stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_no_tweets_found_title),
-                style = MaterialTheme.typography.h6
-            )
-        }
+  Column(
+    modifier = Modifier.fillMaxSize(),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center
+  ) {
+    Icon(
+      painter = painterResource(res = com.twidere.twiderex.MR.files.ic_empty_status),
+      contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_no_tweets_found_title)
+    )
+    Spacer(modifier = Modifier.height(EmptyStatusListDefaults.VerticalPadding))
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+      Text(
+        text = stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_no_tweets_found_title),
+        style = MaterialTheme.typography.h6
+      )
     }
+  }
 }
 
 private object EmptyStatusListDefaults {
-    val VerticalPadding = 48.dp
+  val VerticalPadding = 48.dp
 }
 
 @Composable
 private fun LoadingStatusPlaceholder() {
-    Column(
-        modifier = Modifier
-            .wrapContentHeight(
-                align = Alignment.Top,
-                unbounded = true
-            )
-    ) {
-        repeat(10) {
-            UiStatusPlaceholder(
-                delayMillis = it * 50L
-            )
-            StatusDivider()
-        }
+  Column(
+    modifier = Modifier
+      .wrapContentHeight(
+        align = Alignment.Top,
+        unbounded = true
+      )
+  ) {
+    repeat(10) {
+      UiStatusPlaceholder(
+        delayMillis = it * 50L
+      )
+      StatusDivider()
     }
+  }
 }

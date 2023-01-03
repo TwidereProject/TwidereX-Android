@@ -25,13 +25,13 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface FriendshipResources {
-    @POST("/1.1/friendships/create.json")
-    suspend fun follow(
-        @Query(value = "user_id") user_id: String,
-    ): User
+  @POST("/1.1/friendships/create.json")
+  suspend fun follow(
+    @Query(value = "user_id") user_id: String,
+  ): User
 
-    @POST("/1.1/friendships/destroy.json")
-    suspend fun unfollow(
-        @Query(value = "user_id") user_id: String,
-    ): User
+  @POST("/1.1/friendships/destroy.json")
+  suspend fun unfollow(
+    @Query(value = "user_id") user_id: String,
+  ): User
 }

@@ -27,23 +27,23 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface FollowsResources {
-    @GET("/2/users/{id}/following")
-    suspend fun following(
-        @Path(value = "id") id: String,
-        @Query("max_results") max_results: Int = 100,
-        @Query("pagination_token") pagination_token: String? = null,
-        @Query("tweet.fields", encoded = true) tweetFields: String? = null,
-        @Query("user.fields", encoded = true) userFields: String? = null,
-        @Query("expansions", encoded = true) expansions: String? = null,
-    ): TwitterResponseV2<List<UserV2>>
+  @GET("/2/users/{id}/following")
+  suspend fun following(
+    @Path(value = "id") id: String,
+    @Query("max_results") max_results: Int = 100,
+    @Query("pagination_token") pagination_token: String? = null,
+    @Query("tweet.fields", encoded = true) tweetFields: String? = null,
+    @Query("user.fields", encoded = true) userFields: String? = null,
+    @Query("expansions", encoded = true) expansions: String? = null,
+  ): TwitterResponseV2<List<UserV2>>
 
-    @GET("/2/users/{id}/followers")
-    suspend fun followers(
-        @Path(value = "id") id: String,
-        @Query("max_results") max_results: Int = 100,
-        @Query("pagination_token") pagination_token: String? = null,
-        @Query("tweet.fields", encoded = true) tweetFields: String? = null,
-        @Query("user.fields", encoded = true) userFields: String? = null,
-        @Query("expansions", encoded = true) expansions: String? = null,
-    ): TwitterResponseV2<List<UserV2>>
+  @GET("/2/users/{id}/followers")
+  suspend fun followers(
+    @Path(value = "id") id: String,
+    @Query("max_results") max_results: Int = 100,
+    @Query("pagination_token") pagination_token: String? = null,
+    @Query("tweet.fields", encoded = true) tweetFields: String? = null,
+    @Query("user.fields", encoded = true) userFields: String? = null,
+    @Query("expansions", encoded = true) expansions: String? = null,
+  ): TwitterResponseV2<List<UserV2>>
 }

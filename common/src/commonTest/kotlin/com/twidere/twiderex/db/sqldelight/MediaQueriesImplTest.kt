@@ -29,20 +29,20 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class MediaQueriesImplTest : BaseCacheDatabaseTest() {
-    @Test
-    fun insertMediaAndReturnResultWithGivenBelongToKey() = runBlocking {
-        val belongToKey = MicroBlogKey.valueOf("test")
-        assert(database.mediaQueries.findMediaByBelongToKey(belongToKey).executeAsList().isEmpty())
-        database.mediaQueries.insert(mockUiMedia(belongToKey = belongToKey).toDbMedia())
-        assert(database.mediaQueries.findMediaByBelongToKey(belongToKey).executeAsList().isNotEmpty())
-        assert(database.mediaQueries.findMediaByBelongToKey(MicroBlogKey.valueOf("test_not_insert")).executeAsList().isEmpty())
-    }
+  @Test
+  fun insertMediaAndReturnResultWithGivenBelongToKey() = runBlocking {
+    val belongToKey = MicroBlogKey.valueOf("test")
+    assert(database.mediaQueries.findMediaByBelongToKey(belongToKey).executeAsList().isEmpty())
+    database.mediaQueries.insert(mockUiMedia(belongToKey = belongToKey).toDbMedia())
+    assert(database.mediaQueries.findMediaByBelongToKey(belongToKey).executeAsList().isNotEmpty())
+    assert(database.mediaQueries.findMediaByBelongToKey(MicroBlogKey.valueOf("test_not_insert")).executeAsList().isEmpty())
+  }
 
-    @Test
-    fun insert_ReplaceWhenBelongToKeyAndUrlAndOrderEquals() = runBlocking {
-        val belongToKey = MicroBlogKey.valueOf("test")
-        database.mediaQueries.insert(mockUiMedia(url = "url", belongToKey = belongToKey, order = 0).toDbMedia())
-        database.mediaQueries.insert(mockUiMedia(url = "url", belongToKey = belongToKey, order = 0).toDbMedia())
-        assertEquals(1, database.mediaQueries.findMediaByBelongToKey(belongToKey).executeAsList().size)
-    }
+  @Test
+  fun insert_ReplaceWhenBelongToKeyAndUrlAndOrderEquals() = runBlocking {
+    val belongToKey = MicroBlogKey.valueOf("test")
+    database.mediaQueries.insert(mockUiMedia(url = "url", belongToKey = belongToKey, order = 0).toDbMedia())
+    database.mediaQueries.insert(mockUiMedia(url = "url", belongToKey = belongToKey, order = 0).toDbMedia())
+    assertEquals(1, database.mediaQueries.findMediaByBelongToKey(belongToKey).executeAsList().size)
+  }
 }

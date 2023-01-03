@@ -32,45 +32,45 @@ import com.twidere.twiderex.room.db.transform.toDbMEventWithAttachments
 import com.twidere.twiderex.room.db.transform.toUi
 
 internal class DirectMessageEventDaoImpl(
-    private val roomCacheDatabase: RoomCacheDatabase
+  private val roomCacheDatabase: RoomCacheDatabase
 ) : DirectMessageEventDao {
-    override fun getPagingSource(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey
-    ): PagingSource<Int, UiDMEvent> {
-        return roomCacheDatabase.directMessageDao().getPagingSource(
-            cacheDatabase = roomCacheDatabase,
-            accountKey = accountKey,
-            conversationKey = conversationKey
-        )
+  override fun getPagingSource(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey
+  ): PagingSource<Int, UiDMEvent> {
+    return roomCacheDatabase.directMessageDao().getPagingSource(
+      cacheDatabase = roomCacheDatabase,
+      accountKey = accountKey,
+      conversationKey = conversationKey
+    )
+  }
+
+  override suspend fun findWithMessageKey(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey,
+    messageKey: MicroBlogKey
+  ) = roomCacheDatabase.directMessageDao().findWithMessageKey(accountKey, conversationKey, messageKey)?.toUi()
+
+  override suspend fun delete(message: UiDMEvent) {
+    roomCacheDatabase.withTransaction {
+      roomCacheDatabase.directMessageDao().findWithMessageKey(
+        accountKey = message.accountKey,
+        conversationKey = message.conversationKey,
+        messageKey = message.messageKey
+      )?.let {
+        roomCacheDatabase.directMessageDao().delete(message.toDbMEventWithAttachments(dbId = it.message._id).message)
+      }
     }
+  }
 
-    override suspend fun findWithMessageKey(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey,
-        messageKey: MicroBlogKey
-    ) = roomCacheDatabase.directMessageDao().findWithMessageKey(accountKey, conversationKey, messageKey)?.toUi()
+  override suspend fun getMessageCount(
+    accountKey: MicroBlogKey,
+    conversationKey: MicroBlogKey
+  ) = roomCacheDatabase.directMessageDao().getMessageCount(accountKey, conversationKey)
 
-    override suspend fun delete(message: UiDMEvent) {
-        roomCacheDatabase.withTransaction {
-            roomCacheDatabase.directMessageDao().findWithMessageKey(
-                accountKey = message.accountKey,
-                conversationKey = message.conversationKey,
-                messageKey = message.messageKey
-            )?.let {
-                roomCacheDatabase.directMessageDao().delete(message.toDbMEventWithAttachments(dbId = it.message._id).message)
-            }
-        }
-    }
-
-    override suspend fun getMessageCount(
-        accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey
-    ) = roomCacheDatabase.directMessageDao().getMessageCount(accountKey, conversationKey)
-
-    override suspend fun insertAll(events: List<UiDMEvent>) {
-        events.map {
-            it.toDbMEventWithAttachments()
-        }.saveToDb(roomCacheDatabase)
-    }
+  override suspend fun insertAll(events: List<UiDMEvent>) {
+    events.map {
+      it.toDbMEventWithAttachments()
+    }.saveToDb(roomCacheDatabase)
+  }
 }

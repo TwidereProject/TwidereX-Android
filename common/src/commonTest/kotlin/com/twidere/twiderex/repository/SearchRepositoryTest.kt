@@ -29,58 +29,58 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class SearchRepositoryTest {
-    @Test
-    fun addToSearchHistoryWhenSavedIsFalse() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("test")
-        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
-        repo.addOrUpgrade(content = "query1", accountKey = accountKey)
-        repo.addOrUpgrade(content = "query2", accountKey = accountKey)
-        repo.addOrUpgrade(content = "query3", accountKey = accountKey, saved = true)
-        val searchHistory = repo.searchHistory(accountKey).first()
-        assertEquals(2, searchHistory.size)
-        searchHistory.forEach {
-            assert(!it.saved)
-        }
+  @Test
+  fun addToSearchHistoryWhenSavedIsFalse() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("test")
+    val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
+    repo.addOrUpgrade(content = "query1", accountKey = accountKey)
+    repo.addOrUpgrade(content = "query2", accountKey = accountKey)
+    repo.addOrUpgrade(content = "query3", accountKey = accountKey, saved = true)
+    val searchHistory = repo.searchHistory(accountKey).first()
+    assertEquals(2, searchHistory.size)
+    searchHistory.forEach {
+      assert(!it.saved)
     }
+  }
 
-    @Test
-    fun addOrUpdateToSavedSearchWhenSavedIsTrue() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("test")
-        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
-        repo.addOrUpgrade(content = "query1", accountKey = accountKey, saved = false)
-        assert(repo.savedSearch(accountKey).first().isEmpty())
-        repo.addOrUpgrade(content = "query1", accountKey = accountKey, saved = true)
-        repo.addOrUpgrade(content = "query2", accountKey = accountKey, saved = true)
-        val savedSearch = repo.savedSearch(accountKey).first()
-        assertEquals(2, savedSearch.size)
-        savedSearch.forEach {
-            assert(it.saved)
-        }
+  @Test
+  fun addOrUpdateToSavedSearchWhenSavedIsTrue() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("test")
+    val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
+    repo.addOrUpgrade(content = "query1", accountKey = accountKey, saved = false)
+    assert(repo.savedSearch(accountKey).first().isEmpty())
+    repo.addOrUpgrade(content = "query1", accountKey = accountKey, saved = true)
+    repo.addOrUpgrade(content = "query2", accountKey = accountKey, saved = true)
+    val savedSearch = repo.savedSearch(accountKey).first()
+    assertEquals(2, savedSearch.size)
+    savedSearch.forEach {
+      assert(it.saved)
     }
+  }
 
-    @Test
-    fun canNotSetSavedToFalseOnSavedSearch() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("test")
-        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
-        repo.addOrUpgrade(content = "query", accountKey = accountKey, saved = true)
-        repo.addOrUpgrade(content = "query", accountKey = accountKey, saved = false)
-        val savedSearch = repo.savedSearch(accountKey).first()
-        assert(savedSearch.isNotEmpty())
-    }
+  @Test
+  fun canNotSetSavedToFalseOnSavedSearch() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("test")
+    val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
+    repo.addOrUpgrade(content = "query", accountKey = accountKey, saved = true)
+    repo.addOrUpgrade(content = "query", accountKey = accountKey, saved = false)
+    val savedSearch = repo.savedSearch(accountKey).first()
+    assert(savedSearch.isNotEmpty())
+  }
 
-    @Test
-    fun deleteFromDbAfterRemove() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("test")
-        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
-        val savedSearchFlow = repo.savedSearch(accountKey)
-        val searchHistoryFlow = repo.searchHistory(accountKey)
-        repo.addOrUpgrade(content = "query saved", accountKey = accountKey, saved = true)
-        repo.addOrUpgrade(content = "query history", accountKey = accountKey, saved = false)
-        assert(savedSearchFlow.first().isNotEmpty())
-        assert(searchHistoryFlow.first().isNotEmpty())
-        repo.remove(repo.savedSearch(accountKey).first().first())
-        repo.remove(repo.searchHistory(accountKey).first().first())
-        assert(savedSearchFlow.first().isEmpty())
-        assert(searchHistoryFlow.first().isEmpty())
-    }
+  @Test
+  fun deleteFromDbAfterRemove() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("test")
+    val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
+    val savedSearchFlow = repo.savedSearch(accountKey)
+    val searchHistoryFlow = repo.searchHistory(accountKey)
+    repo.addOrUpgrade(content = "query saved", accountKey = accountKey, saved = true)
+    repo.addOrUpgrade(content = "query history", accountKey = accountKey, saved = false)
+    assert(savedSearchFlow.first().isNotEmpty())
+    assert(searchHistoryFlow.first().isNotEmpty())
+    repo.remove(repo.savedSearch(accountKey).first().first())
+    repo.remove(repo.searchHistory(accountKey).first().first())
+    assert(savedSearchFlow.first().isEmpty())
+    assert(searchHistoryFlow.first().isEmpty())
+  }
 }

@@ -35,73 +35,73 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 internal class ListQueriesImplTest : BaseCacheDatabaseTest() {
-    private val accountKey = MicroBlogKey.twitter("account")
-    @Test
-    fun insert_ReplaceWhenPrimaryKeyEquals() = runBlocking {
-        val insert = mockIListModel("insert").toUi(accountKey)
-        database.listQueries.insert(insert.toDbList())
-        assertEquals(
-            "insert",
-            database.listQueries.findWithListKey(
-                accountKey = insert.accountKey,
-                listKey = insert.listKey
-            ).executeAsOneOrNull()?.title
-        )
-        database.listQueries.insert(insert.toDbList().copy(title = "replace"))
-        assertEquals(
-            "replace",
-            database.listQueries.findWithListKey(
-                accountKey = insert.accountKey,
-                listKey = insert.listKey
-            ).executeAsOneOrNull()?.title
-        )
+  private val accountKey = MicroBlogKey.twitter("account")
+  @Test
+  fun insert_ReplaceWhenPrimaryKeyEquals() = runBlocking {
+    val insert = mockIListModel("insert").toUi(accountKey)
+    database.listQueries.insert(insert.toDbList())
+    assertEquals(
+      "insert",
+      database.listQueries.findWithListKey(
+        accountKey = insert.accountKey,
+        listKey = insert.listKey
+      ).executeAsOneOrNull()?.title
+    )
+    database.listQueries.insert(insert.toDbList().copy(title = "replace"))
+    assertEquals(
+      "replace",
+      database.listQueries.findWithListKey(
+        accountKey = insert.accountKey,
+        listKey = insert.listKey
+      ).executeAsOneOrNull()?.title
+    )
+  }
+
+  @Test
+  fun getPagingList_ReturnResultsWithGiveLimitAndOffset() = runBlocking {
+    val list = listOf(
+      mockIListModel(name = "1"),
+      mockIListModel(name = "2"),
+      mockIListModel(name = "3"),
+      mockIListModel(name = "4"),
+    ).map { it.toUi(accountKey) }
+    database.listQueries.transaction {
+      list.forEach { database.listQueries.insert(it.toDbList()) }
     }
+    assertEquals(4, database.listQueries.getPagingCount(accountKey = accountKey).executeAsOne())
+    assertEquals(2, database.listQueries.getPagingList(accountKey = accountKey, limit = 2, offSet = 0).executeAsList().size)
+    assertEquals("3", database.listQueries.getPagingList(accountKey = accountKey, limit = 2, offSet = 2).executeAsList().first().title)
+  }
 
-    @Test
-    fun getPagingList_ReturnResultsWithGiveLimitAndOffset() = runBlocking {
-        val list = listOf(
-            mockIListModel(name = "1"),
-            mockIListModel(name = "2"),
-            mockIListModel(name = "3"),
-            mockIListModel(name = "4"),
-        ).map { it.toUi(accountKey) }
-        database.listQueries.transaction {
-            list.forEach { database.listQueries.insert(it.toDbList()) }
-        }
-        assertEquals(4, database.listQueries.getPagingCount(accountKey = accountKey).executeAsOne())
-        assertEquals(2, database.listQueries.getPagingList(accountKey = accountKey, limit = 2, offSet = 0).executeAsList().size)
-        assertEquals("3", database.listQueries.getPagingList(accountKey = accountKey, limit = 2, offSet = 2).executeAsList().first().title)
+  @Test
+  fun delete_DeleteListWithGiveUniqueIndex() = runBlocking {
+    val insert = mockIListModel("insert").toUi(accountKey)
+    database.listQueries.insert(insert.toDbList())
+    val flow = database.listQueries.findWithListKey(accountKey = insert.accountKey, listKey = insert.listKey).asFlow().mapToOneOrNull()
+    assertNotNull(flow.firstOrNull())
+    database.listQueries.delete(accountKey = insert.accountKey, listKey = insert.listKey)
+    assertNull(flow.firstOrNull())
+  }
+
+  @Test
+  fun clearAll_DeleteAllListMatchesAccountKey() = runBlocking {
+    val list = mutableListOf(
+      mockIListModel(name = "1"),
+      mockIListModel(name = "2"),
+      mockIListModel(name = "3"),
+      mockIListModel(name = "4"),
+    ).map { it.toUi(accountKey) }
+    database.listQueries.transaction {
+      list.forEach { database.listQueries.insert(it.toDbList()) }
     }
+    val otherAcct = MicroBlogKey.twitter("other")
+    database.listQueries.insert(mockIListModel().toUi(otherAcct).toDbList())
+    assertEquals(4, database.listQueries.getPagingCount(accountKey = accountKey).executeAsOne())
+    assertEquals(1, database.listQueries.getPagingCount(accountKey = otherAcct).executeAsOne())
 
-    @Test
-    fun delete_DeleteListWithGiveUniqueIndex() = runBlocking {
-        val insert = mockIListModel("insert").toUi(accountKey)
-        database.listQueries.insert(insert.toDbList())
-        val flow = database.listQueries.findWithListKey(accountKey = insert.accountKey, listKey = insert.listKey).asFlow().mapToOneOrNull()
-        assertNotNull(flow.firstOrNull())
-        database.listQueries.delete(accountKey = insert.accountKey, listKey = insert.listKey)
-        assertNull(flow.firstOrNull())
-    }
+    database.listQueries.clearAll(accountKey = accountKey)
 
-    @Test
-    fun clearAll_DeleteAllListMatchesAccountKey() = runBlocking {
-        val list = mutableListOf(
-            mockIListModel(name = "1"),
-            mockIListModel(name = "2"),
-            mockIListModel(name = "3"),
-            mockIListModel(name = "4"),
-        ).map { it.toUi(accountKey) }
-        database.listQueries.transaction {
-            list.forEach { database.listQueries.insert(it.toDbList()) }
-        }
-        val otherAcct = MicroBlogKey.twitter("other")
-        database.listQueries.insert(mockIListModel().toUi(otherAcct).toDbList())
-        assertEquals(4, database.listQueries.getPagingCount(accountKey = accountKey).executeAsOne())
-        assertEquals(1, database.listQueries.getPagingCount(accountKey = otherAcct).executeAsOne())
-
-        database.listQueries.clearAll(accountKey = accountKey)
-
-        assertEquals(0, database.listQueries.getPagingCount(accountKey = accountKey).executeAsOne())
-        assertEquals(1, database.listQueries.getPagingCount(accountKey = otherAcct).executeAsOne())
-    }
+    assertEquals(0, database.listQueries.getPagingCount(accountKey = accountKey).executeAsOne())
+    assertEquals(1, database.listQueries.getPagingCount(accountKey = otherAcct).executeAsOne())
+  }
 }

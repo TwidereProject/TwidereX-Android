@@ -31,63 +31,82 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.timeline.mastodon.FederatedTimelineViewModel
+import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
 class FederatedTimelineItem : HomeNavigationItem() {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_federated_title)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_federated_title)
+  }
 
-    override val route: String
-        get() = Root.Mastodon.FederatedTimeline
+  override val route: String
+    get() = Root.Mastodon.FederatedTimeline
 
-    @Composable
-    override fun icon(): Painter {
-        return painterResource(res = com.twidere.twiderex.MR.files.ic_globe)
-    }
+  @Composable
+  override fun icon(): Painter {
+    return painterResource(res = com.twidere.twiderex.MR.files.ic_globe)
+  }
 
-    @Composable
-    override fun Content() {
-        FederatedTimelineContent(
-            lazyListController = lazyListController
-        )
-    }
+  @Composable
+  override fun Content(navigator: Navigator) {
+    FederatedTimelineContent(
+      lazyListController = lazyListController,
+      navigator = navigator,
+    )
+  }
 }
 
+@NavGraphDestination(
+  route = Root.Mastodon.FederatedTimeline,
+)
 @Composable
-fun FederatedTimelineScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = "Federated")
-                    }
-                )
-            }
-        ) {
-            FederatedTimelineContent()
-        }
+fun FederatedTimelineScene(
+  navigator: Navigator
+) {
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
+          },
+          title = {
+            Text(text = "Federated")
+          }
+        )
+      }
+    ) {
+      FederatedTimelineContent(
+        navigator = navigator
+      )
     }
+  }
 }
 
 @Composable
 fun FederatedTimelineContent(
-    lazyListController: LazyListController? = null,
+  lazyListController: LazyListController? = null,
+  navigator: Navigator,
 ) {
-    val account = LocalActiveAccount.current ?: return
-    if (account.service !is MastodonService) {
-        return
-    }
-    val viewModel: FederatedTimelineViewModel = getViewModel()
-    TimelineComponent(viewModel = viewModel, lazyListController = lazyListController)
+  val account = LocalActiveAccount.current ?: return
+  if (account.service !is MastodonService) {
+    return
+  }
+  val statusNavigationData = rememberStatusNavigationData(navigator)
+  TimelineComponent(
+    lazyListController = lazyListController,
+    savedStateKeyType = SavedStateKeyType.FEDERATED,
+    statusNavigation = statusNavigationData,
+  )
 }

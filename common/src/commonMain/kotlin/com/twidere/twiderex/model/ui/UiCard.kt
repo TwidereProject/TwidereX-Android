@@ -20,10 +20,13 @@
  */
 package com.twidere.twiderex.model.ui
 
+import androidx.compose.runtime.Stable
+
+@Stable
 data class UiCard(
-    val link: String,
-    val displayLink: String?,
-    val title: String?,
-    val description: String?,
-    val image: String?,
+  val link: String,
+  val displayLink: String?,
+  val title: String?,
+  val description: String?,
+  val image: String?,
 )

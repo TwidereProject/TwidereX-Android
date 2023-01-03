@@ -29,11 +29,11 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
 internal class SqlDelightMediaDaoImplTest : BaseCacheDatabaseTest() {
-    @Test
-    fun returnUiMediaWithGivenBelongToKey() = runBlocking {
-        val belongToKey = MicroBlogKey.valueOf("test")
-        val dao = SqlDelightMediaDaoImpl(database.mediaQueries)
-        database.mediaQueries.insert(mockUiMedia(belongToKey = belongToKey).toDbMedia())
-        assert(dao.findMediaByBelongToKey(belongToKey = belongToKey).isNotEmpty())
-    }
+  @Test
+  fun returnUiMediaWithGivenBelongToKey() = runBlocking {
+    val belongToKey = MicroBlogKey.valueOf("test")
+    val dao = SqlDelightMediaDaoImpl(database.mediaQueries)
+    database.mediaQueries.insert(mockUiMedia(belongToKey = belongToKey).toDbMedia())
+    assert(dao.findMediaByBelongToKey(belongToKey = belongToKey).isNotEmpty())
+  }
 }

@@ -20,17 +20,12 @@
  */
 package com.twidere.twiderex.ui
 
-// import android.app.Activity
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.staticCompositionLocalOf
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.preferences.model.DisplayPreferences
-import moe.tlaster.precompose.navigation.NavController
 
-val LocalNavController = staticCompositionLocalOf<NavController> { error("No NavController") }
 val LocalActiveAccount = compositionLocalOf<AccountDetails?> { null }
 val LocalActiveAccountViewModel =
-    compositionLocalOf<com.twidere.twiderex.viewmodel.ActiveAccountViewModel> { error("No ActiveAccountViewModel") }
-// val LocalActivity = staticCompositionLocalOf<Activity> { error("NoActivity") }
+  compositionLocalOf<com.twidere.twiderex.viewmodel.ActiveAccountViewModel> { error("No ActiveAccountViewModel") }
 val LocalVideoPlayback = compositionLocalOf { DisplayPreferences.AutoPlayback.Auto }
 val LocalIsActiveNetworkMetered = compositionLocalOf { false }

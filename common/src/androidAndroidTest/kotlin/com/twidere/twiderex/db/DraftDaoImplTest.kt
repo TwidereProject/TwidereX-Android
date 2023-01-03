@@ -31,32 +31,32 @@ import kotlin.test.assertNull
 
 internal class DraftDaoImplTest : AppDatabaseDaoTest() {
 
-    @Test
-    fun getAll_returnResultFlow(): Unit = runBlocking {
-        val appDatabase = AppDatabaseImpl(roomDatabase)
-        val resultFlow = appDatabase.draftDao().getAll()
-        assertEquals(0, resultFlow.firstOrNull()?.size)
-        val removeDraft = mockUiDraft()
-        appDatabase.withTransaction {
-            appDatabase.draftDao().insert(removeDraft)
-            appDatabase.draftDao().insert(mockUiDraft())
-        }
-        assertEquals(2, resultFlow.firstOrNull()?.size)
-
-        appDatabase.draftDao().remove(removeDraft)
-
-        assertNull(appDatabase.draftDao().get(removeDraft.draftId))
+  @Test
+  fun getAll_returnResultFlow(): Unit = runBlocking {
+    val appDatabase = AppDatabaseImpl(roomDatabase)
+    val resultFlow = appDatabase.draftDao().getAll()
+    assertEquals(0, resultFlow.firstOrNull()?.size)
+    val removeDraft = mockUiDraft()
+    appDatabase.withTransaction {
+      appDatabase.draftDao().insert(removeDraft)
+      appDatabase.draftDao().insert(mockUiDraft())
     }
+    assertEquals(2, resultFlow.firstOrNull()?.size)
 
-    @Test
-    fun getDraftCount_returnCorrectCountFlow(): Unit = runBlocking {
-        val appDatabase = AppDatabaseImpl(roomDatabase)
-        val resultFlow = appDatabase.draftDao().getDraftCount()
-        assertEquals(0, resultFlow.firstOrNull())
-        appDatabase.withTransaction {
-            appDatabase.draftDao().insert(mockUiDraft())
-            appDatabase.draftDao().insert(mockUiDraft())
-        }
-        assertEquals(2, resultFlow.firstOrNull())
+    appDatabase.draftDao().remove(removeDraft)
+
+    assertNull(appDatabase.draftDao().get(removeDraft.draftId))
+  }
+
+  @Test
+  fun getDraftCount_returnCorrectCountFlow(): Unit = runBlocking {
+    val appDatabase = AppDatabaseImpl(roomDatabase)
+    val resultFlow = appDatabase.draftDao().getDraftCount()
+    assertEquals(0, resultFlow.firstOrNull())
+    appDatabase.withTransaction {
+      appDatabase.draftDao().insert(mockUiDraft())
+      appDatabase.draftDao().insert(mockUiDraft())
     }
+    assertEquals(2, resultFlow.firstOrNull())
+  }
 }

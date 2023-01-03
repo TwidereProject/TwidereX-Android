@@ -24,12 +24,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 actual class PlatformWindow {
-    private val _visibilityFlow = MutableStateFlow(true)
-    actual val windowBarVisibility: Flow<Boolean> get() = _visibilityFlow
-    actual fun hideControls() {
-        _visibilityFlow.value = false
-    }
-    actual fun showControls() {
-        _visibilityFlow.value = true
-    }
+  private val _visibilityFlow = MutableStateFlow(true)
+  actual val windowBarVisibility: Flow<Boolean> get() = _visibilityFlow
+  actual fun hideControls() {
+    _visibilityFlow.value = false
+  }
+  actual fun showControls() {
+    _visibilityFlow.value = true
+  }
 }

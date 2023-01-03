@@ -32,65 +32,65 @@ import org.jetbrains.annotations.TestOnly
 
 internal class MockPagingSource<T : Any> @TestOnly constructor(val data: List<T>) : PagingSource<Int, T>() {
 
-    override fun getRefreshKey(state: PagingState<Int, T>): Int? {
-        return null
-    }
+  override fun getRefreshKey(state: PagingState<Int, T>): Int? {
+    return null
+  }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, T> {
-        return try {
-            val page = params.key ?: 0
-            val count = params.loadSize
-            val startIndex = page * count
-            val endIndex = page * count + count
-            val result = when {
-                endIndex <= data.size -> {
-                    data.subList(startIndex, endIndex)
-                }
-                data.size in (startIndex + 1) until endIndex -> {
-                    data.subList(startIndex, data.size)
-                }
-                else -> {
-                    emptyList()
-                }
-            }
-            LoadResult.Page(result, null, if (result.isEmpty()) null else page + 1)
-        } catch (e: Exception) {
-            LoadResult.Error(e)
+  override suspend fun load(params: LoadParams<Int>): LoadResult<Int, T> {
+    return try {
+      val page = params.key ?: 0
+      val count = params.loadSize
+      val startIndex = page * count
+      val endIndex = page * count + count
+      val result = when {
+        endIndex <= data.size -> {
+          data.subList(startIndex, endIndex)
         }
+        data.size in (startIndex + 1) until endIndex -> {
+          data.subList(startIndex, data.size)
+        }
+        else -> {
+          emptyList()
+        }
+      }
+      LoadResult.Page(result, null, if (result.isEmpty()) null else page + 1)
+    } catch (e: Exception) {
+      LoadResult.Error(e)
     }
+  }
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestOnly
 internal suspend fun <T : Any> PagingData<T>.collectDataForTest(): List<T> {
-    val dcb = object : DifferCallback {
-        override fun onChanged(position: Int, count: Int) {}
-        override fun onInserted(position: Int, count: Int) {}
-        override fun onRemoved(position: Int, count: Int) {}
+  val dcb = object : DifferCallback {
+    override fun onChanged(position: Int, count: Int) {}
+    override fun onInserted(position: Int, count: Int) {}
+    override fun onRemoved(position: Int, count: Int) {}
+  }
+  val items = mutableListOf<T>()
+  val dif = object : PagingDataDiffer<T>(dcb, UnconfinedTestDispatcher()) {
+    override suspend fun presentNewList(
+      previousList: NullPaddedList<T>,
+      newList: NullPaddedList<T>,
+      lastAccessedIndex: Int,
+      onListPresentable: () -> Unit
+    ): Int? {
+      for (idx in 0 until newList.size)
+        items.add(newList.getFromStorage(idx))
+      onListPresentable()
+      return null
     }
-    val items = mutableListOf<T>()
-    val dif = object : PagingDataDiffer<T>(dcb, UnconfinedTestDispatcher()) {
-        override suspend fun presentNewList(
-            previousList: NullPaddedList<T>,
-            newList: NullPaddedList<T>,
-            lastAccessedIndex: Int,
-            onListPresentable: () -> Unit
-        ): Int? {
-            for (idx in 0 until newList.size)
-                items.add(newList.getFromStorage(idx))
-            onListPresentable()
-            return null
-        }
-    }
-    dif.collectFrom(this)
-    return items
+  }
+  dif.collectFrom(this)
+  return items
 }
 
 @TestOnly
 internal suspend fun <K : Any, V : Any> PagingSource<K, V>.collectDataForTest(): List<V> {
-    return if (this is MockPagingSource) {
-        PagingData.from(this.data).collectDataForTest()
-    } else {
-        emptyList()
-    }
+  return if (this is MockPagingSource) {
+    PagingData.from(this.data).collectDataForTest()
+  } else {
+    emptyList()
+  }
 }

@@ -41,7 +41,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
@@ -50,6 +49,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,7 +62,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.HumanizedTime
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.icon
@@ -70,666 +70,754 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiCard
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
+import com.twidere.twiderex.navigation.StatusNavigationData
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.utils.PreviewResolver
 
 @Composable
 fun TimelineStatusComponent(
-    data: UiStatus,
-    showActions: Boolean = true,
-    lineUp: Boolean = false,
-    lineDown: Boolean = false,
-    threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
+  data: UiStatus,
+  showActions: Boolean = true,
+  lineUp: Boolean = false,
+  lineDown: Boolean = false,
+  threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
+  statusNavigation: StatusNavigationData
 ) {
-    when {
-        data.platformType == PlatformType.Mastodon &&
-            data.mastodonExtra != null &&
-            (
-                data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
-                    data.mastodonExtra.type == MastodonStatusType.NotificationFollow
-                ) -> {
-            MastodonFollowStatus(data)
-        }
-        else -> NormalStatus(data, showActions, threadStyle, lineUp, lineDown)
+  when {
+    data.platformType == PlatformType.Mastodon &&
+      data.mastodonExtra != null &&
+      (
+        data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
+          data.mastodonExtra.type == MastodonStatusType.NotificationFollow
+        ) -> {
+      MastodonFollowStatus(data, statusNavigation)
     }
+    else -> NormalStatus(data, showActions, threadStyle, lineUp, lineDown, statusNavigation)
+  }
 }
 
 @Composable
-fun MastodonFollowStatus(data: UiStatus) {
-    val navigator = LocalNavigator.current
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                navigator.user(data.user)
-            }
-            .padding(MastodonFollowStatusDefaults.ContentPadding),
-    ) {
-        StatusHeader(data = data)
-        Row {
-            UserAvatar(user = data.user)
-            Spacer(modifier = Modifier.width(MastodonFollowStatusDefaults.AvatarSpacing))
-            Column {
-                UserName(data.user)
-                Spacer(modifier = Modifier.width(MastodonFollowStatusDefaults.NameSpacing))
-                UserScreenName(data.user)
-            }
-        }
+fun MastodonFollowStatus(
+  data: UiStatus,
+  statusNavigation: StatusNavigationData,
+) {
+  Column(
+    modifier = Modifier
+      .fillMaxWidth()
+      .clickable {
+        statusNavigation.toUser.invoke(data.user)
+      }
+      .padding(MastodonFollowStatusDefaults.ContentPadding),
+  ) {
+    StatusHeader(
+      data = data,
+      statusNavigation = statusNavigation,
+    )
+    Row {
+      UserAvatar(user = data.user, onClick = statusNavigation.toUser)
+      Spacer(modifier = Modifier.width(MastodonFollowStatusDefaults.AvatarSpacing))
+      Column {
+        UserName(
+          user = data.user,
+          onUserNameClicked = statusNavigation.openLink
+        )
+        Spacer(modifier = Modifier.width(MastodonFollowStatusDefaults.NameSpacing))
+        UserScreenName(data.user)
+      }
     }
+  }
 }
 
 object MastodonFollowStatusDefaults {
-    val ContentPadding = PaddingValues(
-        horizontal = 16.dp,
-        vertical = 8.dp
-    )
-    val AvatarSpacing = 8.dp
-    val NameSpacing = 4.dp
+  val ContentPadding = PaddingValues(
+    horizontal = 16.dp,
+    vertical = 8.dp
+  )
+  val AvatarSpacing = 8.dp
+  val NameSpacing = 4.dp
 }
 
 @Composable
 private fun NormalStatus(
-    data: UiStatus,
-    showActions: Boolean,
-    threadStyle: StatusThreadStyle,
-    lineUp: Boolean,
-    lineDown: Boolean
+  data: UiStatus,
+  showActions: Boolean,
+  threadStyle: StatusThreadStyle,
+  lineUp: Boolean,
+  lineDown: Boolean,
+  statusNavigation: StatusNavigationData,
 ) {
-    val navigator = LocalNavigator.current
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(
-                onClick = {
-                    navigator.status(data)
-                },
+  Column(
+    modifier = Modifier
+      .fillMaxWidth()
+      .clickable(
+        onClick = {
+          statusNavigation.toStatus.invoke(data)
+        },
+      )
+  ) {
+    StatusContent(
+      contentPadding = NormalStatusDefaults.ContentPadding,
+      threadStyle = threadStyle,
+      lineUp = lineUp,
+      lineDown = lineDown || (threadStyle.lineDown && data.isInThread()),
+      data = data,
+      footer = {
+        Column {
+          if (showActions) {
+            StatusActions(
+              status = data,
+              statusNavigation = statusNavigation,
             )
-    ) {
-        StatusContent(
-            contentPadding = NormalStatusDefaults.ContentPadding,
-            threadStyle = threadStyle,
-            lineUp = lineUp,
-            lineDown = lineDown || (threadStyle.lineDown && data.isInThread()),
-            data = data,
-            footer = {
-                Column {
-                    if (showActions) {
-                        StatusActions(data)
-                    } else {
-                        Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
-                    }
-                }
-            },
-            isSelectionAble = false,
-        )
-    }
+          } else {
+            Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
+          }
+        }
+      },
+      isSelectionAble = true,
+      statusNavigation = statusNavigation,
+    )
+  }
 }
 
 object NormalStatusDefaults {
-    val ContentPadding = PaddingValues(
-        start = 16.dp,
-        end = 16.dp,
-        top = 12.dp
-    )
-    val ContentSpacing = 8.dp
-    val ThreadSpacing = 18.dp
-    val ThreadBottomPadding = 6.dp
+  val ContentPadding = PaddingValues(
+    start = 16.dp,
+    end = 16.dp,
+    top = 12.dp
+  )
+  val ContentSpacing = 8.dp
+  val ThreadSpacing = 18.dp
+  val ThreadBottomPadding = 6.dp
 }
 
 @Composable
-private fun StatusHeader(data: UiStatus) {
-    when {
-        data.platformType == PlatformType.Mastodon && data.mastodonExtra != null && data.mastodonExtra.type != MastodonStatusType.Status -> {
-            MastodonStatusHeader(data.mastodonExtra, data)
-        }
-        data.retweet != null -> {
-            RetweetHeader(data = data)
-            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
-        }
+private fun StatusHeader(
+  data: UiStatus,
+  statusNavigation: StatusNavigationData,
+) {
+  when {
+    data.platformType == PlatformType.Mastodon &&
+      data.mastodonExtra != null &&
+      data.mastodonExtra.type != MastodonStatusType.Status -> {
+      MastodonStatusHeader(
+        mastodonExtra = data.mastodonExtra,
+        data = data,
+        openLink = statusNavigation.openLink,
+      )
     }
+    data.retweet != null -> {
+      RetweetHeader(
+        data = data,
+        openLink = statusNavigation.openLink,
+      )
+      Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
+    }
+  }
 }
 
 private object StatusHeaderDefaults {
-    val HeaderSpacing = 8.dp
+  val HeaderSpacing = 8.dp
 }
 
 @Composable
 private fun MastodonStatusHeader(
-    mastodonExtra: MastodonStatusExtra,
-    data: UiStatus
+  mastodonExtra: MastodonStatusExtra,
+  data: UiStatus,
+  openLink: (String) -> Unit,
 ) {
-    when (mastodonExtra.type) {
-        MastodonStatusType.Status -> Unit
-        MastodonStatusType.NotificationFollow -> {
-            TweetHeader(
-                icon = {
-                    Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_user_plus),
-                        contentDescription = null,
-                        tint = Color(0xFF4C9EEB),
-                    )
-                },
-                text = {
-                    Text(
-                        text = stringResource(
-                            res = com.twidere.twiderex.MR.strings.common_notification_follow,
-                            data.user.displayName
-                        )
-                    )
-                }
+  when (mastodonExtra.type) {
+    MastodonStatusType.Status -> Unit
+    MastodonStatusType.NotificationFollow -> {
+      TweetHeader(
+        icon = {
+          Icon(
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_user_plus),
+            contentDescription = null,
+            tint = Color(0xFF4C9EEB),
+          )
+        },
+        text = {
+          Text(
+            text = stringResource(
+              res = com.twidere.twiderex.MR.strings.common_notification_follow,
+              data.user.displayName
             )
-            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
+          )
         }
-        MastodonStatusType.NotificationFollowRequest -> {
-            TweetHeader(
-                icon = {
-                    Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_user_exclamation),
-                        contentDescription = null,
-                        tint = Color(0xFFFF9500),
-                    )
-                },
-                text = {
-                    Text(
-                        text = stringResource(
-                            res = com.twidere.twiderex.MR.strings.common_notification_follow_request,
-                            data.user.displayName
-                        )
-                    )
-                }
-            )
-            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
-        }
-        MastodonStatusType.NotificationMention -> Unit
-        MastodonStatusType.NotificationReblog -> {
-            RetweetHeader(data = data)
-            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
-        }
-        MastodonStatusType.NotificationFavourite -> {
-            TweetHeader(
-                icon = {
-                    Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_heart),
-                        contentDescription = null,
-                        tint = Color(0xFFFF2D55),
-                    )
-                },
-                text = {
-                    Text(
-                        text = stringResource(
-                            res = com.twidere.twiderex.MR.strings.common_notification_favourite,
-                            data.user.displayName
-                        )
-                    )
-                }
-            )
-            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
-        }
-        MastodonStatusType.NotificationPoll -> {
-            TweetHeader(
-                icon = {
-                    Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_poll),
-                        contentDescription = null,
-                        tint = Color(0xFF4C9EEB),
-                    )
-                },
-                text = {
-                    val text =
-                        if (LocalActiveAccount.current?.let { it.accountKey == data.user.userKey } == true) {
-                            stringResource(
-                                res = com.twidere.twiderex.MR.strings.common_notification_own_poll,
-                            )
-                        } else {
-                            stringResource(
-                                res = com.twidere.twiderex.MR.strings.common_notification_poll,
-                            )
-                        }
-
-                    Text(
-                        text = text
-                    )
-                }
-            )
-            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
-        }
-        MastodonStatusType.NotificationStatus -> {
-            TweetHeader(
-                icon = {
-                    Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_bell_ringing),
-                        contentDescription = null,
-                        tint = Color(0xFFFF9500),
-                    )
-                },
-                text = {
-                    Text(
-                        text = stringResource(
-                            res = com.twidere.twiderex.MR.strings.common_notification_status,
-                            data.user.displayName
-                        )
-                    )
-                }
-            )
-            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
-        }
+      )
+      Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
     }
+    MastodonStatusType.NotificationFollowRequest -> {
+      TweetHeader(
+        icon = {
+          Icon(
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_user_exclamation),
+            contentDescription = null,
+            tint = Color(0xFFFF9500),
+          )
+        },
+        text = {
+          Text(
+            text = stringResource(
+              res = com.twidere.twiderex.MR.strings.common_notification_follow_request,
+              data.user.displayName
+            )
+          )
+        }
+      )
+      Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
+    }
+    MastodonStatusType.NotificationMention -> Unit
+    MastodonStatusType.NotificationReblog -> {
+      RetweetHeader(
+        data = data,
+        openLink = openLink,
+      )
+      Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
+    }
+    MastodonStatusType.NotificationFavourite -> {
+      TweetHeader(
+        icon = {
+          Icon(
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_heart),
+            contentDescription = null,
+            tint = Color(0xFFFF2D55),
+          )
+        },
+        text = {
+          Text(
+            text = stringResource(
+              res = com.twidere.twiderex.MR.strings.common_notification_favourite,
+              data.user.displayName
+            )
+          )
+        }
+      )
+      Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
+    }
+    MastodonStatusType.NotificationPoll -> {
+      TweetHeader(
+        icon = {
+          Icon(
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_poll),
+            contentDescription = null,
+            tint = Color(0xFF4C9EEB),
+          )
+        },
+        text = {
+          val text =
+            if (LocalActiveAccount.current?.let { it.accountKey == data.user.userKey } == true) {
+              stringResource(
+                res = com.twidere.twiderex.MR.strings.common_notification_own_poll,
+              )
+            } else {
+              stringResource(
+                res = com.twidere.twiderex.MR.strings.common_notification_poll,
+              )
+            }
+
+          Text(
+            text = text
+          )
+        }
+      )
+      Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
+    }
+    MastodonStatusType.NotificationStatus -> {
+      TweetHeader(
+        icon = {
+          Icon(
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_bell_ringing),
+            contentDescription = null,
+            tint = Color(0xFFFF9500),
+          )
+        },
+        text = {
+          Text(
+            text = stringResource(
+              res = com.twidere.twiderex.MR.strings.common_notification_status,
+              data.user.displayName
+            )
+          )
+        }
+      )
+      Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
+    }
+  }
 }
 
 @Composable
-private fun StatusActions(status: UiStatus) {
-    CompositionLocalProvider(
-        LocalContentAlpha provides ContentAlpha.medium,
+private fun StatusActions(
+  status: UiStatus,
+  statusNavigation: StatusNavigationData,
+) {
+  CompositionLocalProvider(
+    LocalContentAlpha provides ContentAlpha.medium,
+  ) {
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            ReplyButton(status = status)
-            RetweetButton(status = status)
-            LikeButton(status = status)
-            ShareButton(status = status, compat = true)
-        }
+      ReplyButton(
+        status = status,
+        compose = statusNavigation.composeNavigationData.compose
+      )
+      RetweetButton(
+        status = status,
+        compose = statusNavigation.composeNavigationData.compose
+      )
+      LikeButton(status = status)
+      ShareButton(status = status, compat = true)
     }
+  }
 }
 
 enum class StatusContentType {
-    Normal,
-    Extend,
+  Normal,
+  Extend,
 }
 
 @Composable
 fun AvatarConnectLine(
-    modifier: Modifier = Modifier,
-    lineWidth: Dp = AvatarConnectLineDefaults.LineWidth,
-    lineShape: Shape = RoundedCornerShape(lineWidth / 2),
-    lineColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
+  modifier: Modifier = Modifier,
+  lineWidth: Dp = AvatarConnectLineDefaults.LineWidth,
+  lineShape: Shape = RoundedCornerShape(lineWidth / 2),
+  lineColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
 ) {
-    Box(modifier.clip(lineShape)) {
-        Box(
-            modifier = Modifier
-                .width(lineWidth)
-                .fillMaxHeight()
-                .background(lineColor)
-        )
-    }
+  Box(modifier.clip(lineShape)) {
+    Box(
+      modifier = Modifier
+        .width(lineWidth)
+        .fillMaxHeight()
+        .background(lineColor)
+    )
+  }
 }
 
 object AvatarConnectLineDefaults {
-    val LineWidth = 2.dp
+  val LineWidth = 2.dp
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun StatusContent(
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    data: UiStatus,
-    type: StatusContentType = StatusContentType.Normal,
-    lineDown: Boolean = false,
-    lineUp: Boolean = false,
-    threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
-    footer: @Composable () -> Unit = {},
-    isSelectionAble: Boolean = true,
+  modifier: Modifier = Modifier,
+  contentPadding: PaddingValues = PaddingValues(0.dp),
+  data: UiStatus,
+  type: StatusContentType = StatusContentType.Normal,
+  lineDown: Boolean = false,
+  lineUp: Boolean = false,
+  threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
+  footer: @Composable () -> Unit = {},
+  isSelectionAble: Boolean = true,
+  statusNavigation: StatusNavigationData,
 ) {
-    val layoutDirection = LocalLayoutDirection.current
-    val status = data.retweet ?: data
-    Column(
-        modifier = modifier
-            .padding(
-                start = contentPadding.calculateLeftPadding(layoutDirection),
-                end = contentPadding.calculateRightPadding(layoutDirection)
-            )
-            .wrapContentHeight()
-            .fillMaxWidth()
-    ) {
-        // Status header, include line up and tweet headers e.g. retweet
-        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
-            if (lineUp) {
-                AvatarConnectLine(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(start = UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2),
-                    lineShape = RoundedCornerShape(
-                        bottomStart = AvatarConnectLineDefaults.LineWidth / 2,
-                        bottomEnd = AvatarConnectLineDefaults.LineWidth / 2
-                    )
-                )
-            }
-            Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2))
-            Column {
-                Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
-                StatusHeader(data)
-            }
-        }
-        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxHeight()
-            ) {
-                UserAvatar(user = status.user, modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing))
-                if (lineDown) {
-                    AvatarConnectLine(
-                        modifier = Modifier
-                            .weight(1f),
-                        lineShape = RoundedCornerShape(
-                            topStart = AvatarConnectLineDefaults.LineWidth / 2,
-                            topEnd = AvatarConnectLineDefaults.LineWidth / 2
-                        )
-                    )
-                }
-                // Thread Avatar
-                if (threadStyle == StatusThreadStyle.WITH_AVATAR && data.isInThread()) {
-                    UserAvatar(
-                        user = data.user,
-                        size = StatusThreadDefaults.AvatarSize,
-                        modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing)
-                    )
-                    Spacer(modifier = Modifier.height(NormalStatusDefaults.ThreadBottomPadding))
-                }
-            }
-            Spacer(modifier = Modifier.width(StatusContentDefaults.AvatarSpacing))
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Row(
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        UserName(status.user, fontWeight = FontWeight.W600)
-                        if (type == StatusContentType.Normal) {
-                            Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
-                            UserScreenName(status.user)
-                        }
-                    }
-                    CompositionLocalProvider(
-                        LocalContentAlpha provides ContentAlpha.disabled
-                    ) {
-                        val mastodonExtra = status.mastodonExtra
-                        if (status.platformType == PlatformType.Mastodon && mastodonExtra != null) {
-                            Icon(
-                                modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
-                                painter = mastodonExtra.visibility.icon(),
-                                contentDescription = mastodonExtra.visibility.name
-                            )
-                            Spacer(modifier = Modifier.width(StatusContentDefaults.Mastodon.VisibilitySpacing))
-                        }
-                        if (type == StatusContentType.Normal) {
-                            HumanizedTime(time = status.timestamp)
-                        }
-                    }
-                }
-                when (type) {
-                    StatusContentType.Normal -> {
-                        Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
-                        StatusBody(
-                            status = status,
-                            type = type,
-                            isSelectionAble = isSelectionAble,
-                        )
-                    }
-                    StatusContentType.Extend -> UserScreenName(status.user)
-                }
-                if (type == StatusContentType.Extend) {
-                    Column {
-                        Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
-                        StatusBody(
-                            status = status,
-                            type = type,
-                            isSelectionAble = isSelectionAble
-                        )
-                    }
-                }
-                Column {
-                    Spacer(modifier = Modifier.height(StatusContentDefaults.FooterSpacing))
-                    footer.invoke()
-                    Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
-                }
-                if (data.isInThread()) {
-                    StatusThread(threadStyle, data)
-                    Spacer(modifier = Modifier.height(NormalStatusDefaults.ThreadBottomPadding))
-                }
-            }
-        }
+  val layoutDirection = LocalLayoutDirection.current
+  val status = data.retweet ?: data
+  Column(
+    modifier = modifier
+      .padding(
+        start = contentPadding.calculateLeftPadding(layoutDirection),
+        end = contentPadding.calculateRightPadding(layoutDirection)
+      )
+      .wrapContentHeight()
+      .fillMaxWidth()
+  ) {
+    // Status header, include line up and tweet headers e.g. retweet
+    Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+      if (lineUp) {
+        AvatarConnectLine(
+          modifier = Modifier
+            .fillMaxHeight()
+            .padding(start = UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2),
+          lineShape = RoundedCornerShape(
+            bottomStart = AvatarConnectLineDefaults.LineWidth / 2,
+            bottomEnd = AvatarConnectLineDefaults.LineWidth / 2
+          )
+        )
+      }
+      Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2))
+      Column {
+        Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
+        StatusHeader(
+          data = data,
+          statusNavigation = statusNavigation,
+        )
+      }
     }
+    Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+      Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxHeight()
+      ) {
+        UserAvatar(
+          user = status.user,
+          modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing),
+          onClick = statusNavigation.toUser,
+        )
+        if (lineDown) {
+          AvatarConnectLine(
+            modifier = Modifier
+              .weight(1f),
+            lineShape = RoundedCornerShape(
+              topStart = AvatarConnectLineDefaults.LineWidth / 2,
+              topEnd = AvatarConnectLineDefaults.LineWidth / 2
+            )
+          )
+        }
+        // Thread Avatar
+        if (threadStyle == StatusThreadStyle.WITH_AVATAR && data.isInThread()) {
+          UserAvatar(
+            user = data.user,
+            size = StatusThreadDefaults.AvatarSize,
+            modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing),
+            onClick = statusNavigation.toUser,
+          )
+          Spacer(modifier = Modifier.height(NormalStatusDefaults.ThreadBottomPadding))
+        }
+      }
+      Spacer(modifier = Modifier.width(StatusContentDefaults.AvatarSpacing))
+      Column(
+        modifier = Modifier
+          .weight(1f)
+      ) {
+        Row(
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Row(
+            modifier = Modifier.weight(1f),
+          ) {
+            UserName(
+              status.user,
+              fontWeight = FontWeight.W600,
+              onUserNameClicked = statusNavigation.openLink,
+            )
+            if (type == StatusContentType.Normal) {
+              Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
+              UserScreenName(status.user)
+            }
+          }
+          CompositionLocalProvider(
+            LocalContentAlpha provides ContentAlpha.disabled
+          ) {
+            val mastodonExtra = status.mastodonExtra
+            if (status.platformType == PlatformType.Mastodon && mastodonExtra != null) {
+              Icon(
+                modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
+                painter = mastodonExtra.visibility.icon(),
+                contentDescription = mastodonExtra.visibility.name
+              )
+              Spacer(modifier = Modifier.width(StatusContentDefaults.Mastodon.VisibilitySpacing))
+            }
+            if (type == StatusContentType.Normal) {
+              HumanizedTime(time = status.timestamp)
+            }
+          }
+        }
+        when (type) {
+          StatusContentType.Normal -> {
+            Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
+            StatusBody(
+              status = status,
+              type = type,
+              isSelectionAble = isSelectionAble,
+              statusNavigation = statusNavigation,
+            )
+          }
+          StatusContentType.Extend -> UserScreenName(status.user)
+        }
+        if (type == StatusContentType.Extend) {
+          Column {
+            Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
+            StatusBody(
+              status = status,
+              type = type,
+              isSelectionAble = isSelectionAble,
+              statusNavigation = statusNavigation,
+            )
+          }
+        }
+        Column {
+          Spacer(modifier = Modifier.height(StatusContentDefaults.FooterSpacing))
+          footer.invoke()
+          Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
+        }
+        if (data.isInThread()) {
+          StatusThread(threadStyle, data, toStatus = statusNavigation.toStatus)
+          Spacer(modifier = Modifier.height(NormalStatusDefaults.ThreadBottomPadding))
+        }
+      }
+    }
+  }
 }
 
 @Composable
-private fun StatusThread(threadStyle: StatusThreadStyle, data: UiStatus) {
-    val navigator = LocalNavigator.current
-    when (threadStyle) {
-        StatusThreadStyle.NONE -> {
-            // show nothing
-        }
-        StatusThreadStyle.WITH_AVATAR, StatusThreadStyle.TEXT_ONLY -> {
-            StatusThreadTextOnly(
-                modifier = Modifier.padding(start = UserAvatarDefaults.AvatarSize),
-                onClick = {
-                    navigator.status(data)
-                }
-            )
-        }
+private fun StatusThread(
+  threadStyle: StatusThreadStyle,
+  data: UiStatus,
+  toStatus: (UiStatus) -> Unit,
+) {
+  when (threadStyle) {
+    StatusThreadStyle.NONE -> {
+      // show nothing
     }
+    StatusThreadStyle.WITH_AVATAR, StatusThreadStyle.TEXT_ONLY -> {
+      StatusThreadTextOnly(
+        modifier = Modifier.padding(start = UserAvatarDefaults.AvatarSize),
+        onClick = {
+          toStatus.invoke(data)
+        }
+      )
+    }
+  }
 }
 
 object StatusContentDefaults {
-    val FooterSpacing = 4.dp
-    val AvatarSpacing = 4.dp
+  val FooterSpacing = 4.dp
+  val AvatarSpacing = 4.dp
 
-    object Normal {
-        val BodySpacing = 4.dp
-        val UserNameSpacing = 4.dp
-    }
+  object Normal {
+    val BodySpacing = 4.dp
+    val UserNameSpacing = 4.dp
+  }
 
-    object Extend {
-        val BodySpacing = 8.dp
-    }
+  object Extend {
+    val BodySpacing = 8.dp
+  }
 
-    object Mastodon {
-        val VisibilitySpacing = 4.dp
-    }
+  object Mastodon {
+    val VisibilitySpacing = 4.dp
+  }
 
-    object AvatarLine {
-        val Spacing = 1.dp
-    }
+  object AvatarLine {
+    val Spacing = 1.dp
+  }
 }
 
 @Composable
 fun ColumnScope.StatusBody(
-    status: UiStatus,
-    type: StatusContentType,
-    isSelectionAble: Boolean,
+  status: UiStatus,
+  type: StatusContentType,
+  isSelectionAble: Boolean,
+  statusNavigation: StatusNavigationData,
 ) {
-    StatusText(
-        status = status,
-        isSelectionAble = isSelectionAble
+  StatusText(
+    status = status,
+    isSelectionAble = isSelectionAble,
+    openLink = statusNavigation.openLink,
+  )
+
+  StatusBodyMedia(
+    status = status,
+    statusNavigation = statusNavigation,
+  )
+
+  if (
+    LocalDisplayPreferences.current.urlPreview &&
+    !status.media.any() &&
+    status.card != null
+  ) {
+    val card by remember {
+      PreviewResolver.parsePreview(status.card)
+    }
+    Spacer(modifier = Modifier.height(StatusBodyDefaults.LinkPreviewSpacing))
+    StatusLinkPreview(
+      card = card,
+      openLink = statusNavigation.openLink
     )
+  }
 
-    StatusBodyMedia(status)
-
-    if (LocalDisplayPreferences.current.urlPreview && !status.media.any()) {
-        status.card?.let {
-            Spacer(modifier = Modifier.height(StatusBodyDefaults.LinkPreviewSpacing))
-            StatusLinkPreview(it)
-        }
+  if (status.geo.name.isNotEmpty() && type == StatusContentType.Normal) {
+    Spacer(modifier = Modifier.height(StatusBodyDefaults.PlaceSpacing))
+    CompositionLocalProvider(
+      LocalContentAlpha provides ContentAlpha.disabled
+    ) {
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Icon(
+          modifier = Modifier.size(16.dp),
+          painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
+          contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_location)
+        )
+        Box(modifier = Modifier.width(StatusBodyDefaults.PlaceSpacing))
+        Text(text = status.geo.name)
+      }
     }
+  }
 
-    if (status.geo.name.isNotEmpty() && type == StatusContentType.Normal) {
-        Spacer(modifier = Modifier.height(StatusBodyDefaults.PlaceSpacing))
-        CompositionLocalProvider(
-            LocalContentAlpha provides ContentAlpha.disabled
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    modifier = Modifier.size(16.dp),
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
-                    contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_location)
-                )
-                Box(modifier = Modifier.width(StatusBodyDefaults.PlaceSpacing))
-                Text(text = status.geo.name)
-            }
-        }
+  status.quote?.let { quote ->
+    Spacer(modifier = Modifier.height(StatusBodyDefaults.QuoteSpacing))
+    Box(
+      modifier = Modifier
+        .background(
+          LocalContentColor.current.copy(alpha = 0.04f),
+          shape = MaterialTheme.shapes.medium
+        )
+        .clip(MaterialTheme.shapes.medium)
+    ) {
+      MaterialTheme(
+        shapes = StatusBodyDefaults.QuoteShape,
+      ) {
+        StatusQuote(
+          quote = quote,
+          statusNavigation = statusNavigation,
+        )
+      }
     }
-
-    status.quote?.let { quote ->
-        Spacer(modifier = Modifier.height(StatusBodyDefaults.QuoteSpacing))
-        Box(
-            modifier = Modifier
-                .background(
-                    LocalContentColor.current.copy(alpha = 0.04f),
-                    shape = MaterialTheme.shapes.medium
-                )
-                .clip(MaterialTheme.shapes.medium)
-        ) {
-            MaterialTheme(
-                shapes = StatusBodyDefaults.QuoteShape,
-            ) {
-                StatusQuote(quote = quote)
-            }
-        }
-    }
+  }
 }
 
 object StatusBodyDefaults {
-    val QuoteShape
-        @Composable
-        get() = MaterialTheme.shapes.copy(medium = RoundedCornerShape(8.dp))
-    val LinkPreviewSpacing = 10.dp
-    val PlaceSpacing = 10.dp
-    val QuoteSpacing = 10.dp
+  val QuoteShape
+    @Composable
+    get() = MaterialTheme.shapes.copy(medium = RoundedCornerShape(8.dp))
+  val LinkPreviewSpacing = 10.dp
+  val PlaceSpacing = 10.dp
+  val QuoteSpacing = 10.dp
 }
 
 @Composable
-private fun StatusLinkPreview(card: UiCard) {
-    val navigator = LocalNavigator.current
-    LinkPreview(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                navigator.openLink(card.link)
-            },
-        link = card.displayLink ?: card.link,
-        title = card.title?.trim(),
-        image = card.image,
-        desc = card.description?.trim(),
-        maxLines = 5,
-    )
+private fun StatusLinkPreview(
+  card: UiCard,
+  openLink: (String) -> Unit,
+) {
+  LinkPreview(
+    modifier = Modifier
+      .fillMaxWidth()
+      .clickable {
+        openLink(card.link)
+      },
+    link = card.displayLink ?: card.link,
+    title = card.title?.trim(),
+    image = card.image,
+    desc = card.description?.trim(),
+    maxLines = 5,
+  )
 }
 
 @Composable
 @OptIn(ExperimentalAnimationApi::class)
 private fun ColumnScope.StatusBodyMedia(
-    status: UiStatus,
+  status: UiStatus,
+  statusNavigation: StatusNavigationData,
 ) {
-    val navigator = LocalNavigator.current
-    if (status.media.any()) {
-        Spacer(modifier = Modifier.height(StatusBodyMediaDefaults.Spacing))
-        AnimatedContent(LocalDisplayPreferences.current.mediaPreview) { mediaPreview ->
-            if (mediaPreview) {
-                StatusMediaComponent(status = status)
-            } else {
-                CompositionLocalProvider(
-                    LocalContentAlpha provides ContentAlpha.medium
-                ) {
-                    MediaPreviewButton {
-                        navigator.media(statusKey = status.statusKey)
-                    }
-                }
-            }
+  if (status.media.any()) {
+    Spacer(modifier = Modifier.height(StatusBodyMediaDefaults.Spacing))
+    AnimatedContent(LocalDisplayPreferences.current.mediaPreview) { mediaPreview ->
+      if (mediaPreview) {
+        StatusMediaComponent(
+          status = status,
+          statusNavigation = statusNavigation,
+        )
+      } else {
+        CompositionLocalProvider(
+          LocalContentAlpha provides ContentAlpha.medium
+        ) {
+          MediaPreviewButton {
+            statusNavigation.toMedia(status.statusKey)
+          }
         }
+      }
     }
+  }
 }
 
 object StatusBodyMediaDefaults {
-    val Spacing = 10.dp
+  val Spacing = 10.dp
 }
 
 @Composable
 fun MediaPreviewButton(
-    onClick: () -> Unit,
+  onClick: () -> Unit,
 ) {
-    Row(
-        modifier = Modifier
-            .background(
-                LocalContentColor.current.copy(alpha = 0.04f),
-                shape = MaterialTheme.shapes.small,
-            )
-            .clip(MaterialTheme.shapes.small)
-            .clipToBounds()
-            .clickable(
-                onClick = {
-                    onClick.invoke()
-                }
-            )
-            .padding(horizontal = 4.dp)
-            .height(30.dp)
-    ) {
-        Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_photo),
-            contentDescription = stringResource(
-                res = com.twidere.twiderex.MR.strings.accessibility_common_status_media
-            )
-        )
-        Spacer(modifier = Modifier.width(MediaPreviewButtonDefaults.IconSpacing))
-        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_status_media))
-    }
+  Row(
+    modifier = Modifier
+      .background(
+        LocalContentColor.current.copy(alpha = 0.04f),
+        shape = MaterialTheme.shapes.small,
+      )
+      .clip(MaterialTheme.shapes.small)
+      .clipToBounds()
+      .clickable(
+        onClick = {
+          onClick.invoke()
+        }
+      )
+      .padding(horizontal = 4.dp)
+      .height(30.dp)
+  ) {
+    Icon(
+      painter = painterResource(res = com.twidere.twiderex.MR.files.ic_photo),
+      contentDescription = stringResource(
+        res = com.twidere.twiderex.MR.strings.accessibility_common_status_media
+      )
+    )
+    Spacer(modifier = Modifier.width(MediaPreviewButtonDefaults.IconSpacing))
+    Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_status_media))
+  }
 }
 
 object MediaPreviewButtonDefaults {
-    val IconSpacing = 8.dp
+  val IconSpacing = 8.dp
 }
 
 @Composable
-fun StatusQuote(quote: UiStatus) {
-    val navigator = LocalNavigator.current
-    Column(
-        modifier = Modifier
-            .clickable(
-                onClick = {
-                    navigator.status(quote)
-                }
-            )
-            .padding(StatusQuoteDefaults.ContentPadding),
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            UserAvatar(
-                user = quote.user,
-                size = LocalTextStyle.current.fontSize.value.dp
-            )
-            Spacer(modifier = Modifier.width(StatusQuoteDefaults.AvatarSpacing))
-            Row(
-                modifier = Modifier.weight(1f),
-            ) {
-                UserName(quote.user)
-                Spacer(modifier = Modifier.width(StatusQuoteDefaults.NameSpacing))
-                UserScreenName(quote.user)
-            }
+fun StatusQuote(
+  quote: UiStatus,
+  statusNavigation: StatusNavigationData,
+) {
+  Column(
+    modifier = Modifier
+      .clickable(
+        onClick = {
+          statusNavigation.toStatus(quote)
         }
-        Spacer(modifier = Modifier.height(StatusQuoteDefaults.TextSpacing))
-        StatusText(
-            status = quote,
-            maxLines = 5,
-            isSelectionAble = false
+      )
+      .padding(StatusQuoteDefaults.ContentPadding),
+  ) {
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      UserAvatar(
+        user = quote.user,
+        size = LocalTextStyle.current.fontSize.value.dp,
+        onClick = statusNavigation.toUser,
+      )
+      Spacer(modifier = Modifier.width(StatusQuoteDefaults.AvatarSpacing))
+      Row(
+        modifier = Modifier.weight(1f),
+      ) {
+        UserName(
+          quote.user,
+          onUserNameClicked = statusNavigation.openLink,
         )
-        StatusBodyMedia(status = quote)
+        Spacer(modifier = Modifier.width(StatusQuoteDefaults.NameSpacing))
+        UserScreenName(quote.user)
+      }
     }
+    Spacer(modifier = Modifier.height(StatusQuoteDefaults.TextSpacing))
+    StatusText(
+      status = quote,
+      maxLines = 5,
+      isSelectionAble = false,
+      openLink = statusNavigation.openLink,
+    )
+    StatusBodyMedia(
+      status = quote,
+      statusNavigation = statusNavigation,
+    )
+  }
 }
 
 object StatusQuoteDefaults {
-    val ContentPadding = PaddingValues(
-        top = 8.dp,
-        bottom = 12.dp,
-        start = 12.dp,
-        end = 12.dp,
-    )
-    val AvatarSpacing = 8.dp
-    val NameSpacing = 4.dp
-    val TextSpacing = 4.dp
+  val ContentPadding = PaddingValues(
+    top = 8.dp,
+    bottom = 12.dp,
+    start = 12.dp,
+    end = 12.dp,
+  )
+  val AvatarSpacing = 8.dp
+  val NameSpacing = 4.dp
+  val TextSpacing = 4.dp
 }

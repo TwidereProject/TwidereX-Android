@@ -31,17 +31,17 @@ import kotlin.test.BeforeTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal open class MainThreadTestBase {
-    @OptIn(DelicateCoroutinesApi::class)
-    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
+  @OptIn(DelicateCoroutinesApi::class)
+  private val mainThreadSurrogate = newSingleThreadContext("UI thread")
 
-    @BeforeTest
-    open fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
-    }
+  @BeforeTest
+  open fun setUp() {
+    Dispatchers.setMain(mainThreadSurrogate)
+  }
 
-    @AfterTest
-    open fun tearDown() {
-        Dispatchers.resetMain() // reset main dispatcher to the original Main dispatcher
-        mainThreadSurrogate.close()
-    }
+  @AfterTest
+  open fun tearDown() {
+    Dispatchers.resetMain() // reset main dispatcher to the original Main dispatcher
+    mainThreadSurrogate.close()
+  }
 }

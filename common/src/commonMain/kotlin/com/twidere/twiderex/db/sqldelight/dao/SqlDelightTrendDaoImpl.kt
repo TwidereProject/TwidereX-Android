@@ -33,30 +33,30 @@ import com.twidere.twiderex.model.ui.UiTrend
 import com.twidere.twiderex.sqldelight.SqlDelightCacheDatabase
 
 internal class SqlDelightTrendDaoImpl(private val database: SqlDelightCacheDatabase) : TrendDao {
-    override suspend fun insertAll(trends: List<UiTrend>) {
-        trends.map { it.toDbTrendWithHistory() }.saveToDb(database)
-    }
+  override suspend fun insertAll(trends: List<UiTrend>) {
+    trends.map { it.toDbTrendWithHistory() }.saveToDb(database)
+  }
 
-    override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiTrend> {
-        return QueryPagingSource(
-            countQuery = database.trendQueries.getTrendPagingCount(accountKey = accountKey),
-            transacter = database.trendQueries,
-            queryProvider = { limit, offset, _ ->
-                database.trendQueries.getTrendPagingList(
-                    accountKey = accountKey,
-                    limit = limit,
-                    offset = offset
-                ).flatMap {
-                    it.withHistory(database).toUi()
-                }
-            }
-        )
-    }
-
-    override suspend fun clear(accountKey: MicroBlogKey) {
-        database.transaction {
-            database.trendQueries.clear(accountKey = accountKey)
-            database.trendHistoryQueries.clear(accountKey = accountKey)
+  override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiTrend> {
+    return QueryPagingSource(
+      countQuery = database.trendQueries.getTrendPagingCount(accountKey = accountKey),
+      transacter = database.trendQueries,
+      queryProvider = { limit, offset, _ ->
+        database.trendQueries.getTrendPagingList(
+          accountKey = accountKey,
+          limit = limit,
+          offset = offset
+        ).flatMap {
+          it.withHistory(database).toUi()
         }
+      }
+    )
+  }
+
+  override suspend fun clear(accountKey: MicroBlogKey) {
+    database.transaction {
+      database.trendQueries.clear(accountKey = accountKey)
+      database.trendHistoryQueries.clear(accountKey = accountKey)
     }
+  }
 }

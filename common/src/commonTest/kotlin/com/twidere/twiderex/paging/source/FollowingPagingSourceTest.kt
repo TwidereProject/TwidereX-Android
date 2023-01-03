@@ -27,22 +27,22 @@ import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 
 class FollowingPagingSourceTest {
-    @Test
-    fun loadFollowingUsersFromService(): Unit = runBlocking {
-        val service = MockRelationshipService()
-        val pagingSource = FollowingPagingSource(
-            MicroBlogKey.twitter("123"),
-            service = service
-        )
-        val result = pagingSource.load(
-            PagingSource.LoadParams.Refresh(
-                key = null,
-                loadSize = 2,
-                placeholdersEnabled = false
-            )
-        )
-        (result as PagingSource.LoadResult.Page).data.map {
-            assert(service.showRelationship(it.id).following)
-        }
+  @Test
+  fun loadFollowingUsersFromService(): Unit = runBlocking {
+    val service = MockRelationshipService()
+    val pagingSource = FollowingPagingSource(
+      MicroBlogKey.twitter("123"),
+      service = service
+    )
+    val result = pagingSource.load(
+      PagingSource.LoadParams.Refresh(
+        key = null,
+        loadSize = 2,
+        placeholdersEnabled = false
+      )
+    )
+    (result as PagingSource.LoadResult.Page).data.map {
+      assert(service.showRelationship(it.id).following)
     }
+  }
 }

@@ -26,7 +26,7 @@ import com.twidere.twiderex.room.db.RoomCacheDatabase
 import com.twidere.twiderex.room.db.transform.toUi
 
 internal class MediaDaoImpl(private val database: RoomCacheDatabase) : MediaDao {
-    override suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey) = database.mediaDao().findMediaByBelongToKey(
-        belongToKey
-    ).toUi()
+  override suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey) = database.mediaDao().findMediaByBelongToKey(
+    belongToKey
+  ).toUi()
 }

@@ -27,7 +27,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.painter.Painter
-import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -43,91 +42,103 @@ import com.twidere.twiderex.scenes.home.AllNotificationItem
 import com.twidere.twiderex.scenes.home.MentionItem
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
+import io.github.seiko.precompose.annotation.NavGraphDestination
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.Navigator
 
 class MastodonNotificationItem : HomeNavigationItem() {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_title)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_title)
+  }
 
-    override val route: String
-        get() = Root.Mastodon.Notification
+  override val route: String
+    get() = Root.Mastodon.Notification
 
-    @Composable
-    override fun icon(): Painter {
-        return painterResource(res = com.twidere.twiderex.MR.files.ic_bell)
-    }
+  @Composable
+  override fun icon(): Painter {
+    return painterResource(res = com.twidere.twiderex.MR.files.ic_bell)
+  }
 
-    override var lazyListController: LazyListController = LazyListController()
+  override var lazyListController: LazyListController = LazyListController()
 
-    @Composable
-    override fun Content() {
-        MastodonNotificationSceneContent(
-            setLazyListController = {
-                lazyListController = it
-            }
-        )
-    }
+  @Composable
+  override fun Content(navigator: Navigator) {
+    MastodonNotificationSceneContent(
+      setLazyListController = {
+        lazyListController = it
+      },
+      navigator = navigator,
+    )
+  }
 }
 
+@NavGraphDestination(
+  route = Root.Mastodon.Notification,
+)
 @Composable
-fun MastodonNotificationScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_title))
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    }
-                )
-            }
-        ) {
-            MastodonNotificationSceneContent()
-        }
+fun MastodonNotificationScene(
+  navigator: Navigator
+) {
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_title))
+          },
+          navigationIcon = {
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
+          }
+        )
+      }
+    ) {
+      MastodonNotificationSceneContent(
+        navigator = navigator
+      )
     }
+  }
 }
 
 @Composable
 fun MastodonNotificationSceneContent(
-    setLazyListController: ((lazyListController: LazyListController) -> Unit)? = null,
+  setLazyListController: ((lazyListController: LazyListController) -> Unit)? = null,
+  navigator: Navigator,
 ) {
-    val account = LocalActiveAccount.current ?: return
-    if (account.service !is NotificationService) {
-        return
+  val account = LocalActiveAccount.current ?: return
+  val tabs = remember(account) {
+    listOf(
+      AllNotificationItem(),
+      MentionItem()
+    )
+  }
+  val pagerState = rememberPagerState(pageCount = tabs.size)
+  LaunchedEffect(pagerState.currentPage) {
+    // FIXME: 2021/5/17 A little bit dirty
+    setLazyListController?.invoke(tabs[pagerState.currentPage].lazyListController)
+  }
+  val scope = rememberCoroutineScope()
+  Scaffold(
+    topBar = {
+      TextTabsComponent(
+        items = tabs.map { it.name() },
+        selectedItem = pagerState.currentPage,
+        onItemSelected = {
+          scope.launch {
+            pagerState.selectPage {
+              pagerState.currentPage = it
+            }
+          }
+        },
+      )
     }
-    val tabs = remember {
-        listOf(
-            AllNotificationItem(),
-            MentionItem(),
-        )
+  ) {
+    Pager(state = pagerState) {
+      tabs[page].Content(navigator)
     }
-    val pagerState = rememberPagerState(pageCount = tabs.size)
-    LaunchedEffect(pagerState.currentPage) {
-        // FIXME: 2021/5/17 A little bit dirty
-        setLazyListController?.invoke(tabs[pagerState.currentPage].lazyListController)
-    }
-    val scope = rememberCoroutineScope()
-    Scaffold(
-        topBar = {
-            TextTabsComponent(
-                items = tabs.map { it.name() },
-                selectedItem = pagerState.currentPage,
-                onItemSelected = {
-                    scope.launch {
-                        pagerState.selectPage {
-                            pagerState.currentPage = it
-                        }
-                    }
-                },
-            )
-        }
-    ) {
-        Pager(state = pagerState) {
-            tabs[page].Content()
-        }
-    }
+  }
 }

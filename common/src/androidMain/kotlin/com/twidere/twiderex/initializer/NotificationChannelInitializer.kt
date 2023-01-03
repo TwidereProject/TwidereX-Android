@@ -37,86 +37,86 @@ import org.koin.core.component.inject
 class NotificationChannelInitializerHolder
 
 class NotificationChannelInitializer : Initializer<NotificationChannelInitializerHolder>, KoinComponent {
-    private val repository: AccountRepository by inject()
+  private val repository: AccountRepository by inject()
 
-    override fun create(context: Context): NotificationChannelInitializerHolder {
-        val notificationManagerCompat = NotificationManagerCompat.from(context)
-        val addedChannels = mutableListOf<String>()
-        for (spec in NotificationChannelSpec.values().filter { !it.grouped }) {
-            val builder = NotificationChannelCompat.Builder(spec.id, spec.importance)
-                .setName(context.getString(spec.nameRes.resourceId))
+  override fun create(context: Context): NotificationChannelInitializerHolder {
+    val notificationManagerCompat = NotificationManagerCompat.from(context)
+    val addedChannels = mutableListOf<String>()
+    for (spec in NotificationChannelSpec.values().filter { !it.grouped }) {
+      val builder = NotificationChannelCompat.Builder(spec.id, spec.importance)
+        .setName(context.getString(spec.nameRes.resourceId))
 
+      if (spec.descriptionRes != null) {
+        builder.setDescription(context.getString(spec.descriptionRes.resourceId))
+      }
+      builder.setShowBadge(spec.showBadge)
+      val channel = builder.build()
+      notificationManagerCompat.createNotificationChannel(channel)
+      addedChannels.add(channel.id)
+    }
+
+    notificationManagerCompat.notificationChannelsCompat.forEach {
+      if (it.id !in addedChannels && it.group == null) {
+        notificationManagerCompat.deleteNotificationChannel(it.id)
+      }
+    }
+
+    updateAccountChannelsAndGroups(context)
+
+    return NotificationChannelInitializerHolder()
+  }
+
+  private fun updateAccountChannelsAndGroups(context: Context) {
+    val notificationManagerCompat = NotificationManagerCompat.from(context)
+    val accounts = repository.getAccounts()
+    val specs = NotificationChannelSpec.values().filter { it.grouped }
+
+    val addedChannels = mutableListOf<String>()
+    val addedGroups = mutableListOf<String>()
+
+    accounts.forEach { account ->
+      val group = NotificationChannelGroupCompat
+        .Builder(account.accountKey.notificationChannelGroupId())
+        .setName(account.account.name.let { MicroBlogKey.valueOf(it) }.id)
+        .setDescription(account.account.name)
+        .build()
+      addedGroups.add(group.id)
+      notificationManagerCompat.createNotificationChannelGroup(group)
+
+      for (spec in specs) {
+        val channel = NotificationChannelCompat
+          .Builder(account.accountKey.notificationChannelId(spec.id), spec.importance)
+          .setName(context.getString(spec.nameRes.resourceId))
+          .let {
             if (spec.descriptionRes != null) {
-                builder.setDescription(context.getString(spec.descriptionRes.resourceId))
+              it.setDescription(context.getString(spec.descriptionRes.resourceId))
+            } else {
+              it
             }
-            builder.setShowBadge(spec.showBadge)
-            val channel = builder.build()
-            notificationManagerCompat.createNotificationChannel(channel)
-            addedChannels.add(channel.id)
-        }
+          }
+          .setGroup(group.id)
+          .setShowBadge(spec.showBadge)
+          .build()
 
-        notificationManagerCompat.notificationChannelsCompat.forEach {
-            if (it.id !in addedChannels && it.group == null) {
-                notificationManagerCompat.deleteNotificationChannel(it.id)
-            }
-        }
-
-        updateAccountChannelsAndGroups(context)
-
-        return NotificationChannelInitializerHolder()
+        notificationManagerCompat.createNotificationChannel(channel)
+        addedChannels.add(channel.id)
+      }
     }
 
-    private fun updateAccountChannelsAndGroups(context: Context) {
-        val notificationManagerCompat = NotificationManagerCompat.from(context)
-        val accounts = repository.getAccounts()
-        val specs = NotificationChannelSpec.values().filter { it.grouped }
-
-        val addedChannels = mutableListOf<String>()
-        val addedGroups = mutableListOf<String>()
-
-        accounts.forEach { account ->
-            val group = NotificationChannelGroupCompat
-                .Builder(account.accountKey.notificationChannelGroupId())
-                .setName(account.account.name.let { MicroBlogKey.valueOf(it) }.id)
-                .setDescription(account.account.name)
-                .build()
-            addedGroups.add(group.id)
-            notificationManagerCompat.createNotificationChannelGroup(group)
-
-            for (spec in specs) {
-                val channel = NotificationChannelCompat
-                    .Builder(account.accountKey.notificationChannelId(spec.id), spec.importance)
-                    .setName(context.getString(spec.nameRes.resourceId))
-                    .let {
-                        if (spec.descriptionRes != null) {
-                            it.setDescription(context.getString(spec.descriptionRes.resourceId))
-                        } else {
-                            it
-                        }
-                    }
-                    .setGroup(group.id)
-                    .setShowBadge(spec.showBadge)
-                    .build()
-
-                notificationManagerCompat.createNotificationChannel(channel)
-                addedChannels.add(channel.id)
-            }
-        }
-
-        // Delete all channels and groups of non-existing accounts
-        notificationManagerCompat.notificationChannelsCompat.forEach {
-            if (it.id !in addedChannels && it.group != null) {
-                notificationManagerCompat.deleteNotificationChannel(it.id)
-            }
-        }
-        notificationManagerCompat.notificationChannelGroupsCompat.forEach {
-            if (it.id !in addedGroups) {
-                notificationManagerCompat.deleteNotificationChannelGroup(it.id)
-            }
-        }
+    // Delete all channels and groups of non-existing accounts
+    notificationManagerCompat.notificationChannelsCompat.forEach {
+      if (it.id !in addedChannels && it.group != null) {
+        notificationManagerCompat.deleteNotificationChannel(it.id)
+      }
     }
-
-    override fun dependencies(): List<Class<out Initializer<*>>> {
-        return emptyList()
+    notificationManagerCompat.notificationChannelGroupsCompat.forEach {
+      if (it.id !in addedGroups) {
+        notificationManagerCompat.deleteNotificationChannelGroup(it.id)
+      }
     }
+  }
+
+  override fun dependencies(): List<Class<out Initializer<*>>> {
+    return emptyList()
+  }
 }

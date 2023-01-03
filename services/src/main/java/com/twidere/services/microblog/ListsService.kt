@@ -24,56 +24,56 @@ import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.microblog.model.IUser
 
 interface ListsService {
-    suspend fun lists(
-        userId: String? = null,
-        screenName: String? = null,
-        reverse: Boolean = true,
-    ): List<IListModel>
+  suspend fun lists(
+    userId: String? = null,
+    screenName: String? = null,
+    reverse: Boolean = true,
+  ): List<IListModel>
 
-    suspend fun createList(
-        name: String,
-        mode: String? = null,
-        description: String? = null,
-        repliesPolicy: String? = null
-    ): IListModel
+  suspend fun createList(
+    name: String,
+    mode: String? = null,
+    description: String? = null,
+    repliesPolicy: String? = null
+  ): IListModel
 
-    suspend fun updateList(
-        listId: String,
-        name: String? = null,
-        mode: String? = null,
-        description: String? = null,
-        repliesPolicy: String? = null,
-    ): IListModel
+  suspend fun updateList(
+    listId: String,
+    name: String? = null,
+    mode: String? = null,
+    description: String? = null,
+    repliesPolicy: String? = null,
+  ): IListModel
 
-    suspend fun destroyList(
-        listId: String,
-    )
+  suspend fun destroyList(
+    listId: String,
+  )
 
-    suspend fun listMembers(
-        listId: String,
-        count: Int = 20,
-        cursor: String? = null,
-    ): List<IUser>
+  suspend fun listMembers(
+    listId: String,
+    count: Int = 20,
+    cursor: String? = null,
+  ): List<IUser>
 
-    suspend fun addMember(
-        listId: String,
-        userId: String,
-        screenName: String,
-    )
+  suspend fun addMember(
+    listId: String,
+    userId: String,
+    screenName: String,
+  )
 
-    suspend fun removeMember(
-        listId: String,
-        userId: String,
-        screenName: String,
-    )
+  suspend fun removeMember(
+    listId: String,
+    userId: String,
+    screenName: String,
+  )
 
-    suspend fun listSubscribers(
-        listId: String,
-        count: Int = 20,
-        cursor: String? = null,
-    ): List<IUser>
+  suspend fun listSubscribers(
+    listId: String,
+    count: Int = 20,
+    cursor: String? = null,
+  ): List<IUser>
 
-    suspend fun unsubscribeList(listId: String): IListModel
+  suspend fun unsubscribeList(listId: String): IListModel
 
-    suspend fun subscribeList(listId: String): IListModel
+  suspend fun subscribeList(listId: String): IListModel
 }

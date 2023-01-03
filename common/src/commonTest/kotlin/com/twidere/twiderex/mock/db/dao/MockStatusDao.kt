@@ -28,38 +28,38 @@ import kotlinx.coroutines.flow.flow
 import org.jetbrains.annotations.TestOnly
 
 internal class MockStatusDao @TestOnly constructor() : StatusDao {
-    private val fakeDb = mutableMapOf<MicroBlogKey, UiStatus>()
-    override suspend fun findWithStatusKey(statusKey: MicroBlogKey, accountKey: MicroBlogKey): UiStatus? {
-        return fakeDb[statusKey]
-    }
+  private val fakeDb = mutableMapOf<MicroBlogKey, UiStatus>()
+  override suspend fun findWithStatusKey(statusKey: MicroBlogKey, accountKey: MicroBlogKey): UiStatus? {
+    return fakeDb[statusKey]
+  }
 
-    override suspend fun insertAll(listOf: List<UiStatus>, accountKey: MicroBlogKey) {
-        listOf.forEach { status ->
-            fakeDb[status.statusKey] = status
-        }
+  override suspend fun insertAll(listOf: List<UiStatus>, accountKey: MicroBlogKey) {
+    listOf.forEach { status ->
+      fakeDb[status.statusKey] = status
     }
+  }
 
-    override fun findWithStatusKeyWithFlow(
-        statusKey: MicroBlogKey,
-        accountKey: MicroBlogKey
-    ): Flow<UiStatus?> {
-        return flow {
-            emit(findWithStatusKey(statusKey, accountKey))
-        }
+  override fun findWithStatusKeyWithFlow(
+    statusKey: MicroBlogKey,
+    accountKey: MicroBlogKey
+  ): Flow<UiStatus?> {
+    return flow {
+      emit(findWithStatusKey(statusKey, accountKey))
     }
+  }
 
-    override suspend fun delete(statusKey: MicroBlogKey) {
-        fakeDb.remove(statusKey)
-    }
+  override suspend fun delete(statusKey: MicroBlogKey) {
+    fakeDb.remove(statusKey)
+  }
 
-    override suspend fun updateAction(
-        statusKey: MicroBlogKey,
-        accountKey: MicroBlogKey,
-        liked: Boolean?,
-        retweet: Boolean?
-    ) {
-        fakeDb[statusKey]?.let {
-            fakeDb[statusKey] = it.copy(liked = liked ?: it.liked, retweeted = retweet ?: it.retweeted)
-        }
+  override suspend fun updateAction(
+    statusKey: MicroBlogKey,
+    accountKey: MicroBlogKey,
+    liked: Boolean?,
+    retweet: Boolean?
+  ) {
+    fakeDb[statusKey]?.let {
+      fakeDb[statusKey] = it.copy(liked = liked ?: it.liked, retweeted = retweet ?: it.retweeted)
     }
+  }
 }

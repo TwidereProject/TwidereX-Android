@@ -27,23 +27,23 @@ import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 
 class ListsSubscribersPagingSourceTest {
-    @Test
-    fun loadListSubscribersFromService(): Unit = runBlocking {
-        val service = MockListsService()
-        val pagingSource = ListsSubscribersPagingSource(
-            MicroBlogKey.twitter("123"),
-            service = service,
-            listId = "123"
-        )
-        val result = pagingSource.load(
-            PagingSource.LoadParams.Refresh(
-                key = null,
-                loadSize = 2,
-                placeholdersEnabled = false
-            )
-        )
-        (result as PagingSource.LoadResult.Page).data.map {
-            assert(service.isSubscribers(it.id))
-        }
+  @Test
+  fun loadListSubscribersFromService(): Unit = runBlocking {
+    val service = MockListsService()
+    val pagingSource = ListsSubscribersPagingSource(
+      MicroBlogKey.twitter("123"),
+      service = service,
+      listId = "123"
+    )
+    val result = pagingSource.load(
+      PagingSource.LoadParams.Refresh(
+        key = null,
+        loadSize = 2,
+        placeholdersEnabled = false
+      )
+    )
+    (result as PagingSource.LoadResult.Page).data.map {
+      assert(service.isSubscribers(it.id))
     }
+  }
 }

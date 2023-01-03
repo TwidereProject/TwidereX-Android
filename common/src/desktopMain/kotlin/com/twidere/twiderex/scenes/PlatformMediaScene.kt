@@ -24,65 +24,86 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.enums.MediaType
+import moe.tlaster.precompose.navigation.Navigator
 
 @Composable
-actual fun PlatformStatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
-    MediaScene {
-        StatusMediaScene(statusKey = statusKey, selectedIndex = selectedIndex)
-    }
+actual fun PlatformStatusMediaScene(
+  statusKey: String,
+  selectedIndex: Int?,
+  navigator: Navigator,
+) {
+  MediaScene {
+    StatusMediaScene(
+      statusKey = statusKey,
+      selectedIndex = selectedIndex ?: 0,
+      navigator = navigator,
+    )
+  }
 }
 
 @Composable
-actual fun PlatformRawMediaScene(url: String, type: MediaType) {
-    MediaScene {
-        RawMediaScene(url = url, type = type)
-    }
+actual fun PlatformRawMediaScene(
+  url: String,
+  type: String,
+  navigator: Navigator,
+) {
+  MediaScene {
+    RawMediaScene(url = url, type = type, navigator = navigator)
+  }
 }
 
 @Composable
-actual fun PlatformPureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
-    MediaScene {
-        PureMediaScene(belongToKey = belongToKey, selectedIndex = selectedIndex)
-    }
+actual fun PlatformPureMediaScene(
+  belongToKey: String,
+  selectedIndex: Int?,
+  navigator: Navigator,
+) {
+  MediaScene {
+    PureMediaScene(
+      belongToKey = belongToKey,
+      selectedIndex = selectedIndex ?: 0,
+      navigator = navigator,
+    )
+  }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+actual fun PlatformScene(target: String, navigator: Navigator) {
+}
+
 @Composable
 actual fun StatusMediaSceneLayout(
-    backgroundColor: Color,
-    contentColor: Color,
-    closeButton: @Composable () -> Unit,
-    bottomView: @Composable () -> Unit,
-    mediaView: @Composable () -> Unit,
-    backgroundView: @Composable () -> Unit,
+  backgroundColor: Color,
+  contentColor: Color,
+  closeButton: @Composable () -> Unit,
+  bottomView: @Composable () -> Unit,
+  mediaView: @Composable () -> Unit,
+  backgroundView: @Composable () -> Unit,
 ) {
-    InAppNotificationScaffold(
-        backgroundColor = backgroundColor,
-        contentColor = contentColor,
-    ) {
-        Box {
-            backgroundView.invoke()
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                closeButton.invoke()
-                Box(modifier = Modifier.weight(1f)) {
-                    mediaView.invoke()
-                }
-                bottomView.invoke()
-            }
+  InAppNotificationScaffold(
+    backgroundColor = backgroundColor,
+    contentColor = contentColor,
+  ) {
+    Box {
+      backgroundView.invoke()
+      Column(
+        modifier = Modifier.fillMaxSize()
+      ) {
+        closeButton.invoke()
+        Box(modifier = Modifier.weight(1f)) {
+          mediaView.invoke()
         }
+        bottomView.invoke()
+      }
     }
+  }
 }
 
 @Composable
 private fun MediaScene(content: @Composable () -> Unit) {
-    // causes some bug when navigate to other scenes when open a new window to show media
-    content.invoke()
+  // causes some bug when navigate to other scenes when open a new window to show media
+  content.invoke()
 }

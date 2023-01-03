@@ -33,84 +33,84 @@ import kotlin.test.assertNull
 
 internal class ListsRepositoryTest {
 
-    @Test
-    fun saveToDbAfterCreateListSuccess() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("test")
-        val repo = ListsRepository(MockCacheDatabase())
-        val listKey = repo.createLists(
-            accountKey = accountKey,
-            service = MockListsService(),
-            title = "list title",
-            description = "desc",
-            mode = "private",
-        ).listKey
-        val list = repo.findListWithListKey(accountKey, listKey).first()
-        assertNotNull(list)
-        assertEquals(accountKey, list.accountKey)
-        assertEquals("list title", list.title)
-        assertEquals("desc", list.descriptions)
-        assertEquals("private", list.mode)
-    }
+  @Test
+  fun saveToDbAfterCreateListSuccess() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("test")
+    val repo = ListsRepository(MockCacheDatabase())
+    val listKey = repo.createLists(
+      accountKey = accountKey,
+      service = MockListsService(),
+      title = "list title",
+      description = "desc",
+      mode = "private",
+    ).listKey
+    val list = repo.findListWithListKey(accountKey, listKey).first()
+    assertNotNull(list)
+    assertEquals(accountKey, list.accountKey)
+    assertEquals("list title", list.title)
+    assertEquals("desc", list.descriptions)
+    assertEquals("private", list.mode)
+  }
 
-    @Test
-    fun saveToDbAfterUpdateListSuccess() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("test")
-        val repo = ListsRepository(MockCacheDatabase())
-        val listId = repo.prepare(accountKey).id
+  @Test
+  fun saveToDbAfterUpdateListSuccess() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("test")
+    val repo = ListsRepository(MockCacheDatabase())
+    val listId = repo.prepare(accountKey).id
 
-        val listKey = repo.updateLists(
-            accountKey = accountKey,
-            service = MockListsService(),
-            title = "upgrade title",
-            description = "upgrade desc",
-            mode = "public",
-            listId = listId
-        ).listKey
+    val listKey = repo.updateLists(
+      accountKey = accountKey,
+      service = MockListsService(),
+      title = "upgrade title",
+      description = "upgrade desc",
+      mode = "public",
+      listId = listId
+    ).listKey
 
-        val list = repo.findListWithListKey(accountKey, listKey).first()
-        assertNotNull(list)
-        assertEquals("upgrade title", list.title)
-        assertEquals("upgrade desc", list.descriptions)
-        assertEquals("public", list.mode)
-    }
+    val list = repo.findListWithListKey(accountKey, listKey).first()
+    assertNotNull(list)
+    assertEquals("upgrade title", list.title)
+    assertEquals("upgrade desc", list.descriptions)
+    assertEquals("public", list.mode)
+  }
 
-    @Test
-    fun deleteFromDbAfterDeleteListSuccess() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("test")
-        val repo = ListsRepository(MockCacheDatabase())
-        val list = repo.prepare(accountKey)
-        assertNotNull(
-            repo.deleteLists(
-                accountKey,
-                service = MockListsService(),
-                listId = list.id,
-                listKey = list.listKey
-            )
-        )
-        assertNull(repo.findListWithListKey(accountKey, list.listKey).first())
-    }
+  @Test
+  fun deleteFromDbAfterDeleteListSuccess() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("test")
+    val repo = ListsRepository(MockCacheDatabase())
+    val list = repo.prepare(accountKey)
+    assertNotNull(
+      repo.deleteLists(
+        accountKey,
+        service = MockListsService(),
+        listId = list.id,
+        listKey = list.listKey
+      )
+    )
+    assertNull(repo.findListWithListKey(accountKey, list.listKey).first())
+  }
 
-    @Test
-    fun updateStatusToDbAfterSubscribeOrUnsubscribe() = runBlocking {
-        val accountKey = MicroBlogKey.twitter("test")
-        val repo = ListsRepository(MockCacheDatabase())
-        val list = repo.prepare(accountKey)
-        assertEquals(true, list.isFollowed)
+  @Test
+  fun updateStatusToDbAfterSubscribeOrUnsubscribe() = runBlocking {
+    val accountKey = MicroBlogKey.twitter("test")
+    val repo = ListsRepository(MockCacheDatabase())
+    val list = repo.prepare(accountKey)
+    assertEquals(true, list.isFollowed)
 
-        repo.unsubscribeLists(accountKey, MockListsService(), list.listKey)
-        assertEquals(false, repo.findListWithListKey(accountKey, list.listKey).first()?.isFollowed)
+    repo.unsubscribeLists(accountKey, MockListsService(), list.listKey)
+    assertEquals(false, repo.findListWithListKey(accountKey, list.listKey).first()?.isFollowed)
 
-        repo.subscribeLists(accountKey, MockListsService(), list.listKey)
-        assertEquals(true, repo.findListWithListKey(accountKey, list.listKey).first()?.isFollowed)
-    }
+    repo.subscribeLists(accountKey, MockListsService(), list.listKey)
+    assertEquals(true, repo.findListWithListKey(accountKey, list.listKey).first()?.isFollowed)
+  }
 
-    private suspend fun ListsRepository.prepare(accountKey: MicroBlogKey): UiList {
-        return createLists(
-            accountKey = accountKey,
-            service = MockListsService(),
-            title = "list title",
-            description = "desc",
-            mode = "private",
-        )
-    }
+  private suspend fun ListsRepository.prepare(accountKey: MicroBlogKey): UiList {
+    return createLists(
+      accountKey = accountKey,
+      service = MockListsService(),
+      title = "list title",
+      description = "desc",
+      mode = "private",
+    )
+  }
 }

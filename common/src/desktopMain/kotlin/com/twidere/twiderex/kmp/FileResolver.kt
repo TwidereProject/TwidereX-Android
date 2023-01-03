@@ -29,44 +29,44 @@ import javax.imageio.ImageIO
 import javax.imageio.stream.FileImageInputStream
 
 actual class FileResolver {
-    actual fun getMimeType(file: String): String? {
-        return File(file).takeIf { it.exists() && it.isFile }?.let {
-            Files.probeContentType(it.toPath())
-        }
+  actual fun getMimeType(file: String): String? {
+    return File(file).takeIf { it.exists() && it.isFile }?.let {
+      Files.probeContentType(it.toPath())
     }
+  }
 
-    actual fun getFileSize(file: String): Long? {
-        return File(file).takeIf { it.exists() && it.isFile }?.length()
-    }
+  actual fun getFileSize(file: String): Long? {
+    return File(file).takeIf { it.exists() && it.isFile }?.length()
+  }
 
-    actual fun openInputStream(file: String): InputStream? {
-        return File(file).takeIf { it.exists() && it.isFile }?.inputStream()
-    }
+  actual fun openInputStream(file: String): InputStream? {
+    return File(file).takeIf { it.exists() && it.isFile }?.inputStream()
+  }
 
-    actual fun openOutputStream(file: String): OutputStream? {
-        return File(file).apply {
-            if (!exists()) {
-                createNewFile()
-            }
-        }.takeIf { it.exists() && it.isFile }?.outputStream()
-    }
+  actual fun openOutputStream(file: String): OutputStream? {
+    return File(file).apply {
+      if (!exists()) {
+        createNewFile()
+      }
+    }.takeIf { it.exists() && it.isFile }?.outputStream()
+  }
 
-    actual fun getMediaSize(file: String): MediaSize {
-        val imgFile = File(file)
-        val iter = ImageIO.getImageReadersBySuffix(imgFile.extension)
-        while (iter.hasNext()) {
-            val reader = iter.next()
-            try {
-                val stream = FileImageInputStream(imgFile)
-                reader.input = stream
-                val width = reader.getWidth(reader.minIndex)
-                val height = reader.getHeight(reader.minIndex)
-                return MediaSize(width.toLong(), height.toLong())
-            } catch (e: IOException) {
-            } finally {
-                reader.dispose()
-            }
-        }
-        throw IOException("Not a known image file: " + imgFile.absolutePath)
+  actual fun getMediaSize(file: String): MediaSize {
+    val imgFile = File(file)
+    val iter = ImageIO.getImageReadersBySuffix(imgFile.extension)
+    while (iter.hasNext()) {
+      val reader = iter.next()
+      try {
+        val stream = FileImageInputStream(imgFile)
+        reader.input = stream
+        val width = reader.getWidth(reader.minIndex)
+        val height = reader.getHeight(reader.minIndex)
+        return MediaSize(width.toLong(), height.toLong())
+      } catch (e: IOException) {
+      } finally {
+        reader.dispose()
+      }
     }
+    throw IOException("Not a known image file: " + imgFile.absolutePath)
+  }
 }

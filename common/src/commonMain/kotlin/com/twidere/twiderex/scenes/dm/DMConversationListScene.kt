@@ -34,78 +34,96 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.ui.LazyUiDMConversationList
+import com.twidere.twiderex.component.navigation.openLink
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMConversationViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
+
+@NavGraphDestination(
+  route = Root.Messages.Home,
+)
 
 @Composable
-fun DMConversationListScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_title))
-                    },
-                )
-            },
-            floatingActionButton = {
-                DMConversationListSceneFab()
-            },
-        ) {
-            DMConversationListSceneContent()
-        }
+fun DMConversationListScene(
+  navigator: Navigator,
+) {
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          navigationIcon = {
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_title))
+          },
+        )
+      },
+      floatingActionButton = {
+        DMConversationListSceneFab(navigator)
+      },
+    ) {
+      DMConversationListSceneContent(
+        navigator = navigator,
+      )
     }
+  }
 }
 
 @Composable
-fun DMConversationListSceneFab() {
-    val navController = LocalNavController.current
-    FloatingActionButton(
-        onClick = {
-            navController.navigate(Root.Messages.NewConversation)
-        }
-    ) {
-        Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_add),
-            contentDescription = stringResource(
-                res = com.twidere.twiderex.MR.strings.scene_lists_icons_create
-            ),
-        )
+fun DMConversationListSceneFab(
+  navigator: Navigator,
+) {
+  FloatingActionButton(
+    onClick = {
+      navigator.navigate(Root.Messages.NewConversation)
     }
+  ) {
+    Icon(
+      painter = painterResource(res = com.twidere.twiderex.MR.files.ic_add),
+      contentDescription = stringResource(
+        res = com.twidere.twiderex.MR.strings.scene_lists_icons_create
+      ),
+    )
+  }
 }
 
 @Composable
 fun DMConversationListSceneContent(
-    lazyListController: LazyListController? = null
+  lazyListController: LazyListController? = null,
+  navigator: Navigator,
 ) {
-    val account = LocalActiveAccount.current ?: return
-    val navController = LocalNavController.current
-    if (!account.supportDirectMessage) return
-    val viewModel: DMConversationViewModel = getViewModel()
-    val source = viewModel.source.collectAsLazyPagingItems()
-    val listState = rememberLazyListState()
-    LaunchedEffect(lazyListController) {
-        lazyListController?.listState = listState
-    }
-    SwipeToRefreshLayout(
-        refreshingState = source.loadState.refresh is LoadState.Loading,
-        onRefresh = { source.refresh() }
-    ) {
-        LazyUiDMConversationList(
-            items = source,
-            state = listState,
-            onItemClicked = {
-                navController.navigate(Root.Messages.Conversation(it.conversation.conversationKey))
-            }
-        )
-    }
+  val account = LocalActiveAccount.current ?: return
+  if (!account.supportDirectMessage) return
+  val viewModel: DMConversationViewModel = getViewModel()
+  val source = viewModel.source.collectAsLazyPagingItems()
+  val listState = rememberLazyListState()
+  LaunchedEffect(lazyListController) {
+    lazyListController?.listState = listState
+  }
+  SwipeToRefreshLayout(
+    refreshingState = source.loadState.refresh is LoadState.Loading,
+    onRefresh = { source.refresh() }
+  ) {
+    LazyUiDMConversationList(
+      items = source,
+      state = listState,
+      onItemClicked = {
+        navigator.navigate(Root.Messages.Conversation(it.conversation.conversationKey))
+      },
+      openLink = {
+        navigator.openLink(it)
+      }
+    )
+  }
 }

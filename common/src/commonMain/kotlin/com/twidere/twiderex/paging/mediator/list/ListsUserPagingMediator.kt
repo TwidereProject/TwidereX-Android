@@ -34,29 +34,29 @@ import com.twidere.twiderex.paging.crud.PagingMemoryCache
 
 @ExperimentalPagingApi
 abstract class ListsUserPagingMediator(
-    protected val userKey: MicroBlogKey,
-    memoryCache: PagingMemoryCache<UiUser>,
+  protected val userKey: MicroBlogKey,
+  memoryCache: PagingMemoryCache<UiUser>,
 ) : MemoryCachePagingMediator<String, UiUser>(memoryCache) {
-    override suspend fun load(
-        key: String?,
-        loadType: LoadType,
-        state: PagingState<Int, UiUser>
-    ): PagingSource.LoadResult<String, UiUser> {
-        return try {
-            val result = loadUsers(key, state.config.pageSize)
-            val users = result.map {
-                it.toUi(userKey)
-            }
-            val nextKey = if (result is IPaging && users.isNotEmpty()) {
-                result.nextPage
-            } else {
-                null
-            }
-            PagingSource.LoadResult.Page(users, null, nextKey)
-        } catch (e: Exception) {
-            PagingSource.LoadResult.Error(e)
-        }
+  override suspend fun load(
+    key: String?,
+    loadType: LoadType,
+    state: PagingState<Int, UiUser>
+  ): PagingSource.LoadResult<String, UiUser> {
+    return try {
+      val result = loadUsers(key, state.config.pageSize)
+      val users = result.map {
+        it.toUi(userKey)
+      }
+      val nextKey = if (result is IPaging && users.isNotEmpty()) {
+        result.nextPage
+      } else {
+        null
+      }
+      PagingSource.LoadResult.Page(users, null, nextKey)
+    } catch (e: Exception) {
+      PagingSource.LoadResult.Error(e)
     }
+  }
 
-    abstract suspend fun loadUsers(key: String?, count: Int): List<IUser>
+  abstract suspend fun loadUsers(key: String?, count: Int): List<IUser>
 }

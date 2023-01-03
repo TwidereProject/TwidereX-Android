@@ -35,49 +35,50 @@ import com.twidere.twiderex.ui.LocalVideoPlayback
 import kotlinx.coroutines.flow.map
 
 val LocalAppearancePreferences =
-    compositionLocalOf<AppearancePreferences> { error("No AppearancePreferences") }
+  compositionLocalOf<AppearancePreferences> { error("No AppearancePreferences") }
 val LocalDisplayPreferences =
-    compositionLocalOf<DisplayPreferences> { error("No DisplayPreferences") }
+  compositionLocalOf<DisplayPreferences> { error("No DisplayPreferences") }
 val LocalHttpConfig = compositionLocalOf<HttpConfig> { error("No Http config preferences") }
 
 @Composable
 fun ProvidePreferences(
-    holder: PreferencesHolder,
-    content: @Composable () -> Unit,
+  holder: PreferencesHolder,
+  content: @Composable () -> Unit,
 ) {
-    val appearances by holder.appearancePreferences
-        .data
-        .collectAsState(initial = AppearancePreferences())
-    val display by holder.displayPreferences
-        .data
-        .collectAsState(initial = DisplayPreferences())
-    val proxyConfigFlow = remember(holder.miscPreferences.data) {
-        holder.miscPreferences
-            .data
-            .map {
-                HttpConfig(
-                    proxyConfig = ProxyConfig(
-                        enable = it.useProxy,
-                        server = it.proxyServer,
-                        port = it.proxyPort,
-                        userName = it.proxyUserName,
-                        password = it.proxyPassword,
-                        type = when (it.proxyType) {
-                            MiscPreferences.ProxyType.REVERSE -> ProxyConfig.Type.REVERSE
-                            else -> ProxyConfig.Type.HTTP
-                        }
-                    )
-                )
+  val appearances by holder.appearancePreferences
+    .data
+    .collectAsState(initial = AppearancePreferences())
+  val display by holder.displayPreferences
+    .data
+    .collectAsState(initial = DisplayPreferences())
+  val proxyConfigFlow = remember(holder.miscPreferences.data) {
+    holder.miscPreferences
+      .data
+      .map {
+        HttpConfig(
+          proxyConfig = ProxyConfig(
+            enable = it.useProxy,
+            server = it.proxyServer,
+            port = it.proxyPort,
+            userName = it.proxyUserName,
+            password = it.proxyPassword,
+            type = when (it.proxyType) {
+              MiscPreferences.ProxyType.REVERSE -> ProxyConfig.Type.REVERSE
+              MiscPreferences.ProxyType.SOCKS -> ProxyConfig.Type.SOCKS
+              else -> ProxyConfig.Type.HTTP
             }
-    }
-    val proxyConfig by proxyConfigFlow.collectAsState(initial = HttpConfig())
+          )
+        )
+      }
+  }
+  val proxyConfig by proxyConfigFlow.collectAsState(initial = HttpConfig())
 
-    CompositionLocalProvider(
-        LocalAppearancePreferences provides appearances,
-        LocalDisplayPreferences provides display,
-        LocalHttpConfig provides proxyConfig,
-        LocalVideoPlayback provides display.autoPlayback,
-    ) {
-        content.invoke()
-    }
+  CompositionLocalProvider(
+    LocalAppearancePreferences provides appearances,
+    LocalDisplayPreferences provides display,
+    LocalHttpConfig provides proxyConfig,
+    LocalVideoPlayback provides display.autoPlayback,
+  ) {
+    content.invoke()
+  }
 }

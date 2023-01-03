@@ -21,100 +21,69 @@
 package com.twidere.twiderex.component
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
-import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.kmp.Platform
-import com.twidere.twiderex.kmp.currentPlatform
-import com.twidere.twiderex.viewmodel.timeline.TimelineScrollState
-import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
-import moe.tlaster.precompose.viewmodel.viewModelScope
+import com.twidere.twiderex.extensions.rememberPresenterState
+import com.twidere.twiderex.navigation.StatusNavigationData
+import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
+import com.twidere.twiderex.viewmodel.timeline.TimeLineEvent
+import com.twidere.twiderex.viewmodel.timeline.TimelinePresenter
+import com.twidere.twiderex.viewmodel.timeline.TimelineState
 
 @Composable
 fun TimelineComponent(
-    viewModel: TimelineViewModel,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    lazyListController: LazyListController? = null,
+  contentPadding: PaddingValues = PaddingValues(0.dp),
+  lazyListController: LazyListController? = null,
+  savedStateKeyType: SavedStateKeyType,
+  statusNavigation: StatusNavigationData,
 ) {
-    val items = viewModel.source.collectAsLazyPagingItems()
-    val loadingBetween by viewModel.loadingBetween.observeAsState(initial = listOf())
-    SwipeToRefreshLayout(
-        refreshingState = items.loadState.refresh is LoadState.Loading,
-        onRefresh = {
-            items.refreshOrRetry()
-        },
-        refreshIndicatorPadding = contentPadding
-    ) {
-        val listState = rememberLazyListState()
-        LaunchedEffect(Unit) {
-            viewModel.provideScrollState()
-                .filterNotNull()
-                .collectLatest {
-                    listState.scrollToItem(
-                        it.firstVisibleItemIndex,
-                        it.firstVisibleItemScrollOffset
-                    )
-                }
-        }
-        if (items.itemCount > 0) {
-            LaunchedEffect(lazyListController) {
-                lazyListController?.listState = listState
-            }
-        }
-        LaunchedEffect(Unit) {
-            // TODO FIXME #listState 20211119: listState.isScrollInProgress is always false on desktop - https://github.com/JetBrains/compose-jb/issues/1423
-            snapshotFlow { listState.isScrollInProgress }
-                .distinctUntilChanged()
-                .filter { !it }
-                .filter { listState.layoutInfo.totalItemsCount != 0 }
-                .collect {
-                    viewModel.saveScrollState(
-                        TimelineScrollState(
-                            firstVisibleItemIndex = listState.firstVisibleItemIndex,
-                            firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
-                        )
-                    )
-                }
-        }
-        // TODO: Temporary solution， remove after [FIXME #listState] is fixed
-        if (currentPlatform == Platform.JVM) {
-            DisposableEffect(Unit) {
-                onDispose {
-                    viewModel.viewModelScope.launch {
-                        viewModel.saveScrollState(
-                            TimelineScrollState(
-                                firstVisibleItemIndex = listState.firstVisibleItemIndex,
-                                firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
-                            )
-                        )
-                    }
-                }
-            }
-        }
-        LazyUiStatusList(
-            items = items,
-            state = listState,
-            contentPadding = contentPadding,
-            loadingBetween = loadingBetween,
-            onLoadBetweenClicked = { current, next ->
-                viewModel.loadBetween(current, next)
-            },
-        )
+
+  val (state, channel) = rememberPresenterState<TimelineState, TimeLineEvent> {
+    TimelinePresenter(it, savedStateKeyType = savedStateKeyType)
+  }
+
+  if (state !is TimelineState.Data) {
+    return
+  }
+
+  val refreshingState by remember(state) {
+    derivedStateOf {
+      state.source.loadState.refresh is LoadState.Loading
     }
+  }
+
+  SwipeToRefreshLayout(
+    refreshingState = refreshingState,
+    onRefresh = {
+      state.source.refreshOrRetry()
+    },
+    refreshIndicatorPadding = contentPadding
+  ) {
+
+    if (state.source.itemCount > 0) {
+      LaunchedEffect(lazyListController) {
+        lazyListController?.listState = state.listState
+      }
+    }
+
+    LazyUiStatusList(
+      items = state.source,
+      state = state.listState,
+      contentPadding = contentPadding,
+      loadingBetween = state.loadingBetween,
+      onLoadBetweenClicked = { current, next ->
+        channel.trySend(TimeLineEvent.LoadBetween(current, next))
+      },
+      statusNavigation = statusNavigation,
+    )
+  }
 }

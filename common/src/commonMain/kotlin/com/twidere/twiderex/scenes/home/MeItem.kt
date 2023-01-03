@@ -22,6 +22,7 @@ package com.twidere.twiderex.scenes.home
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.graphics.painter.Painter
 import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.component.foundation.AppBar
@@ -29,54 +30,83 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.navigation.rememberUserNavigationData
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
+import com.twidere.twiderex.viewmodel.user.UserEvent
+import com.twidere.twiderex.viewmodel.user.UserPresenter
+import com.twidere.twiderex.viewmodel.user.UserState
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import moe.tlaster.precompose.navigation.Navigator
 
 class MeItem : HomeNavigationItem() {
 
-    @Composable
-    override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_profile_title)
-    override val route: String
-        get() = Root.Me
+  @Composable
+  override fun name(): String = stringResource(com.twidere.twiderex.MR.strings.scene_profile_title)
+  override val route: String
+    get() = Root.Me
 
-    @Composable
-    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_user)
+  @Composable
+  override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_user)
 
-    override val withAppBar: Boolean
-        get() = false
+  override val withAppBar: Boolean
+    get() = false
 
-    @Composable
-    override fun Content() {
-        MeSceneContent()
+  @Composable
+  override fun Content(navigator: Navigator) {
+    MeSceneContent(navigator)
+  }
+}
+
+@NavGraphDestination(
+  route = Root.Me,
+)
+@Composable
+fun MeScene(
+  navigator: Navigator,
+) {
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_profile_title))
+          },
+          navigationIcon = {
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
+          }
+        )
+      }
+    ) {
+      MeSceneContent(navigator = navigator)
     }
+  }
 }
 
 @Composable
-fun MeScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_profile_title))
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    }
-                )
-            }
-        ) {
-            MeSceneContent()
-        }
+fun MeSceneContent(
+  navigator: Navigator
+) {
+  val account = LocalActiveAccount.current
+  account?.toUi()?.let { user ->
+    val (state, channel) = key(user.userKey) {
+      rememberPresenterState<UserState, UserEvent> {
+        UserPresenter(it, userKey = user.userKey)
+      }
     }
-}
-
-@Composable
-fun MeSceneContent() {
-    val account = LocalActiveAccount.current
-    account?.toUi()?.let { user ->
-        UserComponent(userKey = user.userKey)
-    }
+    val userNavigationData = rememberUserNavigationData(navigator)
+    UserComponent(
+      userKey = user.userKey,
+      state = state,
+      channel = channel,
+      userNavigationData = userNavigationData,
+    )
+  }
 }

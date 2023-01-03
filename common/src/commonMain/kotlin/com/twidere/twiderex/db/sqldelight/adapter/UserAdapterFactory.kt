@@ -24,11 +24,11 @@ import com.squareup.sqldelight.EnumColumnAdapter
 import com.twidere.twiderex.sqldelight.table.DbUser
 
 internal object UserAdapterFactory {
-    fun create() = MicroBlogKeyColumnAdapter().let {
-        DbUser.Adapter(
-            userKeyAdapter = it,
-            acctAdapter = it,
-            platformTypeAdapter = EnumColumnAdapter(),
-        )
-    }
+  fun create() = MicroBlogKeyColumnAdapter().let {
+    DbUser.Adapter(
+      userKeyAdapter = it,
+      acctAdapter = it,
+      platformTypeAdapter = EnumColumnAdapter(),
+    )
+  }
 }

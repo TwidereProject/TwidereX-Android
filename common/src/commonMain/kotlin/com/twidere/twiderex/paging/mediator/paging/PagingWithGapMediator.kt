@@ -36,126 +36,126 @@ import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingWithGapMediator(
-    accountKey: MicroBlogKey,
-    database: CacheDatabase,
+  accountKey: MicroBlogKey,
+  database: CacheDatabase,
 ) : PagingMediator(accountKey = accountKey, database = database) {
 
-    private val _loadingBetween = MutableStateFlow(listOf<MicroBlogKey>())
-    val loadingBetween
-        get() = _loadingBetween.asSharedFlow()
+  private val _loadingBetween = MutableStateFlow(listOf<MicroBlogKey>())
+  val loadingBetween
+    get() = _loadingBetween.asSharedFlow()
 
-    override suspend fun initialize(): InitializeAction {
-        return InitializeAction.SKIP_INITIAL_REFRESH
+  override suspend fun initialize(): InitializeAction {
+    return InitializeAction.SKIP_INITIAL_REFRESH
+  }
+
+  override suspend fun load(
+    loadType: LoadType,
+    state: PagingState<Int, PagingTimeLineWithStatus>
+  ): MediatorResult {
+    val maxStatusKey = when (loadType) {
+      LoadType.APPEND -> {
+        val lastItem = state.lastItemOrNull()
+          ?: return MediatorResult.Success(
+            endOfPaginationReached = true
+          )
+        lastItem.status.statusKey
+      }
+      LoadType.PREPEND -> {
+        return MediatorResult.Success(endOfPaginationReached = true)
+      }
+      LoadType.REFRESH -> {
+        null
+      }
     }
-
-    override suspend fun load(
-        loadType: LoadType,
-        state: PagingState<Int, PagingTimeLineWithStatus>
-    ): MediatorResult {
-        val maxStatusKey = when (loadType) {
-            LoadType.APPEND -> {
-                val lastItem = state.lastItemOrNull()
-                    ?: return MediatorResult.Success(
-                        endOfPaginationReached = true
-                    )
-                lastItem.status.statusKey
-            }
-            LoadType.PREPEND -> {
-                return MediatorResult.Success(endOfPaginationReached = true)
-            }
-            LoadType.REFRESH -> {
-                null
-            }
+    val sinceStatueKey = when (loadType) {
+      LoadType.APPEND -> {
+        null
+      }
+      LoadType.PREPEND -> {
+        return MediatorResult.Success(endOfPaginationReached = true)
+      }
+      LoadType.REFRESH -> {
+        withContext(Dispatchers.IO) {
+          database.pagingTimelineDao()
+            .getLatest(pagingKey, accountKey)?.status?.statusKey
         }
-        val sinceStatueKey = when (loadType) {
-            LoadType.APPEND -> {
-                null
-            }
-            LoadType.PREPEND -> {
-                return MediatorResult.Success(endOfPaginationReached = true)
-            }
-            LoadType.REFRESH -> {
-                withContext(Dispatchers.IO) {
-                    database.pagingTimelineDao()
-                        .getLatest(pagingKey, accountKey)?.status?.statusKey
-                }
-            }
+      }
+    }
+    return loadBetween(
+      pageSize = if (loadType === LoadType.REFRESH) {
+        state.config.initialLoadSize
+      } else {
+        state.config.pageSize
+      },
+      maxStatusKey = maxStatusKey,
+      sinceStatusKey = sinceStatueKey
+    )
+  }
+
+  suspend fun loadBetween(
+    pageSize: Int,
+    maxStatusKey: MicroBlogKey? = null,
+    sinceStatusKey: MicroBlogKey? = null,
+  ): MediatorResult {
+    if (maxStatusKey != null && sinceStatusKey != null) {
+      _loadingBetween.value = _loadingBetween.value + maxStatusKey
+    }
+    try {
+      val max_id = withContext(Dispatchers.IO) {
+        maxStatusKey?.let { database.statusDao().findWithStatusKey(it, accountKey)?.statusId }
+      }
+      val result = loadBetweenImpl(pageSize, max_id = max_id, since_id = null).let { list ->
+        list.map {
+          it.toPagingTimeline(accountKey, pagingKey)
+        }.let {
+          transform(it, list)
         }
-        return loadBetween(
-            pageSize = if (loadType === LoadType.REFRESH) {
-                state.config.initialLoadSize
-            } else {
-                state.config.pageSize
-            },
-            maxStatusKey = maxStatusKey,
-            sinceStatusKey = sinceStatueKey
-        )
-    }
-
-    suspend fun loadBetween(
-        pageSize: Int,
-        maxStatusKey: MicroBlogKey? = null,
-        sinceStatusKey: MicroBlogKey? = null,
-    ): MediatorResult {
-        if (maxStatusKey != null && sinceStatusKey != null) {
-            _loadingBetween.value = _loadingBetween.value + maxStatusKey
+      }
+      database.withTransaction {
+        if (maxStatusKey != null) {
+          database.pagingTimelineDao().findWithStatusKey(maxStatusKey, accountKey)?.let {
+            it.isGap = false
+            database.pagingTimelineDao().insertAll(listOf(it))
+          }
         }
-        try {
-            val max_id = withContext(Dispatchers.IO) {
-                maxStatusKey?.let { database.statusDao().findWithStatusKey(it, accountKey)?.statusId }
-            }
-            val result = loadBetweenImpl(pageSize, max_id = max_id, since_id = null).let { list ->
-                list.map {
-                    it.toPagingTimeline(accountKey, pagingKey)
-                }.let {
-                    transform(it, list)
-                }
-            }
-            database.withTransaction {
-                if (maxStatusKey != null) {
-                    database.pagingTimelineDao().findWithStatusKey(maxStatusKey, accountKey)?.let {
-                        it.isGap = false
-                        database.pagingTimelineDao().insertAll(listOf(it))
-                    }
-                }
-                if (sinceStatusKey != null) {
-                    result.lastOrNull()?.let {
-                        database.pagingTimelineDao().findWithStatusKey(it.status.statusKey, accountKey = accountKey)
-                    }.let {
-                        result.lastOrNull()?.timeline?.isGap = it == null
-                    }
-                }
-                result.saveToDb(database)
-            }
-            return MediatorResult.Success(
-                endOfPaginationReached = !hasMore(result, max_id),
-            )
-        } catch (e: Throwable) {
-            return MediatorResult.Error(e)
-        } finally {
-            if (maxStatusKey != null && sinceStatusKey != null) {
-                _loadingBetween.value = _loadingBetween.value - maxStatusKey
-            }
+        if (sinceStatusKey != null) {
+          result.lastOrNull()?.let {
+            database.pagingTimelineDao().findWithStatusKey(it.status.statusKey, accountKey = accountKey)
+          }.let {
+            result.lastOrNull()?.timeline?.isGap = it == null
+          }
         }
+        result.saveToDb(database)
+      }
+      return MediatorResult.Success(
+        endOfPaginationReached = !hasMore(result, max_id),
+      )
+    } catch (e: Throwable) {
+      return MediatorResult.Error(e)
+    } finally {
+      if (maxStatusKey != null && sinceStatusKey != null) {
+        _loadingBetween.value = _loadingBetween.value - maxStatusKey
+      }
     }
+  }
 
-    protected open suspend fun transform(
-        data: List<PagingTimeLineWithStatus>,
-        list: List<IStatus>
-    ): List<PagingTimeLineWithStatus> {
-        return data
-    }
+  protected open suspend fun transform(
+    data: List<PagingTimeLineWithStatus>,
+    list: List<IStatus>
+  ): List<PagingTimeLineWithStatus> {
+    return data
+  }
 
-    protected abstract suspend fun loadBetweenImpl(
-        pageSize: Int,
-        max_id: String? = null,
-        since_id: String? = null,
-    ): List<IStatus>
+  protected abstract suspend fun loadBetweenImpl(
+    pageSize: Int,
+    max_id: String? = null,
+    since_id: String? = null,
+  ): List<IStatus>
 
-    protected open suspend fun hasMore(result: List<PagingTimeLineWithStatus>, max_id: String?): Boolean {
-        // Twitter API returns single status with max_id  when there is no more data
-        return result.size > 1 || result.firstOrNull()?.let {
-            it.status.statusId != max_id
-        } ?: false
-    }
+  protected open suspend fun hasMore(result: List<PagingTimeLineWithStatus>, max_id: String?): Boolean {
+    // Twitter API returns single status with max_id  when there is no more data
+    return result.size > 1 || result.firstOrNull()?.let {
+      it.status.statusId != max_id
+    } ?: false
+  }
 }

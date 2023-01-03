@@ -43,176 +43,176 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 internal class ListsModifyViewModelTest : AccountViewModelTestBase() {
-    override val mockService: MicroBlogService
-        get() = MockListsService()
+  override val mockService: MicroBlogService
+    get() = MockListsService()
 
-    private var mockRepository: ListsRepository = ListsRepository(MockCacheDatabase())
+  private var mockRepository: ListsRepository = ListsRepository(MockCacheDatabase())
 
-    @MockK
-    private lateinit var mockAppNotification: InAppNotification
+  @MockK
+  private lateinit var mockAppNotification: InAppNotification
 
-    @MockK
-    private lateinit var mockSuccessObserver: Observer<Boolean>
+  @MockK
+  private lateinit var mockSuccessObserver: Observer<Boolean>
 
-    @MockK
-    private lateinit var mockLoadingObserver: Observer<Boolean>
+  @MockK
+  private lateinit var mockLoadingObserver: Observer<Boolean>
 
-    private var errorNotification: NotificationEvent? = null
+  private var errorNotification: NotificationEvent? = null
 
-    private lateinit var modifyViewModel: ListsModifyViewModel
+  private lateinit var modifyViewModel: ListsModifyViewModel
 
-    private val scope by lazy {
-        CoroutineScope(Dispatchers.Main)
+  private val scope by lazy {
+    CoroutineScope(Dispatchers.Main)
+  }
+
+  @Test
+  fun updateList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
+    verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+    suspendCoroutine<Boolean> {
+      modifyViewModel.editList(
+        listId = "123",
+        title = "title",
+        private = false
+      ) { success, _ ->
+        mockSuccessObserver.onChanged(success)
+        it.resume(success)
+      }
     }
+    verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
+  }
 
-    @Test
-    fun updateList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
-        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        suspendCoroutine<Boolean> {
-            modifyViewModel.editList(
-                listId = "123",
-                title = "title",
-                private = false
-            ) { success, _ ->
-                mockSuccessObserver.onChanged(success)
-                it.resume(success)
-            }
+  @Test
+  fun updateList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
+    verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+    Assert.assertNull(errorNotification)
+    suspendCoroutine<Boolean> {
+      modifyViewModel.editList(
+        listId = "error",
+        title = "name",
+        private = false
+      ) { success, _ ->
+        mockSuccessObserver.onChanged(success)
+        it.resume(success)
+      }
+    }
+    verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
+    Assert.assertNotNull(errorNotification)
+  }
+
+  @Test
+  fun deleteList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
+    verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+    suspendCoroutine<Boolean> {
+      modifyViewModel.deleteList(listId = "123", MicroBlogKey.Empty) { success, _ ->
+        mockSuccessObserver.onChanged(success)
+        it.resume(success)
+      }
+    }
+    verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
+  }
+
+  @Test
+  fun deleteList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
+    verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+    Assert.assertNull(errorNotification)
+    suspendCoroutine<Boolean> {
+      modifyViewModel.deleteList(listId = "error", MicroBlogKey.Empty) { success, _ ->
+        mockSuccessObserver.onChanged(success)
+        it.resume(success)
+      }
+    }
+    verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
+    Assert.assertNotNull(errorNotification)
+  }
+
+  @Test
+  fun subscribeList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
+    verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+    suspendCoroutine<Boolean> {
+      modifyViewModel.subscribeList(MicroBlogKey.twitter("123")) { success, _ ->
+        mockSuccessObserver.onChanged(success)
+        it.resume(success)
+      }
+    }
+    verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
+  }
+
+  @Test
+  fun subscribeList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
+    verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+    Assert.assertNull(errorNotification)
+    suspendCoroutine<Boolean> {
+      modifyViewModel.subscribeList(MicroBlogKey.twitter("error")) { success, _ ->
+        mockSuccessObserver.onChanged(success)
+        it.resume(success)
+      }
+    }
+    verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
+    Assert.assertNotNull(errorNotification)
+  }
+
+  @Test
+  fun unsubscribeList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
+    verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+    suspendCoroutine<Boolean> {
+      modifyViewModel.unsubscribeList(MicroBlogKey.twitter("123")) { success, _ ->
+        mockSuccessObserver.onChanged(success)
+        it.resume(success)
+      }
+    }
+    verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
+  }
+
+  @Test
+  fun unsubscribeList_failedExpectFalseAndShowNotification(): Unit =
+    runBlocking(Dispatchers.Main) {
+      verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+      Assert.assertNull(errorNotification)
+      suspendCoroutine<Boolean> {
+        modifyViewModel.unsubscribeList(MicroBlogKey.twitter("error")) { success, _ ->
+          mockSuccessObserver.onChanged(success)
+          it.resume(success)
         }
-        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
+      }
+      verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
+      Assert.assertNotNull(errorNotification)
     }
 
-    @Test
-    fun updateList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
-        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        Assert.assertNull(errorNotification)
-        suspendCoroutine<Boolean> {
-            modifyViewModel.editList(
-                listId = "error",
-                title = "name",
-                private = false
-            ) { success, _ ->
-                mockSuccessObserver.onChanged(success)
-                it.resume(success)
-            }
-        }
-        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
-        Assert.assertNotNull(errorNotification)
+  override fun setUp() {
+    super.setUp()
+    modifyViewModel = ListsModifyViewModel(
+      mockRepository,
+      mockAppNotification,
+      mockAccountRepository,
+      listKey = MicroBlogKey.Empty,
+    )
+    every { mockAppNotification.show(any()) }.answers {
+      errorNotification = arg(0)
     }
-
-    @Test
-    fun deleteList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
-        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        suspendCoroutine<Boolean> {
-            modifyViewModel.deleteList(listId = "123", MicroBlogKey.Empty) { success, _ ->
-                mockSuccessObserver.onChanged(success)
-                it.resume(success)
-            }
-        }
-        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
+    errorNotification = null
+    mockSuccessObserver.onChanged(false)
+    scope.launch {
+      modifyViewModel.loading.collect {
+        mockLoadingObserver.onChanged(it)
+      }
     }
+  }
 
-    @Test
-    fun deleteList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
-        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        Assert.assertNull(errorNotification)
-        suspendCoroutine<Boolean> {
-            modifyViewModel.deleteList(listId = "error", MicroBlogKey.Empty) { success, _ ->
-                mockSuccessObserver.onChanged(success)
-                it.resume(success)
-            }
-        }
-        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
-        Assert.assertNotNull(errorNotification)
-    }
+  private fun verifySuccessAndLoadingBefore(
+    loadingObserver: Observer<Boolean>,
+    successObserver: Observer<Boolean>
+  ) {
+    verify(exactly = 1) { loadingObserver.onChanged(false) }
+    verify { successObserver.onChanged(false) }
+  }
 
-    @Test
-    fun subscribeList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
-        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        suspendCoroutine<Boolean> {
-            modifyViewModel.subscribeList(MicroBlogKey.twitter("123")) { success, _ ->
-                mockSuccessObserver.onChanged(success)
-                it.resume(success)
-            }
-        }
-        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
-    }
-
-    @Test
-    fun subscribeList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
-        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        Assert.assertNull(errorNotification)
-        suspendCoroutine<Boolean> {
-            modifyViewModel.subscribeList(MicroBlogKey.twitter("error")) { success, _ ->
-                mockSuccessObserver.onChanged(success)
-                it.resume(success)
-            }
-        }
-        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
-        Assert.assertNotNull(errorNotification)
-    }
-
-    @Test
-    fun unsubscribeList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
-        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        suspendCoroutine<Boolean> {
-            modifyViewModel.unsubscribeList(MicroBlogKey.twitter("123")) { success, _ ->
-                mockSuccessObserver.onChanged(success)
-                it.resume(success)
-            }
-        }
-        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
-    }
-
-    @Test
-    fun unsubscribeList_failedExpectFalseAndShowNotification(): Unit =
-        runBlocking(Dispatchers.Main) {
-            verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-            Assert.assertNull(errorNotification)
-            suspendCoroutine<Boolean> {
-                modifyViewModel.unsubscribeList(MicroBlogKey.twitter("error")) { success, _ ->
-                    mockSuccessObserver.onChanged(success)
-                    it.resume(success)
-                }
-            }
-            verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
-            Assert.assertNotNull(errorNotification)
-        }
-
-    override fun setUp() {
-        super.setUp()
-        modifyViewModel = ListsModifyViewModel(
-            mockRepository,
-            mockAppNotification,
-            mockAccountRepository,
-            listKey = MicroBlogKey.Empty,
-        )
-        every { mockAppNotification.show(any()) }.answers {
-            errorNotification = arg(0)
-        }
-        errorNotification = null
-        mockSuccessObserver.onChanged(false)
-        scope.launch {
-            modifyViewModel.loading.collect {
-                mockLoadingObserver.onChanged(it)
-            }
-        }
-    }
-
-    private fun verifySuccessAndLoadingBefore(
-        loadingObserver: Observer<Boolean>,
-        successObserver: Observer<Boolean>
-    ) {
-        verify(exactly = 1) { loadingObserver.onChanged(false) }
-        verify { successObserver.onChanged(false) }
-    }
-
-    private fun verifySuccessAndLoadingAfter(
-        loadingObserver: Observer<Boolean>,
-        successObserver: Observer<Boolean>,
-        success: Boolean
-    ) {
-        verify(exactly = 1) { loadingObserver.onChanged(true) }
-        verify(exactly = 1) { loadingObserver.onChanged(false) }
-        verify(exactly = if (success) 1 else 2) { successObserver.onChanged(success) }
-    }
+  private fun verifySuccessAndLoadingAfter(
+    loadingObserver: Observer<Boolean>,
+    successObserver: Observer<Boolean>,
+    success: Boolean
+  ) {
+    verify(exactly = 1) { loadingObserver.onChanged(true) }
+    verify(exactly = 1) { loadingObserver.onChanged(false) }
+    verify(exactly = if (success) 1 else 2) { successObserver.onChanged(success) }
+  }
 }

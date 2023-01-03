@@ -23,7 +23,6 @@ package com.twidere.twiderex.scenes.home
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
-import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.component.TimelineComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -31,63 +30,72 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.HomeNavigationItem
-import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.navigation.StatusNavigationData
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineViewModel
+import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
+import moe.tlaster.precompose.navigation.Navigator
 
 class AllNotificationItem : HomeNavigationItem() {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_tabs_all)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_tabs_all)
+  }
 
-    override val route: String
-        get() = TODO("Not yet implemented")
+  override val route: String
+    get() = TODO("Not yet implemented")
 
-    @Composable
-    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_message_circle)
+  @Composable
+  override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_message_circle)
 
-    @Composable
-    override fun Content() {
-        val account = LocalActiveAccount.current ?: return
-        if (account.service !is NotificationService) {
-            return
-        }
-        AllNotificationSceneContent(
-            lazyListController = lazyListController,
-        )
-    }
+  @Composable
+  override fun Content(navigator: Navigator) {
+    val statusNavigation = rememberStatusNavigationData(navigator)
+    AllNotificationSceneContent(
+      lazyListController = lazyListController,
+      statusNavigation = statusNavigation,
+    )
+  }
 }
 
 @Composable
-fun AllNotificationScene() {
-    TwidereScene {
-        InAppNotificationScaffold(
-            topBar = {
-                AppBar(
-                    title = {
-                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_tabs_all))
-                    },
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    }
-                )
-            }
-        ) {
-            AllNotificationSceneContent()
-        }
+fun AllNotificationScene(
+  navigator: Navigator,
+) {
+  val statusNavigation = rememberStatusNavigationData(navigator)
+  TwidereScene {
+    InAppNotificationScaffold(
+      topBar = {
+        AppBar(
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_notification_tabs_all))
+          },
+          navigationIcon = {
+            AppBarNavigationButton(
+              onBack = {
+                navigator.popBackStack()
+              }
+            )
+          }
+        )
+      }
+    ) {
+      AllNotificationSceneContent(
+        statusNavigation = statusNavigation
+      )
     }
+  }
 }
 
 @Composable
 fun AllNotificationSceneContent(
-    lazyListController: LazyListController? = null,
+  lazyListController: LazyListController? = null,
+  statusNavigation: StatusNavigationData,
 ) {
-    val viewModel: NotificationTimelineViewModel = getViewModel()
-    TimelineComponent(
-        viewModel = viewModel,
-        lazyListController = lazyListController,
-    )
+  TimelineComponent(
+    lazyListController = lazyListController,
+    savedStateKeyType = SavedStateKeyType.NOTIFICATION,
+    statusNavigation = statusNavigation,
+  )
 }

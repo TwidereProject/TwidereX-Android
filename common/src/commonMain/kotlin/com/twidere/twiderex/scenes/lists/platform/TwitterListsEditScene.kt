@@ -42,75 +42,99 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsModifyViewModel
+import io.github.seiko.precompose.annotation.NavGraphDestination
+import io.github.seiko.precompose.annotation.Path
+import moe.tlaster.precompose.navigation.Navigator
 import org.koin.core.parameter.parametersOf
+
+@NavGraphDestination(
+  route = Root.Lists.TwitterEdit.route,
+)
+@Composable
+fun TwitterListsEditScene(
+  @Path("listKey") listKey: String,
+  navigator: Navigator,
+) {
+  TwitterListsEditScene(
+    listKey = MicroBlogKey.valueOf(listKey),
+    navigator = navigator,
+  )
+}
 
 @Composable
 fun TwitterListsEditScene(
-    listKey: MicroBlogKey
+  listKey: MicroBlogKey,
+  navigator: Navigator,
 ) {
-    val navController = LocalNavController.current
-    val listsEditViewModel: ListsModifyViewModel = getViewModel {
-        parametersOf(listKey)
-    }
-    val loading by listsEditViewModel.loading.observeAsState(initial = false)
-    val source by listsEditViewModel.source.observeAsState(null)
-    source?.let { uiList ->
-        TwidereScene {
-            val name by listsEditViewModel.editName.observeAsState(uiList.title)
-            val desc by listsEditViewModel.editDesc.observeAsState(uiList.descriptions)
-            val isPrivate by listsEditViewModel.editPrivate.observeAsState(uiList.isPrivate)
-            InAppNotificationScaffold(
-                topBar = {
-                    AppBar(
-                        navigationIcon = { AppBarNavigationButton(Icons.Default.Close) },
-                        title = {
-                            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_edit_title))
-                        },
-                        actions = {
-                            IconButton(
-                                enabled = name.isNotEmpty(),
-                                onClick = {
-                                    listsEditViewModel.editList(
-                                        listKey.id,
-                                        title = name,
-                                        description = desc,
-                                        private = isPrivate
-                                    ) { success, _ ->
-                                        if (success) navController.popBackStack()
-                                    }
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Done,
-                                    contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_confirm),
-                                    tint = if (name.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(
-                                        alpha = LocalContentAlpha.current
-                                    )
-                                )
-                            }
-                        }
-                    )
+  val listsEditViewModel: ListsModifyViewModel = getViewModel {
+    parametersOf(listKey)
+  }
+  val loading by listsEditViewModel.loading.observeAsState(initial = false)
+  val source by listsEditViewModel.source.observeAsState(null)
+  source?.let { uiList ->
+    TwidereScene {
+      val name by listsEditViewModel.editName.observeAsState(uiList.title)
+      val desc by listsEditViewModel.editDesc.observeAsState(uiList.descriptions)
+      val isPrivate by listsEditViewModel.editPrivate.observeAsState(uiList.isPrivate)
+      InAppNotificationScaffold(
+        topBar = {
+          AppBar(
+            navigationIcon = {
+              AppBarNavigationButton(
+                Icons.Default.Close,
+                onBack = {
+                  navigator.popBackStack()
                 }
-            ) {
-                Box {
-                    TwitterListsModifyComponent(
-                        name = name,
-                        desc = desc,
-                        isPrivate = isPrivate,
-                        onNameChanged = { listsEditViewModel.editName.value = it },
-                        onDescChanged = { listsEditViewModel.editDesc.value = it },
-                        onPrivateChanged = { listsEditViewModel.editPrivate.value = it }
-                    )
-                    if (loading) {
-                        Dialog(onDismissRequest = { }) {
-                            LoadingProgress()
-                        }
-                    }
+              )
+            },
+            title = {
+              Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_edit_title))
+            },
+            actions = {
+              IconButton(
+                enabled = name.isNotEmpty(),
+                onClick = {
+                  listsEditViewModel.editList(
+                    listKey.id,
+                    title = name,
+                    description = desc,
+                    private = isPrivate
+                  ) { success, _ ->
+                    if (success) navigator.popBackStack()
+                  }
                 }
+              ) {
+                Icon(
+                  imageVector = Icons.Default.Done,
+                  contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_confirm),
+                  tint = if (name.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                    alpha = LocalContentAlpha.current
+                  )
+                )
+              }
             }
+          )
         }
+      ) {
+        Box {
+          TwitterListsModifyComponent(
+            name = name,
+            desc = desc,
+            isPrivate = isPrivate,
+            onNameChanged = { listsEditViewModel.editName.value = it },
+            onDescChanged = { listsEditViewModel.editDesc.value = it },
+            onPrivateChanged = { listsEditViewModel.editPrivate.value = it }
+          )
+          if (loading) {
+            Dialog(onDismissRequest = { }) {
+              LoadingProgress()
+            }
+          }
+        }
+      }
     }
+  }
 }

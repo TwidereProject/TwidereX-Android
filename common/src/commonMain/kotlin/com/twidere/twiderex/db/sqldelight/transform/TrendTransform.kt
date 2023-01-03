@@ -28,38 +28,38 @@ import com.twidere.twiderex.sqldelight.table.DbTrend
 import com.twidere.twiderex.sqldelight.table.DbTrendHistory
 
 internal fun UiTrendHistory.toDbTrendHistory(accountKey: MicroBlogKey) = DbTrendHistory(
-    trendKey = trendKey,
-    accountKey = accountKey,
-    day = day,
-    uses = uses,
-    accounts = accounts
+  trendKey = trendKey,
+  accountKey = accountKey,
+  day = day,
+  uses = uses,
+  accounts = accounts
 )
 
 internal fun UiTrend.toDbTrendWithHistory() = DbTrendWithHistory(
-    trend = DbTrend(
-        trendKey = trendKey,
-        accountKey = accountKey,
-        displayName = displayName,
-        url = url,
-        query = query,
-        volume = volume
-    ),
-    history = history.map { it.toDbTrendHistory(accountKey) }
+  trend = DbTrend(
+    trendKey = trendKey,
+    accountKey = accountKey,
+    displayName = displayName,
+    url = url,
+    query = query,
+    volume = volume
+  ),
+  history = history.map { it.toDbTrendHistory(accountKey) }
 )
 
 internal fun DbTrendHistory.toUi() = UiTrendHistory(
-    trendKey = trendKey,
-    day = day,
-    uses = uses,
-    accounts = accounts
+  trendKey = trendKey,
+  day = day,
+  uses = uses,
+  accounts = accounts
 )
 
 internal fun DbTrendWithHistory.toUi() = UiTrend(
-    trendKey = trend.trendKey,
-    accountKey = trend.accountKey,
-    displayName = trend.displayName,
-    url = trend.url,
-    query = trend.query,
-    volume = trend.volume,
-    history = history.map { it.toUi() }
+  trendKey = trend.trendKey,
+  accountKey = trend.accountKey,
+  displayName = trend.displayName,
+  url = trend.url,
+  query = trend.query,
+  volume = trend.volume,
+  history = history.map { it.toUi() }
 )

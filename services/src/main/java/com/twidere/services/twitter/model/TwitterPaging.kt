@@ -23,6 +23,6 @@ package com.twidere.services.twitter.model
 import com.twidere.services.microblog.model.IPaging
 
 class TwitterPaging<T>(
-    data: List<T>,
-    override val nextPage: String? = null
+  data: List<T>,
+  override val nextPage: String? = null
 ) : ArrayList<T>(data), IPaging

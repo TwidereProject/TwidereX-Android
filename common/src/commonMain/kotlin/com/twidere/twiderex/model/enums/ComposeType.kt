@@ -24,8 +24,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class ComposeType {
-    New,
-    Reply,
-    Quote,
-    Thread,
+  New,
+  Reply,
+  Quote,
+  Thread,
 }

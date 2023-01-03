@@ -38,49 +38,49 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MostCenterInListLayout(
-    videoKey: String,
-    modifier: Modifier = Modifier,
-    content: @Composable (isMostCenter: Boolean) -> Unit
+  videoKey: String,
+  modifier: Modifier = Modifier,
+  content: @Composable (isMostCenter: Boolean) -> Unit
 ) {
-    var middleLine = 0.0f
-    val composableScope = rememberCoroutineScope()
+  var middleLine = 0.0f
+  val composableScope = rememberCoroutineScope()
 
-    var isMostCenter by remember {
-        mutableStateOf(false)
+  var isMostCenter by remember {
+    mutableStateOf(false)
+  }
+  var debounceJob: Job? = null
+  DisposableEffect(Unit) {
+    onDispose {
+      VideoPool.removeRect(videoKey)
     }
-    var debounceJob: Job? = null
-    DisposableEffect(Unit) {
-        onDispose {
-            VideoPool.removeRect(videoKey)
+  }
+  Box(
+    modifier = modifier.onGloballyPositioned { coordinates ->
+      if (middleLine == 0.0f) {
+        var rootCoordinates = coordinates
+        while (rootCoordinates.parentCoordinates != null) {
+          rootCoordinates = rootCoordinates.parentCoordinates!!
         }
-    }
-    Box(
-        modifier = modifier.onGloballyPositioned { coordinates ->
-            if (middleLine == 0.0f) {
-                var rootCoordinates = coordinates
-                while (rootCoordinates.parentCoordinates != null) {
-                    rootCoordinates = rootCoordinates.parentCoordinates!!
-                }
-                rootCoordinates.boundsInWindow().run {
-                    middleLine = (top + bottom) / 2
-                }
-            }
-            coordinates.boundsInWindow().run {
-                VideoPool.setRect(videoKey, this)
-                if (!isMostCenter) {
-                    debounceJob?.cancel()
-                    debounceJob = composableScope.launch {
-                        delay(VideoPool.DEBOUNCE_DELAY)
-                        if (VideoPool.isMostCenter(videoKey, middleLine)) {
-                            isMostCenter = true
-                        }
-                    }
-                } else if (isMostCenter && !VideoPool.isMostCenter(videoKey, middleLine)) {
-                    isMostCenter = false
-                }
-            }
+        rootCoordinates.boundsInWindow().run {
+          middleLine = (top + bottom) / 2
         }
-    ) {
-        content.invoke(isMostCenter)
+      }
+      coordinates.boundsInWindow().run {
+        VideoPool.setRect(videoKey, this)
+        if (!isMostCenter) {
+          debounceJob?.cancel()
+          debounceJob = composableScope.launch {
+            delay(VideoPool.DEBOUNCE_DELAY)
+            if (VideoPool.isMostCenter(videoKey, middleLine)) {
+              isMostCenter = true
+            }
+          }
+        } else if (isMostCenter && !VideoPool.isMostCenter(videoKey, middleLine)) {
+          isMostCenter = false
+        }
+      }
     }
+  ) {
+    content.invoke(isMostCenter)
+  }
 }

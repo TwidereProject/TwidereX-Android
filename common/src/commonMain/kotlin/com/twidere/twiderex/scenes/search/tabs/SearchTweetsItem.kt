@@ -21,37 +21,48 @@
 package com.twidere.twiderex.scenes.search.tabs
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.viewmodel.search.SearchTweetsViewModel
-import org.koin.core.parameter.parametersOf
+import com.twidere.twiderex.extensions.rememberPresenter
+import com.twidere.twiderex.navigation.rememberStatusNavigationData
+import com.twidere.twiderex.scenes.search.tabs.presenter.SearchTweetsPresenter
+import com.twidere.twiderex.scenes.search.tabs.presenter.SearchTweetsState
+import moe.tlaster.precompose.navigation.Navigator
 
 class SearchTweetsItem : SearchSceneItem {
-    @Composable
-    override fun name(): String {
-        return stringResource(res = com.twidere.twiderex.MR.strings.scene_search_tabs_tweets)
-    }
+  @Composable
+  override fun name(): String {
+    return stringResource(res = com.twidere.twiderex.MR.strings.scene_search_tabs_tweets)
+  }
 
-    @Composable
-    override fun Content(keyword: String) {
-        val viewModel: SearchTweetsViewModel = getViewModel {
-            parametersOf(keyword)
+  @Composable
+  override fun Content(
+    keyword: String,
+    navigator: Navigator
+  ) {
+
+    val state by rememberPresenter {
+      SearchTweetsPresenter(keyword = keyword)
+    }.collectAsState()
+
+    (state as? SearchTweetsState.Data)?.let {
+      SwipeToRefreshLayout(
+        refreshingState = it.data.loadState.refresh is LoadState.Loading,
+        onRefresh = {
+          it.data.refreshOrRetry()
         }
-        val source = viewModel.source.collectAsLazyPagingItems()
-        SwipeToRefreshLayout(
-            refreshingState = source.loadState.refresh is LoadState.Loading,
-            onRefresh = {
-                source.refreshOrRetry()
-            }
-        ) {
-            LazyUiStatusList(
-                items = source,
-            )
-        }
+      ) {
+        val statusNavigation = rememberStatusNavigationData(navigator)
+        LazyUiStatusList(
+          items = it.data,
+          statusNavigation = statusNavigation,
+        )
+      }
     }
+  }
 }

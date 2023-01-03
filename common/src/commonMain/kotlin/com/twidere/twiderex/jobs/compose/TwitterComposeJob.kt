@@ -36,69 +36,69 @@ import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
 
 class TwitterComposeJob constructor(
-    accountRepository: AccountRepository,
-    notificationManager: AppNotificationManager,
-    exifScrambler: ExifScrambler,
-    remoteNavigator: RemoteNavigator,
-    resLoader: ResLoader,
-    private val statusRepository: StatusRepository,
-    private val fileResolver: FileResolver,
-    private val cacheDatabase: CacheDatabase,
+  accountRepository: AccountRepository,
+  notificationManager: AppNotificationManager,
+  exifScrambler: ExifScrambler,
+  remoteNavigator: RemoteNavigator,
+  resLoader: ResLoader,
+  private val statusRepository: StatusRepository,
+  private val fileResolver: FileResolver,
+  private val cacheDatabase: CacheDatabase,
 ) : ComposeJob<TwitterService>(
-    accountRepository,
-    notificationManager,
-    exifScrambler,
-    remoteNavigator,
-    resLoader,
+  accountRepository,
+  notificationManager,
+  exifScrambler,
+  remoteNavigator,
+  resLoader,
 ) {
-    override suspend fun compose(
-        service: TwitterService,
-        composeData: ComposeData,
-        accountKey: MicroBlogKey,
-        mediaIds: ArrayList<String>
-    ): UiStatus {
-        val lat = composeData.lat
-        val long = composeData.long
-        val content = composeData.content.let {
-            if (composeData.composeType == ComposeType.Quote && composeData.statusKey != null) {
-                val status = statusRepository.loadFromCache(
-                    composeData.statusKey,
-                    accountKey = accountKey
-                )
-                it + " ${status?.generateShareLink()}"
-            } else {
-                it
-            }
-        }
-        val result = service.update(
-            content,
-            media_ids = mediaIds,
-            in_reply_to_status_id = if (composeData.composeType == ComposeType.Reply || composeData.composeType == ComposeType.Thread) composeData.statusKey?.id else null,
-            repost_status_id = if (composeData.composeType == ComposeType.Quote) composeData.statusKey?.id else null,
-            lat = lat,
-            long = long,
-            exclude_reply_user_ids = composeData.excludedReplyUserIds
-        ).toUi(accountKey)
-        cacheDatabase.statusDao().insertAll(listOf = listOf(result), accountKey = accountKey)
-        return result
+  override suspend fun compose(
+    service: TwitterService,
+    composeData: ComposeData,
+    accountKey: MicroBlogKey,
+    mediaIds: ArrayList<String>
+  ): UiStatus {
+    val lat = composeData.lat
+    val long = composeData.long
+    val content = composeData.content.let {
+      if (composeData.composeType == ComposeType.Quote && composeData.statusKey != null) {
+        val status = statusRepository.loadFromCache(
+          composeData.statusKey,
+          accountKey = accountKey
+        )
+        it + " ${status?.generateShareLink()}"
+      } else {
+        it
+      }
     }
+    val result = service.update(
+      content,
+      media_ids = mediaIds,
+      in_reply_to_status_id = if (composeData.composeType == ComposeType.Reply || composeData.composeType == ComposeType.Thread) composeData.statusKey?.id else null,
+      repost_status_id = if (composeData.composeType == ComposeType.Quote) composeData.statusKey?.id else null,
+      lat = lat,
+      long = long,
+      exclude_reply_user_ids = composeData.excludedReplyUserIds
+    ).toUi(accountKey)
+    cacheDatabase.statusDao().insertAll(listOf = listOf(result), accountKey = accountKey)
+    return result
+  }
 
-    override suspend fun uploadImage(
-        originUri: String,
-        scramblerUri: String,
-        service: TwitterService
-    ): String {
-        val type = fileResolver.getMimeType(originUri)
-        val size = fileResolver.getFileSize(scramblerUri)
-        return fileResolver.openInputStream(scramblerUri)?.use {
-            service.uploadFile(
-                it,
-                type ?: "image/*",
-                size ?: it.available().toLong()
-            )
-        } ?: throw Error()
-    }
+  override suspend fun uploadImage(
+    originUri: String,
+    scramblerUri: String,
+    service: TwitterService
+  ): String {
+    val type = fileResolver.getMimeType(originUri)
+    val size = fileResolver.getFileSize(scramblerUri)
+    return fileResolver.openInputStream(scramblerUri)?.use {
+      service.uploadFile(
+        it,
+        type ?: "image/*",
+        size ?: it.available().toLong()
+      )
+    } ?: throw Error()
+  }
 
-    override val imageMaxSize: Long
-        get() = 5 * 1024 * 1024 // https://help.twitter.com/en/using-twitter/tweeting-gifs-and-pictures
+  override val imageMaxSize: Long
+    get() = 5 * 1024 * 1024 // https://help.twitter.com/en/using-twitter/tweeting-gifs-and-pictures
 }

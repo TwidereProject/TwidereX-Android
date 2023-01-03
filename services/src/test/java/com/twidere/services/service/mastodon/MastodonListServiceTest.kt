@@ -25,15 +25,15 @@ import com.twidere.services.microblog.ListsService
 import com.twidere.services.service.ListServiceTest
 
 class MastodonListServiceTest : ListServiceTest() {
-    override fun createService(): ListsService {
-        return mockMastodonService()
-    }
+  override fun createService(): ListsService {
+    return mockMastodonService()
+  }
 
-    override fun testListId(): String {
-        return "13585"
-    }
+  override fun testListId(): String {
+    return "13585"
+  }
 
-    override fun testUserId(): String {
-        return "23634"
-    }
+  override fun testUserId(): String {
+    return "23634"
+  }
 }

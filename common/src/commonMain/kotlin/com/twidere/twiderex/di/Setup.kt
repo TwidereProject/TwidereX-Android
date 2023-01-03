@@ -34,20 +34,20 @@ import org.koin.core.KoinApplication
 import org.koin.dsl.module
 
 fun KoinApplication.setupModules() {
-    modules(storageProviderModule)
-    modules(preferencesModule)
-    modules(dataBaseModule)
-    modules(platformModule)
-    modules(viewModelModule)
-    modules(repositoryModule)
-    modules(actionModule)
-    modules(jobsModule)
-    modules(kmpModule)
-    modules(
-        module {
-            single {
-                OAuthLauncher(get())
-            }
-        }
-    )
+  modules(storageProviderModule)
+  modules(preferencesModule)
+  modules(dataBaseModule)
+  modules(platformModule)
+  modules(viewModelModule)
+  modules(repositoryModule)
+  modules(actionModule)
+  modules(jobsModule)
+  modules(kmpModule)
+  modules(
+    module {
+      single {
+        OAuthLauncher(get())
+      }
+    }
+  )
 }
