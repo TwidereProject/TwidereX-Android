@@ -45,6 +45,7 @@ object Versions {
     const val kFilePicker = "1.0.4"
     const val jodaTime = "2.12.2"
     const val cache4k  = "0.9.0"
+    const val uri = "0.0.9"
     const val precompose = "1.3.13"
     const val precomposeKsp = "1.0.2"
 }

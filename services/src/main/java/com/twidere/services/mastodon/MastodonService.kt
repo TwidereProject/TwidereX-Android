@@ -63,7 +63,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.InputStream
 
 class MastodonService(
-  private val host: String,
+  private val baseUrl: String,
   private val accessToken: String,
   private val httpClientFactory: HttpClientFactory
 ) : MicroBlogService,
@@ -78,7 +78,7 @@ class MastodonService(
   TrendService {
   private val resources: MastodonResources get() = httpClientFactory.createResources(
     clazz = MastodonResources::class.java,
-    baseUrl = "https://$host",
+    baseUrl = baseUrl,
     authorization = BearerAuthorization(accessToken),
     useCache = true
   )

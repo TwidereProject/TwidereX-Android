@@ -39,7 +39,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
-import java.net.URI
+import com.eygraber.uri.Uri
 
 class MastodonSignInViewModel(
   private val repository: AccountRepository,
@@ -54,16 +54,14 @@ class MastodonSignInViewModel(
   }
 
   fun beginOAuth(
-    host: String,
+    urlString: String,
     finished: (success: Boolean) -> Unit,
   ) = viewModelScope.launch {
     loading.value = true
-    val realHost = runCatching {
-      URI.create(host)
-    }.getOrNull()?.takeIf { !it.scheme.isNullOrEmpty() }?.toString() ?: "https://$host"
+    val uri = Uri.parseOrNull(urlString) ?: Uri.parse("https://$host")
     runCatching {
       val service = MastodonOAuthService(
-        host = realHost,
+        baseUrl = uri.toString(),
         client_name = "Twidere X",
         website = "https://github.com/TwidereProject/TwidereX-Android",
         redirect_uri = RootDeepLinks.Callback.SignIn.Mastodon,
@@ -80,8 +78,8 @@ class MastodonSignInViewModel(
           val name = user.username
           val id = user.id
           if (name != null && id != null) {
-            val displayKey = MicroBlogKey(name, host = host)
-            val internalKey = MicroBlogKey(id, host = host)
+            val displayKey = MicroBlogKey(name, host = uri.host!!)
+            val internalKey = MicroBlogKey(id, host = uri.host!!)
             val credentials_json = OAuth2Credentials(
               access_token = accessToken
             ).json()
