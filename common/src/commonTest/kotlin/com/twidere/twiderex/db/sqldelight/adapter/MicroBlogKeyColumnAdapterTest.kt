@@ -26,6 +26,7 @@ import kotlin.test.assertEquals
 
 internal class MicroBlogKeyColumnAdapterTest {
   private val adapter = MicroBlogKeyColumnAdapter()
+
   @Test
   fun decode_GenerateCorrectHostAndId() {
     val key = adapter.decode("123@twitter.com")

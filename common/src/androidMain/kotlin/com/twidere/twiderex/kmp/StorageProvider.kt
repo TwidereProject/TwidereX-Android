@@ -37,9 +37,9 @@ actual class StorageProvider(private val context: Context) {
   actual fun clearCaches(dir: String, deleteDirAlso: Boolean) {
     val cacheDir = File(dir)
     if (!cacheDir.exists()) return
-    if (deleteDirAlso)
+    if (deleteDirAlso) {
       cacheDir.deleteRecursively()
-    else {
+    } else {
       cacheDir.listFiles()?.forEach { file ->
         file.deleteRecursively()
       }

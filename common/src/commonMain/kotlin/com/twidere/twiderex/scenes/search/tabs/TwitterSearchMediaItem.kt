@@ -48,7 +48,6 @@ class TwitterSearchMediaItem : SearchSceneItem {
     keyword: String,
     navigator: Navigator,
   ) {
-
     val state by rememberPresenter {
       TwitterSearchMediaPresenter(keyword = keyword)
     }.collectAsState()

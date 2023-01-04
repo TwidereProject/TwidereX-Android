@@ -39,6 +39,7 @@ internal class NotificationCursorQueriesImplTest : BaseCacheDatabaseTest() {
     value = "value",
     timestamp = System.currentTimeMillis()
   )
+
   @Test
   fun insert_ReplaceWhenPrimaryKeyEquals() = runBlocking {
     database.notificationCursorQueries.insert(cursor.toDb().copy(value_ = "insert"))

@@ -96,8 +96,9 @@ fun TwitterListsModifyComponent(
       TextField(
         value = nameTextFieldVale.value,
         onValueChange = {
-          if (it.text != nameTextFieldVale.value.text)
+          if (it.text != nameTextFieldVale.value.text) {
             onNameChanged(it.text)
+          }
           nameTextFieldVale.value = it
         },
         modifier = Modifier
@@ -127,8 +128,9 @@ fun TwitterListsModifyComponent(
       TextField(
         value = descTextFieldVale.value,
         onValueChange = {
-          if (it.text != descTextFieldVale.value.text)
+          if (it.text != descTextFieldVale.value.text) {
             onDescChanged(it.text)
+          }
           descTextFieldVale.value = it
         },
         modifier = Modifier

@@ -212,7 +212,7 @@ android {
         }
     }
 
-    //@see https://github.com/icerockdev/moko-resources/issues/353
+    // @see https://github.com/icerockdev/moko-resources/issues/353
     sourceSets["main"].apply {
         assets.srcDir(File(buildDir, "generated/moko/androidMain/assets"))
         res.srcDir(File(buildDir, "generated/moko/androidMain/res"))

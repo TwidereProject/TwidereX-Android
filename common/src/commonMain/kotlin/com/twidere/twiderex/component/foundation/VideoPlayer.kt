@@ -53,7 +53,7 @@ fun VideoPlayer(
   playEnable: Boolean = true,
   zOrderMediaOverlay: Boolean = false,
   keepScreenOn: Boolean = false,
-  thumb: @Composable() (() -> Unit)? = null,
+  thumb: @Composable (() -> Unit)? = null,
   backgroundColor: Color? = null,
   onClick: (() -> Unit)? = null
 ) {

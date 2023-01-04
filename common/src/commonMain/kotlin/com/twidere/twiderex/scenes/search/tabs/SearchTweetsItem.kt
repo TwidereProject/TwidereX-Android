@@ -45,7 +45,6 @@ class SearchTweetsItem : SearchSceneItem {
     keyword: String,
     navigator: Navigator
   ) {
-
     val state by rememberPresenter {
       SearchTweetsPresenter(keyword = keyword)
     }.collectAsState()

@@ -43,16 +43,22 @@ data class Notification(
 enum class NotificationTypes {
   @SerialName("follow")
   follow,
+
   @SerialName("favourite")
   favourite,
+
   @SerialName("reblog")
   reblog,
+
   @SerialName("mention")
   mention,
+
   @SerialName("poll")
   poll,
+
   @SerialName("follow_request")
   follow_request,
+
   @SerialName("status")
   status,
 }

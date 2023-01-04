@@ -213,10 +213,11 @@ fun SearchSceneContent(
             }
           ) {
             Text(
-              text = if (state.searchInputState.expandSearch)
+              text = if (state.searchInputState.expandSearch) {
                 stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_less)
-              else
-                stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_more),
+              } else {
+                stringResource(res = com.twidere.twiderex.MR.strings.scene_search_show_more)
+              },
               style = MaterialTheme.typography.subtitle1,
               color = MaterialTheme.colors.primary
             )

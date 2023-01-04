@@ -37,7 +37,6 @@ fun TwitterSearchMediaPresenter(
   repository: SearchRepository = get(),
   keyword: String
 ): TwitterSearchMediaState {
-
   val accountState = CurrentAccountPresenter()
 
   if (accountState !is CurrentAccountState.Account) {
@@ -46,7 +45,8 @@ fun TwitterSearchMediaPresenter(
 
   val data = remember {
     repository.media(
-      keyword, accountState.account.accountKey,
+      keyword,
+      accountState.account.accountKey,
       accountState.account.service as SearchService
     )
   }

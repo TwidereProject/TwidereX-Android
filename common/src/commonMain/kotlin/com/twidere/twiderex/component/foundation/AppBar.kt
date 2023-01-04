@@ -41,7 +41,13 @@ fun AppBar(
   elevation: Dp = AppBarDefaults.TopAppBarElevation
 ) {
   TopAppBar(
-    title, modifier, navigationIcon, actions, backgroundColor, contentColor, elevation,
+    title,
+    modifier,
+    navigationIcon,
+    actions,
+    backgroundColor,
+    contentColor,
+    elevation,
   )
 }
 

@@ -95,6 +95,7 @@ fun StatusLineComponent(
 object StatusLineDefaults {
   val lineWidth = 2.dp
   val TopPoint = 16.dp + UserAvatarDefaults.AvatarSize / 2
+
   @Composable
   fun startPadding(lineWidth: Dp) = 16.dp + UserAvatarDefaults.AvatarSize / 2 - lineWidth / 2
 }

@@ -46,7 +46,6 @@ class SearchUserItem : SearchSceneItem {
     keyword: String,
     navigator: Navigator,
   ) {
-
     val state by rememberPresenter {
       SearchUserPresenter(keyword = keyword)
     }.collectAsState()

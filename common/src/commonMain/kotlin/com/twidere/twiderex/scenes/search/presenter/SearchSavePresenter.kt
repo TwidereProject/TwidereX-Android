@@ -38,7 +38,6 @@ fun SearchSavePresenter(
   repository: SearchRepository = get(),
   content: String,
 ): SearchSaveState {
-
   val accountState = CurrentAccountPresenter()
 
   if (accountState !is CurrentAccountState.Account) {

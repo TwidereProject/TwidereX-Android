@@ -29,9 +29,9 @@ import com.twidere.twiderex.mock.model.toIPaging
 internal class MockTrendService : TrendService, MicroBlogService, ErrorService() {
   override suspend fun trends(locationId: String, limit: Int?): List<ITrend> {
     checkError()
-    return if (locationId == "error")
+    return if (locationId == "error") {
       throw IllegalArgumentException("service error")
-    else {
+    } else {
       val list = mutableListOf<ITrend>()
       for (i in 0 until (limit ?: 1)) {
         list.add(
