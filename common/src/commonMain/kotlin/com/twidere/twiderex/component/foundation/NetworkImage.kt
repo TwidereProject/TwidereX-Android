@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -62,30 +62,32 @@ fun NetworkImage(
   } else {
     val httpConfig = LocalHttpConfig.current
     val account = LocalActiveAccount.current
-    val auth = try {
-      val url = URL(data.toString())
-      if (url.host == twitterTonApiHost) {
-        account?.let {
-          (it.credentials as OAuthCredentials).let { oauth ->
-            OAuth1Authorization(
-              consumerKey = oauth.consumer_key,
-              consumerSecret = oauth.consumer_secret,
-              accessToken = oauth.access_token,
-              accessSecret = oauth.access_token_secret,
-            )
-          }
-        } ?: EmptyAuthorization()
-      } else {
+    val auth = remember(data, account) {
+      try {
+        val url = URL(data.toString())
+        if (url.host == twitterTonApiHost) {
+          account?.let {
+            (it.credentials as OAuthCredentials).let { oauth ->
+              OAuth1Authorization(
+                consumerKey = oauth.consumer_key,
+                consumerSecret = oauth.consumer_secret,
+                accessToken = oauth.access_token,
+                accessSecret = oauth.access_token_secret,
+              )
+            }
+          } ?: EmptyAuthorization()
+        } else {
+          EmptyAuthorization()
+        }
+      } catch (e: MalformedURLException) {
         EmptyAuthorization()
       }
-    } catch (e: MalformedURLException) {
-      EmptyAuthorization()
     }
     rememberNetworkImagePainter(
       data = data,
       httpConfig = httpConfig,
       authorization = auth,
-      effects = ImageEffects.Builder().apply(effects).build(),
+      effects = remember(effects) { ImageEffects.Builder().apply(effects).build() },
       cacheDir = get<StorageProvider>().mediaCacheDir,
       onImageStateChanged = {
         if (state.value == NetworkImageState.LOADING) state.value = it
@@ -97,7 +99,7 @@ fun NetworkImage(
     val size = painter.intrinsicSize
     Image(
       painter = painter,
-      modifier = if (zoomable && size != Size.Unspecified) Modifier.aspectRatio(size.width / size.height).then(modifier) else modifier,
+      modifier = if (zoomable && size != Size.Unspecified) Modifier.aspectRatio(remember(size) { size.width / size.height }).then(modifier) else modifier,
       contentScale = contentScale,
       contentDescription = stringResource(MR.strings.accessibility_common_network_image)
     )
