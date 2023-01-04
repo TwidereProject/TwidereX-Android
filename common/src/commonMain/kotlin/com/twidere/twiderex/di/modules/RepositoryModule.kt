@@ -37,6 +37,8 @@ import com.twidere.twiderex.repository.TimelineRepository
 import com.twidere.twiderex.repository.TrendRepository
 import com.twidere.twiderex.repository.UserListRepository
 import com.twidere.twiderex.repository.UserRepository
+import com.twidere.twiderex.utils.ITranslationRepo
+import com.twidere.twiderex.utils.TranslationRepo
 import org.koin.dsl.module
 
 val repositoryModule = module {
@@ -56,4 +58,5 @@ val repositoryModule = module {
   single { UserRepository(get(), get()) }
   single { GifRepository(get()) }
   single { NitterRepository() }
+  single<ITranslationRepo> { TranslationRepo() }
 }

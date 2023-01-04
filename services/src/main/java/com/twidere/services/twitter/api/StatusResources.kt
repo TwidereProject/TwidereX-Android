@@ -20,6 +20,8 @@
  */
 package com.twidere.services.twitter.api
 
+import com.twidere.services.twitter.model.PostTweetRequestV2
+import com.twidere.services.twitter.model.PostTweetResponse
 import com.twidere.services.twitter.model.Status
 import com.twidere.services.twitter.model.StatusReactionsV2
 import com.twidere.services.twitter.model.TwitterResponseV2
@@ -57,6 +59,11 @@ interface StatusResources {
     @Query("attachment_url") attachment_url: String? = null,
     @Query("possibly_sensitive") possibly_sensitive: Boolean? = null,
   ): Status
+
+  @POST("2/tweets")
+  suspend fun postV2(
+    @Body body: PostTweetRequestV2,
+  ): TwitterResponseV2<PostTweetResponse>
 
   @POST("/1.1/statuses/destroy/{id}.json")
   suspend fun destroy(@Path(value = "id") id: String): Status

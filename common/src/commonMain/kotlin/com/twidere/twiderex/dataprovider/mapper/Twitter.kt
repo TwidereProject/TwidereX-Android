@@ -210,7 +210,8 @@ internal fun StatusV2.toUiStatus(
       replyTo?.let { this[ReferenceType.Reply] = it }
       quote?.let { this[ReferenceType.Quote] = it }
       retweet?.let { this[ReferenceType.Retweet] = it }
-    }
+    },
+    language = lang,
   )
 }
 
@@ -317,7 +318,8 @@ internal fun Status.toUiStatus(
     referenceStatus = mutableMapOf<ReferenceType, UiStatus>().apply {
       quote?.let { this[ReferenceType.Quote] = it }
       retweet?.let { this[ReferenceType.Retweet] = it }
-    }
+    },
+    language = lang,
   )
 }
 

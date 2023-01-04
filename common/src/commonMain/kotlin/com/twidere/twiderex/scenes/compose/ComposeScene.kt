@@ -137,7 +137,6 @@ import com.twidere.twiderex.viewmodel.compose.ComposePresenter
 import com.twidere.twiderex.viewmodel.compose.ComposeState
 import com.twidere.twiderex.viewmodel.compose.VoteExpired
 import com.twidere.twiderex.viewmodel.compose.VoteState
-import com.twitter.twittertext.TwitterTextParser
 import io.github.seiko.precompose.annotation.NavGraphDestination
 import io.github.seiko.precompose.annotation.Path
 import io.github.seiko.precompose.annotation.Query
@@ -449,7 +448,7 @@ private fun ComposeBody(
         Row(
           verticalAlignment = Alignment.CenterVertically,
         ) {
-          TextProgress(state.textFieldValue, state.maxLength)
+          TextProgress(state.parsedTextLength, state.maxLength)
           if (state.account.type == PlatformType.Mastodon) {
             ComposeMastodonVisibility(
               modifier = Modifier.weight(1f),
@@ -622,13 +621,12 @@ private object LocationDisplayDefaults {
 }
 
 @Composable
-private fun TextProgress(textFieldValue: TextFieldValue, maxLength: Int) {
-  val textLength = remember(textFieldValue) {
-    TwitterTextParser.parseTweet(textFieldValue.text).weightedLength
+private fun TextProgress(parsedTextLength: Int, maxLength: Int) {
+
+  val progress = remember(parsedTextLength) {
+    parsedTextLength.toFloat() / maxLength.toFloat()
   }
-  val progress = remember(textLength) {
-    textLength.toFloat() / maxLength.toFloat()
-  }
+
   Box(
     modifier = Modifier
       .size(48.dp),
@@ -653,7 +651,7 @@ private fun TextProgress(textFieldValue: TextFieldValue, maxLength: Int) {
   }
   Box(modifier = Modifier.width(4.dp))
   if (progress > 1.0) {
-    Text(text = (maxLength - textLength).toString(), color = Color.Red)
+    Text(text = (maxLength - parsedTextLength).toString(), color = Color.Red)
   }
 }
 

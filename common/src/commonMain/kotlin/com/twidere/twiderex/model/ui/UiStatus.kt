@@ -56,7 +56,8 @@ data class UiStatus(
   val referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
   val inReplyToUserId: String? = null,
   val inReplyToStatusId: String? = null,
-  val extra: StatusExtra? = null
+  val extra: StatusExtra? = null,
+  val language: String? = null,
 ) {
   val mastodonExtra: MastodonStatusExtra? = if (extra is MastodonStatusExtra) extra else null
 

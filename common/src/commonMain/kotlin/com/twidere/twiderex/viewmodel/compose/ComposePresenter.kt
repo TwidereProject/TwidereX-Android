@@ -67,6 +67,7 @@ import com.twidere.twiderex.scenes.CurrentAccountState
 import com.twidere.twiderex.utils.notifyError
 import com.twitter.twittertext.Extractor
 import com.twitter.twittertext.TwitterTextConfiguration
+import com.twitter.twittertext.TwitterTextParser
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -194,6 +195,9 @@ fun ComposePresenter(
   var textFieldValue by remember {
     mutableStateOf(TextFieldValue())
   }
+  val parsedTextLength = remember(textFieldValue) {
+    TwitterTextParser.parseTweet(textFieldValue.text).weightedLength
+  }
   val draftCount by draftRepository.sourceCount.collectAsState(0)
   val maxContentLength = remember(accountState) {
     when (accountState.account.type) {
@@ -225,9 +229,9 @@ fun ComposePresenter(
   var mediaInsertMode by remember {
     mutableStateOf(MediaInsertMode.All)
   }
-  val canSend = remember(textFieldValue, images, maxContentLength) {
+  val canSend = remember(textFieldValue, images, maxContentLength, parsedTextLength) {
     (textFieldValue.text.isNotEmpty() || !images.isEmpty()) &&
-      textFieldValue.text.length <= maxContentLength
+      parsedTextLength <= maxContentLength
   }
   val canSaveDraft = remember(textFieldValue, images) {
     textFieldValue.text.isNotEmpty() || !images.isEmpty()
@@ -525,6 +529,7 @@ fun ComposePresenter(
     visibility = visibility,
     emojis = emojis,
     excludedReplyUserIds = excludedReplyUserIds,
+    parsedTextLength = parsedTextLength,
   )
 }
 
@@ -599,6 +604,7 @@ interface ComposeState {
     val images: MutableList<UiMediaInsert>,
     val excludedReplyUserIds: MutableList<String>,
     val replyToUser: List<UiUser>,
+    val parsedTextLength: Int,
   ) : ComposeState
   object NoAccount : ComposeState
 }
