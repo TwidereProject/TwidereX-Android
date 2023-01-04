@@ -23,6 +23,7 @@ package com.twidere.twiderex.component.status
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,14 +40,20 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.component.DoubleLiftContent
 import com.twidere.twiderex.component.painterResource
+import com.twidere.twiderex.icon.IcTranslate
+import com.twidere.twiderex.icon.TwidereIcons
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.utils.TranslationParam
+import com.twidere.twiderex.utils.isDefaultLanguage
 
 @Composable
 fun ColumnScope.StatusText(
@@ -61,9 +68,21 @@ fun ColumnScope.StatusText(
 
   var expanded by rememberSaveable { mutableStateOf(!expandable) }
 
+  var showTranslate by rememberSaveable {
+    mutableStateOf(false)
+  }
+
+  var visibleText by rememberSaveable {
+    mutableStateOf("")
+  }
+
   if (expandable && status.spoilerText != null) {
     Text(text = status.spoilerText)
-    Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.SpoilerSpacing))
+    Spacer(
+      modifier = Modifier.height(
+        StatusTextDefaults.Mastodon.SpoilerSpacing
+      )
+    )
     Row(
       modifier = Modifier
         .background(
@@ -76,8 +95,13 @@ fun ColumnScope.StatusText(
         },
     ) {
       Icon(
-        modifier = Modifier.size(width = StatusTextDefaults.Mastodon.MoreButton.Width, height = StatusTextDefaults.Mastodon.MoreButton.Height).padding(StatusTextDefaults.Mastodon.SpoilerButtonPadding),
-        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_expand_more),
+        modifier = Modifier.size(
+          width = StatusTextDefaults.Mastodon.MoreButton.Width,
+          height = StatusTextDefaults.Mastodon.MoreButton.Height
+        ).padding(StatusTextDefaults.Mastodon.SpoilerButtonPadding),
+        painter = painterResource(
+          res = com.twidere.twiderex.MR.files.ic_expand_more
+        ),
         contentDescription = null,
         tint = MaterialTheme.colors.primary,
       )
@@ -95,10 +119,57 @@ fun ColumnScope.StatusText(
           },
           positionWrapper = it,
           openLink = openLink,
+          onVisibleTextParsed = { parsed ->
+            visibleText = parsed
+          }
         )
       }
-      if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.poll != null) {
-        Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.PollSpacing))
+      if (
+        visibleText.isNotBlank() &&
+        status.language?.isDefaultLanguage() != true
+      ) {
+        val interactionSource = remember { MutableInteractionSource() }
+        DoubleLiftContent(
+          modifier = Modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null,
+          ) {
+            showTranslate = !showTranslate
+          },
+          state = showTranslate,
+          content = {
+            if (it) {
+              TranslationStatus(
+                translationParam = TranslationParam(
+                  key = status.statusId,
+                  text = visibleText,
+                  from = status.language ?: "auto",
+                )
+              )
+            } else {
+              Icon(
+                modifier = Modifier.padding(
+                  top = StatusTextDefaults.TransLateIconPadding,
+                  bottom = StatusTextDefaults.TransLateIconPadding,
+                ),
+                imageVector = TwidereIcons.IcTranslate,
+                contentDescription = "",
+                tint = MaterialTheme.colors.primary,
+              )
+            }
+          }
+        )
+      }
+
+      if (showMastodonPoll &&
+        status.platformType == PlatformType.Mastodon &&
+        status.poll != null
+      ) {
+        Spacer(
+          modifier = Modifier.height(
+            StatusTextDefaults.Mastodon.PollSpacing
+          )
+        )
         MastodonPoll(status)
       }
     }
@@ -117,6 +188,7 @@ object StatusTextDefaults {
     )
     val PollSpacing = 10.dp
   }
+  val TransLateIconPadding = 8.dp
 }
 
 fun UiStatus.resolveLink(

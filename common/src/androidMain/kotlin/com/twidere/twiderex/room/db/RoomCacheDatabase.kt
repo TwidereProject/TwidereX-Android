@@ -76,7 +76,7 @@ import com.twidere.twiderex.room.db.model.converter.UserTimelineTypeConverter
     DbDMConversation::class,
     DbDMEvent::class
   ],
-  version = 21,
+  version = 22,
 )
 @TypeConverters(
   MicroBlogKeyConverter::class,

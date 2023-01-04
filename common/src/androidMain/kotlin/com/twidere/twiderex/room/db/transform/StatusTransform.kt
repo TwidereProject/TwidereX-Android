@@ -107,7 +107,8 @@ internal fun DbStatusV2.toUi(
     inReplyToStatusId = inReplyToStatusId,
     inReplyToUserId = inReplyToStatusId,
     sensitive = is_possibly_sensitive,
-    spoilerText = spoilerText
+    spoilerText = spoilerText,
+    language = lang,
   )
 }
 
@@ -189,7 +190,7 @@ internal fun UiStatus.toDbStatusV2() = DbStatusV2(
   placeString = geo.name,
   source = source,
   userKey = user.userKey,
-  lang = "",
+  lang = language,
   is_possibly_sensitive = sensitive,
   platformType = platformType,
   previewCard = card?.toDbCard(),
