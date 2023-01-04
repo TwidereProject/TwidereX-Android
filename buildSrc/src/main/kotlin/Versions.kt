@@ -27,7 +27,7 @@ object Versions {
     const val lifecycle = "2.6.0-alpha03"
     const val work = "2.8.0-rc01"
     const val startup = "1.2.0-alpha01"
-    const val coil = "2.2.2"
+    const val imageLoader = "1.2.5"
     const val accompanist = "0.28.0"
     const val accompanist_jb = "0.25.2"
     const val androidx_exifinterface = "1.3.5"

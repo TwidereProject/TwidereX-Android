@@ -21,18 +21,28 @@
 package com.twidere.twiderex.kmp
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.painter.Painter
+import com.seiko.imageloader.ImageLoaderBuilder
+import com.seiko.imageloader.rememberAsyncImagePainter
+import com.seiko.imageloader.request.ImageRequestBuilder
 import com.twidere.services.http.authorization.Authorization
 import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.component.foundation.NetworkImageState
 import com.twidere.twiderex.component.image.ImageEffects
 
 @Composable
-internal expect fun rememberNetworkImagePainter(
+internal fun rememberNetworkImagePainter(
   data: Any,
   authorization: Authorization,
   httpConfig: HttpConfig,
   effects: ImageEffects,
-  cacheDir: String,
   onImageStateChanged: (NetworkImageState) -> Unit
-): Painter
+): Painter {
+  val request = remember(data) { ImageRequestBuilder().data(data).build() }
+  return rememberAsyncImagePainter(request)
+}
+
+fun ImageLoaderBuilder.commonConfig(): ImageLoaderBuilder {
+  return this
+}

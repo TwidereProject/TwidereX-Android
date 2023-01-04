@@ -86,7 +86,6 @@ fun NetworkImage(
       httpConfig = httpConfig,
       authorization = auth,
       effects = ImageEffects.Builder().apply(effects).build(),
-      cacheDir = get<StorageProvider>().mediaCacheDir,
       onImageStateChanged = {
         if (state.value == NetworkImageState.LOADING) state.value = it
       }
