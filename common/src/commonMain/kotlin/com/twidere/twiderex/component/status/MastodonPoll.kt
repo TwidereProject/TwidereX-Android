@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,19 +28,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
@@ -74,13 +62,8 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.LocalActiveAccount
 import kotlin.math.max
 
-private val UiPoll.canVote: Boolean
-  get() = !voted &&
-    !expired &&
-    expiresAt?.let { it > System.currentTimeMillis() } ?: true // some instance allows expires time == null
-
 @Composable
-fun MastodonPoll(status: UiStatus) {
+fun ColumnScope.MastodonPoll(status: UiStatus) {
   val account = LocalActiveAccount.current ?: return
   if (status.platformType != PlatformType.Mastodon || status.poll == null) {
     return
@@ -163,7 +146,7 @@ fun MastodonPoll(status: UiStatus) {
         if (status.poll.expired) {
           Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_status_poll_expired))
         } else {
-          Text(text = status.poll.expiresAt?.humanizedTimestamp() ?: "")
+          Text(text = status.poll.expiresAtString)
         }
       }
     }
@@ -236,10 +219,12 @@ fun MastodonPollOption(
         modifier = Modifier
           .fillMaxSize()
           .background(
-            if (poll.expired == true) {
-              color.copy(alpha = 0.0304f)
-            } else {
-              color.copy(alpha = 0.08f)
+            remember(poll.expired, color) {
+              if (poll.expired == true) {
+                color.copy(alpha = 0.0304f)
+              } else {
+                color.copy(alpha = 0.08f)
+              }
             }
           )
       )
@@ -256,22 +241,24 @@ fun MastodonPollOption(
           )
           .background(
             color.let {
-              // foreGroundAlpha =1 - (1 - wantedAlpha)/(1 - backgroundAlpha)
-              if (poll.ownVotes?.contains(index) == true) {
-                if (poll.expired == true) {
-                  // wanted alpha is 0.75f * 0.38f, but still a little bit heaver, so down to 0.185f
-                  it.copy(alpha = 0.185f)
+              remember(poll.ownVotes, poll.expired) {
+                // foreGroundAlpha =1 - (1 - wantedAlpha)/(1 - backgroundAlpha)
+                if (poll.ownVotes?.contains(index) == true) {
+                  if (poll.expired == true) {
+                    // wanted alpha is 0.75f * 0.38f, but still a little bit heaver, so down to 0.185f
+                    it.copy(alpha = 0.185f)
+                  } else {
+                    // wanted alpha is 0.75f
+                    it.copy(alpha = 0.62f)
+                  }
                 } else {
-                  // wanted alpha is 0.75f
-                  it.copy(alpha = 0.62f)
-                }
-              } else {
-                if (poll.expired == true) {
-                  // wanted alpha is 0.2f * 0.38f
-                  it.copy(alpha = 0.076f)
-                } else {
-                  // wanted alpha is 0.2f
-                  it.copy(alpha = 0.13f)
+                  if (poll.expired == true) {
+                    // wanted alpha is 0.2f * 0.38f
+                    it.copy(alpha = 0.076f)
+                  } else {
+                    // wanted alpha is 0.2f
+                    it.copy(alpha = 0.13f)
+                  }
                 }
               }
             }
@@ -330,7 +317,7 @@ fun MastodonPollOption(
         )
         Spacer(modifier = Modifier.width(MastodonPollOptionDefaults.IconSpacing))
         Text(
-          text = String.format("%.0f%%", progress * 100),
+          text = remember(progress) { String.format("%.0f%%", progress * 100) },
           style = MaterialTheme.typography.caption
         )
       }

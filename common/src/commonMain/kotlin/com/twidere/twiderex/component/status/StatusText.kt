@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -63,18 +63,12 @@ fun ColumnScope.StatusText(
   isSelectionAble: Boolean = true,
   openLink: (String) -> Unit,
 ) {
-  val expandable = status.platformType == PlatformType.Mastodon &&
-    status.spoilerText != null
+  val expandable = remember(status.platformType, status.spoilerText) {
+    status.platformType == PlatformType.Mastodon &&
+      status.spoilerText != null
+  }
 
   var expanded by rememberSaveable { mutableStateOf(!expandable) }
-
-  var showTranslate by rememberSaveable {
-    mutableStateOf(false)
-  }
-
-  var visibleText by rememberSaveable {
-    mutableStateOf("")
-  }
 
   if (expandable && status.spoilerText != null) {
     Text(text = status.spoilerText)
@@ -119,48 +113,8 @@ fun ColumnScope.StatusText(
           },
           positionWrapper = it,
           openLink = openLink,
-          onVisibleTextParsed = { parsed ->
-            visibleText = parsed
-          }
         )
       }
-      if (
-        visibleText.isNotBlank() &&
-        status.language?.isDefaultLanguage() != true
-      ) {
-        val interactionSource = remember { MutableInteractionSource() }
-        DoubleLiftContent(
-          modifier = Modifier.clickable(
-            interactionSource = interactionSource,
-            indication = null,
-          ) {
-            showTranslate = !showTranslate
-          },
-          state = showTranslate,
-          content = {
-            if (it) {
-              TranslationStatus(
-                translationParam = TranslationParam(
-                  key = status.statusId,
-                  text = visibleText,
-                  from = status.language ?: "auto",
-                )
-              )
-            } else {
-              Icon(
-                modifier = Modifier.padding(
-                  top = StatusTextDefaults.TransLateIconPadding,
-                  bottom = StatusTextDefaults.TransLateIconPadding,
-                ),
-                imageVector = TwidereIcons.IcTranslate,
-                contentDescription = "",
-                tint = MaterialTheme.colors.primary,
-              )
-            }
-          }
-        )
-      }
-
       if (showMastodonPoll &&
         status.platformType == PlatformType.Mastodon &&
         status.poll != null

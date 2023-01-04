@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -94,16 +94,17 @@ fun HtmlText(
   linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
   positionWrapper: PositionWrapper? = null,
   openLink: (String) -> Unit,
-  onVisibleTextParsed: ((String) -> Unit)? = null,
 ) {
   val bidi = remember(htmlText) {
     Bidi(htmlText, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT)
   }
   CompositionLocalProvider(
-    LocalLayoutDirection provides if (bidi.baseIsLeftToRight()) {
-      LayoutDirection.Ltr
-    } else {
-      LayoutDirection.Rtl
+    LocalLayoutDirection provides remember(bidi) {
+      if (bidi.baseIsLeftToRight()) {
+        LayoutDirection.Ltr
+      } else {
+        LayoutDirection.Rtl
+      }
     }
   ) {
     RenderContent(
@@ -128,7 +129,6 @@ fun HtmlText(
       overflow = overflow,
       softWrap = softWrap,
       positionWrapper = positionWrapper,
-      onVisibleTextParsed = onVisibleTextParsed,
     )
   }
 }
@@ -155,14 +155,15 @@ private fun RenderContent(
   overflow: TextOverflow = TextOverflow.Clip,
   softWrap: Boolean = true,
   positionWrapper: PositionWrapper? = null,
-  onVisibleTextParsed: ((String) -> Unit)? = null,
 ) {
-  val value = renderContentAnnotatedString(
-    htmlText = htmlText,
-    linkResolver = linkResolver,
-    textStyle = textStyle,
-    linkStyle = linkStyle
-  )
+  val value = remember(htmlText, linkResolver, textStyle, linkStyle) {
+    buildContentAnnotatedString(
+      htmlText = htmlText,
+      linkResolver = linkResolver,
+      textStyle = textStyle,
+      linkStyle = linkStyle
+    )
+  }
   val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
   DisposableEffect(htmlText) {
     positionWrapper?.action = { position ->
@@ -178,7 +179,6 @@ private fun RenderContent(
     }
   }
   if (value.text.isNotEmpty() && value.text.isNotBlank()) {
-    onVisibleTextParsed?.invoke(value.text)
     Text(
       modifier = modifier.pointerInput(Unit) {
         forEachGesture {
@@ -268,6 +268,26 @@ fun renderContentAnnotatedString(
   }
 }
 
+@ExperimentalUnitApi
+fun buildContentAnnotatedString(
+  htmlText: String,
+  textStyle: TextStyle,
+  linkStyle: TextStyle,
+  linkResolver: (href: String) -> ResolvedLink,
+): AnnotatedString {
+  val styleData = StyleData(
+    textStyle = textStyle,
+    linkStyle = linkStyle,
+  )
+  val renderContext = RenderContext(linkResolver = linkResolver)
+  val document = Jsoup.parse(htmlText.replace("\n", "<br>"))
+  return buildAnnotatedString {
+    document.body().childNodes().forEach {
+      renderNode(it, renderContext, styleData)
+    }
+  }
+}
+
 private data class RenderContext(
   val linkResolver: (href: String) -> ResolvedLink,
 )
@@ -286,6 +306,7 @@ private fun AnnotatedString.Builder.renderNode(
     is Element -> {
       this.renderElement(node, context = context, styleData = styleData)
     }
+
     is TextNode -> {
       renderText(node.wholeText, styleData.textStyle)
     }
@@ -312,14 +333,17 @@ private fun AnnotatedString.Builder.renderElement(
     "a" -> {
       renderLink(element, context, styleData)
     }
+
     "br" -> {
       renderText("\n", styleData.textStyle)
     }
+
     "span", "p" -> {
       element.childNodes().forEach {
         renderNode(node = it, context = context, styleData = styleData)
       }
     }
+
     "emoji" -> {
       renderEmoji(element)
     }
@@ -354,8 +378,10 @@ private fun AnnotatedString.Builder.renderLink(
         renderText(resolvedLink.display ?: resolvedLink.expanded, styleData.textStyle)
       }
     }
+
     resolvedLink.skip -> {
     }
+
     else -> {
       if (resolvedLink.clickable) {
         pushStringAnnotation(TAG_URL, href)

@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -61,7 +61,6 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.component.HumanizedTime
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.icon
@@ -85,12 +84,7 @@ fun TimelineStatusComponent(
   statusNavigation: StatusNavigationData
 ) {
   when {
-    data.platformType == PlatformType.Mastodon &&
-      data.mastodonExtra != null &&
-      (
-        data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
-          data.mastodonExtra.type == MastodonStatusType.NotificationFollow
-        ) -> {
+    data.isMastodonFollowStatus -> {
       MastodonFollowStatus(data, statusNavigation)
     }
     else -> NormalStatus(data, showActions, threadStyle, lineUp, lineDown, statusNavigation)
@@ -160,7 +154,7 @@ private fun NormalStatus(
       contentPadding = NormalStatusDefaults.ContentPadding,
       threadStyle = threadStyle,
       lineUp = lineUp,
-      lineDown = lineDown || (threadStyle.lineDown && data.isInThread()),
+      lineDown = remember(lineDown, threadStyle, data) { lineDown || (threadStyle.lineDown && data.isInThread()) },
       data = data,
       footer = {
         Column {
@@ -413,12 +407,12 @@ fun StatusContent(
   statusNavigation: StatusNavigationData,
 ) {
   val layoutDirection = LocalLayoutDirection.current
-  val status = data.retweet ?: data
+  val status = remember(data) { data.retweet ?: data }
   Column(
     modifier = modifier
       .padding(
-        start = contentPadding.calculateLeftPadding(layoutDirection),
-        end = contentPadding.calculateRightPadding(layoutDirection)
+        start = remember(contentPadding, layoutDirection) { contentPadding.calculateLeftPadding(layoutDirection) },
+        end = remember(contentPadding, layoutDirection) { contentPadding.calculateRightPadding(layoutDirection) }
       )
       .wrapContentHeight()
       .fillMaxWidth()
@@ -429,16 +423,16 @@ fun StatusContent(
         AvatarConnectLine(
           modifier = Modifier
             .fillMaxHeight()
-            .padding(start = UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2),
+            .padding(start = remember { UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2 }),
           lineShape = RoundedCornerShape(
-            bottomStart = AvatarConnectLineDefaults.LineWidth / 2,
-            bottomEnd = AvatarConnectLineDefaults.LineWidth / 2
+            bottomStart = remember { AvatarConnectLineDefaults.LineWidth / 2 },
+            bottomEnd = remember { AvatarConnectLineDefaults.LineWidth / 2 }
           )
         )
       }
-      Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2))
+      Spacer(modifier = Modifier.width(remember { UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2 }))
       Column {
-        Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
+        Spacer(modifier = Modifier.height(remember(contentPadding) { contentPadding.calculateTopPadding() }))
         StatusHeader(
           data = data,
           statusNavigation = statusNavigation,
@@ -460,8 +454,8 @@ fun StatusContent(
             modifier = Modifier
               .weight(1f),
             lineShape = RoundedCornerShape(
-              topStart = AvatarConnectLineDefaults.LineWidth / 2,
-              topEnd = AvatarConnectLineDefaults.LineWidth / 2
+              topStart = remember { AvatarConnectLineDefaults.LineWidth / 2 },
+              topEnd = remember { AvatarConnectLineDefaults.LineWidth / 2 }
             )
           )
         }
@@ -510,7 +504,7 @@ fun StatusContent(
               Spacer(modifier = Modifier.width(StatusContentDefaults.Mastodon.VisibilitySpacing))
             }
             if (type == StatusContentType.Normal) {
-              HumanizedTime(time = status.timestamp)
+              Text(status.humanizedTime)
             }
           }
         }
@@ -540,7 +534,7 @@ fun StatusContent(
         Column {
           Spacer(modifier = Modifier.height(StatusContentDefaults.FooterSpacing))
           footer.invoke()
-          Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
+          Spacer(modifier = Modifier.height(remember(contentPadding) { contentPadding.calculateBottomPadding() }))
         }
         if (data.isInThread()) {
           StatusThread(threadStyle, data, toStatus = statusNavigation.toStatus)
@@ -689,9 +683,9 @@ private fun StatusLinkPreview(
         openLink(card.link)
       },
     link = card.displayLink ?: card.link,
-    title = card.title?.trim(),
+    title = card.title,
     image = card.image,
-    desc = card.description?.trim(),
+    desc = card.description,
     maxLines = 5,
   )
 }

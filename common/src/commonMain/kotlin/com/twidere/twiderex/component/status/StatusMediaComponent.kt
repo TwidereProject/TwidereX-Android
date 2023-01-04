@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -42,11 +42,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -77,33 +74,37 @@ fun StatusMediaComponent(
   statusNavigation: StatusNavigationData,
 ) {
   val media = status.media
-  if (!media.any() || media.any { it.type == MediaType.audio }) {
+  if (status.isMediaEmptyOfContainsAudio) {
     return
   }
-  val onItemClick = { it: UiMedia ->
-    val index = media.indexOf(it)
-    statusNavigation.toMediaWithIndex(status.statusKey, index)
+  val onItemClick = remember {
+    { it: UiMedia ->
+      val index = media.indexOf(it)
+      statusNavigation.toMediaWithIndex(status.statusKey, index)
+    }
   }
   var sensitive by rememberSaveable(status.statusKey.toString()) {
     mutableStateOf(status.sensitive)
   }
 
-  val aspectRatio = when (media.size) {
-    in 2..4 -> {
-      StatusMediaDefaults.DefaultAspectRatio
-    }
-    1 -> {
-      val first = media.first()
-      (first.width.toFloat() / first.height.toFloat()).let {
-        if (it.isNaN()) {
-          StatusMediaDefaults.DefaultAspectRatio
-        } else {
-          it
+  val aspectRatio = remember(media.size) {
+    when (media.size) {
+      in 2..4 -> {
+        StatusMediaDefaults.DefaultAspectRatio
+      }
+      1 -> {
+        val first = media.first()
+        (first.width.toFloat() / first.height.toFloat()).let {
+          if (it.isNaN()) {
+            StatusMediaDefaults.DefaultAspectRatio
+          } else {
+            it
+          }
         }
       }
-    }
-    else -> {
-      null
+      else -> {
+        null
+      }
     }
   }
   Box(

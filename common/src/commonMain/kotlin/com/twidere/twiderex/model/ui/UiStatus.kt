@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,8 +24,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.dataprovider.mapper.autolink
+import com.twidere.twiderex.extensions.humanizedCount
+import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MastodonStatusType
+import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.enums.ReferenceType
 import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
@@ -59,7 +62,9 @@ data class UiStatus(
   val extra: StatusExtra? = null,
   val language: String? = null,
 ) {
+  val humanizedTime = timestamp.humanizedTimestamp()
   val mastodonExtra: MastodonStatusExtra? = if (extra is MastodonStatusExtra) extra else null
+  val isMediaEmptyOfContainsAudio = !media.any() || media.any { it.type == MediaType.audio }
 
   val twitterExtra: TwitterStatusExtra? = if (extra is TwitterStatusExtra) extra else null
 
@@ -93,6 +98,19 @@ data class UiStatus(
     PlatformType.StatusNet -> TODO()
     PlatformType.Fanfou -> TODO()
     PlatformType.Mastodon -> "/web/statuses/$statusId"
+  }
+
+  val isMastodonFollowStatus: Boolean = platformType == PlatformType.Mastodon &&
+    mastodonExtra != null &&
+    (
+      mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
+        mastodonExtra.type == MastodonStatusType.NotificationFollow
+      )
+
+  val itemType = when {
+    isMastodonFollowStatus -> "follow"
+    isGap -> "gap"
+    else -> "status"
   }
 
   companion object {
@@ -129,4 +147,11 @@ data class StatusMetrics(
   val like: Long,
   val reply: Long,
   val retweet: Long
-)
+) {
+  val likeString = like.humanizedCount()
+  val replyString = reply.humanizedCount()
+  val retweetString = retweet.humanizedCount()
+  val showLike = like > 0
+  val showReply = reply > 0
+  val showRetweet = retweet > 0
+}
