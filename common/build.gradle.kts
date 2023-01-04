@@ -103,6 +103,7 @@ kotlin {
                 implementation("androidx.vectordrawable:vectordrawable:1.2.0-beta01")
                 implementation("androidx.activity:activity-compose:${Versions.activity}")
                 implementation("com.github.android:renderscript-intrinsics-replacement-toolkit:b6363490c3")
+                implementation("com.google.accompanist:accompanist-permissions:${Versions.accompanist}")
             }
         }
         val androidAndroidTest by getting {
