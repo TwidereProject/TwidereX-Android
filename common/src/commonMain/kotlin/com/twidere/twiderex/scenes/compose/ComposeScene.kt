@@ -622,7 +622,6 @@ private object LocationDisplayDefaults {
 
 @Composable
 private fun TextProgress(parsedTextLength: Int, maxLength: Int) {
-
   val progress = remember(parsedTextLength) {
     parsedTextLength.toFloat() / maxLength.toFloat()
   }

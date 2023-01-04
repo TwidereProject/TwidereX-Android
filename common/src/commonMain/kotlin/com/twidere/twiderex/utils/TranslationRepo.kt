@@ -125,7 +125,6 @@ class TranslationRepo : ITranslationRepo {
   override fun translation(
     param: TranslationParam
   ): MutableState<TranslationState> {
-
     cache.get(param.key)?.let {
       return it
     }
