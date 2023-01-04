@@ -1,4 +1,3 @@
-
 import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import org.jetbrains.kotlin.konan.properties.loadProperties
 
@@ -204,6 +203,7 @@ android {
                 listOf(
                     "META-INF/AL2.0",
                     "META-INF/LGPL2.1",
+                    "META-INF/LICENSE.md",
                     "DebugProbesKt.bin",
                     "win32-x86-64/attach_hotspot_windows.dll",
                     "win32-x86/attach_hotspot_windows.dll",
