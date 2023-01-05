@@ -26,10 +26,9 @@ import com.twidere.services.http.HttpClientFactory
 import com.twidere.services.http.HttpConfigProvider
 import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.http.authorization.Authorization
+import com.twidere.services.http.proxy
 import com.twidere.services.mastodon.api.MastodonResources
 import com.twidere.services.mastodon.model.exceptions.MastodonException
-import com.twidere.services.proxy.ProxyConfig
-import com.twidere.services.proxy.ReverseProxyInterceptor
 import com.twidere.services.serializer.DateQueryConverterFactory
 import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.model.exceptions.TwitterApiException
@@ -38,15 +37,12 @@ import com.twidere.services.utils.DEBUG
 import com.twidere.services.utils.JSON
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
-import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
-import java.net.InetSocketAddress
-import java.net.Proxy
 
 class HttpConfigClientFactory(private val configProvider: HttpConfigProvider) : HttpClientFactory {
   private val resourceCache = mutableMapOf<Class<*>, Pair<*, CacheIdentifier>>()
@@ -87,6 +83,7 @@ class HttpConfigClientFactory(private val configProvider: HttpConfigProvider) : 
             response
           }
         }
+
         MastodonResources::class.java -> Interceptor { chain ->
           val response = chain.proceed(chain.request())
           if (!response.isSuccessful) {
@@ -103,6 +100,7 @@ class HttpConfigClientFactory(private val configProvider: HttpConfigProvider) : 
             response
           }
         }
+
         else -> null
       }
       retrofit(
@@ -110,7 +108,7 @@ class HttpConfigClientFactory(private val configProvider: HttpConfigProvider) : 
         baseUrl,
         authorization,
         createHttpClientBuilder(),
-        interceptors
+        interceptors,
       )
     }
     if (useCache) {
@@ -121,71 +119,7 @@ class HttpConfigClientFactory(private val configProvider: HttpConfigProvider) : 
 
   override fun createHttpClientBuilder(): OkHttpClient.Builder {
     val config = configProvider.provideConfig()
-    return proxy(OkHttpClient.Builder(), config.proxyConfig)
-  }
-
-  private fun proxy(
-    builder: OkHttpClient.Builder,
-    proxyConfig: ProxyConfig
-  ): OkHttpClient.Builder {
-    return if (proxyConfig.enable) {
-      when (proxyConfig.type) {
-        ProxyConfig.Type.HTTP -> {
-          proxyOkHttpBuilder(
-            builder,
-            proxyType = Proxy.Type.HTTP,
-            host = proxyConfig.server,
-            port = proxyConfig.port,
-            username = proxyConfig.userName,
-            password = proxyConfig.password,
-          )
-        }
-        ProxyConfig.Type.SOCKS -> {
-          proxyOkHttpBuilder(
-            builder,
-            proxyType = Proxy.Type.SOCKS,
-            host = proxyConfig.server,
-            port = proxyConfig.port,
-            username = proxyConfig.userName,
-            password = proxyConfig.password,
-          )
-        }
-        ProxyConfig.Type.REVERSE -> {
-          builder.addInterceptor(
-            ReverseProxyInterceptor(
-              proxyConfig.server,
-              proxyConfig.userName,
-              proxyConfig.password,
-            )
-          )
-        }
-      }
-    } else {
-      builder
-    }
-  }
-
-  private fun proxyOkHttpBuilder(
-    builder: OkHttpClient.Builder,
-    proxyType: Proxy.Type,
-    host: String,
-    port: Int,
-    username: String,
-    password: String,
-  ): OkHttpClient.Builder {
-    if (port !in (0..65535)) return builder
-    val address = InetSocketAddress.createUnresolved(host, port)
-    return builder.proxy(Proxy(proxyType, address))
-      .proxyAuthenticator { _, response ->
-        val b = response.request.newBuilder()
-        if (response.code == 407) {
-          if (username.isNotEmpty() && password.isNotEmpty()) {
-            val credential = Credentials.basic(username, password)
-            b.header("Proxy-Authorization", credential)
-          }
-        }
-        b.build()
-      }
+    return OkHttpClient.Builder().proxy(config.proxyConfig)
   }
 
   @OptIn(ExperimentalSerializationApi::class)
@@ -196,39 +130,29 @@ class HttpConfigClientFactory(private val configProvider: HttpConfigProvider) : 
     clientBuilder: OkHttpClient.Builder = OkHttpClient.Builder(),
     vararg interceptors: Interceptor?
   ): T {
-    return Retrofit
-      .Builder()
-      .baseUrl(baseUrl)
-      .client(
-        clientBuilder
-          .addInterceptor(AuthorizationInterceptor(authorization))
-          .apply {
-            if (DEBUG) {
-              addInterceptor(
-                HttpLoggingInterceptor().apply {
-                  setLevel(HttpLoggingInterceptor.Level.BODY)
-                }
-              )
-            }
-            addInterceptor {
-              it.proceed(
-                it.request().let { request ->
-                  request.newBuilder()
-                    .url(request.url.toString().replace("%20", "+")).build()
-                }
-              )
-            }
-            interceptors.forEach {
-              it?.let { addInterceptor(it) }
-            }
-          }
-          .build()
-      )
-      .addConverterFactory(ScalarsConverterFactory.create())
+    return Retrofit.Builder().baseUrl(baseUrl).client(
+      clientBuilder.addInterceptor(AuthorizationInterceptor(authorization)).apply {
+        if (DEBUG) {
+          addInterceptor(
+            HttpLoggingInterceptor().apply {
+              setLevel(HttpLoggingInterceptor.Level.BODY)
+            },
+          )
+        }
+        addInterceptor {
+          it.proceed(
+            it.request().let { request ->
+              request.newBuilder().url(request.url.toString().replace("%20", "+")).build()
+            },
+          )
+        }
+        interceptors.forEach {
+          it?.let { addInterceptor(it) }
+        }
+      }.build(),
+    ).addConverterFactory(ScalarsConverterFactory.create())
       .addConverterFactory(JSON.asConverterFactory("application/json".toMediaType()))
-      .addConverterFactory(DateQueryConverterFactory())
-      .build()
-      .create(clazz)
+      .addConverterFactory(DateQueryConverterFactory()).build().create(clazz)
   }
 
   private data class CacheIdentifier(
@@ -237,8 +161,7 @@ class HttpConfigClientFactory(private val configProvider: HttpConfigProvider) : 
   ) {
     override fun equals(other: Any?): Boolean {
       if (other !is CacheIdentifier) return false
-      return config.toString() == other.config.toString() &&
-        baseUrl == other.baseUrl
+      return config.toString() == other.config.toString() && baseUrl == other.baseUrl
     }
 
     override fun hashCode(): Int {

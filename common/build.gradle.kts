@@ -67,6 +67,7 @@ kotlin {
                 api("io.github.qdsfdhvh:image-loader:${Versions.imageLoader}")
                 api("moe.tlaster:precompose:${Versions.precompose}")
                 api("io.github.qdsfdhvh:precompose-annotation:${Versions.precomposeKsp}")
+                implementation("io.ktor:ktor-client-okhttp:${Versions.ktor}")
             }
         }
         val commonTest by getting {
