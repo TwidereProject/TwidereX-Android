@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.model.ui
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
@@ -61,7 +60,6 @@ data class UiUser(
   val mastodonExtra: MastodonUserExtra? = if (extra is MastodonUserExtra) extra else null
 
   companion object {
-    @Composable
     fun sample() = UiUser(
       id = "",
       name = "Twidere",

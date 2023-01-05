@@ -253,7 +253,7 @@ fun renderContentAnnotatedString(
     )
   }
   val renderContext = remember(linkResolver) {
-    RenderContext(linkResolver = linkResolver)
+    HtmlRenderContext(linkResolver = linkResolver)
   }
   return remember(
     htmlText,
@@ -279,7 +279,7 @@ fun buildContentAnnotatedString(
     textStyle = textStyle,
     linkStyle = linkStyle,
   )
-  val renderContext = RenderContext(linkResolver = linkResolver)
+  val renderContext = HtmlRenderContext(linkResolver = linkResolver)
   val document = Jsoup.parse(htmlText.replace("\n", "<br>"))
   return buildAnnotatedString {
     document.body().childNodes().forEach {
@@ -288,7 +288,7 @@ fun buildContentAnnotatedString(
   }
 }
 
-private data class RenderContext(
+private data class HtmlRenderContext(
   val linkResolver: (href: String) -> ResolvedLink,
 )
 
@@ -299,7 +299,7 @@ data class StyleData(
 
 private fun AnnotatedString.Builder.renderNode(
   node: Node,
-  context: RenderContext,
+  context: HtmlRenderContext,
   styleData: StyleData
 ) {
   when (node) {
@@ -323,7 +323,7 @@ private fun AnnotatedString.Builder.renderText(text: String, textStyle: TextStyl
 
 private fun AnnotatedString.Builder.renderElement(
   element: Element,
-  context: RenderContext,
+  context: HtmlRenderContext,
   styleData: StyleData
 ) {
   if (skipElement(element = element)) {
@@ -363,7 +363,7 @@ private fun AnnotatedString.Builder.renderEmoji(
 
 private fun AnnotatedString.Builder.renderLink(
   element: Element,
-  context: RenderContext,
+  context: HtmlRenderContext,
   styleData: StyleData
 ) {
   val href = element.attr("href")

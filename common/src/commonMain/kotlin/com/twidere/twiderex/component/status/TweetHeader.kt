@@ -36,20 +36,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.model.ui.UiStatus
 
 @Composable
 fun RetweetHeader(
-  data: UiStatus,
+  name: String,
   openLink: (String) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
-  TweetHeader(
+  StatusHeader(
+    modifier = modifier,
     icon = {
       Icon(
-        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_repeat),
-        contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_retweeted),
+        painter = painterResource(res = MR.files.ic_repeat),
+        contentDescription = stringResource(res = MR.strings.accessibility_common_status_retweeted),
         tint = Color(0xFF4C9EEB)
       )
     },
@@ -57,8 +59,8 @@ fun RetweetHeader(
       HtmlText(
         textStyle = MaterialTheme.typography.caption,
         htmlText = stringResource(
-          res = com.twidere.twiderex.MR.strings.common_controls_status_user_retweeted,
-          data.user.displayName
+          res = MR.strings.common_controls_status_user_retweeted,
+          name,
         ),
         openLink = openLink,
       )
@@ -67,15 +69,17 @@ fun RetweetHeader(
 }
 
 @Composable
-fun TweetHeader(
+fun StatusHeader(
   icon: @Composable () -> Unit,
   text: @Composable () -> Unit,
+  modifier: Modifier = Modifier,
 ) {
   ProvideTextStyle(value = MaterialTheme.typography.caption) {
     CompositionLocalProvider(
       LocalContentAlpha provides ContentAlpha.medium
     ) {
       Row(
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
       ) {
         Box(
@@ -87,13 +91,14 @@ fun TweetHeader(
             icon.invoke()
           }
         }
-        Spacer(modifier = Modifier.width(TweetHeaderDefaults.IconSpacing))
+        Spacer(modifier = Modifier.width(StatusHeaderDefaults.IconSpacing))
         text.invoke()
       }
     }
   }
 }
 
-object TweetHeaderDefaults {
+object StatusHeaderDefaults {
   val IconSpacing = 8.dp
+  val HeaderSpacing = 9.dp
 }

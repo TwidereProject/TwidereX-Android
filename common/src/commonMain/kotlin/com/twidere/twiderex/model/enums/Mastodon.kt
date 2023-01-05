@@ -23,15 +23,14 @@ package com.twidere.twiderex.model.enums
 import androidx.compose.runtime.Immutable
 
 @Immutable
-enum class MastodonStatusType {
+enum class MastodonNotificationType {
+  Follow,
+  FollowRequest,
+  Mention,
+  Reblog,
+  Favourite,
+  Poll,
   Status,
-  NotificationFollow,
-  NotificationFollowRequest,
-  NotificationMention,
-  NotificationReblog,
-  NotificationFavourite,
-  NotificationPoll,
-  NotificationStatus,
 }
 
 @Immutable

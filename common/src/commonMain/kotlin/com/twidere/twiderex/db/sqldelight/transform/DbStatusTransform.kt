@@ -42,6 +42,8 @@ import com.twidere.twiderex.sqldelight.table.DbStatus
 import com.twidere.twiderex.sqldelight.table.DbStatusReactions
 import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toPersistentMap
 
 internal fun UiStatus.toDbStatusWithAttachments(accountKey: MicroBlogKey): DbStatusWithAttachments = DbStatusWithAttachments(
   status = DbStatus(
