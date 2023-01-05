@@ -27,8 +27,10 @@ import kotlinx.serialization.Serializable
 enum class ReferencedTweetType {
   @SerialName("retweeted")
   retweeted,
+
   @SerialName("quoted")
   quoted,
+
   @SerialName("replied_to")
   replied_to,
 }

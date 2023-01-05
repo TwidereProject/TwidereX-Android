@@ -50,6 +50,7 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
       accountRepository.findByAccountKey(accountKey = it)
     } ?: throw Error("can't find any account matches:$accountKey")
     val notificationId = sendData.draftMessageKey.hashCode()
+
     @Suppress("UNCHECKED_CAST")
     val service = accountDetails.service as T
 

@@ -43,9 +43,12 @@ class CacheDataSourceFactory(
   private val defaultDatasourceFactory: DefaultDataSource.Factory
   override fun createDataSource(): DataSource {
     return CacheDataSource(
-      simpleCache, defaultDatasourceFactory.createDataSource(),
-      FileDataSource(), CacheDataSink(simpleCache, maxFileSize),
-      CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR, null
+      simpleCache,
+      defaultDatasourceFactory.createDataSource(),
+      FileDataSource(),
+      CacheDataSink(simpleCache, maxFileSize),
+      CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR,
+      null
     )
   }
 

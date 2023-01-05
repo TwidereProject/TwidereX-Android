@@ -54,7 +54,7 @@ class AccountAuthenticatorService : Service() {
       accountType: String,
       authTokenType: String?,
       requiredFeatures: Array<String>?,
-      options: Bundle?
+      options: Bundle?,
     ): Bundle {
       val intent = Intent(Intent.ACTION_VIEW, Uri.parse(RootDeepLinks.SignIn))
       intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response)
@@ -67,7 +67,7 @@ class AccountAuthenticatorService : Service() {
       response: AccountAuthenticatorResponse,
       account: Account,
       authTokenType: String,
-      options: Bundle?
+      options: Bundle?,
     ): Bundle {
       val am = AccountManager.get(context)
       val authToken = am.peekAuthToken(account, authTokenType)
@@ -88,14 +88,14 @@ class AccountAuthenticatorService : Service() {
     override fun confirmCredentials(
       response: AccountAuthenticatorResponse,
       account: Account,
-      options: Bundle?
+      options: Bundle?,
     ): Bundle {
       return bundleOf(AccountManager.KEY_BOOLEAN_RESULT to true)
     }
 
     override fun editProperties(
       response: AccountAuthenticatorResponse,
-      accountType: String
+      accountType: String,
     ): Bundle {
       return bundleOf(AccountManager.KEY_BOOLEAN_RESULT to true)
     }
@@ -107,7 +107,7 @@ class AccountAuthenticatorService : Service() {
     override fun hasFeatures(
       response: AccountAuthenticatorResponse,
       account: Account,
-      features: Array<String>
+      features: Array<String>,
     ): Bundle {
       return bundleOf(AccountManager.KEY_BOOLEAN_RESULT to true)
     }
@@ -116,7 +116,7 @@ class AccountAuthenticatorService : Service() {
       response: AccountAuthenticatorResponse,
       account: Account,
       authTokenType: String,
-      options: Bundle?
+      options: Bundle?,
     ): Bundle {
       return bundleOf(AccountManager.KEY_BOOLEAN_RESULT to true)
     }

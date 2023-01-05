@@ -138,7 +138,8 @@ fun SearchInput(
     Spacer(modifier = Modifier.width(SearchInputDefaults.ContentSpacing))
     TextInput(
       value = input,
-      onValueChange = onValueChanged, modifier = Modifier.weight(1f),
+      onValueChange = onValueChanged,
+      modifier = Modifier.weight(1f),
       placeholder = {
         Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_new_conversation_search))
       },

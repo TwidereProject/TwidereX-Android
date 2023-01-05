@@ -34,6 +34,7 @@ import kotlin.test.assertNull
 
 internal class PagingTimelineQueriesImplTest : BaseCacheDatabaseTest() {
   private val accountKey = MicroBlogKey.twitter("account")
+
   @Test
   fun insert_ReplaceWhenUniqueKeyEquals() = runBlocking {
     val insert = mockIStatus(text = "insert").toPagingTimeline(accountKey = accountKey, pagingKey = "pagingKey").toDbPagingTimelineWithStatus()
@@ -49,7 +50,8 @@ internal class PagingTimelineQueriesImplTest : BaseCacheDatabaseTest() {
     for (i in 0 until 10) {
       list.add(
         mockIStatus().toPagingTimeline(accountKey, "pagingKey").toDbPagingTimelineWithStatus().timeline.copy(
-          statusKey = MicroBlogKey.valueOf(i.toString()), sortId = i.toLong()
+          statusKey = MicroBlogKey.valueOf(i.toString()),
+          sortId = i.toLong()
         ),
       )
     }
@@ -69,7 +71,8 @@ internal class PagingTimelineQueriesImplTest : BaseCacheDatabaseTest() {
     for (i in 0 until 10) {
       list.add(
         mockIStatus().toPagingTimeline(accountKey, "pagingKey").toDbPagingTimelineWithStatus().timeline.copy(
-          statusKey = MicroBlogKey.valueOf(i.toString()), sortId = i.toLong()
+          statusKey = MicroBlogKey.valueOf(i.toString()),
+          sortId = i.toLong()
         ),
       )
     }
@@ -91,7 +94,8 @@ internal class PagingTimelineQueriesImplTest : BaseCacheDatabaseTest() {
     for (i in 0 until 10) {
       list.add(
         mockIStatus().toPagingTimeline(accountKey, "pagingKey").toDbPagingTimelineWithStatus().timeline.copy(
-          statusKey = MicroBlogKey.valueOf(i.toString()), sortId = i.toLong()
+          statusKey = MicroBlogKey.valueOf(i.toString()),
+          sortId = i.toLong()
         ),
       )
     }

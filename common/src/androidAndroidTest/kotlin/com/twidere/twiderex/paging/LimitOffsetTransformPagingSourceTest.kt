@@ -47,6 +47,7 @@ internal class LimitOffsetTransformPagingSourceTest {
     db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), RoomCacheDatabase::class.java).build(),
     tables = arrayOf(),
   )
+
   @Test
   fun refreshReturnsResultPageWithCorrectParams() = runBlocking {
     val result = pagingSource.load(params = PagingSource.LoadParams.Refresh(key = null, loadSize = 15, placeholdersEnabled = false))

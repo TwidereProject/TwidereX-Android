@@ -37,6 +37,7 @@ interface DesktopMediaPlayer {
   fun registerProgressCallback(callBack: PlayerProgressCallBack)
   fun removePlayerCallback(callback: PlayerCallBack)
   fun removeProgressCallback(callback: PlayerProgressCallBack)
+
   @Composable
   fun Content(modifier: Modifier, update: () -> Unit)
 }

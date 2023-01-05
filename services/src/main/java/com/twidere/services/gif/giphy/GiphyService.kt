@@ -56,9 +56,9 @@ class GiphyService(
     return pagination?.let {
       if (it.count != null && it.offset != null && it.totalCount != null) {
         val nextOffset = it.count + it.offset
-        if (nextOffset < it.totalCount)
+        if (nextOffset < it.totalCount) {
           nextOffset.toString()
-        else null
+        } else null
       } else null
     }
   }

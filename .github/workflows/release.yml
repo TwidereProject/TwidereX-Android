@@ -1,7 +1,7 @@
 name: Release CI
 
 on:
-  push: 
+  push:
     tags:
       - '**'
 
@@ -11,7 +11,14 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
 
       - name: Set up JDK
         uses: actions/setup-java@v1
@@ -45,13 +52,20 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
 
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: 17
-      
+
       - name: Build with Gradle
         run: ./gradlew :desktop:packageMsi
 
@@ -65,13 +79,20 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
 
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: 17
-      
+
       - name: Build with Gradle
         run: ./gradlew :desktop:packageDmg
 
@@ -85,13 +106,20 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
 
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: 17
-      
+
       - name: Build with Gradle
         run: ./gradlew :desktop:packageDeb
 
@@ -100,7 +128,7 @@ jobs:
         with:
           name: linux-release
           path: "**/*.deb"
-            
+
   upload-release:
     runs-on: ubuntu-latest
     needs: [release-android, release-linux, release-macos, release-windows]

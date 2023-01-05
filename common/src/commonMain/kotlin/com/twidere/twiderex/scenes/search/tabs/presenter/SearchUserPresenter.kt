@@ -38,7 +38,6 @@ fun SearchUserPresenter(
   keyword: String,
   following: Boolean = false,
 ): SearchUserState {
-
   val accountState = CurrentAccountPresenter()
 
   if (accountState !is CurrentAccountState.Account) {

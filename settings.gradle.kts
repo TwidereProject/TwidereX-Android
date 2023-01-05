@@ -10,5 +10,4 @@ pluginManagement {
 rootProject.name = "TwidereX"
 include(":android", ":services", ":common", ":desktop", ":routeProcessor")
 
-// enableFeaturePreview("VERSION_CATALOGS")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

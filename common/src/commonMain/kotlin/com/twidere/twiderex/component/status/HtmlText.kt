@@ -94,6 +94,7 @@ fun HtmlText(
   linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
   positionWrapper: PositionWrapper? = null,
   openLink: (String) -> Unit,
+  onVisibleTextParsed: ((String) -> Unit)? = null,
 ) {
   val bidi = remember(htmlText) {
     Bidi(htmlText, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT)
@@ -126,7 +127,8 @@ fun HtmlText(
       lineHeight = lineHeight,
       overflow = overflow,
       softWrap = softWrap,
-      positionWrapper = positionWrapper
+      positionWrapper = positionWrapper,
+      onVisibleTextParsed = onVisibleTextParsed,
     )
   }
 }
@@ -153,6 +155,7 @@ private fun RenderContent(
   overflow: TextOverflow = TextOverflow.Clip,
   softWrap: Boolean = true,
   positionWrapper: PositionWrapper? = null,
+  onVisibleTextParsed: ((String) -> Unit)? = null,
 ) {
   val value = renderContentAnnotatedString(
     htmlText = htmlText,
@@ -175,6 +178,7 @@ private fun RenderContent(
     }
   }
   if (value.text.isNotEmpty() && value.text.isNotBlank()) {
+    onVisibleTextParsed?.invoke(value.text)
     Text(
       modifier = modifier.pointerInput(Unit) {
         forEachGesture {

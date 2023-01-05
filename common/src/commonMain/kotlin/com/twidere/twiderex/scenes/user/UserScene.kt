@@ -70,7 +70,6 @@ import moe.tlaster.precompose.navigation.Navigator
   route = Root.User.route,
   deepLink = [RootDeepLinks.User.route]
 )
-
 @Composable
 fun UserScene(
   @Path("userKey") key: String,
@@ -171,10 +170,11 @@ fun UserScene(
                   ?.blocking?.let { blocking ->
                     DropdownMenuItem(
                       onClick = {
-                        if (blocking)
+                        if (blocking) {
                           channel.trySend(UserEvent.UnBlock)
-                        else
+                        } else {
                           showBlockAlert = true
+                        }
                         expanded = false
                       }
                     ) {

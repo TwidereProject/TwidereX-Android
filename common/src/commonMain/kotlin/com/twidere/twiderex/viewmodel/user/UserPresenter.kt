@@ -52,7 +52,6 @@ fun UserPresenter(
   inAppNotification: InAppNotification = get(),
   userKey: MicroBlogKey,
 ): UserState {
-
   val currentAccount = CurrentAccountPresenter()
   if (currentAccount !is CurrentAccountState.Account) {
     return UserState.NoAccount

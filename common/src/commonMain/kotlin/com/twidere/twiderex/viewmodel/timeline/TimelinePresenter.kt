@@ -90,7 +90,6 @@ fun TimelinePresenter(
   notificationRepository: NotificationRepository = get(),
   savedStateKeyType: SavedStateKeyType,
 ): TimelineState {
-
   val accountState = CurrentAccountPresenter()
 
   if (accountState !is CurrentAccountState.Account) {

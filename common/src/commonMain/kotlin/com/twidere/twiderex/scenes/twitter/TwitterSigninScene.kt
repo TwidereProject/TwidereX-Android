@@ -38,7 +38,11 @@ import org.koin.core.parameter.parametersOf
 
 @NavGraphDestination(
   route = Root.SignIn.Twitter.route,
-  deepLink = [RootDeepLinks.SignIn]
+  deepLink = [
+    RootDeepLinks.SignIn,
+    RootDeepLinks.Callback.SignIn.Twitter,
+    RootDeepLinks.Callback.SignIn.Mastodon,
+  ]
 )
 @Composable
 fun TwitterSignInScene(
