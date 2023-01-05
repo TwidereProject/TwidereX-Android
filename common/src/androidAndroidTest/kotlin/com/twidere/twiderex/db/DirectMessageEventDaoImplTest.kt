@@ -35,6 +35,7 @@ import kotlin.test.assertNull
 
 internal class DirectMessageEventDaoImplTest : CacheDatabaseDaoTest() {
   val accountKey = MicroBlogKey.twitter("test")
+
   @Test
   fun insertAll_SaveBothMessageAndAttachmentsToDatabase() = runBlocking {
     val cacheDatabase = CacheDatabaseImpl(roomDatabase)
@@ -107,6 +108,7 @@ internal class DirectMessageEventDaoImplTest : CacheDatabaseDaoTest() {
       )
     )
   }
+
   @Test
   fun getPagingListCount_ReturnsCountMatchesQuery() = runBlocking {
     val cacheDatabase = CacheDatabaseImpl(roomDatabase)

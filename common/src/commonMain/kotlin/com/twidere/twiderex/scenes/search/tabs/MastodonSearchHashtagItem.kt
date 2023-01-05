@@ -52,7 +52,6 @@ class MastodonSearchHashtagItem : SearchSceneItem {
     keyword: String,
     navigator: Navigator,
   ) {
-
     val state by rememberPresenter {
       MastodonSearchHashtagPresenter(keyword = keyword)
     }.collectAsState()

@@ -222,10 +222,11 @@ fun StatusScene(
                           source.peek(index + 1)?.inReplyToStatusId == item.statusId
                         TimelineStatusComponent(
                           data = item,
-                          threadStyle = if (lineUp && !lineDown)
+                          threadStyle = if (lineUp && !lineDown) {
                             StatusThreadStyle.TEXT_ONLY
-                          else
-                            StatusThreadStyle.NONE,
+                          } else {
+                            StatusThreadStyle.NONE
+                          },
                           lineUp = lineUp,
                           lineDown = lineDown,
                           statusNavigation = statusNavigationData,

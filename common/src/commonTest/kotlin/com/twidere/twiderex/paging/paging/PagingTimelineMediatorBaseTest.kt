@@ -108,7 +108,8 @@ internal class MockTransformPagingTimelineMediatorBase(
   accountKey: MicroBlogKey,
   database: CacheDatabase
 ) : MockPagingTimelineMediatorBase(
-  accountKey = accountKey, database = database
+  accountKey = accountKey,
+  database = database
 ) {
   override fun transform(
     state: PagingState<Int, PagingTimeLineWithStatus>,

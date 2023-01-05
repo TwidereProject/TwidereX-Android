@@ -24,6 +24,7 @@ import java.io.File
 
 actual class StorageProvider() {
   private val rootDir = "TwidereX"
+
   // for persistence data
   actual val appDir: String get() = "${getWorkDirectory()}/$rootDir/app".mkdirs()
 
@@ -36,9 +37,9 @@ actual class StorageProvider() {
   actual fun clearCaches(dir: String, deleteDirAlso: Boolean) {
     val cacheDir = File(dir)
     if (!cacheDir.exists()) return
-    if (deleteDirAlso)
+    if (deleteDirAlso) {
       cacheDir.deleteRecursively()
-    else {
+    } else {
       cacheDir.listFiles()?.forEach { file ->
         // delete database may cause error
         if (!file.absolutePath.contains(cacheFiles.databaseDir)) file.deleteRecursively()
@@ -61,8 +62,9 @@ actual class StorageProvider() {
       // in either case, we would start in the user's home directory
       workingDirectory = System.getProperty("user.home")
       // if we are on a Mac, we are not done, we look for "Application Support"
-      if (os.contains("MAC"))
+      if (os.contains("MAC")) {
         workingDirectory += "/Library/Application Support"
+      }
     }
     return workingDirectory ?: throw Error("Can't get work directory for os:$os!")
   }

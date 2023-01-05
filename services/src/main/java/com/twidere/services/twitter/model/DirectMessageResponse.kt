@@ -31,6 +31,7 @@ data class DirectMessageResponse(
   @SerialName("next_cursor")
   val nextCursor: String? = null
 )
+
 @Serializable
 data class DirectMessageEventObject(
   val event: DirectMessageEvent? = null

@@ -177,7 +177,8 @@ private fun SearchInput(modifier: Modifier = Modifier, input: String, onValueCha
     Spacer(modifier = Modifier.width(SearchInputDefaults.ContentSpacing))
     TextInput(
       value = input,
-      onValueChange = onValueChanged, modifier = Modifier.weight(1f),
+      onValueChange = onValueChanged,
+      modifier = Modifier.weight(1f),
       placeholder = {
         Text(text = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_gif_search))
       },

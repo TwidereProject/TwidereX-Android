@@ -34,6 +34,7 @@ import java.util.concurrent.Executors
 @RunWith(AndroidJUnit4::class)
 internal abstract class BaseDaoTest<DB : RoomDatabase> {
   protected lateinit var roomDatabase: DB
+
   @get:Rule
   val rule = InstantTaskExecutorRule()
 

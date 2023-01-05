@@ -34,7 +34,7 @@ fun ConnectivityManager.asIsActiveNetworkFlow(): Flow<Boolean> = callbackFlow {
   val networkCallback = object : ConnectivityManager.NetworkCallback() {
     override fun onCapabilitiesChanged(
       network: Network,
-      networkCapabilities: NetworkCapabilities
+      networkCapabilities: NetworkCapabilities,
     ) {
       trySend(ConnectivityManagerCompat.isActiveNetworkMetered(this@asIsActiveNetworkFlow))
     }

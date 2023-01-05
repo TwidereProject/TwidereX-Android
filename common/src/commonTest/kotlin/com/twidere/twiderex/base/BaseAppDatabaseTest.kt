@@ -28,6 +28,7 @@ import org.junit.Before
 internal open class BaseAppDatabaseTest {
   private val driver = SqlDriverFactory.create(SqlDelightAppDatabase.Schema)
   protected val database: SqlDelightAppDatabase = createAppDataBase(driver)
+
   @Before
   fun setUp() {
   }

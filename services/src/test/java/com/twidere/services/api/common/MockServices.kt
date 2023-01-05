@@ -53,14 +53,18 @@ class MockClientFactory : HttpClientFactory {
 
 fun mockMastodonService(): MastodonService {
   return MastodonService(
-    "", "",
+    "",
+    "",
     httpClientFactory = MockClientFactory()
   )
 }
 
 fun mockTwitterService(): TwitterService {
   return TwitterService(
-    "", "", "", "",
+    "",
+    "",
+    "",
+    "",
     httpClientFactory = MockClientFactory()
   )
 }

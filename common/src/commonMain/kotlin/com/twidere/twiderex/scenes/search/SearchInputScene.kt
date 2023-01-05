@@ -65,7 +65,6 @@ fun SearchInputScene(
   initial: String? = null,
   navigator: Navigator,
 ) {
-
   val (state, channel) = rememberPresenterState<SearchInputState, SearchInputEvent> {
     SearchInputPresenter(it, keyword = initial ?: "")
   }

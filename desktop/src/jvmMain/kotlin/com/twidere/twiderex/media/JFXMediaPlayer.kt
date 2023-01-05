@@ -49,7 +49,7 @@ import javax.swing.event.MouseInputAdapter
 class JFXMediaPlayer(
   private val url: String,
   private val backgroundColor: androidx.compose.ui.graphics.Color?,
-  private val onClick: (() -> Unit)?
+  private val onClick: (() -> Unit)?,
 ) : DesktopMediaPlayer {
   private val scope = CoroutineScope(Dispatchers.IO)
   private var playerCallBack: PlayerCallBack? = null
@@ -229,7 +229,7 @@ class JFXMediaPlayer(
         modifier = modifier,
         update = {
           update.invoke()
-        }
+        },
       )
     }
   }

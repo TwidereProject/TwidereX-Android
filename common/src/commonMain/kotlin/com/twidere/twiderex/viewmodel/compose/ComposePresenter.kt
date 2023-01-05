@@ -132,7 +132,6 @@ fun ComposePresenter(
   statusKey: MicroBlogKey? = null,
   id: String? = null,
 ): ComposeState {
-
   val accountState = CurrentAccountPresenter()
   if (accountState !is CurrentAccountState.Account) {
     return ComposeState.NoAccount
@@ -303,10 +302,11 @@ fun ComposePresenter(
         MediaInsertMode.Disabled
 
       else -> {
-        if (images.size == imageLimit)
+        if (images.size == imageLimit) {
           MediaInsertMode.Disabled
-        else
+        } else {
           MediaInsertMode.ImageOnly
+        }
       }
     }
   }
@@ -327,7 +327,8 @@ fun ComposePresenter(
   LaunchedEffect(accountState) {
     if (statusKey != null) {
       repository.loadStatus(
-        statusKey, accountKey = accountState.account.accountKey
+        statusKey,
+        accountKey = accountState.account.accountKey
       ).map { status ->
         if (
           status != null &&
@@ -624,7 +625,8 @@ data class MediaInsertMode(
         MediaInsertType.GIF,
         MediaInsertType.RECORD_VIDEO
       ),
-      true, listOf(MediaLibraryType.Image)
+      true,
+      listOf(MediaLibraryType.Image)
     )
     val Disabled = MediaInsertMode(
       MediaInsertType.values().toList(),
