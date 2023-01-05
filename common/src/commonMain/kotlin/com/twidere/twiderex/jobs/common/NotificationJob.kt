@@ -67,7 +67,7 @@ class NotificationJob(
       }.joinAll()
   }
 
-  private suspend fun notify(account: AccountDetails, status: UiStatus) {
+  private fun notify(account: AccountDetails, status: UiStatus) {
     val notificationId = "${account.accountKey}_${status.statusKey}"
     val builder = AppNotification.Builder(
       account.accountKey.notificationChannelId(

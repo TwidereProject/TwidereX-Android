@@ -302,21 +302,23 @@ private fun ComposeBody(
             ) {
               Icon(
                 painter = painterResource(
-                  res = if (state.enableThreadMode)
+                  res = if (state.enableThreadMode) {
                     com.twidere.twiderex.MR.files.ic_send_thread
-                  else
+                  } else {
                     com.twidere.twiderex.MR.files.ic_send
+                  }
                 ),
                 contentDescription = stringResource(
-                  res = if (state.enableThreadMode)
+                  res = if (state.enableThreadMode) {
                     com.twidere.twiderex
                       .MR.strings.accessibility_scene_compose_thread
-                  else
+                  } else {
                     com.twidere.twiderex.MR.strings.accessibility_scene_compose_send
+                  }
                 ),
-                tint = if (state.canSend)
+                tint = if (state.canSend) {
                   MaterialTheme.colors.primary
-                else LocalContentColor.current.copy(
+                } else LocalContentColor.current.copy(
                   alpha = LocalContentAlpha.current
                 )
               )
@@ -620,7 +622,6 @@ private object LocationDisplayDefaults {
 
 @Composable
 private fun TextProgress(parsedTextLength: Int, maxLength: Int) {
-
   val progress = remember(parsedTextLength) {
     parsedTextLength.toFloat() / maxLength.toFloat()
   }
@@ -1109,7 +1110,6 @@ private fun ComposeActions(
   state: ComposeState.Data,
   channel: Channel<ComposeEvent>,
 ) {
-
   val scope = rememberCoroutineScope()
   Box {
     Row {
@@ -1133,10 +1133,11 @@ private fun ComposeActions(
           Icon(
             painter = painterResource(res = if (showEmoji) com.twidere.twiderex.MR.files.ic_keyboard else com.twidere.twiderex.MR.files.ic_mood_smile),
             contentDescription = null,
-            tint = if (showEmoji)
+            tint = if (showEmoji) {
               MaterialTheme.colors.primary
-            else
+            } else {
               LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+            }
           )
         }
       }
@@ -1257,10 +1258,11 @@ private fun ComposeActions(
           Box {
             Icon(
               painter = painterResource(
-                res = if (state.draftCount > 9)
+                res = if (state.draftCount > 9) {
                   com.twidere.twiderex.MR.files.ic_drafts_more
-                else
+                } else {
                   com.twidere.twiderex.MR.files.ic_draft_number
+                }
               ),
               contentDescription = stringResource(
                 res = com.twidere.twiderex.MR.strings.accessibility_scene_compose_draft

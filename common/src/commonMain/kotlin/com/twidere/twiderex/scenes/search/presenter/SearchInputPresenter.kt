@@ -45,7 +45,6 @@ fun SearchInputPresenter(
   repository: SearchRepository = get(),
   keyword: String
 ): SearchInputState {
-
   val accountState = CurrentAccountPresenter()
 
   if (accountState !is CurrentAccountState.Account) {

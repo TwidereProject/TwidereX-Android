@@ -32,7 +32,8 @@ fun CoroutineScope.launchCatching(
   start: CoroutineStart = CoroutineStart.DEFAULT,
   block: suspend CoroutineScope.() -> Unit
 ): Job = launch(
-  context, start
+  context,
+  start
 ) {
   runCatching {
     block()

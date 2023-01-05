@@ -40,7 +40,9 @@ fun rememberSwiperState(
 ): SwiperState {
   return rememberSaveable(
     saver = SwiperState.Saver(
-      onStart, onDismiss, onEnd
+      onStart,
+      onDismiss,
+      onEnd
     )
   ) {
     SwiperState(

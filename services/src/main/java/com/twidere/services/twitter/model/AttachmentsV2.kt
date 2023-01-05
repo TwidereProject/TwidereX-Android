@@ -42,6 +42,7 @@ data class AttachmentsV2(
 
   @Transient
   var media: List<MediaV2>? = null
+
   @Transient
   var poll: List<PollV2>? = null
 }

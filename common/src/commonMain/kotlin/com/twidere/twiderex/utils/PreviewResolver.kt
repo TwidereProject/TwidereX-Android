@@ -70,7 +70,6 @@ object PreviewResolver {
   }
 
   fun parsePreview(card: UiCard): MutableState<UiCard> {
-
     if (card.image != null || card.description != null || card.title != null) {
       return mutableStateOf(card)
     }

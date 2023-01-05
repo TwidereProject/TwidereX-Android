@@ -152,7 +152,6 @@ fun ParallaxLayout(
   backContent: @Composable () -> Unit,
   frontContent: @Composable () -> Unit,
 ) {
-
   val animateSpec = remember {
     tween<Float>(durationMillis = animateDuration, easing = LinearEasing)
   }

@@ -47,6 +47,7 @@ expect class PlatformPlayerView(
   fun setVolume(volume: Float)
   fun setMute(mute: Boolean)
   fun release()
+
   @Composable
   fun Content(modifier: Modifier, update: () -> Unit)
 }

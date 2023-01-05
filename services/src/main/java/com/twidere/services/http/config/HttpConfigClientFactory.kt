@@ -129,7 +129,6 @@ class HttpConfigClientFactory(private val configProvider: HttpConfigProvider) : 
     proxyConfig: ProxyConfig
   ): OkHttpClient.Builder {
     return if (proxyConfig.enable) {
-
       when (proxyConfig.type) {
         ProxyConfig.Type.HTTP -> {
           proxyOkHttpBuilder(

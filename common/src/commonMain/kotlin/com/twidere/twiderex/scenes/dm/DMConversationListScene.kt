@@ -48,7 +48,6 @@ import moe.tlaster.precompose.navigation.Navigator
 @NavGraphDestination(
   route = Root.Messages.Home,
 )
-
 @Composable
 fun DMConversationListScene(
   navigator: Navigator,

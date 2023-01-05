@@ -34,10 +34,10 @@ data class MediaSize(
   val h: Long? = null,
   val resize: Resize? = null
 )
+
 @Serializable(with = Resize.Companion::class)
 enum class Resize(val value: String) {
-  Crop("crop"),
-  Fit("fit");
+  Crop("crop"), Fit("fit");
 
   companion object : KSerializer<Resize> {
     override val descriptor: SerialDescriptor

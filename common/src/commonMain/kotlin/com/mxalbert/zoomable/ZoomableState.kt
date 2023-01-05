@@ -306,7 +306,9 @@ class ZoomableState(
 
   override fun toString(): String =
     "ZoomableState(translateX=%.1f,translateY=%.1f,scale=%.2f)".format(
-      translationX, translationY, scale
+      translationX,
+      translationY,
+      scale
     )
 
   companion object {

@@ -42,14 +42,13 @@ fun TrendingPresenter(
   events: Flow<SearchInputEvent>,
   repository: TrendRepository = get(),
 ): SearchItemState {
-
   val accountState = CurrentAccountPresenter()
 
   if (accountState !is CurrentAccountState.Account) {
     return SearchItemState.NoAccount
   }
 
-  val (state, channel) = rememberNestedPresenter <SearchInputState, SearchInputEvent> {
+  val (state, channel) = rememberNestedPresenter<SearchInputState, SearchInputEvent> {
     SearchInputPresenter(it, keyword = "")
   }
 

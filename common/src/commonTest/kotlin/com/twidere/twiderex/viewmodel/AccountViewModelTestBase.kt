@@ -34,8 +34,10 @@ internal abstract class AccountViewModelTestBase : ViewModelTestBase() {
 
   @MockK
   protected lateinit var mockUser: AmUser
+
   @MockK
   protected lateinit var mockAccount: AccountDetails
+
   @MockK
   protected lateinit var mockAccountRepository: AccountRepository
 

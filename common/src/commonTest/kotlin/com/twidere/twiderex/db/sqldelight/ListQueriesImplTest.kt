@@ -36,6 +36,7 @@ import kotlin.test.assertNull
 
 internal class ListQueriesImplTest : BaseCacheDatabaseTest() {
   private val accountKey = MicroBlogKey.twitter("account")
+
   @Test
   fun insert_ReplaceWhenPrimaryKeyEquals() = runBlocking {
     val insert = mockIListModel("insert").toUi(accountKey)
