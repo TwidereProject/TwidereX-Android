@@ -139,7 +139,7 @@ private fun signin(
   navController: Navigator,
 ) {
   viewModel.beginOAuth(
-    host.text,
+    host.text.trim(),
   ) { success ->
     if (success) {
       navController.goBackWith(success)

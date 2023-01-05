@@ -58,7 +58,9 @@ internal class RoomAppDatabaseMigrationTest {
     }
 
     helper.runMigrationsAndValidate(
-      TEST_DB, 2, true,
+      TEST_DB,
+      2,
+      true,
       com.twidere.twiderex.room.db.AppDatabase_Migration_1_2
     ).apply {
       query(SimpleSQLiteQuery("SELECT * FROM draft WHERE _id = ?", arrayOf(id))).apply {
@@ -92,7 +94,9 @@ internal class RoomAppDatabaseMigrationTest {
     }
 
     helper.runMigrationsAndValidate(
-      TEST_DB, 3, true,
+      TEST_DB,
+      3,
+      true,
       com.twidere.twiderex.room.db.AppDatabase_Migration_2_3
     ).apply {
       query(SimpleSQLiteQuery("SELECT * FROM search WHERE _id = ?", arrayOf(id))).apply {

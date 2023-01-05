@@ -54,7 +54,6 @@ internal class PagingTimelineDaoImplTest : CacheDatabaseDaoTest() {
 
   @Test
   fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
-
     val cacheDatabase = CacheDatabaseImpl(roomDatabase)
     val originData = listOf(
       mockIStatus().toPagingTimeline(accountKey, pagingKey),
@@ -104,6 +103,7 @@ internal class PagingTimelineDaoImplTest : CacheDatabaseDaoTest() {
     }
     assert(invalidate)
   }
+
   @Test
   fun getLatest_ReturnsResultWithStatusAndReference() = runBlocking {
     val cacheDatabase = CacheDatabaseImpl(roomDatabase)

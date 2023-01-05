@@ -138,7 +138,8 @@ fun DMConversationScene(
       } else {
         // user might enter this page by notifications after switch platform
         NormalContent(
-          viewModel, dmNavigationData,
+          viewModel,
+          dmNavigationData,
         )
       }
     }

@@ -46,7 +46,6 @@ fun TimelineComponent(
   savedStateKeyType: SavedStateKeyType,
   statusNavigation: StatusNavigationData,
 ) {
-
   val (state, channel) = rememberPresenterState<TimelineState, TimeLineEvent> {
     TimelinePresenter(it, savedStateKeyType = savedStateKeyType)
   }
@@ -68,7 +67,6 @@ fun TimelineComponent(
     },
     refreshIndicatorPadding = contentPadding
   ) {
-
     if (state.source.itemCount > 0) {
       LaunchedEffect(lazyListController) {
         lazyListController?.listState = state.listState

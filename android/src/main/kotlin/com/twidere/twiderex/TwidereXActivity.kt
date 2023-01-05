@@ -20,9 +20,11 @@
  */
 package com.twidere.twiderex
 
+import android.Manifest
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.compose.animation.AnimatedVisibility
@@ -59,6 +61,7 @@ import com.seiko.imageloader.cache.memory.MemoryCacheBuilder
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.LocalWindowInsetsController
+import com.twidere.twiderex.component.TwiderexPermissionsRequired
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.di.ext.get
@@ -148,12 +151,12 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
         darkColors()
       } else {
         lightColors()
-      }
+      },
     ) {
       Box(Modifier.fillMaxSize(), Alignment.Center) {
         Image(
           painter = painterResource(id = R.drawable.ic_login_logo),
-          contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_logo_twidere)
+          contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_logo_twidere),
         )
       }
     }
@@ -183,9 +186,23 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
       ProvidePreferences(
         preferencesHolder,
       ) {
-        Router(
-          navController = navController,
-          isDebug = moe.tlaster.kfilepicker.BuildConfig.DEBUG,
+        val permissions = remember {
+          listOfNotNull(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS else null,
+          )
+        }
+        TwiderexPermissionsRequired(
+          permissions,
+          onPermissionDenied = {
+            finish()
+          },
+          feature = "Twiderex",
+          content = {
+            Router(
+              navController = navController,
+              isDebug = moe.tlaster.kfilepicker.BuildConfig.DEBUG,
+            )
+          },
         )
       }
     }

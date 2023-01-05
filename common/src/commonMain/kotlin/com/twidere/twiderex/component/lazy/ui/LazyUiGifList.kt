@@ -72,7 +72,8 @@ fun LazyUiGifList(
               .clickable { onItemSelected(item) }
               .then(
                 if (selected) Modifier.border(
-                  LazyUiGifListDefaults.Border, color = MaterialTheme.colors.primary,
+                  LazyUiGifListDefaults.Border,
+                  color = MaterialTheme.colors.primary,
                   shape = MaterialTheme.shapes.medium
                 ) else Modifier
               )

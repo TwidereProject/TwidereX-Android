@@ -24,6 +24,7 @@ expect class StorageProvider {
   companion object {
     fun create(): StorageProvider
   }
+
   // for persistence data
   val appDir: String
 

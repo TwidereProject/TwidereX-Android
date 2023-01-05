@@ -71,7 +71,6 @@ import moe.tlaster.precompose.navigation.Navigator
 @NavGraphDestination(
   route = Root.Settings.About,
 )
-
 @Composable
 fun AboutScene(
   navigator: Navigator,

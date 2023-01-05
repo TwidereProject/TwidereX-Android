@@ -79,7 +79,7 @@ internal fun UiStatus.toDbStatusWithAttachments(accountKey: MicroBlogKey): DbSta
   user = user.toDbUser(),
   medias = media.map { it.toDbMedia() },
   urls = url.map { it.toDbUrlEntity(statusKey) },
-  references = referenceStatus.mapValues { it.value.toDbStatusWithAttachments(accountKey) }
+  references = referenceStatus.mapValues { it.value.toDbStatusWithAttachments(accountKey) },
 )
 
 internal fun DbStatusWithAttachments.toUi(): UiStatus = UiStatus(
@@ -111,7 +111,7 @@ internal fun DbStatusWithAttachments.toUi(): UiStatus = UiStatus(
   referenceStatus = references.mapValues { it.value.toUi() },
   user = user.toUi(),
   media = medias.map { it.toUi() },
-  url = urls.map { it.toUi() }
+  url = urls.map { it.toUi() },
 )
 
 private fun UiPoll.toDbPoll() = DbPoll(

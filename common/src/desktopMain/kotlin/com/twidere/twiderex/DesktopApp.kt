@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,7 +24,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 import com.seiko.imageloader.ImageLoader
 import com.seiko.imageloader.ImageLoaderBuilder
 import com.seiko.imageloader.LocalImageLoader
@@ -35,6 +37,8 @@ import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
 import com.twidere.twiderex.init.Initializer
 import com.twidere.twiderex.init.TwidereServiceFactoryInitialTask
+import com.twidere.twiderex.kmp.LocalPlatformWindow
+import com.twidere.twiderex.kmp.PlatformWindow
 import com.twidere.twiderex.kmp.StorageProvider
 import com.twidere.twiderex.kmp.commonConfig
 import com.twidere.twiderex.navigation.twidereXSchema
@@ -172,11 +176,16 @@ private fun startDesktopApp() {
           stopKoin()
           exitApplication()
         },
+        state = rememberWindowState(
+          width = 400.dp,
+          height = 900.dp
+        ),
         title = "Twidere X",
         icon = painterResource(MR.files.ic_launcher.filePath),
       ) {
         FilePicker.init(window)
         CompositionLocalProvider(
+          LocalPlatformWindow provides PlatformWindow(),
           LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
           LocalImageLoader provides generateImageLoader(get()),
         ) {

@@ -33,6 +33,7 @@ import kotlin.test.assertNull
 
 internal class SqlDelightStatusDaoImplTest : BaseCacheDatabaseTest() {
   private val accountKey = MicroBlogKey.twitter("account")
+
   @Test
   fun findWithStatusKey_ReturnStatusWithAttachments() = runBlocking {
     val dao = SqlDelightStatusDaoImpl(database)

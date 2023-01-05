@@ -25,7 +25,7 @@ allprojects {
             freeCompilerArgs = freeCompilerArgs + listOf(
                 "-opt-in=kotlin.RequiresOptIn",
                 "-Xjvm-default=all",
-                "-Xskip-prerelease-check",
+                "-Xskip-prerelease-check"
             )
         }
     }
@@ -37,7 +37,9 @@ allprojects {
             ktlint(Versions.ktlint).editorConfigOverride(
                 mapOf(
                     "indent_size" to 2,
-                    "continuation_indent_size" to 2
+                    "continuation_indent_size" to 2,
+                    // rules: https://github.com/pinterest/ktlint/blob/master/README.md#standard-rules
+                    "disabled_rules" to "filename,enum-entry-name-case,trailing-comma"
                 )
             )
             licenseHeaderFile(rootProject.file("spotless/license"))

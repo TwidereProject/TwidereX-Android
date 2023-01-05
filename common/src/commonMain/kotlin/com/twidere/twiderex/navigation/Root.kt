@@ -42,7 +42,6 @@ import java.net.URLDecoder
 expect fun RouteBuilder.twidereRoute(navigator: Navigator)
 
 fun RouteBuilder.complexRoute(navigator: Navigator) {
-
   scene(
     Root.Home,
     deepLinks = twitterHosts.map { "$it/*" }

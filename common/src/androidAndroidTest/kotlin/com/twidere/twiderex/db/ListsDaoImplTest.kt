@@ -42,6 +42,7 @@ internal class ListsDaoImplTest : CacheDatabaseDaoTest() {
     mockIListModel().toUi(accountKey),
     mockIListModel().toUi(accountKey)
   )
+
   @Test
   fun checkInsertDbLists() = runBlocking {
     val cacheDatabase = CacheDatabaseImpl(roomDatabase)

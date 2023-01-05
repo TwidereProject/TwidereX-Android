@@ -37,7 +37,6 @@ import com.twidere.twiderex.scenes.CurrentAccountState
 fun MastodonSearchHashtagPresenter(
   keyword: String,
 ): MastodonSearchHashtagState {
-
   val accountState = CurrentAccountPresenter()
 
   if (accountState !is CurrentAccountState.Account) {

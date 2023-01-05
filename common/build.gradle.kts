@@ -1,4 +1,3 @@
-
 import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import org.jetbrains.kotlin.konan.properties.loadProperties
 
@@ -100,6 +99,7 @@ kotlin {
                 implementation("androidx.vectordrawable:vectordrawable:1.2.0-beta01")
                 implementation("androidx.activity:activity-compose:${Versions.activity}")
                 implementation("com.github.android:renderscript-intrinsics-replacement-toolkit:b6363490c3")
+                implementation("com.google.accompanist:accompanist-permissions:${Versions.accompanist}")
             }
         }
         val androidAndroidTest by getting {
@@ -198,18 +198,16 @@ android {
         resources {
             excludes.addAll(
                 listOf(
-                    "META-INF/AL2.0",
-                    "META-INF/LGPL2.1",
+                    "META-INF/*",
                     "DebugProbesKt.bin",
                     "win32-x86-64/attach_hotspot_windows.dll",
-                    "win32-x86/attach_hotspot_windows.dll",
-                    "META-INF/licenses/ASM"
+                    "win32-x86/attach_hotspot_windows.dll"
                 )
             )
         }
     }
 
-    //@see https://github.com/icerockdev/moko-resources/issues/353
+    // @see https://github.com/icerockdev/moko-resources/issues/353
     sourceSets["main"].apply {
         assets.srcDir(File(buildDir, "generated/moko/androidMain/assets"))
         res.srcDir(File(buildDir, "generated/moko/androidMain/res"))

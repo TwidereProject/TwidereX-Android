@@ -109,14 +109,15 @@ fun LazyUiDMEventList(
               .fillMaxSize()
               .padding(LazyUiDMEventListDefaults.ContentPadding)
           ) {
-            if (it.isInCome)
+            if (it.isInCome) {
               DMInComeEvent(
                 it,
                 onItemLongClick,
                 dmNavigationData = dmNavigationData,
               )
-            else
+            } else {
               DMOutComeEvent(onResend, it, onItemLongClick, dmNavigationData)
+            }
           }
         } ?: run {
           LoadingEventPlaceholder()
@@ -263,10 +264,11 @@ private fun MessageBody(
         }
       ) { }
       .background(
-        if (event.isInCome)
+        if (event.isInCome) {
           MaterialTheme.colors.primary.copy(alpha = 0.15f)
-        else
+        } else {
           MaterialTheme.colors.primary
+        }
       )
       .padding(MessageBodyDefaults.ContentPadding)
   ) {

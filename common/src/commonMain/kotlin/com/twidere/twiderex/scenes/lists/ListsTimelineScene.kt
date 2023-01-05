@@ -126,7 +126,7 @@ fun ListTimeLineScene(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
               )
-              if (source?.isPrivate == true)
+              if (source?.isPrivate == true) {
                 Icon(
                   painter = painterResource(res = com.twidere.twiderex.MR.files.ic_lock),
                   contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_icons_private),
@@ -135,6 +135,7 @@ fun ListTimeLineScene(
                     .padding(start = ListTimelineSceneDefaults.LockIconPadding)
                     .size(ListTimelineSceneDefaults.LockIconSize)
                 )
+              }
             }
           },
           actions = {
@@ -168,10 +169,11 @@ fun ListTimeLineScene(
                   ) {
                     Text(
                       text = stringResource(
-                        res = if (following)
+                        res = if (following) {
                           com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_unfollow
-                        else
+                        } else {
                           com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_follow
+                        }
                       )
                     )
                   }
@@ -221,10 +223,11 @@ fun ListTimeLineScene(
                     }
                   ) {
                     Text(
-                      text = if (account.type == PlatformType.Mastodon)
+                      text = if (account.type == PlatformType.Mastodon) {
                         stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_rename_list)
-                      else
+                      } else {
                         stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_details_menu_actions_edit_list)
+                      }
                     )
                   }
                 }

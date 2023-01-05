@@ -24,7 +24,8 @@ import android.text.format.DateUtils
 actual object TimeUtils {
   actual fun humanizedTimestamp(time: Long): String {
     return DateUtils.getRelativeTimeSpanString(
-      time, System.currentTimeMillis(),
+      time,
+      System.currentTimeMillis(),
       DateUtils.MINUTE_IN_MILLIS,
       DateUtils.FORMAT_ABBREV_ALL
     ).toString()
