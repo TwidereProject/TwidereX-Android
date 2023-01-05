@@ -20,20 +20,24 @@
  */
 package com.twidere.twiderex.model.ui.mastodon
 
+import androidx.compose.runtime.Immutable
 import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.ui.StatusExtra
 import com.twidere.twiderex.model.ui.UiEmojiCategory
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.serialization.Serializable
 
+@Immutable
 @Serializable
 data class MastodonStatusExtra(
   val type: MastodonStatusType,
-  val emoji: List<UiEmojiCategory>,
+  val emoji: ImmutableList<UiEmojiCategory>,
   val visibility: MastodonVisibility,
-  val mentions: List<MastodonMention>?,
+  val mentions: ImmutableList<MastodonMention>?,
 ) : StatusExtra
 
+@Immutable
 @Serializable
 data class MastodonMention(
   val id: String? = null,

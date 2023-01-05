@@ -87,8 +87,10 @@ data class UiUser(
   }
 }
 
+@Immutable
 interface UserExtra
 
+@Immutable
 data class UserMetrics(
   val fans: Long,
   val follow: Long,

@@ -52,6 +52,9 @@ import com.twidere.twiderex.model.ui.twitter.TwitterStatusExtra
 import com.twidere.twiderex.model.ui.twitter.TwitterUserExtra
 import com.twidere.twiderex.navigation.RootDeepLinks
 import com.twitter.twittertext.Autolink
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toPersistentMap
 
 val autolink by lazy {
   Autolink().apply {
@@ -194,7 +197,7 @@ internal fun StatusV2.toUiStatus(
         type = type,
         order = index,
       )
-    },
+    }.toPersistentList(),
     isGap = isGap,
     url = entities?.urls?.map {
       UiUrlEntity(
@@ -205,12 +208,12 @@ internal fun StatusV2.toUiStatus(
         description = it.description,
         image = it.images?.maxByOrNull { it.width ?: it.height ?: 0 }?.url
       )
-    } ?: emptyList(),
+    }?.toPersistentList() ?: persistentListOf(),
     referenceStatus = mutableMapOf<ReferenceType, UiStatus>().apply {
       replyTo?.let { this[ReferenceType.Reply] = it }
       quote?.let { this[ReferenceType.Quote] = it }
       retweet?.let { this[ReferenceType.Retweet] = it }
-    },
+    }.toPersistentMap(),
     language = lang,
   )
 }
@@ -301,7 +304,7 @@ internal fun Status.toUiStatus(
         type = type,
         order = index,
       )
-    },
+    }.toPersistentList(),
     liked = favorited == true,
     retweeted = retweeted == true,
     isGap = isGap,
@@ -314,11 +317,11 @@ internal fun Status.toUiStatus(
         description = null,
         image = null,
       )
-    } ?: emptyList(),
+    }?.toPersistentList() ?: persistentListOf(),
     referenceStatus = mutableMapOf<ReferenceType, UiStatus>().apply {
       quote?.let { this[ReferenceType.Quote] = it }
       retweet?.let { this[ReferenceType.Retweet] = it }
-    },
+    }.toPersistentMap(),
     language = lang,
   )
 }
@@ -359,7 +362,7 @@ internal fun User.toUiUser(): UiUser {
           description = "",
           image = null
         )
-      } ?: emptyList()
+      }?.toPersistentList() ?: persistentListOf()
     )
   )
 }
@@ -401,7 +404,7 @@ internal fun UserV2.toUiUser(): UiUser {
           description = null,
           image = null
         )
-      } ?: emptyList()
+      }?.toPersistentList() ?: persistentListOf()
     )
   )
 }

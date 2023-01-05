@@ -56,6 +56,8 @@ import com.twidere.twiderex.paging.mediator.timeline.mastodon.LocalTimelineMedia
 import com.twidere.twiderex.repository.NotificationRepository
 import com.twidere.twiderex.scenes.CurrentAccountPresenter
 import com.twidere.twiderex.scenes.CurrentAccountState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -178,7 +180,7 @@ fun TimelinePresenter(
   val loadingBetween by remember(pagingMediator) {
     pagingMediator.loadingBetween
   }.collectAsState(
-    emptyList()
+    persistentListOf()
   )
 
   val listState = key(accountState) {
@@ -254,7 +256,7 @@ interface TimeLineEvent {
 interface TimelineState {
   data class Data(
     val source: LazyPagingItems<UiStatus>,
-    val loadingBetween: List<MicroBlogKey>,
+    val loadingBetween: ImmutableList<MicroBlogKey>,
     val listState: LazyListState
   ) : TimelineState
 

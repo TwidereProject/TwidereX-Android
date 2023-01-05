@@ -108,10 +108,10 @@ internal fun DbStatusWithAttachments.toUi(): UiStatus = UiStatus(
     PlatformType.Fanfou -> TODO()
     PlatformType.Mastodon -> status.extra?.fromJson<MastodonStatusExtra>()
   },
-  referenceStatus = references.mapValues { it.value.toUi() },
+  referenceStatus = references.mapValues { it.value.toUi() }.toPersistentMap(),
   user = user.toUi(),
-  media = medias.map { it.toUi() },
-  url = urls.map { it.toUi() },
+  media = medias.map { it.toUi() }.toPersistentList(),
+  url = urls.map { it.toUi() }.toPersistentList(),
 )
 
 private fun UiPoll.toDbPoll() = DbPoll(

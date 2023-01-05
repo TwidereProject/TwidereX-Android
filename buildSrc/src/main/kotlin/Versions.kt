@@ -5,6 +5,7 @@ object Versions {
         const val lang = "1.7.20"
         const val coroutines = "1.6.4"
         const val serialization = "1.4.1"
+        const val immutableCollections = "0.3.5"
     }
 
     object Java {

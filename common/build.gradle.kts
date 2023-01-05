@@ -66,6 +66,7 @@ kotlin {
                 implementation("io.github.reactivecircus.cache4k:cache4k:${Versions.cache4k}")
                 api("moe.tlaster:precompose:${Versions.precompose}")
                 api("io.github.qdsfdhvh:precompose-annotation:${Versions.precomposeKsp}")
+                api("org.jetbrains.kotlinx:kotlinx-collections-immutable:${Versions.Kotlin.immutableCollections}")
             }
         }
         val commonTest by getting {

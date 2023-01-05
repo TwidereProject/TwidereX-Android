@@ -20,18 +20,22 @@
  */
 package com.twidere.twiderex.model.ui.mastodon
 
+import androidx.compose.runtime.Immutable
 import com.twidere.twiderex.model.ui.UiEmojiCategory
 import com.twidere.twiderex.model.ui.UserExtra
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.serialization.Serializable
 
+@Immutable
 @Serializable
 data class MastodonUserExtra(
-  val fields: List<Field>,
-  val emoji: List<UiEmojiCategory>,
+  val fields: ImmutableList<Field>,
+  val emoji: ImmutableList<UiEmojiCategory>,
   val bot: Boolean,
   val locked: Boolean,
 ) : UserExtra
 
+@Immutable
 @Serializable
 data class Field(
   val name: String?,

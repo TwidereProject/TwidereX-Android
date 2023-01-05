@@ -55,6 +55,9 @@ import com.twidere.twiderex.model.ui.mastodon.MastodonMention
 import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
 import com.twidere.twiderex.model.ui.mastodon.MastodonUserExtra
 import com.twidere.twiderex.navigation.RootDeepLinks
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toPersistentMap
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
@@ -111,7 +114,7 @@ fun Notification.toUiStatus(
     platformType = PlatformType.Mastodon,
     extra = MastodonStatusExtra(
       type = this.type.toDbType(),
-      emoji = emptyList(),
+      emoji = persistentListOf(),
       visibility = MastodonVisibility.Public,
       mentions = null,
     ),
@@ -120,13 +123,13 @@ fun Notification.toUiStatus(
     card = null,
     inReplyToStatusId = null,
     inReplyToUserId = null,
-    media = emptyList(),
-    url = emptyList(),
+    media = persistentListOf(),
+    url = persistentListOf(),
     liked = false,
     retweeted = false,
     referenceStatus = mutableMapOf<ReferenceType, UiStatus>().apply {
       relatedStatus?.let { this[ReferenceType.MastodonNotification] = it }
-    },
+    }.toPersistentMap(),
     isGap = isGap,
     language = this.status?.language,
   )
@@ -213,7 +216,7 @@ internal fun Status.toUiStatus(
     poll = poll?.toUi(),
     extra = MastodonStatusExtra(
       type = MastodonStatusType.Status,
-      emoji = emojis?.toUi() ?: emptyList(),
+      emoji = emojis?.toUi()?.toPersistentList() ?: persistentListOf(),
       visibility = visibility.toMastodonVisibility(),
       mentions = mentions?.map {
         MastodonMention(
@@ -222,7 +225,7 @@ internal fun Status.toUiStatus(
           url = it.url,
           acct = it.acct
         )
-      },
+      }?.toPersistentList(),
     ),
     card = card?.url?.let { url ->
       UiCard(
@@ -256,14 +259,14 @@ internal fun Status.toUiStatus(
         } ?: MediaType.photo,
         order = index,
       )
-    },
+    }.toPersistentList(),
     liked = favourited == true,
     retweeted = reblogged == true,
     referenceStatus = mutableMapOf<ReferenceType, UiStatus>().apply {
       retweet?.let { this[ReferenceType.Retweet] = it }
-    },
+    }.toPersistentMap(),
     isGap = isGap,
-    url = emptyList(),
+    url = persistentListOf(),
     language = this.language,
   )
 }
@@ -335,10 +338,10 @@ internal fun Account.toUiUser(
           field.name,
           field.value
         )
-      } ?: emptyList(),
+      }?.toPersistentList() ?: persistentListOf(),
       bot = bot ?: false,
       locked = locked ?: false,
-      emoji = emojis?.toUi() ?: emptyList(),
+      emoji = emojis?.toUi()?.toPersistentList() ?: persistentListOf(),
     )
   )
 }

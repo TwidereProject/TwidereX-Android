@@ -33,6 +33,11 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.enums.ReferenceType
 import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
 import com.twidere.twiderex.model.ui.twitter.TwitterStatusExtra
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableMap
 
 @Immutable
 data class UiStatus(
@@ -48,15 +53,15 @@ data class UiStatus(
   val geo: UiGeo,
   val hasMedia: Boolean,
   val user: UiUser,
-  val media: List<UiMedia>,
+  val media: ImmutableList<UiMedia>,
   val source: String,
   val isGap: Boolean,
-  val url: List<UiUrlEntity>,
+  val url: ImmutableList<UiUrlEntity>,
   val platformType: PlatformType,
   val spoilerText: String? = null,
   val card: UiCard? = null,
   val poll: UiPoll? = null,
-  val referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
+  val referenceStatus: ImmutableMap<ReferenceType, UiStatus> = persistentMapOf(),
   val inReplyToUserId: String? = null,
   val inReplyToStatusId: String? = null,
   val extra: StatusExtra? = null,
@@ -73,7 +78,7 @@ data class UiStatus(
       referenceStatus[ReferenceType.MastodonNotification]
     } else {
       referenceStatus[ReferenceType.Retweet]?.copy(
-        referenceStatus = referenceStatus.filterNot { it.key == ReferenceType.Retweet }
+        referenceStatus = referenceStatus.filterNot { it.key == ReferenceType.Retweet }.toImmutableMap()
       )
     }
   }
@@ -132,7 +137,7 @@ data class UiStatus(
       media = UiMedia.sample(),
       source = "TwidereX",
       isGap = false,
-      url = emptyList(),
+      url = persistentListOf(),
       statusKey = MicroBlogKey.Empty,
       rawText = "",
       platformType = PlatformType.Twitter,
@@ -141,8 +146,10 @@ data class UiStatus(
   }
 }
 
+@Immutable
 interface StatusExtra
 
+@Immutable
 data class StatusMetrics(
   val like: Long,
   val reply: Long,

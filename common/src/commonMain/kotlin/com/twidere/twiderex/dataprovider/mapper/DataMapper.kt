@@ -37,6 +37,7 @@ import com.twidere.twiderex.model.ui.UiEmoji
 import com.twidere.twiderex.model.ui.UiEmojiCategory
 import com.twidere.twiderex.model.ui.UiGif
 import com.twidere.twiderex.model.ui.UiUser
+import kotlinx.collections.immutable.toPersistentList
 import java.util.UUID
 
 private typealias TwitterUser = com.twidere.services.twitter.model.User
@@ -127,7 +128,7 @@ fun List<Emoji>.toUi(): List<UiEmojiCategory> = groupBy({ it.category }, { it })
         visibleInPicker = emoji.visibleInPicker,
         category = emoji.category
       )
-    }
+    }.toPersistentList()
   )
 }
 

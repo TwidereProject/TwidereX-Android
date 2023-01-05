@@ -20,6 +20,9 @@
  */
 package com.twidere.twiderex.model.ui
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class UiGeo(
   val name: String,
   val lat: Long? = null,

@@ -20,9 +20,11 @@
  */
 package com.twidere.twiderex.model.enums
 
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 
 @Serializable
+@Immutable
 enum class MediaType {
   photo,
   video,

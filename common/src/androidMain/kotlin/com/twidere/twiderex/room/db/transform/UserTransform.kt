@@ -34,6 +34,7 @@ import com.twidere.twiderex.room.db.model.DbUser
 import com.twidere.twiderex.room.db.model.TwitterUrlEntity
 import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
+import kotlinx.collections.immutable.toPersistentList
 import java.util.UUID
 
 internal fun DbUser.toUi() =
@@ -137,11 +138,11 @@ internal fun DbTwitterUserExtra.toUi() = TwitterUserExtra(
       description = null,
       image = null
     )
-  }
+  }.toPersistentList()
 )
 
 internal fun DbMastodonUserExtra.toUi() = MastodonUserExtra(
-  emoji = emoji.toUi(),
+  emoji = emoji.toUi().toPersistentList(),
   bot = bot,
   locked = locked,
   fields = fields.map { field ->
@@ -149,5 +150,5 @@ internal fun DbMastodonUserExtra.toUi() = MastodonUserExtra(
       field.name,
       field.value
     )
-  }
+  }.toPersistentList()
 )
