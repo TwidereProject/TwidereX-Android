@@ -36,7 +36,6 @@ import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.image.ImageEffects
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.get
-import com.twidere.twiderex.kmp.StorageProvider
 import com.twidere.twiderex.kmp.rememberNetworkImagePainter
 import com.twidere.twiderex.model.cred.OAuthCredentials
 import com.twidere.twiderex.preferences.LocalHttpConfig
