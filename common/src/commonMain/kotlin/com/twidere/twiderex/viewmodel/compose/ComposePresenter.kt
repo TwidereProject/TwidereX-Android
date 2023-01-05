@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -238,16 +237,16 @@ fun ComposePresenter(
   }
 
   val allowImage = remember(accountState) {
-      accountState.account.type == PlatformType.Twitter ||
-        (accountState.account.type == PlatformType.Mastodon && !isInVoteMode)
+    accountState.account.type == PlatformType.Twitter ||
+      (accountState.account.type == PlatformType.Mastodon && !isInVoteMode)
   }
 
   val allowVote = remember(accountState) {
-      accountState.account.type == PlatformType.Mastodon && !images.any()
+    accountState.account.type == PlatformType.Mastodon && !images.any()
   }
 
   val allowLocation = remember(accountState) {
-      accountState.account.type != PlatformType.Mastodon && currentPlatform == Platform.Android
+    accountState.account.type != PlatformType.Mastodon && currentPlatform == Platform.Android
   }
 
   val locationEnabled by locationProvider.locationEnabled.collectAsState(false)
