@@ -58,8 +58,8 @@ fun UserPresenter(
     return UserState.NoAccount
   }
 
-  val account by remember(currentAccount) {
-    derivedStateOf { currentAccount.account }
+  val account = remember(currentAccount) {
+    currentAccount.account
   }
 
   var refreshing by remember {
@@ -82,8 +82,8 @@ fun UserPresenter(
     mutableStateOf<IRelationship?>(null)
   }
 
-  val isMe by remember(account) {
-    derivedStateOf { account.accountKey == userKey }
+  val isMe = remember(account) {
+    account.accountKey == userKey
   }
 
   LaunchedEffect(account, refreshFlow) {

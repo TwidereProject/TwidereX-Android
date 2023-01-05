@@ -238,23 +238,17 @@ fun ComposePresenter(
     textFieldValue.text.isNotEmpty() || !images.isEmpty()
   }
 
-  val allowImage by remember {
-    derivedStateOf {
+  val allowImage = remember(accountState) {
       accountState.account.type == PlatformType.Twitter ||
         (accountState.account.type == PlatformType.Mastodon && !isInVoteMode)
-    }
   }
 
-  val allowVote by remember {
-    derivedStateOf {
+  val allowVote = remember(accountState) {
       accountState.account.type == PlatformType.Mastodon && !images.any()
-    }
   }
 
-  val allowLocation by remember {
-    derivedStateOf {
+  val allowLocation = remember(accountState) {
       accountState.account.type != PlatformType.Mastodon && currentPlatform == Platform.Android
-    }
   }
 
   val locationEnabled by locationProvider.locationEnabled.collectAsState(false)

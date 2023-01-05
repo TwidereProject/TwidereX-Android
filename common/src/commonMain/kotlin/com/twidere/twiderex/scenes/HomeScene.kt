@@ -119,14 +119,12 @@ fun HomeScene(
   val menuOrder by account.preferences.homeMenuOrder.observeAsState(
     initial = HomeMenus.values().map { it to it.showDefault }
   )
-  val menus by remember(account) {
-    derivedStateOf {
+  val menus = remember(account, menuOrder) {
       menuOrder.filter {
         it.second && it.first.supportedPlatformType.contains(account.type)
       }.map {
         it.first
       }
-    }
   }
   val pagerState = rememberPagerState(
     pageCount = menus.size,

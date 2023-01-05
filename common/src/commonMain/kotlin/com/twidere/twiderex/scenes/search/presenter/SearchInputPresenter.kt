@@ -64,7 +64,7 @@ fun SearchInputPresenter(
     repository.savedSearch(accountState.account.accountKey)
   }.collectAsState(emptyList())
 
-  val filteredSavedSource by derivedStateOf {
+  val filteredSavedSource = remember(savedSource, expandSearch, searchCount) {
     savedSource.filterIndexed { index, _ ->
       index < searchCount || expandSearch
     }
@@ -74,7 +74,7 @@ fun SearchInputPresenter(
     mutableStateOf(TextFieldValue(keyword, TextRange(keyword.length)))
   }
 
-  val showExpand by derivedStateOf {
+  val showExpand = remember(savedSource, searchCount) {
     savedSource.size > searchCount
   }
 

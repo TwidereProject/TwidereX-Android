@@ -31,7 +31,14 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.*
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.ripple.rememberRipple
@@ -54,7 +61,6 @@ import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.extensions.humanizedCount
 import com.twidere.twiderex.kmp.LocalRemoteNavigator
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
