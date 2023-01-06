@@ -40,13 +40,11 @@ actual class ResLoader(
 
   @Composable
   actual fun getSvg(res: FileResource): Painter {
-    val data = "android.resource://${context.packageName}/raw/${context.resources.getResourceEntryName(res.rawResId)}"
-    return rememberAsyncImagePainter(data)
+    return rememberAsyncImagePainter(res.rawResId)
   }
 
   @Composable
   actual fun getImage(res: ImageResource): Painter {
-    val data = "android.resource://${context.packageName}/drawable/${context.resources.getResourceEntryName(res.drawableResId)}"
-    return rememberAsyncImagePainter(data)
+    return rememberAsyncImagePainter(res.drawableResId)
   }
 }
