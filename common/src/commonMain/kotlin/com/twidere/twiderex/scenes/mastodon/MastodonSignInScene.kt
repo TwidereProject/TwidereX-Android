@@ -23,6 +23,7 @@ package com.twidere.twiderex.scenes.mastodon
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
@@ -108,7 +109,8 @@ fun MastodonSignInScene(
               painter = painterResource(res = com.twidere.twiderex.MR.files.ic_mastodon_logo_white),
               contentDescription = stringResource(
                 res = com.twidere.twiderex.MR.strings.accessibility_common_logo_mastodon
-              )
+              ),
+              modifier = Modifier.size(24.dp),
             )
           },
           text = {

@@ -21,6 +21,7 @@
 package com.twidere.twiderex.scenes.search
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
@@ -40,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -122,7 +124,8 @@ fun SearchInputScene(
                 painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
                 contentDescription = stringResource(
                   res = com.twidere.twiderex.MR.strings.scene_search_title
-                )
+                ),
+                modifier = Modifier.size(24.dp),
               )
             }
           }
@@ -157,7 +160,8 @@ fun SearchInputScene(
                   painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
                   contentDescription = stringResource(
                     res = com.twidere.twiderex.MR.strings.common_controls_actions_remove
-                  )
+                  ),
+                  modifier = Modifier.size(24.dp),
                 )
               }
             },

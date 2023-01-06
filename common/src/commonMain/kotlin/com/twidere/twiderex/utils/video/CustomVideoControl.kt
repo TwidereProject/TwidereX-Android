@@ -23,6 +23,7 @@ package com.twidere.twiderex.utils.video
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -30,6 +31,7 @@ import androidx.compose.material.Slider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.VideoPlayerState
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
@@ -54,7 +56,8 @@ fun CustomVideoControl(
       Icon(
         painter = painterResource(res = if (state.isPlaying) com.twidere.twiderex.MR.files.ic_player_pause else com.twidere.twiderex.MR.files.ic_player_play),
         contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_video_play),
-        tint = MaterialTheme.colors.onSurface
+        tint = MaterialTheme.colors.onSurface,
+        modifier = Modifier.size(24.dp),
       )
     }
 
@@ -80,7 +83,8 @@ fun CustomVideoControl(
       Icon(
         painter = painterResource(res = if (state.isMute) com.twidere.twiderex.MR.files.ic_volume_mute else com.twidere.twiderex.MR.files.ic_volume),
         contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_video_play),
-        tint = MaterialTheme.colors.onSurface
+        tint = MaterialTheme.colors.onSurface,
+        modifier = Modifier.size(24.dp),
       )
     }
   }

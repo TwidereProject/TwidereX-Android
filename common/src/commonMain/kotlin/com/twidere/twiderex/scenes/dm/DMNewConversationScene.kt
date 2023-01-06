@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -133,7 +134,8 @@ fun SearchInput(
       painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
       contentDescription = stringResource(
         res = com.twidere.twiderex.MR.strings.scene_search_title
-      )
+      ),
+      modifier = Modifier.size(24.dp),
     )
     Spacer(modifier = Modifier.width(SearchInputDefaults.ContentSpacing))
     TextInput(

@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.BottomNavigation
@@ -267,6 +268,7 @@ private fun EmptyColumnHomeContent(
       Icon(
         painter = painterResource(res = com.twidere.twiderex.MR.files.ic_empty_column),
         contentDescription = null,
+        modifier = Modifier.size(120.dp),
       )
       Spacer(modifier = Modifier.height(EmptyColumnHomeContentDefaults.VerticalPadding))
       CompositionLocalProvider(
@@ -422,7 +424,8 @@ fun HomeBottomNavigation(
           icon = {
             Icon(
               painter = item.item.icon(),
-              contentDescription = item.item.name()
+              contentDescription = item.item.name(),
+              modifier = Modifier.size(24.dp),
             )
           },
           selected = selectedItem == index,
@@ -592,7 +595,8 @@ private fun HomeDrawer(
           ),
           contentDescription = stringResource(
             res = com.twidere.twiderex.MR.strings.scene_settings_title
-          )
+          ),
+          modifier = Modifier.size(24.dp),
         )
       },
       text = {
@@ -626,7 +630,8 @@ private fun DrawerMenuItem(
     icon = {
       Icon(
         painter = icon,
-        contentDescription = iconDescription
+        contentDescription = iconDescription,
+        modifier = Modifier.size(24.dp),
       )
     },
   )
@@ -679,11 +684,11 @@ private fun DrawerUserHeader(
         }
       ) {
         Icon(
-          modifier = Modifier.rotate(rotate),
+          modifier = Modifier.rotate(rotate).size(24.dp),
           imageVector = Icons.Default.ArrowDropDown,
           contentDescription = stringResource(
             res = com.twidere.twiderex.MR.strings.accessibility_scene_home_drawer_account_dropdown
-          )
+          ),
         )
       }
     }

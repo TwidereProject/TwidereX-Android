@@ -20,10 +20,12 @@
  */
 package com.twidere.twiderex.scenes.home
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -125,7 +127,8 @@ private fun HomeTimelineFab(
       painter = painterResource(res = com.twidere.twiderex.MR.files.ic_feather),
       contentDescription = stringResource(
         res = com.twidere.twiderex.MR.strings.accessibility_scene_home_compose
-      )
+      ),
+      modifier = Modifier.size(24.dp),
     )
   }
 }

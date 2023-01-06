@@ -213,7 +213,11 @@ fun UserComponent(
                   Box(
                     modifier = Modifier.padding(16.dp)
                   ) {
-                    Icon(painter = item.icon, contentDescription = item.title)
+                    Icon(
+                      painter = item.icon,
+                      contentDescription = item.title,
+                      modifier = Modifier.size(24.dp),
+                    )
                   }
                 },
               )
@@ -274,7 +278,11 @@ private fun PermissionDeniedInfo(title: String, message: String) {
         .fillMaxSize()
         .padding(PermissionDeniedInfoDefaults.contentPaddingValues)
     ) {
-      Icon(painter = painterResource(res = com.twidere.twiderex.MR.files.ic_eye_off), contentDescription = title)
+      Icon(
+        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_eye_off),
+        contentDescription = title,
+        modifier = Modifier.size(24.dp),
+      )
       Spacer(modifier = Modifier.width(PermissionDeniedInfoDefaults.contentSpacing))
       Column {
         Text(text = title, style = MaterialTheme.typography.subtitle2)
@@ -397,6 +405,7 @@ private fun UserStatusTimelineFilter(
         Icon(
           painter = painterResource(res = com.twidere.twiderex.MR.files.ic_filter),
           contentDescription = null,
+          modifier = Modifier.size(24.dp),
         )
       }
     }
@@ -576,7 +585,8 @@ private fun UserInfoName(
       ) {
         Icon(
           painter = painterResource(res = com.twidere.twiderex.MR.files.ic_lock),
-          contentDescription = null
+          contentDescription = null,
+          modifier = Modifier.size(24.dp),
         )
       }
       Spacer(modifier = Modifier.width(UserInfoNameDefaults.IconSpacing))
@@ -657,7 +667,8 @@ private fun ProfileItem(
   ) {
     Icon(
       painter = painter,
-      contentDescription = contentDescription
+      contentDescription = contentDescription,
+      modifier = Modifier.size(24.dp),
     )
     Spacer(modifier = Modifier.width(ProfileItemDefaults.IconSpacing))
     Text(

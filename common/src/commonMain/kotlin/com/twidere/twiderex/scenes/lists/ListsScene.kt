@@ -23,6 +23,7 @@ package com.twidere.twiderex.scenes.lists
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.FabPosition
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -110,7 +111,7 @@ fun ListsSceneFab(
         contentDescription = stringResource(
           res = com.twidere.twiderex.MR.strings.scene_lists_icons_create
         ),
-        modifier = Modifier.padding(ListsSceneDefaults.Fab.IconPadding)
+        modifier = Modifier.padding(ListsSceneDefaults.Fab.IconPadding).size(24.dp),
       )
       Text(
         text = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_modify_create_title)
