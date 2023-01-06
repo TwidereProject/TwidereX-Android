@@ -82,6 +82,7 @@ fun ListsMembersScene(
     navigator = navigator,
   )
 }
+
 @Composable
 fun ListsMembersScene(
   listKey: MicroBlogKey,
@@ -150,7 +151,8 @@ fun ListsMembersScene(
         }
       ) {
         LazyUiUserList(
-          items = state.source, onItemClicked = {
+          items = state.source,
+          onItemClicked = {
             // navigator.user(it)
           },
           action = {

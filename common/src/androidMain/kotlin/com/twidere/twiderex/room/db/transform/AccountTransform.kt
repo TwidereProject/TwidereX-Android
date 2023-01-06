@@ -29,5 +29,6 @@ fun Account.toTwidere() = TwidereAccount(
 )
 
 fun TwidereAccount.toAndroid() = Account(
-  name, type
+  name,
+  type
 )

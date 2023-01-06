@@ -44,7 +44,6 @@ fun UserTimelinePresenter(
   repository: TimelineRepository = get(),
   userKey: MicroBlogKey,
 ): UserTimelineState {
-
   val currentAccount = CurrentAccountPresenter()
   if (currentAccount !is CurrentAccountState.Account) {
     return UserTimelineState.NoAccount

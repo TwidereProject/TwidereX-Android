@@ -38,7 +38,6 @@ fun UserMediaTimelinePresenter(
   repository: TimelineRepository = get(),
   userKey: MicroBlogKey,
 ): UserMediaTimelineState {
-
   val currentAccount = CurrentAccountPresenter()
 
   if (currentAccount !is CurrentAccountState.Account) {

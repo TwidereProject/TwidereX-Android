@@ -7,4 +7,8 @@
         <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
         <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
     </style>
+    <!--  fix dialog not gravity center in samsung  -->
+    <style name="DialogWindowTheme" parent="android:Theme.Dialog">
+        <item name="android:windowClipToOutline">false</item>
+    </style>
 </resources>

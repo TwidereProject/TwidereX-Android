@@ -46,7 +46,6 @@ fun CustomVideoControl(
     horizontalArrangement = Arrangement.Center,
     verticalAlignment = Alignment.CenterVertically
   ) {
-
     IconButton(
       onClick = {
         state.playSwitch()

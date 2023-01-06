@@ -34,7 +34,9 @@ class LikeStatusJob(
   statusRepository: StatusRepository,
   inAppNotification: InAppNotification,
 ) : StatusJob(
-  accountRepository, statusRepository, inAppNotification
+  accountRepository,
+  statusRepository,
+  inAppNotification
 ) {
   override suspend fun doWork(
     accountKey: MicroBlogKey,

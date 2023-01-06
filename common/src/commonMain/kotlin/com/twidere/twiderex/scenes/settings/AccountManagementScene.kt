@@ -60,7 +60,6 @@ import moe.tlaster.precompose.navigation.PopUpTo
 @NavGraphDestination(
   route = Root.Settings.AccountManagement,
 )
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AccountManagementScene(

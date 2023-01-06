@@ -352,7 +352,11 @@ private fun StatusMediaBottomContent(
           .clickable { statusNavigationData.toStatus.invoke(status) },
       ) {
         StatusMediaInfo(
-          videoPlayerState, status, viewModel, currentMedia, statusNavigationData
+          videoPlayerState,
+          status,
+          viewModel,
+          currentMedia,
+          statusNavigationData
         )
       }
     }
@@ -409,7 +413,8 @@ private fun StatusMediaInfo(
         compose = statusNavigationData.composeNavigationData.compose,
       )
       RetweetButton(
-        status = status, withNumber = false,
+        status = status,
+        withNumber = false,
         compose = statusNavigationData.composeNavigationData.compose,
       )
       LikeButton(status = status, withNumber = false)

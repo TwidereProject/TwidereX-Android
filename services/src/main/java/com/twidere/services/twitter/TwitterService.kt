@@ -49,6 +49,7 @@ import com.twidere.services.twitter.model.DirectMessageEventObject
 import com.twidere.services.twitter.model.MessageCreate
 import com.twidere.services.twitter.model.MessageData
 import com.twidere.services.twitter.model.MessageTarget
+import com.twidere.services.twitter.model.PostTweetRequestV2
 import com.twidere.services.twitter.model.PurpleMedia
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.TwitterPaging
@@ -451,21 +452,38 @@ class TwitterService(
     attachment_url: String? = null,
     possibly_sensitive: Boolean? = null,
     exclude_reply_user_ids: List<String>? = null
-  ) = resources.update(
-    status = status,
-    in_reply_to_status_id = in_reply_to_status_id,
-    auto_populate_reply_metadata = in_reply_to_status_id?.let {
-      true
-    },
-    exclude_reply_user_ids = exclude_reply_user_ids?.joinToString(","),
-    repost_status_id = repost_status_id,
-    display_coordinates = display_coordinates,
-    lat = lat,
-    long = long,
-    media_ids = media_ids?.joinToString(","),
-    attachment_url = attachment_url,
-    possibly_sensitive = possibly_sensitive,
-  )
+  ) = try {
+    resources.update(
+      status = status,
+      in_reply_to_status_id = in_reply_to_status_id,
+      auto_populate_reply_metadata = in_reply_to_status_id?.let {
+        true
+      },
+      exclude_reply_user_ids = exclude_reply_user_ids?.joinToString(","),
+      repost_status_id = repost_status_id,
+      display_coordinates = display_coordinates,
+      lat = lat,
+      long = long,
+      media_ids = media_ids?.joinToString(","),
+      attachment_url = attachment_url,
+      possibly_sensitive = possibly_sensitive,
+    )
+  } catch (e: TwitterApiException) {
+    resources.postV2(
+      body = PostTweetRequestV2(
+        text = status,
+        quote_tweet_id = repost_status_id,
+        reply = in_reply_to_status_id?.let { PostTweetRequestV2.Reply(in_reply_to_tweet_id = in_reply_to_status_id) },
+        media = media_ids?.takeIf { it.isNotEmpty() }?.let {
+          PostTweetRequestV2.Media(
+            media_ids = it,
+          )
+        },
+      )
+    ).run {
+      lookupStatus(data?.id.orEmpty())
+    }
+  }
 
   suspend fun uploadFile(stream: InputStream, type: String, length: Long): String {
     val response =

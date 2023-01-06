@@ -120,6 +120,7 @@ fun rememberUserNavigationData(navigator: Navigator): UserNavigationData {
 data class ComposeNavigationData(
   val compose: (ComposeType, MicroBlogKey) -> Unit = { _, _ -> },
 )
+
 @Composable
 fun rememberComposeNavigationData(navigator: Navigator): ComposeNavigationData {
   val composeNavigationData = remember {

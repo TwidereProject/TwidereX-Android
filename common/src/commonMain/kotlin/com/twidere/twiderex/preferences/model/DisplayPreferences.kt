@@ -37,6 +37,7 @@ data class DisplayPreferences(
     Round,
     Square,
   }
+
   @Serializable
   enum class AutoPlayback {
     Auto,

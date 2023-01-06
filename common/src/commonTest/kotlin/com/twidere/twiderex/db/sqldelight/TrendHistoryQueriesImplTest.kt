@@ -31,6 +31,7 @@ import kotlin.test.assertEquals
 
 internal class TrendHistoryQueriesImplTest : BaseCacheDatabaseTest() {
   private val accountKey = MicroBlogKey.twitter("account")
+
   @Test
   fun insert_ReplaceWhenUniqueKeyEquals() = runBlocking {
     val insert = mockITrend().toUi(accountKey).toDbTrendWithHistory()

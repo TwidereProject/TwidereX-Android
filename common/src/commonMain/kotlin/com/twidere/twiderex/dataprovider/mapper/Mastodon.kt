@@ -127,7 +127,8 @@ fun Notification.toUiStatus(
     referenceStatus = mutableMapOf<ReferenceType, UiStatus>().apply {
       relatedStatus?.let { this[ReferenceType.MastodonNotification] = it }
     },
-    isGap = isGap
+    isGap = isGap,
+    language = this.status?.language,
   )
 }
 
@@ -262,7 +263,8 @@ internal fun Status.toUiStatus(
       retweet?.let { this[ReferenceType.Retweet] = it }
     },
     isGap = isGap,
-    url = emptyList()
+    url = emptyList(),
+    language = this.language,
   )
 }
 

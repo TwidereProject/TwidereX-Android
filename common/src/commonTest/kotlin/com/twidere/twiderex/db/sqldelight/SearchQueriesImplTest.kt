@@ -32,6 +32,7 @@ import kotlin.test.assertNull
 internal class SearchQueriesImplTest : BaseAppDatabaseTest() {
   private val twitterAccountKey = MicroBlogKey.twitter("123")
   private val mastodonAccountKey = MicroBlogKey("456", "mastodon.com")
+
   @Test
   fun insertSearch_InsertOrReplaceWhenContentAndAccountKeyEquals(): Unit = runBlocking {
     val query = database.searchQueries

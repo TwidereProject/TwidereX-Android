@@ -28,6 +28,7 @@ import org.junit.Before
 internal open class BaseCacheDatabaseTest {
   private val driver = SqlDriverFactory.create(SqlDelightCacheDatabase.Schema)
   protected val database: SqlDelightCacheDatabase = createCacheDataBase(driver)
+
   @Before
   open fun setUp() {
   }

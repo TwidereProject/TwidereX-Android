@@ -49,7 +49,6 @@ import kotlin.math.roundToInt
 fun ComposeDebugTool(
   rootNavController: Navigator,
 ) {
-
   var showDebug by remember {
     mutableStateOf(false)
   }

@@ -45,7 +45,6 @@ actual fun PlatformMediaWrapper(
   onResult: (List<UiMediaInsert>) -> Unit,
   content: @Composable (launchCamera: () -> Unit, launchVideo: () -> Unit) -> Unit
 ) {
-
   var cameraTempUri by remember {
     mutableStateOf(Uri.EMPTY)
   }
