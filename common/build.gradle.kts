@@ -67,6 +67,7 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.android)
                 implementation(libs.koin.android)
                 implementation(libs.koin.androidx.workmanager)
+                implementation(libs.compose.accompanist.permissions)
                 implementation(libs.androidx.work.rumtime.ktx)
                 implementation("com.github.android:renderscript-intrinsics-replacement-toolkit:b6363490c3")
             }

@@ -190,7 +190,6 @@ compose = [
     #    "compose-paging",
     "compose-imageloader",
     "compose-safearea",
-    "compose-accompanist-permissions",
     "compose-accompanist-jb-pager",
     "compose-accompanist-jb-pager-indicators"
 ]
