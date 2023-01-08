@@ -28,6 +28,7 @@ sqldelight {
 kotlin {
     sourceSets {
         val commonMain by getting {
+            kotlin.srcDir("src/commonMain/third")
             dependencies {
                 implementation(projects.services)
                 api(libs.bundles.compose)
