@@ -1,6 +1,7 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     kotlin("jvm")
-    kotlin("plugin.serialization").version(Versions.Kotlin.lang)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 java {
@@ -13,11 +14,12 @@ tasks.test {
 }
 
 dependencies {
-    kotlinCoroutines()
-    kotlinSerialization()
-    hson()
-    retrofit()
-    okhttp()
-    junit5()
-    api("joda-time:joda-time:${Versions.jodaTime}")
+    implementation(libs.bundles.kotlinx)
+    implementation(libs.bundles.reftrofit2)
+    implementation(libs.square.okhttp)
+    implementation("com.github.Tlaster:Hson:0.1.4")
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.1")
 }

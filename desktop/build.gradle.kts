@@ -1,10 +1,9 @@
-import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.compose") version Versions.compose_jb
-    id("org.openjfx.javafxplugin") version Versions.javafx
+    id("twiderex.kmp.compose")
+    alias(libs.plugins.javafx)
 }
 
 group = Package.group
@@ -12,10 +11,8 @@ version = Package.versionName
 
 kotlin {
     jvm {
+        setupJvm()
         withJava()
-        compilations.all {
-            kotlinOptions.jvmTarget = Versions.Java.jvmTarget
-        }
         javafx {
             version = Versions.Java.jvmTarget
             modules = listOf("javafx.controls", "javafx.swing", "javafx.media")
@@ -24,7 +21,7 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             dependencies {
-                implementation(project(":common"))
+                implementation(projects.common)
                 implementation(compose.desktop.currentOs)
             }
         }
