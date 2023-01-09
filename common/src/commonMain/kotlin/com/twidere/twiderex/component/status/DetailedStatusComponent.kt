@@ -92,7 +92,7 @@ fun DetailedStatusComponent(
                 modifier = Modifier
                   .align(Alignment.CenterHorizontally)
               ) {
-                val iconSize= with(LocalDensity.current) {
+                val iconSize = with(LocalDensity.current) {
                   MaterialTheme.typography.body1.fontSize.toDp()
                 }
                 Icon(
