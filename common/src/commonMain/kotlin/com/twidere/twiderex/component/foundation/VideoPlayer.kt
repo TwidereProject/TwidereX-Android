@@ -48,8 +48,8 @@ import moe.tlaster.precompose.ui.LocalLifecycleOwner
 
 @Composable
 fun VideoPlayer(
-  modifier: Modifier = Modifier.fillMaxSize(), // must set video player size
   videoState: VideoPlayerState,
+  modifier: Modifier = Modifier.fillMaxSize(), // must set video player size
   playEnable: Boolean = true,
   zOrderMediaOverlay: Boolean = false,
   keepScreenOn: Boolean = false,

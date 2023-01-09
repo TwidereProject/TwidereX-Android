@@ -49,7 +49,7 @@ class MentionItem : HomeNavigationItem() {
 
   @Composable
   override fun Content(navigator: Navigator) {
-    MentionSceneContent(lazyListController, navigator)
+    MentionSceneContent(navigator, lazyListController)
   }
 }
 
@@ -86,8 +86,8 @@ fun MentionScene(
 
 @Composable
 fun MentionSceneContent(
-  lazyListController: LazyListController? = null,
   navigator: Navigator,
+  lazyListController: LazyListController? = null,
 ) {
   val statusNavigationData = rememberStatusNavigationData(navigator)
   TimelineComponent(

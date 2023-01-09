@@ -35,8 +35,8 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun SearchSavePresenter(
   event: Flow<SearchSaveEvent>,
-  repository: SearchRepository = get(),
   content: String,
+  repository: SearchRepository = get(),
 ): SearchSaveState {
   val accountState = CurrentAccountPresenter()
 

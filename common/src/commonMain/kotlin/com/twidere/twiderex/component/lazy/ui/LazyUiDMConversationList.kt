@@ -55,8 +55,8 @@ import com.twidere.twiderex.model.ui.UiDMEvent
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LazyUiDMConversationList(
-  modifier: Modifier = Modifier,
   items: LazyPagingItems<UiDMConversationWithLatestMessage>,
+  modifier: Modifier = Modifier,
   state: LazyListState = rememberLazyListState(),
   key: ((item: UiDMConversationWithLatestMessage) -> Any) = { it.conversation.conversationKey.hashCode() },
   onItemClicked: (UiDMConversationWithLatestMessage) -> Unit = {},

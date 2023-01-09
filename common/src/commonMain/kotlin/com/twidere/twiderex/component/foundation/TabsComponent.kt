@@ -38,13 +38,13 @@ import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 
 @Composable
 fun IconTabsComponent(
+  items: List<Pair<Painter, String>>,
+  selectedItem: Int,
+  onItemSelected: (Int) -> Unit,
   modifier: Modifier = Modifier,
   divider: @Composable () -> Unit = @Composable {
     TabRowDefaults.Divider()
   },
-  items: List<Pair<Painter, String>>,
-  selectedItem: Int,
-  onItemSelected: (Int) -> Unit,
 ) {
   TabsComponent(
     modifier = modifier,
@@ -63,10 +63,10 @@ fun IconTabsComponent(
 
 @Composable
 fun TextTabsComponent(
-  modifier: Modifier = Modifier,
   items: List<String>,
   selectedItem: Int,
   onItemSelected: (Int) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
   TabsComponent(
     modifier = modifier,
@@ -84,13 +84,13 @@ fun TextTabsComponent(
 
 @Composable
 fun TabsComponent(
-  modifier: Modifier = Modifier,
   count: Int,
   selectedItem: Int,
+  onItemSelected: (Int) -> Unit,
+  modifier: Modifier = Modifier,
   divider: @Composable () -> Unit = @Composable {
     TabRowDefaults.Divider()
   },
-  onItemSelected: (Int) -> Unit,
   tabContent: @Composable (Int) -> Unit,
 ) {
   TabRow(

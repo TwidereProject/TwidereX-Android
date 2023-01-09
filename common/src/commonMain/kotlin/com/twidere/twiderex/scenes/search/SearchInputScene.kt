@@ -64,8 +64,8 @@ import moe.tlaster.precompose.navigation.Navigator
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchInputScene(
-  initial: String? = null,
   navigator: Navigator,
+  initial: String? = null,
 ) {
   val (state, channel) = rememberPresenterState<SearchInputState, SearchInputEvent> {
     SearchInputPresenter(it, keyword = initial ?: "")

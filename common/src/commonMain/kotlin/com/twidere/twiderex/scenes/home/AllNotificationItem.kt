@@ -90,8 +90,8 @@ fun AllNotificationScene(
 
 @Composable
 fun AllNotificationSceneContent(
-  lazyListController: LazyListController? = null,
   statusNavigation: StatusNavigationData,
+  lazyListController: LazyListController? = null,
 ) {
   TimelineComponent(
     lazyListController = lazyListController,

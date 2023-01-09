@@ -39,8 +39,8 @@ import kotlinx.coroutines.flow.map
 
 @Composable
 fun SearchTweetsPresenter(
-  database: CacheDatabase = get(),
   keyword: String,
+  database: CacheDatabase = get(),
 ): SearchTweetsState {
   val scope = rememberCoroutineScope()
   val accountState = CurrentAccountPresenter()

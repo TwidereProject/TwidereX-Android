@@ -53,10 +53,10 @@ import com.twidere.twiderex.navigation.UserNavigationData
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LazyUiUserList(
-  modifier: Modifier = Modifier,
   items: LazyPagingItems<UiUser>,
-  state: LazyListState = rememberLazyListState(),
   userNavigationData: UserNavigationData,
+  modifier: Modifier = Modifier,
+  state: LazyListState = rememberLazyListState(),
   key: ((item: UiUser) -> Any) = { it.userKey.hashCode() },
   onItemClicked: (UiUser) -> Unit = {},
   header: LazyListScope.() -> Unit = {},

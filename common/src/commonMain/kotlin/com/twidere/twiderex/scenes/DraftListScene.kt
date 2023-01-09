@@ -85,8 +85,8 @@ fun DraftListScene(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DraftListSceneContent(
-  lazyListController: LazyListController? = null,
   navigator: Navigator,
+  lazyListController: LazyListController? = null,
 ) {
   val viewModel: DraftViewModel = getViewModel()
   val source by viewModel.source.observeAsState(initial = emptyList())

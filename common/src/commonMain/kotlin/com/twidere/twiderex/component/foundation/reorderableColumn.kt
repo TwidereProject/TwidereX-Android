@@ -129,9 +129,9 @@ class ReorderableColumnState(
 
 @Composable
 fun <T> ReorderableColumn(
-  modifier: Modifier = Modifier,
   data: List<T>,
   state: ReorderableColumnState,
+  modifier: Modifier = Modifier,
   dragingContent: @Composable ((T) -> Unit)? = null,
   itemContent: @Composable (T) -> Unit,
 ) {

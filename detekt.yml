@@ -47,7 +47,7 @@ TwitterCompose:
     RememberMissing:
         active: true
     UnstableCollections:
-        active: true
+        active: false # TODO active later
     ViewModelForwarding:
         active: false
     ViewModelInjection:

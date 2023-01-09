@@ -30,6 +30,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -80,7 +81,7 @@ private val UiPoll.canVote: Boolean
     expiresAt?.let { it > System.currentTimeMillis() } ?: true // some instance allows expires time == null
 
 @Composable
-fun MastodonPoll(status: UiStatus) {
+fun ColumnScope.MastodonPoll(status: UiStatus) {
   val account = LocalActiveAccount.current ?: return
   if (status.platformType != PlatformType.Mastodon || status.poll == null) {
     return

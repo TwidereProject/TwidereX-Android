@@ -56,10 +56,10 @@ import com.twidere.twiderex.navigation.StatusNavigationData
 @Composable
 fun DetailedStatusComponent(
   data: UiStatus,
+  statusNavigationData: StatusNavigationData,
   showInfo: Boolean = true,
   showActions: Boolean = true,
   lineUp: Boolean = false,
-  statusNavigationData: StatusNavigationData,
 ) {
   Column(
     modifier = Modifier

@@ -106,8 +106,8 @@ fun MastodonNotificationScene(
 
 @Composable
 fun MastodonNotificationSceneContent(
-  setLazyListController: ((lazyListController: LazyListController) -> Unit)? = null,
   navigator: Navigator,
+  setLazyListController: ((lazyListController: LazyListController) -> Unit)? = null,
 ) {
   val account = LocalActiveAccount.current ?: return
   val tabs = remember(account) {

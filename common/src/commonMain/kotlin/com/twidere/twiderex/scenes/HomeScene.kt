@@ -172,18 +172,19 @@ fun HomeScene(
             HomeBottomNavigation(
               items = menus,
               selectedItem = pagerState.currentPage,
-            ) {
-              if (pagerState.currentPage == it) {
+              onItemSelected = {
+                if (pagerState.currentPage == it) {
+                  scope.launch {
+                    menus[it].item.lazyListController.scrollToTop()
+                  }
+                }
                 scope.launch {
-                  menus[it].item.lazyListController.scrollToTop()
+                  pagerState.selectPage {
+                    pagerState.currentPage = it
+                  }
                 }
               }
-              scope.launch {
-                pagerState.selectPage {
-                  pagerState.currentPage = it
-                }
-              }
-            }
+            )
           }
         },
         drawerContent = {
@@ -289,12 +290,12 @@ private object EmptyColumnHomeContentDefaults {
 
 @Composable
 fun HomeAppBar(
-  modifier: Modifier = Modifier,
   tabPosition: AppearancePreferences.TabPosition,
   menus: List<HomeMenus>,
   pagerState: PagerState,
   scaffoldState: ScaffoldState,
   scope: CoroutineScope,
+  modifier: Modifier = Modifier,
 ) {
   if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
     AnimatedVisibility(
@@ -402,10 +403,10 @@ private object MenuAvatarDefaults {
 
 @Composable
 fun HomeBottomNavigation(
-  modifier: Modifier = Modifier,
   items: List<HomeMenus>,
   selectedItem: Int,
   onItemSelected: (Int) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
   val pureDark = LocalAppearancePreferences.current.isDarkModePureBlack
   val isLight = MaterialTheme.colors.isLight
@@ -642,9 +643,9 @@ private fun DrawerMenuItem(
 private fun DrawerUserHeader(
   user: UiUser?,
   showAccounts: Boolean,
-  onTrailingClicked: () -> Unit = {},
   toUser: (UiUser) -> Unit,
   openLink: (String) -> Unit,
+  onTrailingClicked: () -> Unit = {},
 ) {
   ListItem(
     icon = {

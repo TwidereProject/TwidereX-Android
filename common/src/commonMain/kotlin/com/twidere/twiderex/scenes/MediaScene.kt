@@ -197,7 +197,7 @@ fun StatusMediaScene(
   )
   val currentMedia = status.media[pagerState.currentPage]
 
-  val videoPlayerState = mutableStateOf<VideoPlayerState?>(null)
+  val videoPlayerState = remember { mutableStateOf<VideoPlayerState?>(null) }
 
   val swiperState = rememberSwiperState(
     onDismiss = {
@@ -521,9 +521,9 @@ data class MediaData(
 
 @Composable
 fun MediaView(
-  backgroundColor: Color? = null,
-  modifier: Modifier = Modifier,
   media: List<MediaData>,
+  modifier: Modifier = Modifier,
+  backgroundColor: Color? = null,
   swiperState: SwiperState = rememberSwiperState(),
   pagerState: PagerState = rememberPagerState(
     initialPage = 0,

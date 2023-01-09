@@ -47,9 +47,9 @@ import com.twidere.twiderex.model.ui.UiGif
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LazyUiGifList(
-  modifier: Modifier = Modifier,
   items: LazyPagingItems<UiGif>,
   selectedItem: UiGif?,
+  modifier: Modifier = Modifier,
   state: LazyListState = rememberLazyListState(),
   onItemSelected: (UiGif) -> Unit = {},
   header: LazyListScope.() -> Unit = {},

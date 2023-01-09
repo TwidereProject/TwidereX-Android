@@ -162,7 +162,11 @@ private fun GifContent(viewModel: GifViewModel) {
 }
 
 @Composable
-private fun SearchInput(modifier: Modifier = Modifier, input: String, onValueChanged: (value: String) -> Unit) {
+private fun SearchInput(
+  input: String,
+  onValueChanged: (value: String) -> Unit,
+  modifier: Modifier = Modifier,
+) {
   Row(
     verticalAlignment = Alignment.CenterVertically,
     modifier = modifier.padding(

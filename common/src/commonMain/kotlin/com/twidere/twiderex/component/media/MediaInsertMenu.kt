@@ -64,12 +64,12 @@ enum class MediaLibraryType(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MediaInsertMenu(
+  onResult: (List<UiMediaInsert>) -> Unit,
+  navigateForResult: suspend (String) -> Any?,
   modifier: Modifier = Modifier,
   supportMultipleSelect: Boolean = true,
   librariesSupported: Array<MediaLibraryType> = MediaLibraryType.values(),
   disableList: List<MediaInsertType> = emptyList(),
-  onResult: (List<UiMediaInsert>) -> Unit,
-  navigateForResult: suspend (String) -> Any?,
 ) {
   val mediaInsertProvider = get<MediaInsertProvider>()
   val scope = rememberCoroutineScope()

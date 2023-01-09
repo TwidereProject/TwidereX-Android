@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.IntSize
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun <T> DoubleLiftContent(
-  modifier: Modifier = Modifier,
   state: T,
+  modifier: Modifier = Modifier,
   duration: Int = 300,
   content: @Composable (T) -> Unit,
 ) {

@@ -198,8 +198,8 @@ private val Measurable.page: Int
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Pager(
-  modifier: Modifier = Modifier,
   state: PagerState,
+  modifier: Modifier = Modifier,
   offscreenLimit: Int = 2,
   dragEnabled: Boolean = true,
   content: @Composable PagerScope.() -> Unit

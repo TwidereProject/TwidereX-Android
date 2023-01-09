@@ -42,8 +42,8 @@ private const val searchCount = 3
 @Composable
 fun SearchInputPresenter(
   events: Flow<SearchInputEvent>,
+  keyword: String,
   repository: SearchRepository = get(),
-  keyword: String
 ): SearchInputState {
   val accountState = CurrentAccountPresenter()
 
@@ -63,9 +63,11 @@ fun SearchInputPresenter(
     repository.savedSearch(accountState.account.accountKey)
   }.collectAsState(emptyList())
 
-  val filteredSavedSource by derivedStateOf {
-    savedSource.filterIndexed { index, _ ->
-      index < searchCount || expandSearch
+  val filteredSavedSource by remember {
+    derivedStateOf {
+      savedSource.filterIndexed { index, _ ->
+        index < searchCount || expandSearch
+      }
     }
   }
 
@@ -73,8 +75,10 @@ fun SearchInputPresenter(
     mutableStateOf(TextFieldValue(keyword, TextRange(keyword.length)))
   }
 
-  val showExpand by derivedStateOf {
-    savedSource.size > searchCount
+  val showExpand by remember {
+    derivedStateOf {
+      savedSource.size > searchCount
+    }
   }
 
   LaunchedEffect(Unit) {

@@ -138,12 +138,12 @@ class LazyUiStatusListState(
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun LazyUiStatusList(
-  modifier: Modifier = Modifier,
   items: LazyPagingItems<UiStatus>,
+  statusNavigation: StatusNavigationData,
+  modifier: Modifier = Modifier,
   state: LazyListState = rememberLazyListState(),
   loadingBetween: List<MicroBlogKey> = emptyList(),
   contentPadding: PaddingValues = PaddingValues(0.dp),
-  statusNavigation: StatusNavigationData,
   onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
   key: ((index: Int, item: UiStatus) -> Any) = { _, item -> item.statusKey.hashCode() },
   header: LazyListScope.() -> Unit = {},

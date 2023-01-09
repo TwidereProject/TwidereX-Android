@@ -61,7 +61,7 @@ fun CustomVideoControl(
       )
     }
 
-    Box(modifier.weight(1f)) {
+    Box(Modifier.weight(1f)) {
       Slider(
         valueRange = 0f..state.duration.toFloat(),
         value = state.currentPosition.toFloat(),

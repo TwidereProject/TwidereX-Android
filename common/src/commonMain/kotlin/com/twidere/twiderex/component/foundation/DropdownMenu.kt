@@ -39,8 +39,8 @@ import com.twidere.twiderex.component.foundation.platform.PlatformDropdownMenuIt
 fun DropdownMenu(
   expanded: Boolean,
   onDismissRequest: () -> Unit,
-  focusable: Boolean = true,
   modifier: Modifier = Modifier,
+  focusable: Boolean = true,
   offset: DpOffset = DpOffset(0.dp, 0.dp),
   content: @Composable (ColumnScope.() -> Unit)
 ) {

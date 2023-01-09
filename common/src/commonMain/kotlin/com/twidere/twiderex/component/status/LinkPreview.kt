@@ -219,8 +219,8 @@ private fun LinkWithTitleAndDescPreview(
   title: String,
   desc: String,
   link: String,
-  modifier: Modifier = Modifier,
   maxLines: Int,
+  modifier: Modifier = Modifier,
 ) {
   Column(
     modifier = modifier.padding(LinkPreviewDefaults.ContentPadding),
@@ -241,8 +241,8 @@ private fun LinkWithTitleAndLargeImagePreview(
   image: String,
   desc: String,
   link: String,
-  modifier: Modifier = Modifier,
   maxLines: Int,
+  modifier: Modifier = Modifier,
 ) {
   Layout(
     modifier = modifier,

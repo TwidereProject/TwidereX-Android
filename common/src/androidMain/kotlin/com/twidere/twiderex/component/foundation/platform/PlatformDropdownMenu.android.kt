@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.DpOffset
 actual fun PlatformDropdownMenu(
   expanded: Boolean,
   onDismissRequest: () -> Unit,
-  focusable: Boolean,
   modifier: Modifier,
+  focusable: Boolean,
   offset: DpOffset,
   content: @Composable (ColumnScope.() -> Unit)
 ) {
