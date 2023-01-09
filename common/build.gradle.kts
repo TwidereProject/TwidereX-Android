@@ -66,7 +66,9 @@ kotlin {
                 implementation("io.github.reactivecircus.cache4k:cache4k:${Versions.cache4k}")
                 api("com.eygraber:uri-kmp:${Versions.uri}")
                 api("moe.tlaster:precompose:${Versions.precompose}")
+                api("io.github.qdsfdhvh:image-loader:${Versions.imageLoader}")
                 api("io.github.qdsfdhvh:precompose-annotation:${Versions.precomposeKsp}")
+                implementation("io.ktor:ktor-client-okhttp:${Versions.ktor}")
             }
         }
         val commonTest by getting {
@@ -89,10 +91,6 @@ kotlin {
                 implementation("androidx.room:room-ktx:${Versions.room}")
                 implementation("androidx.room:room-paging:${Versions.room}")
                 kspAndroid("androidx.room:room-compiler:${Versions.room}")
-                implementation("io.coil-kt:coil-base:${Versions.coil}")
-                implementation("io.coil-kt:coil-compose:${Versions.coil}")
-                implementation("io.coil-kt:coil-gif:${Versions.coil}")
-                implementation("io.coil-kt:coil-svg:${Versions.coil}")
                 implementation("com.google.android.exoplayer:exoplayer:${Versions.exoplayer}")
                 implementation("com.google.android.exoplayer:extension-okhttp:${Versions.exoplayer}")
                 implementation("androidx.datastore:datastore:${Versions.datastore}")

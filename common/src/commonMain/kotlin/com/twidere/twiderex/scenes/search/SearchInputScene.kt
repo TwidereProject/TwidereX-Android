@@ -2,25 +2,26 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.twidere.twiderex.scenes.search
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
@@ -40,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -122,7 +124,8 @@ fun SearchInputScene(
                 painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
                 contentDescription = stringResource(
                   res = com.twidere.twiderex.MR.strings.scene_search_title
-                )
+                ),
+                modifier = Modifier.size(24.dp),
               )
             }
           }
@@ -157,7 +160,8 @@ fun SearchInputScene(
                   painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
                   contentDescription = stringResource(
                     res = com.twidere.twiderex.MR.strings.common_controls_actions_remove
-                  )
+                  ),
+                  modifier = Modifier.size(24.dp),
                 )
               }
             },

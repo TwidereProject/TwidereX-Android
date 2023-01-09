@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -213,7 +213,11 @@ fun UserComponent(
                   Box(
                     modifier = Modifier.padding(16.dp)
                   ) {
-                    Icon(painter = item.icon, contentDescription = item.title)
+                    Icon(
+                      painter = item.icon,
+                      contentDescription = item.title,
+                      modifier = Modifier.size(24.dp),
+                    )
                   }
                 },
               )
@@ -274,7 +278,11 @@ private fun PermissionDeniedInfo(title: String, message: String) {
         .fillMaxSize()
         .padding(PermissionDeniedInfoDefaults.contentPaddingValues)
     ) {
-      Icon(painter = painterResource(res = com.twidere.twiderex.MR.files.ic_eye_off), contentDescription = title)
+      Icon(
+        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_eye_off),
+        contentDescription = title,
+        modifier = Modifier.size(24.dp),
+      )
       Spacer(modifier = Modifier.width(PermissionDeniedInfoDefaults.contentSpacing))
       Column {
         Text(text = title, style = MaterialTheme.typography.subtitle2)
@@ -397,6 +405,7 @@ private fun UserStatusTimelineFilter(
         Icon(
           painter = painterResource(res = com.twidere.twiderex.MR.files.ic_filter),
           contentDescription = null,
+          modifier = Modifier.size(24.dp),
         )
       }
     }
@@ -576,7 +585,8 @@ private fun UserInfoName(
       ) {
         Icon(
           painter = painterResource(res = com.twidere.twiderex.MR.files.ic_lock),
-          contentDescription = null
+          contentDescription = null,
+          modifier = Modifier.size(24.dp),
         )
       }
       Spacer(modifier = Modifier.width(UserInfoNameDefaults.IconSpacing))
@@ -657,7 +667,8 @@ private fun ProfileItem(
   ) {
     Icon(
       painter = painter,
-      contentDescription = contentDescription
+      contentDescription = contentDescription,
+      modifier = Modifier.size(24.dp),
     )
     Spacer(modifier = Modifier.width(ProfileItemDefaults.IconSpacing))
     Text(
