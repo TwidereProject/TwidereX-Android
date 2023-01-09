@@ -67,8 +67,8 @@ class TwidereServiceFactory(private val configProvider: TwidereHttpConfigProvide
               it as OAuth2Credentials
             }.let {
               MastodonService(
-                accountKey.host,
-                it.access_token,
+                baseUrl = "https://${accountKey.host}",
+                accessToken = it.access_token,
                 httpClientFactory = createHttpClientFactory()
               )
             }

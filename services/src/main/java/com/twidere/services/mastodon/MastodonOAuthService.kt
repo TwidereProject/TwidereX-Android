@@ -29,7 +29,7 @@ import com.twidere.services.mastodon.model.MastodonAuthScope
 import java.net.URLEncoder
 
 class MastodonOAuthService(
-  private val host: String,
+  private val baseUrl: String,
   private val client_name: String,
   private val website: String? = null,
   private val redirect_uri: String = "urn:ietf:wg:oauth:2.0:oob",
@@ -44,7 +44,7 @@ class MastodonOAuthService(
   private val resources: MastodonOAuthResources by lazy {
     httpClientFactory.createResources(
       MastodonOAuthResources::class.java,
-      host,
+      baseUrl,
       EmptyAuthorization()
     )
   }
@@ -57,7 +57,7 @@ class MastodonOAuthService(
   )
 
   fun getWebOAuthUrl(response: CreateApplicationResponse) =
-    "$host/oauth/authorize?client_id=${response.clientID}&response_type=code&redirect_uri=${response.redirectURI.let {
+    "$baseUrl/oauth/authorize?client_id=${response.clientID}&response_type=code&redirect_uri=${response.redirectURI.let {
       URLEncoder.encode(it, "UTF-8")
     }}&scope=${
     scopes.joinToString(
@@ -80,7 +80,7 @@ class MastodonOAuthService(
   suspend fun verifyCredentials(accessToken: String) =
     httpClientFactory.createResources<MastodonOAuthResources>(
       MastodonOAuthResources::class.java,
-      host,
+      baseUrl,
       BearerAuthorization(accessToken)
     ).verifyCredentials()
 }

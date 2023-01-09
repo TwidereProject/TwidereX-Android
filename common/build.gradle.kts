@@ -64,8 +64,9 @@ kotlin {
                 implementation("ca.gosyer:accompanist-pager-indicators:${Versions.accompanist_jb}")
                 api("com.github.Tlaster.KFilePicker:KFilePicker:${Versions.kFilePicker}")
                 implementation("io.github.reactivecircus.cache4k:cache4k:${Versions.cache4k}")
-                api("io.github.qdsfdhvh:image-loader:${Versions.imageLoader}")
+                api("com.eygraber:uri-kmp:${Versions.uri}")
                 api("moe.tlaster:precompose:${Versions.precompose}")
+                api("io.github.qdsfdhvh:image-loader:${Versions.imageLoader}")
                 api("io.github.qdsfdhvh:precompose-annotation:${Versions.precomposeKsp}")
                 implementation("io.ktor:ktor-client-okhttp:${Versions.ktor}")
             }
