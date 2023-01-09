@@ -149,7 +149,8 @@ fun SearchScene(
                             painter = painterResource(res = com.twidere.twiderex.MR.files.ic_device_floppy),
                             contentDescription = stringResource(
                               res = com.twidere.twiderex.MR.strings.accessibility_scene_search_save
-                            )
+                            ),
+                            modifier = Modifier.size(24.dp),
                           )
                         }
                       }

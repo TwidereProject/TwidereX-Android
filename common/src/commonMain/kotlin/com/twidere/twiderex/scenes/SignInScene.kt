@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -154,7 +155,8 @@ private fun MastodonSignIn(
           painter = painterResource(res = com.twidere.twiderex.MR.files.ic_mastodon_logo_blue),
           contentDescription = stringResource(
             res = com.twidere.twiderex.MR.strings.accessibility_common_logo_mastodon
-          )
+          ),
+          modifier = Modifier.size(24.dp),
         )
       },
       text = {
@@ -208,7 +210,8 @@ private fun TwitterSignIn(
           painter = painterResource(res = com.twidere.twiderex.MR.files.ic_twitter_logo_white),
           contentDescription = stringResource(
             res = com.twidere.twiderex.MR.strings.accessibility_common_logo_twitter
-          )
+          ),
+          modifier = Modifier.size(24.dp),
         )
       },
       text = {

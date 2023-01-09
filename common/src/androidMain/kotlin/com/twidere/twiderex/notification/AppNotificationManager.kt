@@ -31,10 +31,9 @@ import android.text.Html
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.graphics.drawable.toBitmap
-import coil.imageLoader
-import coil.request.ImageRequest
-import coil.request.SuccessResult
+import com.seiko.imageloader.ImageLoaderBuilder
+import com.seiko.imageloader.request.ComposeImageResult
+import com.seiko.imageloader.request.ImageRequestBuilder
 import com.twidere.common.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -104,13 +103,11 @@ actual class AppNotificationManager(
         )
       }
       appNotification.largeIcon?.let {
-        val result = context.imageLoader.execute(
-          ImageRequest.Builder(context)
-            .data(it)
-            .build()
-        )
-        if (result is SuccessResult) {
-          builder.setLargeIcon(result.drawable.toBitmap())
+        val imageLoader = ImageLoaderBuilder(context).build()
+        val request = ImageRequestBuilder().data(it).build()
+        val result = imageLoader.execute(request)
+        if (result is ComposeImageResult) {
+          builder.setLargeIcon(result.image)
         }
       }
       notificationManagerCompat.notify(notificationId, builder.build())

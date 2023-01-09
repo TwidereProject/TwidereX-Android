@@ -21,6 +21,7 @@
 package com.twidere.twiderex.scenes.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
@@ -31,6 +32,7 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -142,7 +144,8 @@ fun SettingsScene(
               icon = {
                 Icon(
                   painter = painterResource(it.icon),
-                  contentDescription = stringResource(it.name)
+                  contentDescription = stringResource(it.name),
+                  modifier = Modifier.size(24.dp),
                 )
               },
               text = {

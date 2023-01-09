@@ -37,6 +37,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -290,7 +291,8 @@ private fun EmptyStatusList() {
   ) {
     Icon(
       painter = painterResource(res = com.twidere.twiderex.MR.files.ic_empty_status),
-      contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_no_tweets_found_title)
+      contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_no_tweets_found_title),
+      modifier = Modifier.size(24.dp),
     )
     Spacer(modifier = Modifier.height(EmptyStatusListDefaults.VerticalPadding))
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {

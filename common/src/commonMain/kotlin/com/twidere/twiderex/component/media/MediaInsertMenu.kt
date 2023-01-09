@@ -21,6 +21,7 @@
 package com.twidere.twiderex.component.media
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -36,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
@@ -135,7 +137,8 @@ fun MediaInsertMenu(
                   contentDescription = it.stringName(),
                   tint = if (enabled) MaterialTheme.colors.primary else LocalContentColor.current.copy(
                     alpha = LocalContentAlpha.current
-                  )
+                  ),
+                  modifier = Modifier.size(24.dp),
                 )
               }
             )
@@ -153,7 +156,8 @@ fun MediaInsertMenu(
       painter = painterResource(res = MR.files.ic_photo),
       contentDescription = stringResource(
         res = MR.strings.accessibility_scene_compose_image
-      )
+      ),
+      modifier = Modifier.size(24.dp),
     )
   }
 }

@@ -462,6 +462,7 @@ fun NitterPreference(
         Icon(
           painter = painterResource(res = MR.files.ic_info_circle),
           contentDescription = null,
+          modifier = Modifier.size(24.dp),
         )
       }
     }
@@ -489,13 +490,15 @@ fun NitterPreference(
             Icon(
               painter = painterResource(res = MR.files.ic_link_success),
               contentDescription = null,
-              tint = MaterialTheme.colors.primary
+              tint = MaterialTheme.colors.primary,
+              modifier = Modifier.size(24.dp),
             )
           } else {
             Icon(
               painter = painterResource(res = MR.files.ic_link_error),
               contentDescription = null,
-              tint = MaterialTheme.colors.error
+              tint = MaterialTheme.colors.error,
+              modifier = Modifier.size(24.dp),
             )
           }
         }

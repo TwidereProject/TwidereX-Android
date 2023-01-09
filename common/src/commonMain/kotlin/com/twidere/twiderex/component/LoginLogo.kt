@@ -21,9 +21,11 @@
 package com.twidere.twiderex.component
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.MR
 
 @Composable
@@ -31,7 +33,7 @@ fun LoginLogo(
   modifier: Modifier = Modifier,
 ) {
   Image(
-    modifier = modifier,
+    modifier = modifier.size(24.dp),
     contentScale = ContentScale.FillWidth,
     painter = painterResource(res = com.twidere.twiderex.MR.files.ic_login_logo),
     contentDescription = stringResource(res = MR.strings.accessibility_common_logo_twidere)

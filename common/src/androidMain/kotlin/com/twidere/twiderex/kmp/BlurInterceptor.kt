@@ -20,31 +20,21 @@
  */
 package com.twidere.twiderex.kmp
 
-import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.painter.Painter
-import com.seiko.imageloader.rememberAsyncImagePainter
-import dev.icerock.moko.resources.FileResource
-import dev.icerock.moko.resources.ImageResource
-import dev.icerock.moko.resources.StringResource
+import com.google.android.renderscript.Toolkit
+import com.seiko.imageloader.intercept.Interceptor
+import com.seiko.imageloader.request.ComposeImageResult
+import com.seiko.imageloader.request.ImageResult
+import com.twidere.twiderex.component.image.ImageEffects
 
-actual class ResLoader(
-  private val context: Context,
-) {
-  actual fun getString(
-    res: StringResource,
-    vararg args: Any
-  ): String {
-    return context.getString(res.resourceId, *args)
-  }
-
-  @Composable
-  actual fun getSvg(res: FileResource): Painter {
-    return rememberAsyncImagePainter(res.rawResId)
-  }
-
-  @Composable
-  actual fun getImage(res: ImageResource): Painter {
-    return rememberAsyncImagePainter(res.drawableResId)
+actual class BlurInterceptor actual constructor(private val effects: ImageEffects) : Interceptor {
+  override suspend fun intercept(chain: Interceptor.Chain): ImageResult {
+    val result = chain.proceed(chain.request)
+    val radius = effects.blur?.blurRadius
+    if (radius != null && result is ComposeImageResult) {
+      return result.copy(
+        image = Toolkit.blur(result.image, radius)
+      )
+    }
+    return result
   }
 }

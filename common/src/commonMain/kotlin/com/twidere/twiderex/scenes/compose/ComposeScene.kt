@@ -288,7 +288,8 @@ private fun ComposeBody(
                 painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
                 contentDescription = stringResource(
                   res = com.twidere.twiderex.MR.strings.accessibility_common_close
-                )
+                ),
+                modifier = Modifier.size(24.dp),
               )
             }
           },
@@ -320,7 +321,8 @@ private fun ComposeBody(
                   MaterialTheme.colors.primary
                 } else LocalContentColor.current.copy(
                   alpha = LocalContentAlpha.current
-                )
+                ),
+                modifier = Modifier.size(24.dp),
               )
             }
           }
@@ -577,7 +579,8 @@ private fun MastodonExtraActions(
           MaterialTheme.colors.primary
         } else {
           LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-        }
+        },
+        modifier = Modifier.size(24.dp),
       )
     }
   }
@@ -593,7 +596,8 @@ private fun MastodonExtraActions(
         MaterialTheme.colors.primary
       } else {
         LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-      }
+      },
+      modifier = Modifier.size(24.dp),
     )
   }
 }
@@ -608,7 +612,8 @@ private fun LocationDisplay(it: com.twidere.twiderex.model.kmp.Location) {
         painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
         contentDescription = stringResource(
           res = com.twidere.twiderex.MR.strings.accessibility_common_status_location
-        )
+        ),
+        modifier = Modifier.size(24.dp),
       )
       Text(text = "${it.latitude}, ${it.longitude}")
       Spacer(modifier = Modifier.width(LocationDisplayDefaults.PaddingEnd))
@@ -680,7 +685,11 @@ fun ComposeMastodonVisibility(
               Text(text = it.stringName())
             },
             icon = {
-              Icon(painter = it.icon(), contentDescription = it.stringName())
+              Icon(
+                painter = it.icon(),
+                contentDescription = it.stringName(),
+                modifier = Modifier.size(24.dp),
+              )
             }
           )
         }
@@ -699,7 +708,11 @@ fun ComposeMastodonVisibility(
           .padding(ComposeMastodonVisibilityDefaults.ContentPadding),
         verticalAlignment = Alignment.CenterVertically
       ) {
-        Icon(painter = visibility.icon(), contentDescription = visibility.stringName())
+        Icon(
+          painter = visibility.icon(),
+          contentDescription = visibility.stringName(),
+          modifier = Modifier.size(24.dp),
+        )
         Spacer(modifier = Modifier.width(ComposeMastodonVisibilityDefaults.IconSpacing))
         Text(text = visibility.stringName())
       }
@@ -745,7 +758,8 @@ private fun ReplySheetContent(
           painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
           contentDescription = stringResource(
             res = com.twidere.twiderex.MR.strings.accessibility_common_close
-          )
+          ),
+          modifier = Modifier.size(24.dp),
         )
       }
     },
@@ -947,6 +961,7 @@ private fun ColumnScope.MastodonContentWarningInput(
           Icon(
             painter = painterResource(res = com.twidere.twiderex.MR.files.ic_alert_octagon),
             contentDescription = null,
+            modifier = Modifier.size(24.dp),
           )
         }
         Spacer(modifier = Modifier.width(MastodonContentWarningInputDefaults.IconSpacing))
@@ -1137,7 +1152,8 @@ private fun ComposeActions(
               MaterialTheme.colors.primary
             } else {
               LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-            }
+            },
+            modifier = Modifier.size(24.dp),
           )
         }
       }
@@ -1154,7 +1170,8 @@ private fun ComposeActions(
               MaterialTheme.colors.primary
             } else {
               LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-            }
+            },
+            modifier = Modifier.size(24.dp),
           )
         }
       }
@@ -1177,7 +1194,8 @@ private fun ComposeActions(
             painter = painterResource(res = com.twidere.twiderex.MR.files.ic_at_sign),
             contentDescription = stringResource(
               res = com.twidere.twiderex.MR.strings.accessibility_scene_compose_add_mention,
-            )
+            ),
+            modifier = Modifier.size(24.dp),
           )
         }
       }
@@ -1197,7 +1215,8 @@ private fun ComposeActions(
         ) {
           Icon(
             painter = painterResource(res = com.twidere.twiderex.MR.files.ic_hash),
-            contentDescription = null
+            contentDescription = null,
+            modifier = Modifier.size(24.dp),
           )
         }
       }
@@ -1228,7 +1247,8 @@ private fun ComposeActions(
                 } else {
                   com.twidere.twiderex.MR.strings.accessibility_scene_compose_location_enable
                 }
-              )
+              ),
+              modifier = Modifier.size(24.dp),
             )
           }
         }
@@ -1245,7 +1265,8 @@ private fun ComposeActions(
           contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_compose_thread),
           tint = if (state.enableThreadMode) MaterialTheme.colors.primary else LocalContentColor.current.copy(
             alpha = LocalContentAlpha.current
-          )
+          ),
+          modifier = Modifier.size(24.dp),
         )
       }
       Spacer(modifier = Modifier.weight(1f))
@@ -1266,7 +1287,8 @@ private fun ComposeActions(
               ),
               contentDescription = stringResource(
                 res = com.twidere.twiderex.MR.strings.accessibility_scene_compose_draft
-              )
+              ),
+              modifier = Modifier.size(24.dp),
             )
             if (state.draftCount < 9) {
               Text(

@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -295,7 +296,7 @@ fun InputMediaPreview(inputImage: UiMediaInsert?, onRemove: () -> Unit) {
         painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
         contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_remove),
         tint = MaterialTheme.colors.surface,
-        modifier = Modifier.padding(InputPhotoPreviewDefaults.IconPadding)
+        modifier = Modifier.padding(InputPhotoPreviewDefaults.IconPadding).size(24.dp),
       )
     }
   }
@@ -350,7 +351,8 @@ fun InputComponent(
         ),
         tint = if (enableSend) MaterialTheme.colors.primary else LocalContentColor.current.copy(
           alpha = LocalContentAlpha.current
-        )
+        ),
+        modifier = Modifier.size(24.dp),
       )
     }
   }

@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.ButtonDefaults
@@ -225,7 +226,8 @@ private fun AboutContent(
           Icon(
             painter = painterResource(res = com.twidere.twiderex.MR.files.ic_twitter),
             tint = MaterialTheme.colors.onBackground,
-            contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_logo_twitter)
+            contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_logo_twitter),
+            modifier = Modifier.size(24.dp),
           )
         }
         Box(modifier = Modifier.width(AboutContentDefaults.Icon.Spacing))
@@ -237,7 +239,8 @@ private fun AboutContent(
           Icon(
             painter = painterResource(res = com.twidere.twiderex.MR.files.ic_github),
             tint = MaterialTheme.colors.onBackground,
-            contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_logo_github)
+            contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_logo_github),
+            modifier = Modifier.size(24.dp),
           )
         }
         Box(modifier = Modifier.width(AboutContentDefaults.Icon.Spacing))
@@ -249,7 +252,8 @@ private fun AboutContent(
           Icon(
             painter = painterResource(res = com.twidere.twiderex.MR.files.ic_telegram),
             tint = MaterialTheme.colors.onBackground,
-            contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_logo_github)
+            contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_logo_github),
+            modifier = Modifier.size(24.dp),
           )
         }
       }

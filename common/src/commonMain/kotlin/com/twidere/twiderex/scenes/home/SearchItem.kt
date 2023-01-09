@@ -24,6 +24,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ContentAlpha
@@ -43,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.dp
 import androidx.paging.compose.items
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -154,7 +156,8 @@ fun SearchSceneContent(
                   painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
                   contentDescription = stringResource(
                     res = com.twidere.twiderex.MR.strings.scene_search_title
-                  )
+                  ),
+                  modifier = Modifier.size(24.dp),
                 )
               }
             }
@@ -194,7 +197,8 @@ fun SearchSceneContent(
                   painter = painterResource(res = com.twidere.twiderex.MR.files.ic_trash_can),
                   contentDescription = stringResource(
                     res = com.twidere.twiderex.MR.strings.common_controls_actions_remove
-                  )
+                  ),
+                  modifier = Modifier.size(24.dp),
                 )
               }
             },

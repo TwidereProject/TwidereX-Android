@@ -35,6 +35,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
@@ -83,7 +84,10 @@ fun TweetHeader(
             .width(UserAvatarDefaults.AvatarSize),
           contentAlignment = Alignment.CenterEnd,
         ) {
-          Box(modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp)) {
+          val iconSize = with(LocalDensity.current) {
+            MaterialTheme.typography.body1.fontSize.toDp()
+          }
+          Box(modifier = Modifier.size(iconSize)) {
             icon.invoke()
           }
         }

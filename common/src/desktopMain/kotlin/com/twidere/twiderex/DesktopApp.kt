@@ -29,6 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.seiko.imageloader.ImageLoader
+import com.seiko.imageloader.ImageLoaderBuilder
+import com.seiko.imageloader.LocalImageLoader
+import com.seiko.imageloader.cache.disk.DiskCacheBuilder
+import com.seiko.imageloader.cache.memory.MemoryCacheBuilder
 import com.twidere.twiderex.component.NativeWindow
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
@@ -36,6 +41,8 @@ import com.twidere.twiderex.init.Initializer
 import com.twidere.twiderex.init.TwidereServiceFactoryInitialTask
 import com.twidere.twiderex.kmp.LocalPlatformWindow
 import com.twidere.twiderex.kmp.PlatformWindow
+import com.twidere.twiderex.kmp.StorageProvider
+import com.twidere.twiderex.kmp.commonConfig
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
@@ -55,6 +62,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.precompose.navigation.Navigator
+import okio.Path.Companion.toPath
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.logger.Level
@@ -203,7 +211,8 @@ private fun startDesktopApp() {
         FilePicker.init(window)
         CompositionLocalProvider(
           LocalPlatformWindow provides PlatformWindow(),
-          LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
+          LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
+          LocalImageLoader provides generateImageLoader(get()),
         ) {
           App(navController = navController)
         }
@@ -220,4 +229,22 @@ private fun onDeeplink(url: String) {
   } else {
     navController.navigate(url)
   }
+}
+
+private fun generateImageLoader(storageService: StorageProvider): ImageLoader {
+  return ImageLoaderBuilder()
+    .commonConfig()
+    .memoryCache {
+      MemoryCacheBuilder()
+        // Set the max size to 25% of the app's available memory.
+        .maxSizePercent(0.25)
+        .build()
+    }
+    .diskCache {
+      DiskCacheBuilder()
+        .directory(storageService.cacheDir.toPath().resolve("image_cache"))
+        .maxSizeBytes(512L * 1024 * 1024) // 512MB
+        .build()
+    }
+    .build()
 }

@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -255,7 +256,8 @@ fun PureMediaControlPanel(
             painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
             contentDescription = stringResource(
               res = com.twidere.twiderex.MR.strings.accessibility_common_close
-            )
+            ),
+            modifier = Modifier.size(24.dp),
           )
         }
       }

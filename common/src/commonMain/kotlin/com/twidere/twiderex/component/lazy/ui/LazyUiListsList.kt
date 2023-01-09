@@ -246,7 +246,8 @@ private fun EmptyList() {
   ) {
     Icon(
       painter = painterResource(res = com.twidere.twiderex.MR.files.ic_empty_list),
-      contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_no_tweets_found_title)
+      contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_no_tweets_found_title),
+      modifier = Modifier.size(24.dp),
     )
   }
 }

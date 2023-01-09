@@ -20,12 +20,15 @@
  */
 package com.twidere.twiderex.scenes.dm
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.AppBar
@@ -93,6 +96,7 @@ fun DMConversationListSceneFab(
       contentDescription = stringResource(
         res = com.twidere.twiderex.MR.strings.scene_lists_icons_create
       ),
+      modifier = Modifier.size(24.dp),
     )
   }
 }

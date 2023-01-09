@@ -21,6 +21,7 @@
 package com.twidere.twiderex.scenes.user
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -33,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.UserComponent
@@ -139,7 +141,8 @@ fun UserScene(
                       contentDescription = stringResource(
                         res = com.twidere.twiderex.MR.strings.scene_messages_title
                       ),
-                      tint = MaterialTheme.colors.onSurface
+                      tint = MaterialTheme.colors.onSurface,
+                      modifier = Modifier.size(24.dp),
                     )
                   }
                 }
