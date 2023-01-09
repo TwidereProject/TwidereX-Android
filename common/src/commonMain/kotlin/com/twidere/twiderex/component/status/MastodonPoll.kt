@@ -68,8 +68,8 @@ import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.model.ui.Option
 import com.twidere.twiderex.model.ui.UiPoll
+import com.twidere.twiderex.model.ui.UiPollOption
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.LocalActiveAccount
 import kotlin.math.max
@@ -186,7 +186,7 @@ object MastodonPollDefaults {
 
 @Composable
 fun MastodonPollOption(
-  option: Option,
+  option: UiPollOption,
   index: Int,
   poll: UiPoll,
   voted: Boolean,

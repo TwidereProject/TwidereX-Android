@@ -38,13 +38,13 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.enums.ReferenceType
 import com.twidere.twiderex.model.paging.PagingTimeLine
 import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
-import com.twidere.twiderex.model.ui.Option
 import com.twidere.twiderex.model.ui.StatusMetrics
 import com.twidere.twiderex.model.ui.UiCard
 import com.twidere.twiderex.model.ui.UiGeo
 import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiPoll
+import com.twidere.twiderex.model.ui.UiPollOption
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiTrend
 import com.twidere.twiderex.model.ui.UiTrendHistory
@@ -274,7 +274,7 @@ internal fun Status.toUiStatus(
 fun Poll.toUi() = UiPoll(
   id = id ?: "",
   options = options?.map { option ->
-    Option(
+    UiPollOption(
       text = option.title ?: "",
       count = option.votesCount ?: 0
     )

@@ -30,11 +30,11 @@ import com.twidere.twiderex.db.sqldelight.model.DbStatusReferenceList
 import com.twidere.twiderex.db.sqldelight.model.DbStatusWithAttachments
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.model.ui.Option
 import com.twidere.twiderex.model.ui.StatusMetrics
 import com.twidere.twiderex.model.ui.UiCard
 import com.twidere.twiderex.model.ui.UiGeo
 import com.twidere.twiderex.model.ui.UiPoll
+import com.twidere.twiderex.model.ui.UiPollOption
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
 import com.twidere.twiderex.model.ui.twitter.TwitterStatusExtra
@@ -130,7 +130,7 @@ private fun UiPoll.toDbPoll() = DbPoll(
 
 private fun DbPoll.toUi() = UiPoll(
   id = id,
-  options = options.map { Option(text = it.text, count = it.count) },
+  options = options.map { UiPollOption(text = it.text, count = it.count) },
   expiresAt = expiresAt,
   multiple = multiple,
   expired = expired,

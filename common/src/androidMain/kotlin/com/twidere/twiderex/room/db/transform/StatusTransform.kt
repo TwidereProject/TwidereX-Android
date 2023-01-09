@@ -28,12 +28,12 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.enums.ReferenceType
 import com.twidere.twiderex.model.paging.PagingTimeLine
 import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
-import com.twidere.twiderex.model.ui.Option
 import com.twidere.twiderex.model.ui.StatusMetrics
 import com.twidere.twiderex.model.ui.UiCard
 import com.twidere.twiderex.model.ui.UiGeo
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiPoll
+import com.twidere.twiderex.model.ui.UiPollOption
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.model.ui.UiUser
@@ -252,7 +252,7 @@ private fun UiPoll.toDbPoll() = DbPoll(
 
 private fun DbPoll.toUi() = UiPoll(
   id = id,
-  options = options.map { Option(text = it.text, count = it.count) },
+  options = options.map { UiPollOption(text = it.text, count = it.count) },
   expiresAt = expiresAt,
   expired = expired,
   multiple = multiple,
@@ -339,7 +339,7 @@ internal fun Poll.toUi() = id?.let {
   UiPoll(
     id = it,
     options = options?.map { option ->
-      Option(
+      UiPollOption(
         text = option.title ?: "",
         count = option.votesCount ?: 0
       )

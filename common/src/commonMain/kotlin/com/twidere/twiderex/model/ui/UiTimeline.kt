@@ -55,17 +55,47 @@ data class UiGap(
 private val parser = TwitterParser()
 
 sealed interface UiStatusTimeline : UiTimeline {
-  val statusKey: MicroBlogKey
-  val metrics: UiStatusMetrics
-  val humanizedTime: String
-  val user: UiUser
-  val platformType: PlatformType
-  val source: String
-  val parsedContent: ImmutableList<Token>
-  val geo: UiGeo?
-  val contentDirection: LayoutDirection
-  val url: ImmutableList<UiUrlEntity>
-  val menu: UiStatusTimelineMenu
+  val data: UiStatusMetaData
+}
+
+data class UiStatusMetaData(
+  val statusKey: MicroBlogKey,
+  val metrics: UiStatusMetrics,
+  val user: UiUser,
+  val content: String,
+  val platformType: PlatformType,
+  val source: String,
+  val geo: UiGeo?,
+  val url: ImmutableList<UiUrlEntity>,
+  val menu: UiStatusTimelineMenu,
+  val owned: Boolean,
+  val sensitive: Boolean,
+  val timestamp: Long,
+) {
+  val humanizedTime = timestamp.humanizedTimestamp()
+  val parsedContent: ImmutableList<Token> = parser.parse(content).toPersistentList()
+  val contentDirection = if (Bidi(content, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT).baseIsLeftToRight()) {
+    LayoutDirection.Ltr
+  } else {
+    LayoutDirection.Rtl
+  }
+
+  fun resolveLink(
+    href: String,
+  ): ResolvedLink {
+    val entity = url.firstOrNull { it.url == href }
+    return when {
+      entity != null -> {
+        ResolvedLink(
+          expanded = entity.expandedUrl,
+          display = entity.displayUrl,
+        )
+      }
+      else -> {
+        ResolvedLink(expanded = null)
+      }
+    }
+  }
 }
 
 data class UiStatusTimelineMenu(
@@ -73,83 +103,40 @@ data class UiStatusTimelineMenu(
   val moreOpened: Boolean,
 )
 
-fun UiStatusTimeline.resolveLink(
-  href: String,
-): ResolvedLink {
-  val entity = url.firstOrNull { it.url == href }
-  return when {
-    entity != null -> {
-      ResolvedLink(
-        expanded = entity.expandedUrl,
-        display = entity.displayUrl,
-      )
-    }
-    else -> {
-      ResolvedLink(expanded = null)
-    }
-  }
-}
-
 sealed interface UiStatusWithExtra : UiTimeline {
   val status: UiStatusTimeline
 }
 
 @Immutable
 data class UiTwitterStatus(
-  override val statusKey: MicroBlogKey,
-  // non html content
-  val content: String,
-  override val metrics: UiStatusMetrics,
-  val timestamp: Long,
-  override val user: UiUser,
-  override val platformType: PlatformType,
-  override val source: String,
-  override val geo: UiGeo?,
+  override val data: UiStatusMetaData,
   val replySettings: TwitterReplySettings,
-  override val url: ImmutableList<UiUrlEntity>,
-  override val menu: UiStatusTimelineMenu,
 ) : UiTimeline, UiStatusTimeline {
-  override val key = statusKey.toString()
-  override val humanizedTime = timestamp.humanizedTimestamp()
+  override val key = data.statusKey.toString()
   override val contentType = "twitter-status"
-  override val parsedContent: ImmutableList<Token> = parser.parse(content).toPersistentList()
-  override val contentDirection = if (Bidi(content, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT).baseIsLeftToRight()) {
-    LayoutDirection.Ltr
-  } else {
-    LayoutDirection.Rtl
-  }
 }
 
 @Immutable
 data class UiMastodonStatus(
-  override val statusKey: MicroBlogKey,
-  // non html content
-  val content: String,
-  override val metrics: UiStatusMetrics,
-  val timestamp: Long,
-  override val user: UiUser,
-  override val platformType: PlatformType,
-  override val source: String,
-  override val geo: UiGeo?,
+  override val data: UiStatusMetaData,
   val expanded: Boolean,
-  val spoilerText: String? = null,
+  val spoilerText: String?,
   val notificationType: MastodonNotificationType?,
   val emoji: ImmutableList<UiEmoji>,
   val visibility: MastodonVisibility,
   val mentions: ImmutableList<MastodonMention>?,
-  override val url: ImmutableList<UiUrlEntity>,
-  override val menu: UiStatusTimelineMenu,
 ) : UiTimeline, UiStatusTimeline {
-  override val key = statusKey.toString()
-  override val humanizedTime = timestamp.humanizedTimestamp()
+  override val key = data.statusKey.toString()
   override val contentType = "mastodon-status"
-  override val parsedContent: ImmutableList<Token> = parser.parse(content).toPersistentList()
   val parsedSpoilerText: ImmutableList<Token> = parser.parse(spoilerText ?: "").toPersistentList()
-  override val contentDirection = if (Bidi(content, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT).baseIsLeftToRight()) {
-    LayoutDirection.Ltr
-  } else {
-    LayoutDirection.Rtl
-  }
+}
+
+@Immutable
+data class UiTwitterThreadStatus(
+  val status: UiTwitterStatus,
+) : UiTimeline {
+  override val key: String = status.key
+  override val contentType: String = "twitter-thread-status-${status.contentType}"
 }
 
 @Immutable
@@ -208,7 +195,7 @@ data class UiRetweetStatus(
 }
 
 @Immutable
-data class UiStatusWithQuote(
+data class UiQuoteStatus(
   val status: UiStatusWithExtra,
   val quote: UiStatusWithExtra,
 ) : UiTimeline {
@@ -217,13 +204,12 @@ data class UiStatusWithQuote(
 }
 
 @Immutable
-data class UiStatusWithRetweetAndQuote(
-  val status: UiStatusWithExtra,
+data class UiRetweetAndQuoteStatus(
   val retweet: UiStatusWithExtra,
-  val quote: UiStatusWithExtra,
+  val status: UiQuoteStatus,
 ) : UiTimeline {
   override val key = status.key
-  override val contentType: String = "status-retweet-quote-${quote.contentType}"
+  override val contentType: String = "status-retweet-quote-${status.contentType}"
 }
 
 @Immutable

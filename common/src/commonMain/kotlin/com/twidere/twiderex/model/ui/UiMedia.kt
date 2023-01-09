@@ -44,6 +44,13 @@ data class UiMedia(
   val fileName: String?
     get() = mediaUrl?.takeIfFileName() ?: url?.takeIfFileName() ?: findFileName()
 
+  val aspectRatio: Float
+    get() = if (width == 0L || height == 0L) {
+      0f
+    } else {
+      width.toFloat() / height.toFloat()
+    }
+
   private fun findFileName(): String? {
     return mediaUrl?.let {
       val start = it.indexOf("?format=")

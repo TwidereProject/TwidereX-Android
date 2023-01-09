@@ -20,26 +20,35 @@
  */
 package com.twidere.twiderex.model.ui
 
+import androidx.compose.runtime.Immutable
 import com.twidere.twiderex.extensions.humanizedTimestamp
+import kotlinx.collections.immutable.ImmutableList
 
+@Immutable
 data class UiPoll(
   val id: String,
-  val options: List<Option>,
+  val options: ImmutableList<UiPollOption>,
   val expiresAt: Long?, // some instance of mastodon won't expire
   val expired: Boolean,
   val multiple: Boolean,
   val voted: Boolean,
   val votesCount: Long? = null,
   val votersCount: Long? = null,
-  val ownVotes: List<Int>? = null,
+  val ownVotes: ImmutableList<Int>? = null,
 ) {
   val expiresAtString = expiresAt?.humanizedTimestamp().orEmpty()
   val canVote = !voted &&
     !expired &&
     expiresAt?.let { it > System.currentTimeMillis() } ?: true // some instance allows expires time == null
+  val anyVotes = options.any { it.voted }
 }
 
-data class Option(
+@Immutable
+data class UiPollOption(
   val text: String,
   val count: Long,
-)
+  val progress: Float,
+  val voted: Boolean,
+) {
+  val progressText = String.format("%.0f%%", progress * 100)
+}
