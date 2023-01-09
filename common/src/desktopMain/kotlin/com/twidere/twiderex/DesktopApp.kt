@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,7 +24,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.seiko.imageloader.ImageLoader
@@ -44,6 +46,7 @@ import com.twidere.twiderex.kmp.commonConfig
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
+import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.utils.CustomTabSignInChannel
@@ -54,7 +57,9 @@ import com.twidere.twiderex.utils.currentOperatingSystem
 import it.sauronsoftware.junique.AlreadyLockedException
 import it.sauronsoftware.junique.JUnique
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.precompose.navigation.Navigator
 import okio.Path.Companion.toPath
@@ -164,8 +169,19 @@ private fun startDesktopApp() {
     e.printStackTrace()
   }
   application {
+    val state = rememberWindowState()
     LaunchedEffect(Unit) {
       preferencesHolder.warmup()
+    }
+    runBlocking {
+      preferencesHolder
+        .appearancePreferences
+        .data.firstOrNull()
+        ?.windowInfo
+        ?.let {
+          state.position = WindowPosition(it.start.dp, it.top.dp)
+          state.size = DpSize(it.width.dp, it.height.dp)
+        }
     }
     Initializer.withScope(rememberCoroutineScope())
       .add(TwidereServiceFactoryInitialTask())
@@ -174,12 +190,21 @@ private fun startDesktopApp() {
       NativeWindow(
         onCloseRequest = {
           stopKoin()
+          runBlocking {
+            preferencesHolder.appearancePreferences.updateData {
+              it.copy(
+                windowInfo = AppearancePreferences.WindowInfo(
+                  top = state.position.y.value,
+                  start = state.position.x.value,
+                  width = state.size.width.value,
+                  height = state.size.height.value,
+                )
+              )
+            }
+          }
           exitApplication()
         },
-        state = rememberWindowState(
-          width = 400.dp,
-          height = 900.dp
-        ),
+        state = state,
         title = "Twidere X",
         icon = painterResource(MR.files.ic_launcher.filePath),
       ) {

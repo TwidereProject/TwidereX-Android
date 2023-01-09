@@ -46,6 +46,7 @@ kotlin {
                 implementation("com.twitter.twittertext:twitter-text:3.1.0")
                 implementation("org.jsoup:jsoup:1.15.3")
                 implementation("app.cash.turbine:turbine:0.12.1")
+                implementation("com.eygraber:uri-kmp:0.0.9")
             }
             configurations.all {
                 // some dependencies contains it, this causes an exception to initialize the Main dispatcher in desktop
