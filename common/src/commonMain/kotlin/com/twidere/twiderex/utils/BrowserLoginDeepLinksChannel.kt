@@ -21,19 +21,13 @@
 package com.twidere.twiderex.utils
 
 import com.twidere.twiderex.navigation.RootDeepLinks
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 
-object CustomTabSignInChannel {
-  private var waiting = false
+object BrowserLoginDeepLinksChannel {
   private val channel: Channel<String> = Channel()
 
-  @OptIn(ExperimentalCoroutinesApi::class)
-  suspend fun send(uri: String) {
-    if (waiting && !channel.isClosedForSend) {
-      channel.send(uri)
-    }
-    waiting = false
+  fun send(uri: String) {
+    channel.trySend(uri)
   }
 
   fun canHandle(uri: String): Boolean {
@@ -42,14 +36,10 @@ object CustomTabSignInChannel {
   }
 
   suspend fun waitOne(): String {
-    waiting = true
     return channel.receive()
   }
 
-  fun onClose() {
-    if (waiting) {
-      channel.close()
-      waiting = false
-    }
+  fun cancel() {
+    channel.cancel()
   }
 }

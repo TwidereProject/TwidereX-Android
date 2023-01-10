@@ -80,7 +80,7 @@ import com.twidere.twiderex.preferences.ProvidePreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
-import com.twidere.twiderex.utils.CustomTabSignInChannel
+import com.twidere.twiderex.utils.BrowserLoginDeepLinksChannel
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
 import com.twidere.twiderex.utils.asIsActiveNetworkFlow
@@ -227,9 +227,9 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
   }
 
   private fun onDeeplink(it: Uri) {
-    if (CustomTabSignInChannel.canHandle(it.toString())) {
+    if (BrowserLoginDeepLinksChannel.canHandle(it.toString())) {
       lifecycleScope.launchWhenResumed {
-        CustomTabSignInChannel.send(it.toString())
+        BrowserLoginDeepLinksChannel.send(it.toString())
       }
     } else {
       navController.navigate(it.toString())
@@ -240,13 +240,6 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
     super.onNewIntent(intent)
     intent?.data?.let {
       onDeeplink(it)
-    }
-  }
-
-  override fun onResume() {
-    super.onResume()
-    lifecycleScope.launchWhenResumed {
-      CustomTabSignInChannel.onClose()
     }
   }
 }
