@@ -72,8 +72,8 @@ private val rippleSize = 24.dp
 
 @Composable
 fun ReplyButton(
-  modifier: Modifier = Modifier,
   status: UiStatus,
+  modifier: Modifier = Modifier,
   withNumber: Boolean = true,
   compose: (ComposeType, MicroBlogKey) -> Unit,
 ) {
@@ -114,8 +114,8 @@ fun ReplyButton(
 
 @Composable
 fun LikeButton(
-  modifier: Modifier = Modifier,
   status: UiStatus,
+  modifier: Modifier = Modifier,
   withNumber: Boolean = true,
 ) {
   val actionsViewModel = LocalStatusActions.current
@@ -162,8 +162,8 @@ fun LikeButton(
 
 @Composable
 fun RetweetButton(
-  modifier: Modifier = Modifier,
   status: UiStatus,
+  modifier: Modifier = Modifier,
   withNumber: Boolean = true,
   compose: (ComposeType, MicroBlogKey) -> Unit,
 ) {
@@ -244,8 +244,8 @@ fun RetweetButton(
 @OptIn(ExperimentalUnitApi::class)
 @Composable
 fun ShareButton(
-  modifier: Modifier = Modifier,
   status: UiStatus,
+  modifier: Modifier = Modifier,
   compat: Boolean = false,
   menus: @Composable ColumnScope.(callback: () -> Unit) -> Unit = {},
 ) {
@@ -382,13 +382,13 @@ fun ShareButton(
 
 @Composable
 private fun StatusActionButtonWithNumbers(
-  modifier: Modifier = Modifier,
   icon: Painter,
   contentDescription: String,
   count: Long,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
   enabled: Boolean = true,
   color: Color = LocalContentColor.current,
-  onClick: () -> Unit,
 ) {
   val contentColor = color.copy(LocalContentAlpha.current)
   val source = remember { MutableInteractionSource() }

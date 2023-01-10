@@ -39,9 +39,9 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun <T> LazyGridForIndexed(
-  modifier: Modifier = Modifier,
   data: List<T>,
   rowSize: Int,
+  modifier: Modifier = Modifier,
   contentPadding: PaddingValues = PaddingValues(0.dp),
   horizontalAlignment: Alignment.Horizontal = Alignment.Start,
   spacing: Dp = 0.dp,

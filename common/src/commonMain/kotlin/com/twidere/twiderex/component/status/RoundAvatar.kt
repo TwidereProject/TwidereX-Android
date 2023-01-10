@@ -34,8 +34,8 @@ import moe.tlaster.placeholder.Placeholder
 
 @Composable
 fun RoundAvatar(
-  modifier: Modifier = Modifier,
   avatar: Any,
+  modifier: Modifier = Modifier,
   size: Dp = UserAvatarDefaults.AvatarSize,
   withPlatformIcon: Boolean = false,
   onClick: (() -> Unit)? = null,

@@ -64,10 +64,10 @@ import java.util.Locale
 @Composable
 fun LazyUiListsList(
   listType: ListType,
-  modifier: Modifier = Modifier,
   source: LazyPagingItems<UiList>,
   ownerItems: LazyPagingItems<UiList>,
   subscribedItems: LazyPagingItems<UiList>,
+  modifier: Modifier = Modifier,
   state: LazyListState = rememberLazyListState(),
   onItemClicked: (UiList) -> Unit = {},
   header: LazyListScope.() -> Unit = {},

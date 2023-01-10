@@ -48,9 +48,9 @@ import java.util.UUID
 @Composable
 fun UserPresenter(
   event: Flow<UserEvent>,
+  userKey: MicroBlogKey,
   repository: UserRepository = get(),
   inAppNotification: InAppNotification = get(),
-  userKey: MicroBlogKey,
 ): UserState {
   val currentAccount = CurrentAccountPresenter()
   if (currentAccount !is CurrentAccountState.Account) {

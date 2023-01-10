@@ -34,8 +34,8 @@ import com.twidere.twiderex.navigation.UserNavigationData
 @Composable
 fun UserListComponent(
   source: LazyPagingItems<UiUser>,
-  action: @Composable (user: UiUser) -> Unit = {},
   userNavigationData: UserNavigationData,
+  action: @Composable (user: UiUser) -> Unit = {},
 ) {
   SwipeToRefreshLayout(
     refreshingState = source.loadState.refresh is LoadState.Loading,

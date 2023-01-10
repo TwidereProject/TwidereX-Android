@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -525,7 +526,7 @@ private fun ComposeBody(
 }
 
 @Composable
-private fun ComposeImageList(
+private fun ColumnScope.ComposeImageList(
   images: List<UiMediaInsert>,
   removeImage: (String) -> Unit,
   navigate: (String) -> Unit,
@@ -626,7 +627,7 @@ private object LocationDisplayDefaults {
 }
 
 @Composable
-private fun TextProgress(parsedTextLength: Int, maxLength: Int) {
+private fun RowScope.TextProgress(parsedTextLength: Int, maxLength: Int) {
   val progress = remember(parsedTextLength) {
     parsedTextLength.toFloat() / maxLength.toFloat()
   }
@@ -662,9 +663,9 @@ private fun TextProgress(parsedTextLength: Int, maxLength: Int) {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ComposeMastodonVisibility(
-  modifier: Modifier = Modifier,
   visibility: MastodonVisibility,
   setVisibility: (MastodonVisibility) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
   var showDropdown by remember {
     mutableStateOf(false)
@@ -880,10 +881,10 @@ private fun ConfirmDraftDialog(
 private fun ComposeInput(
   scaffoldState: BottomSheetScaffoldState,
   state: ComposeState.Data,
-  autoFocus: Boolean = true,
   focusRequester: FocusRequester,
   setText: (TextFieldValue) -> Unit,
   setContentWarningText: (TextFieldValue) -> Unit,
+  autoFocus: Boolean = true,
 ) {
   Column {
     ComposeReply(
@@ -1118,12 +1119,12 @@ private object ComposeVoteDefaults {
 
 @Composable
 private fun ComposeActions(
-  showEmoji: Boolean = false,
   navigateForResult: suspend (String) -> Any?,
   navigate: (String) -> Unit,
-  emojiButtonClicked: () -> Unit = {},
   state: ComposeState.Data,
   channel: Channel<ComposeEvent>,
+  showEmoji: Boolean = false,
+  emojiButtonClicked: () -> Unit = {},
 ) {
   val scope = rememberCoroutineScope()
   Box {

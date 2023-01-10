@@ -654,10 +654,10 @@ object MastodonUserFieldDefaults {
 
 @Composable
 private fun ProfileItem(
-  modifier: Modifier = Modifier,
   painter: Painter,
   contentDescription: String?,
   text: String,
+  modifier: Modifier = Modifier,
   textColor: Color = Color.Unspecified,
 ) {
   Row(
@@ -842,9 +842,9 @@ fun UserMetrics(
 
 @Composable
 fun MetricsItem(
-  modifier: Modifier = Modifier,
   primaryText: String,
   secondaryText: String,
+  modifier: Modifier = Modifier,
 ) {
   Column(
     modifier = modifier,
@@ -857,10 +857,10 @@ fun MetricsItem(
 
 @Composable
 fun UserDescText(
-  modifier: Modifier = Modifier,
   htmlDesc: String,
   url: List<UiUrlEntity>,
   openLick: (String) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
   key(
     htmlDesc,

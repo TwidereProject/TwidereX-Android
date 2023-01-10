@@ -112,7 +112,7 @@ private fun PureMediaScene(
           initialPage = selectedIndex,
           pageCount = medias.size,
         )
-        val videoPlayerState = mutableStateOf<VideoPlayerState?>(null)
+        val videoPlayerState = remember { mutableStateOf<VideoPlayerState?>(null) }
         val swiperState = rememberSwiperState(
           onDismiss = {
             navigator.popBackStack()

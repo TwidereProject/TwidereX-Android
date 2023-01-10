@@ -34,8 +34,8 @@ import com.twidere.twiderex.scenes.CurrentAccountState
 
 @Composable
 fun TwitterSearchMediaPresenter(
+  keyword: String,
   repository: SearchRepository = get(),
-  keyword: String
 ): TwitterSearchMediaState {
   val accountState = CurrentAccountPresenter()
 

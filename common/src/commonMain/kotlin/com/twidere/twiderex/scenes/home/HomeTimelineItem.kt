@@ -135,8 +135,8 @@ private fun HomeTimelineFab(
 
 @Composable
 fun HomeTimelineSceneContent(
-  lazyListController: LazyListController? = null,
   statusNavigation: StatusNavigationData,
+  lazyListController: LazyListController? = null,
 ) {
   TimelineComponent(
     lazyListController = lazyListController,

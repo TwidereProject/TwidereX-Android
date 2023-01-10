@@ -1,0 +1,54 @@
+# https://github.com/detekt/detekt/blob/main/detekt-core/src/main/resources/default-detekt-config.yml
+build:
+    maxIssues: 0
+
+naming:
+    active: false
+    FunctionNaming:
+        active: true
+        functionPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    TopLevelPropertyNaming:
+        active: true
+        constantPattern: '[A-Z][A-Za-z0-9]*'
+
+TwitterCompose:
+    CompositionLocalAllowlist:
+        active: false
+        # allowedCompositionLocals: LocalSomething,LocalSomethingElse
+    CompositionLocalNaming:
+        active: true
+    ContentEmitterReturningValues:
+        active: true
+        # contentEmitters: MyComposable,MyOtherComposable
+    ModifierComposable:
+        active: true
+    ModifierMissing:
+        active: false
+    ModifierReused:
+        active: true
+    ModifierWithoutDefault:
+        active: false
+    MultipleEmitters:
+        active: true
+        # contentEmitters: MyComposable,MyOtherComposable
+    MutableParams:
+        active: true
+    ComposableNaming:
+        active: false # TODO active if this fix: https://github.com/twitter/compose-rules/issues/107
+        allowedComposableFunctionNames: .*Presenter
+    ComposableParamOrder:
+        active: true
+    PreviewNaming:
+        active: true
+    PreviewPublic:
+        active: true
+        # You can optionally disable that only previews with @PreviewParameter are flagged
+        # previewPublicOnlyIfParams: false
+    RememberMissing:
+        active: true
+    UnstableCollections:
+        active: false # TODO active later
+    ViewModelForwarding:
+        active: false
+    ViewModelInjection:
+        active: false

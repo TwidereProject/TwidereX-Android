@@ -35,10 +35,10 @@ import com.twidere.twiderex.model.ui.UiUser
 
 @Composable
 fun StatusThreadWithAvatar(
-  modifier: Modifier = Modifier,
   data: UiStatus,
   onClick: () -> Unit,
   toUser: (UiUser) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
   Row(modifier = modifier) {
     UserAvatar(

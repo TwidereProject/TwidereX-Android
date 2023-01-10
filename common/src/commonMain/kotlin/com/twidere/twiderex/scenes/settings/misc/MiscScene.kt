@@ -412,7 +412,7 @@ fun ItemProxy(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun NitterPreference(
+fun ColumnScope.NitterPreference(
   state: NitterState,
   onChanged: (value: TextFieldValue) -> Unit,
   onShowUsageDialog: () -> Unit,

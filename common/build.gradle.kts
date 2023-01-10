@@ -1,16 +1,18 @@
 import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import org.jetbrains.kotlin.konan.properties.loadProperties
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.compose") version Versions.compose_jb
-    kotlin("plugin.serialization") version Versions.Kotlin.lang
-    id("com.android.library")
-    id("com.google.devtools.ksp").version(Versions.ksp)
-    id("dev.icerock.mobile.multiplatform-resources") version Versions.moko
-    id("com.squareup.sqldelight") version Versions.sqlDelight
-    id("com.codingfeline.buildkonfig") version "0.13.3"
+    id("twiderex.project.kmp.compose")
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.sqldelight)
+    alias(libs.plugins.buildkonfig)
+    alias(libs.plugins.multiplatformResources)
 }
+
+group = Package.group
+version = Package.versionName
 
 sqldelight {
     database("SqlDelightAppDatabase") {
@@ -23,107 +25,72 @@ sqldelight {
     }
 }
 
-group = Package.group
-version = Package.versionName
-
-repositories {
-    google()
-}
-
 kotlin {
-    android()
-    jvm("desktop") {
-        compilations.all {
-            kotlinOptions.jvmTarget = Versions.Java.jvmTarget
-        }
-    }
     sourceSets {
         val commonMain by getting {
+            kotlin.srcDir("src/commonMain/third")
             dependencies {
-                api(compose.runtime)
-                api(compose.foundation)
-                api(compose.material)
-                api(compose.materialIconsExtended)
                 implementation(projects.services)
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Kotlin.coroutines}")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:${Versions.Kotlin.coroutines}")
-                api("androidx.paging:paging-common:${Versions.paging}")
-                api("androidx.datastore:datastore-core:${Versions.datastore}")
-                api("androidx.datastore:datastore-preferences-core:${Versions.datastore}")
-                api("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.Kotlin.serialization}")
-                api("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:${Versions.Kotlin.serialization}")
-                api("io.insert-koin:koin-core:${Versions.koin}")
+                api(libs.bundles.compose)
+                implementation(libs.bundles.kotlinx)
+                implementation(libs.bundles.reftrofit2)
+                implementation(libs.bundles.androidx.common)
+                implementation(libs.sqldelight.coroutines.extensions)
+                implementation(libs.square.okhttp)
+                api(libs.square.okio)
+                api(libs.koin.core)
+                api(libs.mokoResources)
+                api(libs.kfilepicker)
+                api(libs.twitterParser)
+                api(libs.cache4k)
                 implementation("com.twitter.twittertext:twitter-text:3.1.0")
                 implementation("org.jsoup:jsoup:1.15.3")
-                implementation(projects.routeProcessor)
-                kspAll(projects.routeProcessor)
-                implementation("com.squareup.sqldelight:coroutines-extensions-jvm:${Versions.sqlDelight}")
-                api("dev.icerock.moko:resources:${Versions.moko}")
                 implementation("app.cash.turbine:turbine:0.12.1")
-                implementation("ca.gosyer:accompanist-pager:${Versions.accompanist_jb}")
-                implementation("ca.gosyer:accompanist-pager-indicators:${Versions.accompanist_jb}")
-                api("com.github.Tlaster.KFilePicker:KFilePicker:${Versions.kFilePicker}")
-                implementation("io.github.reactivecircus.cache4k:cache4k:${Versions.cache4k}")
-                api("com.eygraber:uri-kmp:${Versions.uri}")
-                api("moe.tlaster:precompose:${Versions.precompose}")
-                api("io.github.qdsfdhvh:image-loader:${Versions.imageLoader}")
-                api("io.github.qdsfdhvh:precompose-annotation:${Versions.precomposeKsp}")
-                implementation("io.ktor:ktor-client-okhttp:${Versions.ktor}")
+                implementation("com.eygraber:uri-kmp:0.0.9")
+            }
+            configurations.all {
+                // some dependencies contains it, this causes an exception to initialize the Main dispatcher in desktop
+                exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-android")
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
-                implementation("io.insert-koin:koin-test:${Versions.koin}")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.coroutines}")
+                implementation(libs.koin.test)
+                implementation(libs.kotlinx.coroutines.test)
                 implementation("io.mockk:mockk:1.13.3")
-                implementation("joda-time:joda-time:${Versions.jodaTime}")
             }
         }
         val androidMain by getting {
             dependencies {
-                implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
-                implementation("androidx.core:core-ktx:1.9.0")
-                implementation("io.insert-koin:koin-android:${Versions.koin}")
-                implementation("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
-                implementation("androidx.work:work-runtime-ktx:${Versions.work}")
-                implementation("androidx.room:room-runtime:${Versions.room}")
-                implementation("androidx.room:room-ktx:${Versions.room}")
-                implementation("androidx.room:room-paging:${Versions.room}")
-                kspAndroid("androidx.room:room-compiler:${Versions.room}")
-                implementation("com.google.android.exoplayer:exoplayer:${Versions.exoplayer}")
-                implementation("com.google.android.exoplayer:extension-okhttp:${Versions.exoplayer}")
-                implementation("androidx.datastore:datastore:${Versions.datastore}")
-                implementation("androidx.datastore:datastore-preferences:${Versions.datastore}")
-                implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
-                implementation("androidx.startup:startup-runtime:${Versions.startup}")
-                implementation("androidx.browser:browser:${Versions.browser}")
-                implementation("androidx.vectordrawable:vectordrawable:1.2.0-beta01")
-                implementation("androidx.activity:activity-compose:${Versions.activity}")
+                implementation(libs.bundles.androidx)
+                implementation(libs.bundles.room)
+                implementation(libs.bundles.exoplayer)
+                implementation(libs.kotlinx.coroutines.android)
+                implementation(libs.koin.android)
+                implementation(libs.koin.androidx.workmanager)
+                implementation(libs.compose.accompanist.permissions)
+                implementation(libs.androidx.work.rumtime.ktx)
                 implementation("com.github.android:renderscript-intrinsics-replacement-toolkit:b6363490c3")
-                implementation("com.google.accompanist:accompanist-permissions:${Versions.accompanist}")
             }
         }
         val androidAndroidTest by getting {
             dependencies {
-                implementation("androidx.arch.core:core-testing:2.1.0")
-                implementation("androidx.test:core:${Versions.androidxTestCore}")
-                implementation("androidx.test:runner:${Versions.androidxTestRunner}")
-                implementation("androidx.test.ext:junit-ktx:${Versions.extJUnitVersion}")
-                implementation("androidx.test.espresso:espresso-core:${Versions.espressoVersion}")
-                implementation("androidx.room:room-testing:${Versions.room}")
-                implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
+                implementation(libs.bundles.test.android)
+                implementation(libs.sqldelight.android.driver)
+                implementation(libs.room.test)
             }
         }
         val androidTest by getting {
             dependencies {
-                implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
+                implementation(libs.sqldelight.sqlite.driver)
             }
         }
         val desktopMain by getting {
             dependencies {
+                implementation(libs.kotlinx.coroutines.swing)
+                implementation(libs.sqldelight.sqlite.driver)
                 implementation("uk.co.caprica:vlcj:4.8.2")
-                implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
                 implementation("de.huxhorn.lilith:de.huxhorn.lilith.3rdparty.junique:1.0.4")
                 implementation("org.javassist:javassist:3.29.2-GA")
                 implementation("org.ocpsoft.prettytime:prettytime:5.0.6.Final")
@@ -135,9 +102,8 @@ kotlin {
 }
 
 dependencies {
-    add("kspCommonMainMetadata", "io.github.qdsfdhvh:precompose-ksp:${Versions.precomposeKsp}")
-    add("kspAndroid", "io.github.qdsfdhvh:precompose-ksp:${Versions.precomposeKsp}")
-    add("kspDesktop", "io.github.qdsfdhvh:precompose-ksp:${Versions.precomposeKsp}")
+    kspAll(libs.compose.precompose.ksp)
+    kspAndroid(libs.room.ksp)
 }
 
 buildkonfig {
@@ -158,42 +124,15 @@ buildkonfig {
     }
 }
 
-multiplatformResources {
-    multiplatformResourcesPackage = Package.id
-}
-
-fun org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler.kspAll(dependencyNotation: Any) {
-    kspAndroid(dependencyNotation)
-    kspDesktop(dependencyNotation)
-}
-
-fun org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler.kspDesktop(dependencyNotation: Any) {
-    configurations["kspDesktop"].dependencies.add(project.dependencies.create(dependencyNotation))
-}
-
-fun org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler.kspAndroid(dependencyNotation: Any) {
-    configurations["kspAndroid"].dependencies.add(project.dependencies.create(dependencyNotation))
-}
-
 android {
-    compileSdk = AndroidSdk.compile
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["androidTest"].assets.srcDirs("$projectDir/schemas")
     defaultConfig {
-        minSdk = AndroidSdk.min
-        targetSdk = AndroidSdk.target
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["notPackage"] = "com.twidere.twiderex.viewmodel"
     }
 
     lint {
         disable.add("MissingTranslation")
         disable.add("JavascriptInterface")
-    }
-
-    compileOptions {
-        sourceCompatibility = Versions.Java.java
-        targetCompatibility = Versions.Java.java
     }
 
     packagingOptions {
@@ -214,6 +153,10 @@ android {
         assets.srcDir(File(buildDir, "generated/moko/androidMain/assets"))
         res.srcDir(File(buildDir, "generated/moko/androidMain/res"))
     }
+}
+
+multiplatformResources {
+    multiplatformResourcesPackage = Package.id
 }
 
 ksp {

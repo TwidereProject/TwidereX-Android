@@ -85,10 +85,10 @@ enum class SavedStateKeyType(val key: String) {
 @Composable
 fun TimelinePresenter(
   event: Flow<TimeLineEvent>,
+  savedStateKeyType: SavedStateKeyType,
   dataStore: DataStore<Preferences> = get(),
   database: CacheDatabase = get(),
   notificationRepository: NotificationRepository = get(),
-  savedStateKeyType: SavedStateKeyType,
 ): TimelineState {
   val accountState = CurrentAccountPresenter()
 

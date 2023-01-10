@@ -40,8 +40,8 @@ import com.twidere.twiderex.utils.TranslationState
 
 @Composable
 fun TranslationStatus(
-  modifier: Modifier = Modifier,
   translationParam: TranslationParam,
+  modifier: Modifier = Modifier,
   translationRepo: ITranslationRepo = get(),
 ) {
   val translationState by remember {
@@ -56,7 +56,7 @@ fun TranslationStatus(
           Text(TranslationDefaults.NoNeedTip)
         }
         is TranslationState.Success -> {
-          Column(modifier = modifier) {
+          Column {
             Spacer(
               modifier = Modifier.height(
                 TranslationDefaults.gap

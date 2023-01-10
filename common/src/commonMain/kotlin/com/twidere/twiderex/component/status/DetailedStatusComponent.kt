@@ -56,10 +56,10 @@ import com.twidere.twiderex.navigation.StatusNavigationData
 @Composable
 fun DetailedStatusComponent(
   data: UiStatus,
+  statusNavigationData: StatusNavigationData,
   showInfo: Boolean = true,
   showActions: Boolean = true,
   lineUp: Boolean = false,
-  statusNavigationData: StatusNavigationData,
 ) {
   Column(
     modifier = Modifier
@@ -92,8 +92,11 @@ fun DetailedStatusComponent(
                 modifier = Modifier
                   .align(Alignment.CenterHorizontally)
               ) {
+                val iconSize = with(LocalDensity.current) {
+                  MaterialTheme.typography.body1.fontSize.toDp()
+                }
                 Icon(
-                  modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp),
+                  modifier = Modifier.size(iconSize),
                   painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
                   contentDescription = stringResource(
                     res = com.twidere.twiderex.MR.strings.accessibility_common_status_location

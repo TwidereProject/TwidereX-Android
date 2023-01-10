@@ -75,8 +75,8 @@ data class ResolvedLink(
 
 @Composable
 fun HtmlText(
-  modifier: Modifier = Modifier,
   htmlText: String,
+  modifier: Modifier = Modifier,
   maxLines: Int = Int.MAX_VALUE,
   color: Color = Color.Unspecified,
   fontSize: TextUnit = TextUnit.Unspecified,
@@ -93,7 +93,7 @@ fun HtmlText(
   linkStyle: TextStyle = textStyle.copy(MaterialTheme.colors.primary),
   linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
   positionWrapper: PositionWrapper? = null,
-  openLink: (String) -> Unit,
+  openLink: (String) -> Unit = {},
   onVisibleTextParsed: ((String) -> Unit)? = null,
 ) {
   val bidi = remember(htmlText) {
@@ -136,10 +136,10 @@ fun HtmlText(
 @OptIn(ExperimentalUnitApi::class)
 @Composable
 private fun RenderContent(
-  modifier: Modifier = Modifier,
   htmlText: String,
   textStyle: TextStyle,
   linkStyle: TextStyle,
+  modifier: Modifier = Modifier,
   linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
   onLinkClicked: (String) -> Unit = {},
   maxLines: Int = Int.MAX_VALUE,

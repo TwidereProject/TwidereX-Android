@@ -35,8 +35,8 @@ import com.twidere.twiderex.scenes.CurrentAccountState
 
 @Composable
 fun UserMediaTimelinePresenter(
-  repository: TimelineRepository = get(),
   userKey: MicroBlogKey,
+  repository: TimelineRepository = get(),
 ): UserMediaTimelineState {
   val currentAccount = CurrentAccountPresenter()
 

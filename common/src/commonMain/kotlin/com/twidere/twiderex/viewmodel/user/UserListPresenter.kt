@@ -52,9 +52,9 @@ interface UserListType {
 @Composable
 fun UserListPresenter(
   event: Flow<UserListEvent>,
+  userType: UserListType,
   repository: UserListRepository = get(),
   listsUsersRepository: ListsUsersRepository = get(),
-  userType: UserListType,
 ): UserListState {
   val currentAccount = CurrentAccountPresenter()
 

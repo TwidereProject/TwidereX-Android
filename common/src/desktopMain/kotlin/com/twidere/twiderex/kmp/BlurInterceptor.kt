@@ -20,31 +20,42 @@
  */
 package com.twidere.twiderex.kmp
 
-import androidx.compose.ui.graphics.toPainter
 import com.seiko.imageloader.intercept.Interceptor
 import com.seiko.imageloader.request.ComposeImageResult
-import com.seiko.imageloader.request.ComposePainterResult
 import com.seiko.imageloader.request.ImageResult
 import com.twidere.twiderex.component.image.ImageEffects
-import com.twidere.twiderex.image.ImageEffectsFilter
-import org.jetbrains.skiko.toBufferedImage
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.FilterTileMode
+import org.jetbrains.skia.Image
+import org.jetbrains.skia.ImageFilter
+import org.jetbrains.skia.Paint
 
 actual class BlurInterceptor actual constructor(private val effects: ImageEffects) : Interceptor {
   override suspend fun intercept(chain: Interceptor.Chain): ImageResult {
     val result = chain.proceed(chain.request)
     val blur = effects.blur
     if (blur != null && result is ComposeImageResult) {
-      val image = result.image.toBufferedImage()
-      val blurImage = ImageEffectsFilter.applyBlurFilter(
-        image,
-        blur.blurRadius,
-        blur.bitmapScale,
-      )
-      return ComposePainterResult(
-        request = result.request,
-        painter = blurImage.toPainter(),
+      return result.copy(
+        image = applyBlurFilter(result.image, blur.blurRadius.toFloat()),
       )
     }
+    return result
+  }
+
+  private fun applyBlurFilter(bitmap: Bitmap, radius: Float): Bitmap {
+    val result = Bitmap().apply {
+      allocN32Pixels(bitmap.width, bitmap.height)
+    }
+    val blur = Paint().apply {
+      imageFilter = ImageFilter.makeBlur(radius, radius, FilterTileMode.CLAMP)
+    }
+    val canvas = Canvas(result)
+    canvas.saveLayer(null, blur)
+    canvas.drawImageRect(Image.makeFromBitmap(bitmap), bitmap.bounds.toRect())
+    canvas.restore()
+    canvas.readPixels(result, 0, 0)
+    canvas.close()
     return result
   }
 }

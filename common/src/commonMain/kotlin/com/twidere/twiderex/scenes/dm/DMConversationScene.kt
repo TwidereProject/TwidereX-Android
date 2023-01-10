@@ -310,7 +310,6 @@ private object InputPhotoPreviewDefaults {
 
 @Composable
 fun InputComponent(
-  modifier: Modifier = Modifier,
   onMediaInsert: (List<UiMediaInsert>) -> Unit,
   input: String,
   onValueChanged: (input: String) -> Unit,
@@ -318,6 +317,7 @@ fun InputComponent(
   enableSend: Boolean,
   onSend: () -> Unit,
   navigateForResult: suspend (String) -> Any?,
+  modifier: Modifier = Modifier,
 ) {
   Row(
     modifier = modifier.padding(InputComponentDefaults.ContentPadding),

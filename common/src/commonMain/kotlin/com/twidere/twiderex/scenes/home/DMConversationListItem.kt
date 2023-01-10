@@ -52,8 +52,8 @@ class DMConversationListItem : HomeNavigationItem() {
   @Composable
   override fun Content(navigator: Navigator) {
     DMConversationListSceneContent(
+      navigator,
       lazyListController,
-      navigator = navigator,
     )
   }
 }

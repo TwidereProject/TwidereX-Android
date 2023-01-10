@@ -85,8 +85,8 @@ fun NotificationScene(
 
 @Composable
 fun NotificationContent(
-  lazyListController: LazyListController? = null,
   navigator: Navigator,
+  lazyListController: LazyListController? = null,
 ) {
   val account = LocalActiveAccount.current ?: return
   if (account.service !is NotificationService) {

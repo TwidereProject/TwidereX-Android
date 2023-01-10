@@ -96,8 +96,8 @@ fun LocalTimelineScene(
 
 @Composable
 fun LocalTimelineContent(
-  lazyListController: LazyListController? = null,
   navigator: Navigator,
+  lazyListController: LazyListController? = null,
 ) {
   val account = LocalActiveAccount.current ?: return
   if (account.service !is MastodonService) {

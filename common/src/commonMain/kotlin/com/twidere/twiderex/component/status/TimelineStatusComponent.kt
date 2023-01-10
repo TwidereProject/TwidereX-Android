@@ -78,11 +78,11 @@ import com.twidere.twiderex.utils.PreviewResolver
 @Composable
 fun TimelineStatusComponent(
   data: UiStatus,
+  statusNavigation: StatusNavigationData,
   showActions: Boolean = true,
   lineUp: Boolean = false,
   lineDown: Boolean = false,
   threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
-  statusNavigation: StatusNavigationData
 ) {
   when {
     data.platformType == PlatformType.Mastodon &&
@@ -401,16 +401,16 @@ object AvatarConnectLineDefaults {
 
 @Composable
 fun StatusContent(
+  data: UiStatus,
+  statusNavigation: StatusNavigationData,
   modifier: Modifier = Modifier,
   contentPadding: PaddingValues = PaddingValues(0.dp),
-  data: UiStatus,
   type: StatusContentType = StatusContentType.Normal,
   lineDown: Boolean = false,
   lineUp: Boolean = false,
   threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
   footer: @Composable () -> Unit = {},
   isSelectionAble: Boolean = true,
-  statusNavigation: StatusNavigationData,
 ) {
   val layoutDirection = LocalLayoutDirection.current
   val status = data.retweet ?: data

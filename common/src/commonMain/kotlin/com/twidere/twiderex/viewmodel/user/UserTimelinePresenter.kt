@@ -41,8 +41,8 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun UserTimelinePresenter(
   event: Flow<UserTimelineEvent>,
-  repository: TimelineRepository = get(),
   userKey: MicroBlogKey,
+  repository: TimelineRepository = get(),
 ): UserTimelineState {
   val currentAccount = CurrentAccountPresenter()
   if (currentAccount !is CurrentAccountState.Account) {

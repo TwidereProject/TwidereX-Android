@@ -143,14 +143,14 @@ class ParallaxLayoutState(
 
 @Composable
 fun ParallaxLayout(
+  parallaxLayoutState: ParallaxLayoutState,
   modifier: Modifier = Modifier,
   alignment: Alignment = Alignment.Center,
-  parallaxLayoutState: ParallaxLayoutState,
   backContentOffsetX: Dp = 0.dp,
   backContentOffsetY: Dp = 0.dp,
   animateDuration: Int = 300,
-  backContent: @Composable () -> Unit,
-  frontContent: @Composable () -> Unit,
+  backContent: @Composable () -> Unit = {},
+  frontContent: @Composable () -> Unit = {},
 ) {
   val animateSpec = remember {
     tween<Float>(durationMillis = animateDuration, easing = LinearEasing)

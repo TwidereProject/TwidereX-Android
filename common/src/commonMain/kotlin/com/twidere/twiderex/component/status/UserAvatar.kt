@@ -42,11 +42,11 @@ import com.twidere.twiderex.preferences.model.DisplayPreferences
 
 @Composable
 fun UserAvatar(
-  modifier: Modifier = Modifier,
   user: UiUser,
+  onClick: (UiUser) -> Unit,
+  modifier: Modifier = Modifier,
   size: Dp = UserAvatarDefaults.AvatarSize,
   withPlatformIcon: Boolean = false,
-  onClick: (UiUser) -> Unit,
 ) {
   Box(
     contentAlignment = Alignment.BottomEnd

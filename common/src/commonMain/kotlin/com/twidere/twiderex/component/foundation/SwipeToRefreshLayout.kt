@@ -232,10 +232,10 @@ private class SwipeToRefreshState(
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun SwipeToRefreshLayout(
-  modifier: Modifier = Modifier,
   refreshingState: Boolean,
-  refreshIndicatorPadding: PaddingValues = PaddingValues(0.dp),
   onRefresh: () -> Unit,
+  modifier: Modifier = Modifier,
+  refreshIndicatorPadding: PaddingValues = PaddingValues(0.dp),
   refreshIndicator: @Composable () -> Unit = {
     Surface(elevation = 10.dp, shape = CircleShape) {
       CircularProgressIndicator(

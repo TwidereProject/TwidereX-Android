@@ -41,10 +41,10 @@ import com.twidere.twiderex.viewmodel.timeline.TimelineState
 
 @Composable
 fun TimelineComponent(
-  contentPadding: PaddingValues = PaddingValues(0.dp),
-  lazyListController: LazyListController? = null,
   savedStateKeyType: SavedStateKeyType,
   statusNavigation: StatusNavigationData,
+  contentPadding: PaddingValues = PaddingValues(0.dp),
+  lazyListController: LazyListController? = null,
 ) {
   val (state, channel) = rememberPresenterState<TimelineState, TimeLineEvent> {
     TimelinePresenter(it, savedStateKeyType = savedStateKeyType)

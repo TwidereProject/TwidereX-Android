@@ -122,9 +122,9 @@ fun DMNewConversationScene(
 
 @Composable
 fun SearchInput(
-  modifier: Modifier = Modifier,
   input: String,
-  onValueChanged: (value: String) -> Unit
+  onValueChanged: (value: String) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
   Row(
     verticalAlignment = Alignment.CenterVertically,
