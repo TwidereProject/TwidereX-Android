@@ -28,12 +28,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.twidere.services.http.config.HttpConfig
 import com.twidere.services.proxy.ProxyConfig
+import com.twidere.twiderex.preferences.model.AccountPreferences
 import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.preferences.model.MiscPreferences
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import kotlinx.coroutines.flow.map
-
+val LocalAccountPreferences =
+  compositionLocalOf<AccountPreferences> { error("No AccountPreferences") }
 val LocalAppearancePreferences =
   compositionLocalOf<AppearancePreferences> { error("No AppearancePreferences") }
 val LocalDisplayPreferences =
@@ -45,6 +47,9 @@ fun ProvidePreferences(
   holder: PreferencesHolder,
   content: @Composable () -> Unit,
 ) {
+  val accountConfig by holder.accountPreferences
+    .data
+    .collectAsState(initial = AccountPreferences())
   val appearances by holder.appearancePreferences
     .data
     .collectAsState(initial = AppearancePreferences())
@@ -74,6 +79,7 @@ fun ProvidePreferences(
   val proxyConfig by proxyConfigFlow.collectAsState(initial = HttpConfig())
 
   CompositionLocalProvider(
+    LocalAccountPreferences provides accountConfig,
     LocalAppearancePreferences provides appearances,
     LocalDisplayPreferences provides display,
     LocalHttpConfig provides proxyConfig,
