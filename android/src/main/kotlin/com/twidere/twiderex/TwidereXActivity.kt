@@ -21,7 +21,9 @@
 package com.twidere.twiderex
 
 import android.Manifest
+import android.content.ContentResolver.SCHEME_ANDROID_RESOURCE
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
@@ -58,6 +60,8 @@ import com.seiko.imageloader.ImageLoaderBuilder
 import com.seiko.imageloader.LocalImageLoader
 import com.seiko.imageloader.cache.disk.DiskCacheBuilder
 import com.seiko.imageloader.cache.memory.MemoryCacheBuilder
+import com.seiko.imageloader.component.keyer.Keyer
+import com.seiko.imageloader.request.Options
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.LocalWindowInsetsController
@@ -222,6 +226,25 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
           .directory(storageService.cacheDir.toPath().resolve("image_cache"))
           .maxSizeBytes(512L * 1024 * 1024) // 512MB
           .build()
+      }
+      .components {
+        add(
+          // TODO remove after library upgrade
+          // fix resource cache, resId will be change
+          // @return android.resource://com.twidere.twiderex/2131755047-ic_heart-16
+          object : Keyer {
+            override fun key(data: Any, options: Options): String? {
+              val androidUri = when {
+                data is String && data.startsWith(SCHEME_ANDROID_RESOURCE) -> data
+                data is com.eygraber.uri.Uri && data.scheme == SCHEME_ANDROID_RESOURCE -> data.toString()
+                else -> return null
+              }
+              val id = androidUri.substringAfterLast('/', "").toIntOrNull() ?: return null
+              val entryName = resources.getResourceEntryName(id)
+              return "$data-$entryName-${resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK}"
+            }
+          },
+        )
       }
       .build()
   }
