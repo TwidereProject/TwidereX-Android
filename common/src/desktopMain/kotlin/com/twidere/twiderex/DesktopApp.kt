@@ -49,7 +49,7 @@ import com.twidere.twiderex.preferences.ProvidePreferences
 import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalVideoPlayback
-import com.twidere.twiderex.utils.CustomTabSignInChannel
+import com.twidere.twiderex.utils.BrowserLoginDeepLinksChannel
 import com.twidere.twiderex.utils.OperatingSystem
 import com.twidere.twiderex.utils.WindowsDatastoreModifier
 import com.twidere.twiderex.utils.WindowsRegistry
@@ -222,9 +222,9 @@ private fun startDesktopApp() {
 }
 
 private fun onDeeplink(url: String) {
-  if (CustomTabSignInChannel.canHandle(url)) {
+  if (BrowserLoginDeepLinksChannel.canHandle(url)) {
     mainScope.launch {
-      CustomTabSignInChannel.send(url)
+      BrowserLoginDeepLinksChannel.send(url)
     }
   } else {
     navController.navigate(url)

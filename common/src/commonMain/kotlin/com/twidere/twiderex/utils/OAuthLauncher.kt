@@ -32,6 +32,6 @@ class OAuthLauncher(
     queryParameterName: String,
   ): String {
     navigator.launchOAuthUri(uri)
-    return QueryString(CustomTabSignInChannel.waitOne()).query(queryParameterName, "") ?: ""
+    return QueryString(BrowserLoginDeepLinksChannel.waitOne()).query(queryParameterName, "") ?: ""
   }
 }
