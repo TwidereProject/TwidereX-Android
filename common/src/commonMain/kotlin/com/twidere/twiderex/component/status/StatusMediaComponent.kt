@@ -176,7 +176,8 @@ fun StatusMediaComponent(
       }
     }
 
-    if (status.platformType == PlatformType.Mastodon && status.mastodonExtra != null) {
+    val showSensitiveButton = status.sensitive || (status.platformType == PlatformType.Mastodon && status.mastodonExtra != null)
+    if (showSensitiveButton) {
       TwidereTheme(darkTheme = true) {
         AnimatedVisibility(
           modifier = Modifier
