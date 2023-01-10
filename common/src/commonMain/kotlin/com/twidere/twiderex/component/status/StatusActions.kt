@@ -51,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.ExperimentalUnitApi
@@ -406,9 +407,12 @@ private fun StatusActionButtonWithNumbers(
       .padding(StatusActionsDefaults.ContentPadding),
     verticalAlignment = Alignment.CenterVertically,
   ) {
+    val iconSize = with(LocalDensity.current) {
+      MaterialTheme.typography.body1.fontSize.toDp()
+    }
     Icon(
       modifier = Modifier
-        .size(MaterialTheme.typography.body1.fontSize.value.dp)
+        .size(iconSize)
         .indication(
           source,
           rememberRipple(
