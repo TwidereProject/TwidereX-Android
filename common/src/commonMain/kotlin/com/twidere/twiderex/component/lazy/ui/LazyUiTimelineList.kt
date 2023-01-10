@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -92,7 +92,6 @@ import com.twidere.twiderex.component.status.MediaPreviewButtonDefaults
 import com.twidere.twiderex.component.status.RetweetHeader
 import com.twidere.twiderex.component.status.StatusContentDefaults
 import com.twidere.twiderex.component.status.StatusHeader
-import com.twidere.twiderex.component.status.StatusHeaderDefaults
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.TokenText
 import com.twidere.twiderex.component.status.UserAvatar
@@ -1089,7 +1088,7 @@ fun UiMastodonStatusComponent(
         data = data,
         clickable = clickable,
       )
-      Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
+      Spacer(modifier = Modifier.height(8.dp))
     }
     Row {
       UserAvatar(
@@ -1253,12 +1252,16 @@ fun UiStatusMetricsComponent(
 
     MetricsButton(
       onClick = {
-        clickable.onReplyClicked.invoke(status)
+        if (status.data.metrics.liked) {
+          clickable.onUnlikeClicked.invoke(status)
+        } else {
+          clickable.onLikeClicked.invoke(status)
+        }
       },
       icon = painterResource(res = MR.files.ic_heart),
       contentDescription = stringResource(res = MR.strings.accessibility_common_status_actions_like),
-      showNumbers = status.data.metrics.hasReplyCount,
-      countString = status.data.metrics.humanizedReplyCount,
+      showNumbers = status.data.metrics.hasLikeCount,
+      countString = status.data.metrics.humanizedLikeCount,
       modifier = Modifier.weight(1f),
       tint = if (status.data.metrics.liked) {
         Color.Red

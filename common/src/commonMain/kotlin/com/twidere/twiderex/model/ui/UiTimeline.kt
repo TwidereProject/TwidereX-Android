@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -31,14 +31,15 @@ import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.enums.TwitterReplySettings
 import com.twidere.twiderex.model.ui.mastodon.MastodonMention
+import java.text.Bidi
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import moe.tlaster.twitter.parser.Token
 import moe.tlaster.twitter.parser.TwitterParser
-import java.text.Bidi
 
 sealed interface UiTimeline {
   val key: String
+  val statusKey: MicroBlogKey
   val contentType: String
 }
 
@@ -50,6 +51,7 @@ data class UiGap(
 ) : UiTimeline {
   override val contentType: String = "gap"
   override val key = "$maxId-$sinceId"
+  override val statusKey: MicroBlogKey = MicroBlogKey.gap(maxId, sinceId)
 }
 
 private val parser = TwitterParser()
@@ -109,6 +111,7 @@ sealed interface UiStatusWithExtra : UiTimeline {
 
 @Immutable
 data class UiTwitterStatus(
+  override val statusKey: MicroBlogKey,
   override val data: UiStatusMetaData,
   val replySettings: TwitterReplySettings,
 ) : UiTimeline, UiStatusTimeline {
@@ -118,6 +121,7 @@ data class UiTwitterStatus(
 
 @Immutable
 data class UiMastodonStatus(
+  override val statusKey: MicroBlogKey,
   override val data: UiStatusMetaData,
   val expanded: Boolean,
   val spoilerText: String?,
@@ -133,6 +137,7 @@ data class UiMastodonStatus(
 
 @Immutable
 data class UiTwitterThreadStatus(
+  override val statusKey: MicroBlogKey,
   val status: UiTwitterStatus,
 ) : UiTimeline {
   override val key: String = status.key
@@ -160,6 +165,7 @@ data class UiStatusMetrics(
 
 @Immutable
 data class UiStatusWithPoll(
+  override val statusKey: MicroBlogKey,
   override val status: UiStatusTimeline,
   val poll: UiPoll,
 ) : UiStatusWithExtra {
@@ -169,6 +175,7 @@ data class UiStatusWithPoll(
 
 @Immutable
 data class UiStatusWithMedia(
+  override val statusKey: MicroBlogKey,
   override val status: UiStatusTimeline,
   val media: ImmutableList<UiMedia>,
 ) : UiStatusWithExtra {
@@ -178,6 +185,7 @@ data class UiStatusWithMedia(
 
 @Immutable
 data class UiStatusWithCard(
+  override val statusKey: MicroBlogKey,
   override val status: UiStatusTimeline,
   val card: UiCard,
 ) : UiStatusWithExtra {
@@ -187,6 +195,7 @@ data class UiStatusWithCard(
 
 @Immutable
 data class UiRetweetStatus(
+  override val statusKey: MicroBlogKey,
   val status: UiStatusWithExtra,
   val retweet: UiStatusWithExtra,
 ) : UiTimeline {
@@ -196,6 +205,7 @@ data class UiRetweetStatus(
 
 @Immutable
 data class UiQuoteStatus(
+  override val statusKey: MicroBlogKey,
   val status: UiStatusWithExtra,
   val quote: UiStatusWithExtra,
 ) : UiTimeline {
@@ -205,6 +215,7 @@ data class UiQuoteStatus(
 
 @Immutable
 data class UiRetweetAndQuoteStatus(
+  override val statusKey: MicroBlogKey,
   val retweet: UiStatusWithExtra,
   val status: UiQuoteStatus,
 ) : UiTimeline {
@@ -214,6 +225,7 @@ data class UiRetweetAndQuoteStatus(
 
 @Immutable
 data class UiFollow(
+  override val statusKey: MicroBlogKey,
   val user: UiUser,
 ) : UiTimeline {
   override val key = user.userKey.copy(id = user.userKey.id + "-follow").toString()
@@ -222,6 +234,7 @@ data class UiFollow(
 
 @Immutable
 data class UiFollowRequest(
+  override val statusKey: MicroBlogKey,
   val user: UiUser,
 ) : UiTimeline {
   override val key = user.userKey.copy(id = user.userKey.id + "-follow-request").toString()

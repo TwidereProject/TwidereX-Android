@@ -5,15 +5,15 @@ CREATE TABLE IF NOT EXISTS DbStatusReactions (
     statusKey TEXT AS MicroBlogKey NOT NULL,
     accountKey TEXT AS MicroBlogKey NOT NULL,
     liked INTEGER AS Boolean NOT NULL,
-    retweeted INTEGER AS Boolean NOT NULL
+    retweeted INTEGER AS Boolean NOT NULL,
+    bookmarked INTEGER AS Boolean NOT NULL
 );
-
 
 CREATE UNIQUE INDEX IF NOT EXISTS index_statusKey_accountKey ON DbStatusReactions (statusKey, accountKey);
 
 insert:
 INSERT OR REPLACE INTO DbStatusReactions(
-    statusKey, accountKey, liked, retweeted
+    statusKey, accountKey, liked, retweeted, bookmarked
 ) VALUES ?;
 
 findWithStatusKey:

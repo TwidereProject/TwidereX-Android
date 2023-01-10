@@ -68,6 +68,7 @@ kotlin {
                 api("io.github.qdsfdhvh:precompose-annotation:${Versions.precomposeKsp}")
                 api("org.jetbrains.kotlinx:kotlinx-collections-immutable:${Versions.Kotlin.immutableCollections}")
                 api("moe.tlaster:twitter-parser:${Versions.twitterParser}")
+                api("com.soywiz.korlibs.krypto:krypto:3.4.0")
             }
         }
         val commonTest by getting {

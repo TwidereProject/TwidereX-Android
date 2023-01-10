@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,18 +25,22 @@ import androidx.compose.runtime.Immutable
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
-import kotlinx.collections.immutable.persistentListOf
 import java.net.URI
+import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
 data class UiMedia(
   val url: String?,
+  @Deprecated("TODO: remove this field")
   val belongToKey: MicroBlogKey,
   val mediaUrl: String?,
   val previewUrl: Any?,
   val type: MediaType,
+  @Deprecated("TODO: remove this field")
   val width: Long = 0,
+  @Deprecated("TODO: remove this field")
   val height: Long = 0,
+  @Deprecated("TODO: remove this field")
   val pageUrl: String? = "",
   val altText: String = "",
   val order: Int = 0,

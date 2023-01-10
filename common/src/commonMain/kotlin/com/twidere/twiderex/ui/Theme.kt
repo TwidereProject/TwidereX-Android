@@ -32,6 +32,7 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import com.twidere.twiderex.component.NativeInsetsColor
@@ -171,48 +172,50 @@ private fun provideTypography(): Typography {
   return if (useSystemFontSize) {
     baseTypography
   } else {
-    baseTypography.let {
-      it.copy(
-        h1 = it.h1.copy(
-          fontSize = it.h1.fontSize * fontScale,
-        ),
-        h2 = it.h2.copy(
-          fontSize = it.h2.fontSize * fontScale,
-        ),
-        h3 = it.h3.copy(
-          fontSize = it.h3.fontSize * fontScale,
-        ),
-        h4 = it.h4.copy(
-          fontSize = it.h4.fontSize * fontScale,
-        ),
-        h5 = it.h5.copy(
-          fontSize = it.h5.fontSize * fontScale,
-        ),
-        h6 = it.h6.copy(
-          fontSize = it.h6.fontSize * fontScale,
-        ),
-        subtitle1 = it.subtitle1.copy(
-          fontSize = it.subtitle1.fontSize * fontScale,
-        ),
-        subtitle2 = it.subtitle2.copy(
-          fontSize = it.subtitle2.fontSize * fontScale,
-        ),
-        body1 = it.body1.copy(
-          fontSize = it.body1.fontSize * fontScale,
-        ),
-        body2 = it.body2.copy(
-          fontSize = it.body2.fontSize * fontScale,
-        ),
-        button = it.button.copy(
-          fontSize = it.button.fontSize * fontScale,
-        ),
-        caption = it.caption.copy(
-          fontSize = it.caption.fontSize * fontScale,
-        ),
-        overline = it.overline.copy(
-          fontSize = it.overline.fontSize * fontScale,
-        ),
-      )
+    remember(baseTypography, fontScale) {
+      baseTypography.let {
+        it.copy(
+          h1 = it.h1.copy(
+            fontSize = it.h1.fontSize * fontScale,
+          ),
+          h2 = it.h2.copy(
+            fontSize = it.h2.fontSize * fontScale,
+          ),
+          h3 = it.h3.copy(
+            fontSize = it.h3.fontSize * fontScale,
+          ),
+          h4 = it.h4.copy(
+            fontSize = it.h4.fontSize * fontScale,
+          ),
+          h5 = it.h5.copy(
+            fontSize = it.h5.fontSize * fontScale,
+          ),
+          h6 = it.h6.copy(
+            fontSize = it.h6.fontSize * fontScale,
+          ),
+          subtitle1 = it.subtitle1.copy(
+            fontSize = it.subtitle1.fontSize * fontScale,
+          ),
+          subtitle2 = it.subtitle2.copy(
+            fontSize = it.subtitle2.fontSize * fontScale,
+          ),
+          body1 = it.body1.copy(
+            fontSize = it.body1.fontSize * fontScale,
+          ),
+          body2 = it.body2.copy(
+            fontSize = it.body2.fontSize * fontScale,
+          ),
+          button = it.button.copy(
+            fontSize = it.button.fontSize * fontScale,
+          ),
+          caption = it.caption.copy(
+            fontSize = it.caption.fontSize * fontScale,
+          ),
+          overline = it.overline.copy(
+            fontSize = it.overline.fontSize * fontScale,
+          ),
+        )
+      }
     }
   }
 }
@@ -252,17 +255,32 @@ private fun provideThemeColors(darkTheme: Boolean): Colors {
   val onBackground by animateColorAsState(targetValue = target.onBackground)
   val onSurface by animateColorAsState(targetValue = target.onSurface)
   val onError by animateColorAsState(targetValue = target.onError)
-  return target.copy(
-    primary = primaryColor,
-    primaryVariant = primaryColor,
-    secondary = primaryColor,
-    background = background,
-    surface = surface,
-    error = error,
-    onPrimary = onPrimary,
-    onSecondary = onSecondary,
-    onBackground = onBackground,
-    onSurface = onSurface,
-    onError = onError,
-  )
+  return remember(
+    target,
+    primaryColor,
+    primaryColor,
+    primaryColor,
+    background,
+    surface,
+    error,
+    onPrimary,
+    onSecondary,
+    onBackground,
+    onSurface,
+    onError,
+  ) {
+    target.copy(
+      primary = primaryColor,
+      primaryVariant = primaryColor,
+      secondary = primaryColor,
+      background = background,
+      surface = surface,
+      error = error,
+      onPrimary = onPrimary,
+      onSecondary = onSecondary,
+      onBackground = onBackground,
+      onSurface = onSurface,
+      onError = onError,
+    )
+  }
 }

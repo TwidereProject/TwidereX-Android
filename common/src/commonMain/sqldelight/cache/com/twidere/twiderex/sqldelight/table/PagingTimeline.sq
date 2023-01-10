@@ -1,23 +1,32 @@
 import com.twidere.twiderex.model.MicroBlogKey;
-import java.lang.Boolean;
 
 CREATE TABLE IF NOT EXISTS DbPagingTimeline (
     accountKey TEXT AS MicroBlogKey NOT NULL,
     pagingKey TEXT NOT NULL,
     statusKey TEXT AS MicroBlogKey NOT NULL,
-    timestamp INTEGER NOT NULL,
-    sortId INTEGER NOT NULL,
-    isGap INTEGER AS Boolean NOT NULL
+    orderKey INTEGER NOT NULL
 );
 CREATE UNIQUE INDEX IF NOT EXISTS index_accountKey_statusKey_pagingKey ON DbPagingTimeline (accountKey, statusKey, pagingKey);
 
+CREATE VIEW IF NOT EXISTS GetTimelineWithStatus AS
+SELECT
+timeline.*,
+status.content AS statusContent,
+reactions.retweeted AS reactionsRetweeted,
+reactions.liked AS reactionsLiked,
+reactions.bookmarked AS reactionsBookmarked
+FROM DbPagingTimeline timeline
+JOIN DbStatus status ON timeline.statusKey = status.statusKey
+LEFT JOIN DbStatusReactions reactions ON status.displayStatusKey == reactions.statusKey AND timeline.accountKey == reactions.accountKey;
+
+
 insert:
 INSERT OR REPLACE INTO DbPagingTimeline(
-    accountKey, pagingKey, statusKey, timestamp, sortId, isGap
+    accountKey, pagingKey, statusKey, orderKey
 ) VALUES ?;
 
 getPagingList:
-SELECT * FROM DbPagingTimeline WHERE accountKey == :accountKey AND pagingKey ==:pagingKey ORDER BY sortId DESC LIMIT :limit OFFSET :offset;
+SELECT * FROM DbPagingTimeline WHERE accountKey == :accountKey AND pagingKey ==:pagingKey ORDER BY orderKey DESC LIMIT :limit OFFSET :offset;
 
 getPagingCount:
 SELECT COUNT(*) FROM DbPagingTimeline WHERE accountKey == :accountKey AND pagingKey ==:pagingKey;
@@ -26,7 +35,7 @@ findWithStatusKey:
 SELECT * FROM DbPagingTimeline WHERE accountKey == :accountKey AND statusKey ==:statusKey;
 
 getLatest:
-SELECT * FROM DbPagingTimeline WHERE accountKey == :accountKey AND pagingKey == :pagingKey ORDER BY sortId DESC LIMIT 1;
+SELECT * FROM DbPagingTimeline WHERE accountKey == :accountKey AND pagingKey == :pagingKey ORDER BY orderKey DESC LIMIT 1;
 
 delete:
 DELETE FROM DbPagingTimeline WHERE statusKey ==:statusKey;

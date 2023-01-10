@@ -1,7 +1,5 @@
 clearAllTables{
     DELETE FROM DbDMEvent;
-    DELETE FROM DbMedia;
-    DELETE FROM DbUrlEntity;
     DELETE FROM DbUser;
     DELETE FROM DbDMConversation;
     DELETE FROM DbTrend;

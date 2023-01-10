@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -29,11 +29,9 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.model.paging.saveToDb
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
+import com.twidere.twiderex.model.ui.UiGap
+import com.twidere.twiderex.model.ui.UiTimeline
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalPagingApi::class)
@@ -41,30 +39,27 @@ abstract class PagingWithGapMediator(
   accountKey: MicroBlogKey,
   database: CacheDatabase,
 ) : PagingMediator(accountKey = accountKey, database = database) {
-
-  private val _loadingBetween = MutableStateFlow(persistentListOf<MicroBlogKey>())
-  val loadingBetween
-    get() = _loadingBetween.asSharedFlow()
-
   override suspend fun initialize(): InitializeAction {
     return InitializeAction.SKIP_INITIAL_REFRESH
   }
 
   override suspend fun load(
     loadType: LoadType,
-    state: PagingState<Int, PagingTimeLineWithStatus>
+    state: PagingState<Int, UiTimeline>
   ): MediatorResult {
     val maxStatusKey = when (loadType) {
       LoadType.APPEND -> {
         val lastItem = state.lastItemOrNull()
           ?: return MediatorResult.Success(
-            endOfPaginationReached = true
+            endOfPaginationReached = true,
           )
-        lastItem.status.statusKey
+        lastItem.statusKey
       }
+
       LoadType.PREPEND -> {
         return MediatorResult.Success(endOfPaginationReached = true)
       }
+
       LoadType.REFRESH -> {
         null
       }
@@ -73,13 +68,15 @@ abstract class PagingWithGapMediator(
       LoadType.APPEND -> {
         null
       }
+
       LoadType.PREPEND -> {
         return MediatorResult.Success(endOfPaginationReached = true)
       }
+
       LoadType.REFRESH -> {
         withContext(Dispatchers.IO) {
           database.pagingTimelineDao()
-            .getLatest(pagingKey, accountKey)?.status?.statusKey
+            .getLatest(pagingKey, accountKey)?.statusKey
         }
       }
     }
@@ -90,7 +87,7 @@ abstract class PagingWithGapMediator(
         state.config.pageSize
       },
       maxStatusKey = maxStatusKey,
-      sinceStatusKey = sinceStatueKey
+      sinceStatusKey = sinceStatueKey,
     )
   }
 
@@ -99,10 +96,21 @@ abstract class PagingWithGapMediator(
     maxStatusKey: MicroBlogKey? = null,
     sinceStatusKey: MicroBlogKey? = null,
   ): MediatorResult {
-    if (maxStatusKey != null && sinceStatusKey != null) {
-      _loadingBetween.value = (_loadingBetween.value + maxStatusKey).toPersistentList()
-    }
     try {
+      val gap = if (maxStatusKey != null && sinceStatusKey != null) {
+        database.pagingTimelineDao()
+          .findWithStatusKey(MicroBlogKey.gap(maxStatusKey.id, sinceStatusKey.id), accountKey)
+          ?.let {
+            it as? UiGap
+          }?.let {
+            it.copy(loading = true)
+          }?.let {
+            database.pagingTimelineDao().insertAll(listOf(it))
+            it
+          }
+      } else {
+        null
+      }
       val max_id = withContext(Dispatchers.IO) {
         maxStatusKey?.let { database.statusDao().findWithStatusKey(it, accountKey)?.statusId }
       }
@@ -114,17 +122,29 @@ abstract class PagingWithGapMediator(
         }
       }
       database.withTransaction {
-        if (maxStatusKey != null) {
-          database.pagingTimelineDao().findWithStatusKey(maxStatusKey, accountKey)?.let {
-            it.isGap = false
-            database.pagingTimelineDao().insertAll(listOf(it))
-          }
-        }
+        // if (maxStatusKey != null && sinceStatusKey != null) {
+        //   database.pagingTimelineDao()
+        //     .findWithStatusKey(MicroBlogKey.gap(maxStatusKey.id, sinceStatusKey.id), accountKey)
+        //     ?.let {
+        //       database.pagingTimelineDao().delete(MicroBlogKey.gap(maxStatusKey.id, sinceStatusKey.id))
+        //     }
+        // }
         if (sinceStatusKey != null) {
           result.lastOrNull()?.let {
-            database.pagingTimelineDao().findWithStatusKey(it.status.statusKey, accountKey = accountKey)
-          }.let {
-            result.lastOrNull()?.timeline?.isGap = it == null
+            val status = database.pagingTimelineDao().findWithStatusKey(it.status.statusKey, accountKey = accountKey)
+            if (status == null) {
+              // is gap
+              database.pagingTimelineDao()
+                .insertAll(
+                  listOf(
+                    UiGap(
+                      maxId = it.status.statusId,
+                      sinceId = sinceStatusKey.id,
+                      loading = false,
+                    ),
+                  ),
+                )
+            }
           }
         }
         result.saveToDb(database)
@@ -134,10 +154,6 @@ abstract class PagingWithGapMediator(
       )
     } catch (e: Throwable) {
       return MediatorResult.Error(e)
-    } finally {
-      if (maxStatusKey != null && sinceStatusKey != null) {
-        _loadingBetween.value = (_loadingBetween.value - maxStatusKey).toPersistentList()
-      }
     }
   }
 

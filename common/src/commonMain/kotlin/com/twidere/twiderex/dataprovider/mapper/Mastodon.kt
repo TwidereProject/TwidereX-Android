@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -55,13 +55,13 @@ import com.twidere.twiderex.model.ui.mastodon.MastodonMention
 import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
 import com.twidere.twiderex.model.ui.mastodon.MastodonUserExtra
 import com.twidere.twiderex.navigation.RootDeepLinks
+import java.util.regex.Pattern
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.collections.immutable.toPersistentMap
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
-import java.util.regex.Pattern
 
 fun Notification.toPagingTimeline(
   accountKey: MicroBlogKey,
@@ -273,19 +273,21 @@ internal fun Status.toUiStatus(
 
 fun Poll.toUi() = UiPoll(
   id = id ?: "",
-  options = options?.map { option ->
+  options = options?.mapIndexed { index, option ->
     UiPollOption(
       text = option.title ?: "",
-      count = option.votesCount ?: 0
+      count = option.votesCount ?: 0,
+      voted = ownVotes?.contains(index) == true,
+      progress = option.votesCount?.toFloat()?.div(votesCount?.toFloat() ?: 1f) ?: 0f,
     )
-  } ?: emptyList(),
+  }?.toPersistentList() ?: persistentListOf(),
   expiresAt = expiresAt?.millis,
   expired = expired ?: false,
   multiple = multiple ?: false,
   voted = voted ?: false,
   votesCount = votesCount ?: 0,
   votersCount = votersCount ?: 0,
-  ownVotes = ownVotes
+  ownVotes = ownVotes?.toPersistentList()
 )
 
 internal fun Account.toUiUser(
