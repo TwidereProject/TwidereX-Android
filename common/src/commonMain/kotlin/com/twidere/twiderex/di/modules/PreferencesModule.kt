@@ -26,6 +26,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.twidere.twiderex.kmp.StorageProvider
 import com.twidere.twiderex.kmp.appFiles
 import com.twidere.twiderex.preferences.PreferencesHolder
+import com.twidere.twiderex.preferences.serializer.AccountPreferencesSerializer
 import com.twidere.twiderex.preferences.serializer.AppearancePreferencesSerializer
 import com.twidere.twiderex.preferences.serializer.DisplayPreferencesSerializer
 import com.twidere.twiderex.preferences.serializer.MiscPreferencesSerializer
@@ -37,6 +38,10 @@ import java.io.File
 internal val preferencesModule = module {
   single {
     PreferencesHolder(
+      accountPreferences = createDataStore(
+        "accountConfig.pb",
+        AccountPreferencesSerializer
+      ),
       appearancePreferences = createDataStore(
         "appearances.pb",
         AppearancePreferencesSerializer

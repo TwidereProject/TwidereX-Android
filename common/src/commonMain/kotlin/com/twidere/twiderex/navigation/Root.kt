@@ -210,6 +210,7 @@ object Root {
     const val Misc = "/Root/Settings/Misc"
     const val Notification = "/Root/Settings/Notification"
     const val Layout = "/Root/Settings/Layout"
+    const val PrivacyAndSafety = "/Root/Settings/PrivacyAndSafety"
     object AccountNotification {
       const val route = "/Root/Settings/AccountNotification/{accountKey}"
       operator fun invoke(accountKey: MicroBlogKey) = "/Root/Settings/AccountNotification/$accountKey"

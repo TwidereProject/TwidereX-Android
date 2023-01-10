@@ -21,6 +21,7 @@
 package com.twidere.twiderex.preferences
 
 import androidx.datastore.core.DataStore
+import com.twidere.twiderex.preferences.model.AccountPreferences
 import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.preferences.model.MiscPreferences
@@ -31,6 +32,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 
 data class PreferencesHolder(
+  val accountPreferences: DataStore<AccountPreferences>,
   val appearancePreferences: DataStore<AppearancePreferences>,
   val displayPreferences: DataStore<DisplayPreferences>,
   val miscPreferences: DataStore<MiscPreferences>,
@@ -38,6 +40,7 @@ data class PreferencesHolder(
 ) {
   suspend fun warmup() = coroutineScope {
     awaitAll(
+      async { accountPreferences.data.firstOrNull() },
       async { appearancePreferences.data.firstOrNull() },
       async { displayPreferences.data.firstOrNull() },
       async { miscPreferences.data.firstOrNull() },

@@ -21,10 +21,8 @@
 package com.twidere.twiderex.component.status
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -44,6 +42,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -66,11 +65,11 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.StatusNavigationData
+import com.twidere.twiderex.preferences.LocalAccountPreferences
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.TwidereTheme
 import moe.tlaster.placeholder.Placeholder
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun StatusMediaComponent(
   status: UiStatus,
@@ -84,8 +83,17 @@ fun StatusMediaComponent(
     val index = media.indexOf(it)
     statusNavigation.toMediaWithIndex(status.statusKey, index)
   }
-  var sensitive by rememberSaveable(status.statusKey.toString()) {
-    mutableStateOf(status.sensitive)
+  val isAlwaysShowSensitiveMedia = LocalAccountPreferences.current.isAlwaysShowSensitiveMedia
+  var sensitive by key(isAlwaysShowSensitiveMedia) {
+    // TODO add key to rememberSaveable not use for display scene
+    rememberSaveable(status.statusKey.toString()) {
+      val initialSensitive = when (status.platformType) {
+        PlatformType.Twitter -> status.sensitive && !isAlwaysShowSensitiveMedia
+        PlatformType.Mastodon -> !isAlwaysShowSensitiveMedia
+        else -> status.sensitive
+      }
+      mutableStateOf(initialSensitive)
+    }
   }
 
   val aspectRatio = when (media.size) {
@@ -176,7 +184,8 @@ fun StatusMediaComponent(
       }
     }
 
-    if (status.platformType == PlatformType.Mastodon && status.mastodonExtra != null) {
+    val showSensitiveButton = status.sensitive || (status.platformType == PlatformType.Mastodon && status.mastodonExtra != null)
+    if (showSensitiveButton) {
       TwidereTheme(darkTheme = true) {
         AnimatedVisibility(
           modifier = Modifier
@@ -233,6 +242,7 @@ fun StatusMediaComponent(
                 painter = painterResource(res = com.twidere.twiderex.MR.files.ic_eye_off),
                 contentDescription = null,
                 tint = MaterialTheme.colors.onSurface,
+                modifier = Modifier.size(StatusMediaDefaults.Sensitive.IconSize),
               )
             }
           }

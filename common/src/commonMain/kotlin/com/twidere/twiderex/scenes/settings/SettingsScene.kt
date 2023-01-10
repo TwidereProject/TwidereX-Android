@@ -53,6 +53,13 @@ data class SettingItem(
 
 private val settings =
   mapOf(
+    com.twidere.twiderex.MR.strings.scene_settings_section_header_account to listOf(
+      SettingItem(
+        com.twidere.twiderex.MR.strings.scene_settings_privacy_and_safety_title,
+        com.twidere.twiderex.MR.files.ic_privacy_and_safety,
+        route = Root.Settings.PrivacyAndSafety,
+      )
+    ),
     com.twidere.twiderex.MR.strings.scene_settings_section_header_general to listOf(
       SettingItem(
         com.twidere.twiderex.MR.strings.scene_settings_appearance_title,
