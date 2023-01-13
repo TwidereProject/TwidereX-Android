@@ -107,7 +107,6 @@ private fun TweetValue.toDbTimelineWithStatus(
   isGap: Boolean = false,
 ): PagingTimeLineWithStatus? {
   val statusKey = MicroBlogKey.twitter(idStr.orEmpty())
-  // val user = response.globalObjects?.users?.get(userIDStr)?.toDbUser() ?: return null
   val status = toUiStatus(response, isGap) ?: return null
   return PagingTimeLineWithStatus(
     timeline = PagingTimeLine(
@@ -119,22 +118,6 @@ private fun TweetValue.toDbTimelineWithStatus(
       isGap = isGap,
     ),
     status = status,
-    // user = DbUserWithRelation(
-    //   user = user,
-    // ),
-    // status = DbStatusWithReactions(
-    //   status = DbStatus(
-    //     statusKey = statusKey,
-    //     userKey = user.userKey,
-    //     content = toDbTwitter(response) ?: return null
-    //   ),
-    //   reactions = DbStatusReactions(
-    //     statusKey = statusKey,
-    //     accountKey = accountKey,
-    //     liked = 0, // TODO USE REAL VALUE
-    //     retweeted = 0, // TODO USE REAL VALUE
-    //   ),
-    // )
   )
 }
 
