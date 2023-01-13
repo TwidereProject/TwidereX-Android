@@ -38,6 +38,7 @@ import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.paging.toUi
 import com.twidere.twiderex.paging.mediator.status.MastodonStatusContextMediator
 import com.twidere.twiderex.paging.mediator.status.TwitterConversationMediator
+import com.twidere.twiderex.paging.mediator.status.TwitterGuestTweetThreadMediator
 import com.twidere.twiderex.preferences.model.MiscPreferences
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -99,19 +100,39 @@ class StatusRepository(
   ): Flow<PagingData<UiStatus>> = flow {
     // TODO: remove usage of `when`
     val remoteMediator = when (platformType) {
-      PlatformType.Twitter -> TwitterConversationMediator(
-        service = service as TwitterService,
-        nitterService = preferences?.data?.first()?.nitterInstance?.takeIf { it.isNotEmpty() }
-          ?.let {
-            NitterService(
-              it.trimEnd('/'),
-              TwidereServiceFactory.createHttpClientFactory()
+      PlatformType.Twitter -> preferences?.data?.first()
+        ?.nitterInstance
+        ?.takeIf { it.isNotEmpty() }
+        ?.let {
+          NitterService(
+            it.trimEnd('/'),
+            TwidereServiceFactory.createHttpClientFactory()
+          )
+        }.let { nitterService ->
+          // TODO nitter merge to guest
+          if (nitterService != null) {
+            TwitterConversationMediator(
+              service = service as TwitterService,
+              nitterService = preferences?.data?.first()?.nitterInstance?.takeIf { it.isNotEmpty() }
+                ?.let {
+                  NitterService(
+                    it.trimEnd('/'),
+                    TwidereServiceFactory.createHttpClientFactory()
+                  )
+                },
+              statusKey = statusKey,
+              accountKey = accountKey,
+              database = database,
             )
-          },
-        statusKey = statusKey,
-        accountKey = accountKey,
-        database = database,
-      )
+          } else {
+            TwitterGuestTweetThreadMediator(
+              statusKey = statusKey,
+              service = service as TwitterService,
+              accountKey = accountKey,
+              database = database,
+            )
+          }
+        }
       PlatformType.StatusNet -> TODO()
       PlatformType.Fanfou -> TODO()
       PlatformType.Mastodon -> MastodonStatusContextMediator(
@@ -123,8 +144,4 @@ class StatusRepository(
     }
     emit(remoteMediator.pager().toUi())
   }.flattenMerge()
-
-  fun tweetThread(
-    statusKey: MicroBlogKey,
-  )
 }
