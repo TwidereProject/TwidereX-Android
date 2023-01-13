@@ -43,6 +43,7 @@ kotlin {
                 api(libs.kfilepicker)
                 api(libs.twitterParser)
                 api(libs.cache4k)
+                api(libs.napier)
                 implementation("com.twitter.twittertext:twitter-text:3.1.0")
                 implementation("org.jsoup:jsoup:1.15.3")
                 implementation("app.cash.turbine:turbine:0.12.1")
@@ -120,6 +121,13 @@ buildkonfig {
             buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "CONSUMERKEY", apiKeyProp.getProperty("ConsumerKey"))
             buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "CONSUMERSECRET", apiKeyProp.getProperty("ConsumerSecret"))
             buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "GIPHYKEY", apiKeyProp.getProperty("GiphyKey"))
+        }
+        val localProperties = rootProject.file("local.properties")
+        if (localProperties.exists()) {
+            val localProp = loadProperties(localProperties.absolutePath)
+            buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.BOOLEAN, "Debug", localProp.getProperty("debug", "false"))
+        } else {
+            buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.BOOLEAN, "Debug", "false")
         }
     }
 }

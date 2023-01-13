@@ -18,17 +18,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.utils
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-import com.twidere.twiderex.component.foundation.DesktopMediaPlayerHelper
-import com.twidere.twiderex.media.DesktopMediaPlayerFactoryImpl
-import com.twidere.twiderex.utils.TwiderexLogger
-import io.github.aakira.napier.Napier
+import com.twidere.twiderex.BuildConfig
+import io.github.aakira.napier.Antilog
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.LogLevel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-@ExperimentalComposeUiApi
-fun main(args: Array<String>) {
-  DesktopMediaPlayerHelper.register(DesktopMediaPlayerFactoryImpl())
-  Napier.base(TwiderexLogger())
-  runDesktopApp(args)
+class TwiderexLogger : Antilog() {
+
+  private val logger by lazy { DebugAntilog() }
+  private val scope by lazy {
+    CoroutineScope(Dispatchers.IO)
+  }
+
+  override fun isEnable(priority: LogLevel, tag: String?): Boolean = BuildConfig.Debug
+
+  override fun performLog(priority: LogLevel, tag: String?, throwable: Throwable?, message: String?) {
+    scope.launch {
+      logger.log(priority, tag, throwable, message)
+    }
+  }
 }
