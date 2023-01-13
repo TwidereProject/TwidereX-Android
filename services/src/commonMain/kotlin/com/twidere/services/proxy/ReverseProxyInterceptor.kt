@@ -20,7 +20,6 @@
  */
 package com.twidere.services.proxy
 
-import com.twidere.services.utils.Base64
 import okhttp3.Credentials
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -28,6 +27,7 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import okio.IOException
 import java.net.URLEncoder
+import okio.ByteString.Companion.encodeUtf8
 
 class ReverseProxyInterceptor(
   private val proxyFormat: String,
@@ -119,10 +119,7 @@ object ReverseProxyHandler {
           "[#FRAGMENT]" -> url.encodedFragment?.prefix("#").orEmpty()
           "[FRAGMENT_ENCODED]" -> url.encodedFragment?.urlEncoded()
           "[URL_ENCODED]" -> url.toString().urlEncoded()
-          "[URL_BASE64]" -> Base64.encodeToString(
-            url.toString().toByteArray(Charsets.UTF_8),
-            Base64.URL_SAFE
-          )
+          "[URL_BASE64]" -> url.toString().encodeUtf8().base64Url()
           else -> throw AssertionError()
         }
       )
