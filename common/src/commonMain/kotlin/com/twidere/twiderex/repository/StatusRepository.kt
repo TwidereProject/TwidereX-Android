@@ -123,4 +123,8 @@ class StatusRepository(
     }
     emit(remoteMediator.pager().toUi())
   }.flattenMerge()
+
+  fun tweetThread(
+    statusKey: MicroBlogKey,
+  )
 }

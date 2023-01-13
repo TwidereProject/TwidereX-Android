@@ -43,14 +43,14 @@ class HttpConfigClientFactoryTest {
     val resourceOld = factory.createResources<TwitterResources>(
       TwitterResources::class.java,
       baseUrl = "https://www.twitter.com",
-      EmptyAuthorization(),
+      EmptyAuthorization,
       useCache = true
     )
 
     val resourceNew = factory.createResources<TwitterResources>(
       TwitterResources::class.java,
       baseUrl = "https://www.twitter.com",
-      EmptyAuthorization(),
+      EmptyAuthorization,
       useCache = true
     )
     assertSame(resourceOld, resourceNew)
@@ -62,13 +62,13 @@ class HttpConfigClientFactoryTest {
     val resourceOld = factory.createResources<TwitterResources>(
       TwitterResources::class.java,
       baseUrl = "https://www.twitter.com",
-      EmptyAuthorization(),
+      EmptyAuthorization,
     )
 
     val resourceNew = factory.createResources<TwitterResources>(
       TwitterResources::class.java,
       baseUrl = "https://www.twitter.com",
-      EmptyAuthorization(),
+      EmptyAuthorization,
     )
     assertNotSame(resourceOld, resourceNew)
   }

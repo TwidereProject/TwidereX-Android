@@ -45,7 +45,7 @@ class MastodonOAuthService(
     httpClientFactory.createResources(
       MastodonOAuthResources::class.java,
       baseUrl,
-      EmptyAuthorization()
+      EmptyAuthorization
     )
   }
 
