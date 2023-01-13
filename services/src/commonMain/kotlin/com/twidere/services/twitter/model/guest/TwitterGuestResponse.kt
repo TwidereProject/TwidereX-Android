@@ -227,6 +227,18 @@ data class TweetValue(
       val domain: VanityUrl? = null,
       val title: VanityUrl? = null,
       val description: VanityUrl? = null,
+      @SerialName("player_image_small")
+      val playerImageSmall: ThumbnailImage? = null,
+      @SerialName("player_image")
+      val playerImage: ThumbnailImage? = null,
+      @SerialName("player_image_large")
+      val playerImageLarge: ThumbnailImage? = null,
+      @SerialName("player_image_x_large")
+      val playerImageXLarge: ThumbnailImage? = null,
+      @SerialName("player_image_color")
+      val playerImageColor: ThumbnailImageColor? = null,
+      @SerialName("player_image_original")
+      val playerImageOriginal: ThumbnailImage? = null,
       @SerialName("thumbnail_image_small")
       val thumbnailImageSmall: ThumbnailImage? = null,
       @SerialName("thumbnail_image")

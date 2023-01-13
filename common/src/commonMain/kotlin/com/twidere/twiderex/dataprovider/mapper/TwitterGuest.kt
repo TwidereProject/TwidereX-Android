@@ -176,7 +176,9 @@ private fun TweetValue.toUiStatus(
         link = it.bindingValues?.cardUrl?.stringValue.orEmpty(),
         title = it.bindingValues?.title?.stringValue.orEmpty(),
         description = it.bindingValues?.description?.stringValue,
-        image = it.bindingValues?.thumbnailImage?.imageValue?.url,
+        image = it.bindingValues?.run {
+          (playerImageOriginal ?: thumbnailImageOriginal)?.imageValue?.url
+        },
         displayLink = "",
       )
     },
