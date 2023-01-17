@@ -131,7 +131,8 @@ private fun ensureDesktopEntry() {
       "Icon=\"${path.parent.parent.absolutePathString() + "/lib/Twidere X.png" + "\""}${System.lineSeparator()}" +
       "Exec=\"${path.absolutePathString() + "\" %u"}${System.lineSeparator()}" +
       "Terminal=false${System.lineSeparator()}" +
-      "MimeType=x-scheme-handler/$twidereXSchema;"
+      "Categories=Network;Internet;${System.lineSeparator()}" +
+      "MimeType=application/x-$twidereXSchema;x-scheme-handler/$twidereXSchema;x-scheme-handler/twitter;"
   )
 }
 
