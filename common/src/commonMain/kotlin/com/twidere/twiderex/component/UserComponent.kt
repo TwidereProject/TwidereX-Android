@@ -77,14 +77,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import com.twidere.services.microblog.model.IRelationship
 import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.HorizontalDivider
 import com.twidere.twiderex.component.foundation.NetworkImage
-import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusImageList
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.component.status.HtmlText
@@ -186,7 +186,7 @@ fun UserComponent(
         )
       },
       content = {
-        val pagerState = rememberPagerState(pageCount = tabs.size)
+        val pagerState = rememberPagerState()
         Column {
           val scope = rememberCoroutineScope()
           TabRow(
@@ -206,7 +206,7 @@ fun UserComponent(
                 selected = pagerState.currentPage == index,
                 onClick = {
                   scope.launch {
-                    pagerState.currentPage = index
+                    pagerState.animateScrollToPage(index)
                   }
                 },
                 content = {
@@ -223,11 +223,11 @@ fun UserComponent(
               )
             }
           }
-          Pager(
+          HorizontalPager(
+            count = tabs.size,
             modifier = Modifier.weight(1f),
             state = pagerState,
-            offscreenLimit = 0,
-          ) {
+          ) { page ->
             Box(
               modifier = Modifier.fillMaxSize(),
               contentAlignment = Alignment.TopCenter,

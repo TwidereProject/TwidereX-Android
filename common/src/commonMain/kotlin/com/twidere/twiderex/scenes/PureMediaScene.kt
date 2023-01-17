@@ -50,9 +50,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.rememberPagerState
 import com.twidere.twiderex.component.bottomInsetsPadding
 import com.twidere.twiderex.component.foundation.VideoPlayerState
-import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.component.topInsetsPadding
@@ -86,6 +87,7 @@ fun PureMediaScene(
   }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun PureMediaScene(
   belongToKey: MicroBlogKey,
@@ -110,7 +112,6 @@ private fun PureMediaScene(
         val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
         val pagerState = rememberPagerState(
           initialPage = selectedIndex,
-          pageCount = medias.size,
         )
         val videoPlayerState = remember { mutableStateOf<VideoPlayerState?>(null) }
         val swiperState = rememberSwiperState(

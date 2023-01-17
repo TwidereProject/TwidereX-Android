@@ -18,6 +18,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalPagerApi::class)
+
 package com.twidere.twiderex.scenes
 
 import androidx.compose.animation.AnimatedVisibility
@@ -62,18 +64,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.mxalbert.zoomable.Zoomable
 import com.twidere.twiderex.component.bottomInsetsHeight
 import com.twidere.twiderex.component.bottomInsetsPadding
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
-import com.twidere.twiderex.component.foundation.Pager
-import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.foundation.VideoPlayerState
-import com.twidere.twiderex.component.foundation.platform.HorizontalPagerIndicator
-import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.foundation.rememberVideoPlayerState
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.LikeButton
@@ -186,6 +189,7 @@ private fun StatusMediaScene(
   }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun StatusMediaScene(
   status: UiStatus,
@@ -198,7 +202,6 @@ private fun StatusMediaScene(
   val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
   val pagerState = rememberPagerState(
     initialPage = selectedIndex,
-    pageCount = status.media.size,
   )
   val currentMedia = status.media[pagerState.currentPage]
 
@@ -427,12 +430,6 @@ private fun StatusMediaInfo(
         DropdownMenuItem(
           onClick = {
             clickable.onSaveMediaClicked(currentMedia)
-            // scope.launch {
-            //   callback.invoke()
-            //   viewModel.saveFile(currentMedia, target = {
-            //     FilePicker.createFile(it)?.path
-            //   })
-            // }
           }
         ) {
           Text(
@@ -526,7 +523,6 @@ fun MediaView(
   swiperState: SwiperState = rememberSwiperState(),
   pagerState: PagerState = rememberPagerState(
     initialPage = 0,
-    pageCount = media.size,
   ),
   onVideoPlayerStateSet: (VideoPlayerState?) -> Unit = {},
   volume: Float = 1f,
@@ -536,9 +532,10 @@ fun MediaView(
     modifier = modifier,
     state = swiperState,
   ) {
-    Pager(
+    HorizontalPager(
+      count = media.size,
       state = pagerState,
-    ) {
+    ) { page ->
       val data = media[page]
       when (data.type) {
         MediaType.photo ->

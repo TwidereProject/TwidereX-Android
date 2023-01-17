@@ -72,6 +72,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
 import com.twidere.twiderex.component.UserMetrics
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarDefaults
@@ -79,9 +83,6 @@ import com.twidere.twiderex.component.foundation.ApplyNotification
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.NestedScrollScaffold
-import com.twidere.twiderex.component.foundation.Pager
-import com.twidere.twiderex.component.foundation.PagerState
-import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.divider
 import com.twidere.twiderex.component.navigation.openLink
 import com.twidere.twiderex.component.navigation.user
@@ -107,6 +108,7 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.BackHandler
 import moe.tlaster.precompose.navigation.Navigator
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun HomeScene(
   navigator: Navigator,
@@ -129,9 +131,7 @@ fun HomeScene(
       }
     }
   }
-  val pagerState = rememberPagerState(
-    pageCount = menus.size,
-  )
+  val pagerState = rememberPagerState()
   val scaffoldState = rememberScaffoldState()
   if (scaffoldState.drawerState.isOpen) {
     BackHandler {
@@ -179,9 +179,7 @@ fun HomeScene(
                   }
                 }
                 scope.launch {
-                  pagerState.selectPage {
-                    pagerState.currentPage = it
-                  }
+                  pagerState.animateScrollToPage(it)
                 }
               }
             )
@@ -222,9 +220,10 @@ fun HomeScene(
             .fillMaxSize()
             .padding(it)
         ) {
-          Pager(
+          HorizontalPager(
+            count = menus.size,
             state = pagerState,
-          ) {
+          ) { page ->
             menus[page].item.Content(navigator)
           }
         }
@@ -288,6 +287,7 @@ private object EmptyColumnHomeContentDefaults {
   val VerticalPadding = 48.dp
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun HomeAppBar(
   tabPosition: AppearancePreferences.TabPosition,
@@ -356,9 +356,7 @@ fun HomeAppBar(
               }
             }
             scope.launch {
-              pagerState.selectPage {
-                pagerState.currentPage = it
-              }
+              pagerState.animateScrollToPage(it)
             }
           },
         )
