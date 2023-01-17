@@ -215,7 +215,7 @@ internal fun StatusV2.toUiStatus(
   )
 }
 
-private fun getImage(uri: String?, type: String): String? {
+internal fun getImage(uri: String?, type: String): String? {
   if (uri == null) {
     return null
   }
@@ -406,7 +406,7 @@ internal fun UserV2.toUiUser(): UiUser {
   )
 }
 
-private fun updateProfileImagePath(
+internal fun updateProfileImagePath(
   value: String,
   size: ProfileImageSize = ProfileImageSize.reasonably_small
 ): String {
@@ -422,7 +422,7 @@ private fun updateProfileImagePath(
   }
 }
 
-private enum class ProfileImageSize {
+internal enum class ProfileImageSize {
   original,
   reasonably_small,
   bigger,

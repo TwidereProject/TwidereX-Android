@@ -66,9 +66,9 @@ import com.twidere.services.twitter.model.fields.PollFields
 import com.twidere.services.twitter.model.fields.TweetFields
 import com.twidere.services.twitter.model.fields.UserFields
 import com.twidere.services.twitter.model.request.TwitterReactionRequestBody
-import com.twidere.services.utils.Base64
 import com.twidere.services.utils.await
 import com.twidere.services.utils.copyToInLength
+import io.ktor.util.encodeBase64
 import okhttp3.Request
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -495,7 +495,7 @@ class TwitterService(
       val currentBulkSize = BULK_SIZE.coerceAtMost(length - streamReadLength).toInt()
       ByteArrayOutputStream().use { output ->
         stream.copyToInLength(output, currentBulkSize)
-        val data = Base64.encodeToString(output.toByteArray(), Base64.DEFAULT)
+        val data = output.toByteArray().encodeBase64()
         uploadResources.appendUpload(mediaId, segmentIndex, data)
       }
       segmentIndex++

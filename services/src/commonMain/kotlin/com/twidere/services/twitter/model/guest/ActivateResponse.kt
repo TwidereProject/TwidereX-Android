@@ -18,9 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.http.authorization
+package com.twidere.services.twitter.model.guest
 
-object EmptyAuthorization : Authorization {
-  override val hasAuthorization: Boolean
-    get() = false
-}
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class ActivateResponse(
+  @SerialName("guest_token")
+  val guestToken: String?,
+)

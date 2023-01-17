@@ -23,9 +23,12 @@ package com.twidere.twiderex
 import androidx.compose.ui.ExperimentalComposeUiApi
 import com.twidere.twiderex.component.foundation.DesktopMediaPlayerHelper
 import com.twidere.twiderex.media.DesktopMediaPlayerFactoryImpl
+import com.twidere.twiderex.utils.TwiderexLogger
+import io.github.aakira.napier.Napier
 
 @ExperimentalComposeUiApi
 fun main(args: Array<String>) {
   DesktopMediaPlayerHelper.register(DesktopMediaPlayerFactoryImpl())
+  Napier.base(TwiderexLogger())
   runDesktopApp(args)
 }
