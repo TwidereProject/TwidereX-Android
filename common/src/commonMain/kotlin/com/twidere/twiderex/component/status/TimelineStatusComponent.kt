@@ -799,7 +799,6 @@ fun StatusQuote(
     Spacer(modifier = Modifier.height(StatusQuoteDefaults.TextSpacing))
     StatusText(
       status = quote,
-      maxLines = 5,
       isSelectionAble = false,
       openLink = statusNavigation.openLink,
     )
