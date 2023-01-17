@@ -24,7 +24,6 @@ import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import com.twidere.twiderex.viewmodel.DraftViewModel
-import com.twidere.twiderex.viewmodel.MediaViewModel
 import com.twidere.twiderex.viewmodel.PureMediaViewModel
 import com.twidere.twiderex.viewmodel.StatusViewModel
 import com.twidere.twiderex.viewmodel.compose.ComposeSearchUserViewModel
@@ -49,7 +48,6 @@ import org.koin.dsl.module
 val viewModelModule = module {
   viewModel { (statusKey: MicroBlogKey) -> StatusViewModel(get(), get(), statusKey) }
   viewModel { (belongKey: MicroBlogKey) -> PureMediaViewModel(get(), belongKey) }
-  viewModel { (statusKey: MicroBlogKey) -> MediaViewModel(get(), get(), get(), statusKey) }
   viewModel { DraftViewModel(get(), get()) }
   viewModel { ActiveAccountViewModel(get()) }
 
