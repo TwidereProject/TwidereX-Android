@@ -14,7 +14,7 @@ kotlin {
         setupJvm()
         withJava()
         javafx {
-            version = "17"
+            version = Versions.Java.java.toString()
             modules = listOf("javafx.controls", "javafx.swing", "javafx.media")
         }
     }
