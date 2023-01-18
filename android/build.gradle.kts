@@ -69,8 +69,6 @@ android {
         release {
             if (hasSigningProps) {
                 signingConfig = signingConfigs.getByName("twidere")
-            } else {
-                signingConfig = signingConfigs.getByName("debug")
             }
             isMinifyEnabled = true
             isShrinkResources = true
