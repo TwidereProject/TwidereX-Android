@@ -52,7 +52,7 @@ fun TimelineComponent(
     return
   }
 
-  val refreshingState = remember(state) {
+  val refreshingState = remember(state.source.loadState.refresh) {
     state.source.loadState.refresh is LoadState.Loading
   }
 
