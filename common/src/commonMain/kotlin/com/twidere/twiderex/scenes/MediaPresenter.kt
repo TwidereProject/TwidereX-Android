@@ -23,14 +23,19 @@ package com.twidere.twiderex.scenes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.action.MediaAction
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.repository.StatusRepository
+import com.twidere.twiderex.repository.TimelineRepository
 import kotlinx.coroutines.flow.Flow
 import moe.tlaster.kfilepicker.FilePicker
 
@@ -40,6 +45,7 @@ internal fun MediaPresenter(
   statusKey: MicroBlogKey,
   userKey: MicroBlogKey?,
   statusRepository: StatusRepository = get(),
+  timelineRepository: TimelineRepository = get(),
   mediaAction: MediaAction = get(),
 ): MediaState {
   val accountState = CurrentAccountPresenter()
@@ -75,19 +81,28 @@ internal fun MediaPresenter(
       }
     }
   }
-  val status by produceState<MediaState>(
-    initialValue = MediaState.Loading,
-  ) {
+  val status by remember {
     statusRepository.loadStatus(
       statusKey = statusKey,
       accountKey = account.accountKey,
-    ).collect { status ->
-      if (status != null) {
-        value = MediaState.Data(status)
-      }
-    }
+    )
+  }.collectAsState(null)
+  val userMedias = if (userKey != null) {
+    remember(account) {
+      timelineRepository.mediaTimeline(
+        userKey,
+        account.accountKey,
+        account.service as TimelineService
+      )
+    }.collectAsLazyPagingItems()
+  } else null
+  return when (status) {
+    null -> MediaState.Loading
+    else -> MediaState.Data(
+      status!!,
+      userMedias,
+    )
   }
-  return status
 }
 
 internal sealed interface MediaEvent {
@@ -106,6 +121,7 @@ internal sealed interface MediaState {
 
   @Immutable
   data class Data(
-    val status: UiStatus
+    val status: UiStatus,
+    val userMedias: LazyPagingItems<Pair<UiMedia, UiStatus>>?
   ) : MediaState
 }
