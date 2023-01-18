@@ -44,6 +44,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.model.enums.PlatformType
@@ -100,13 +101,18 @@ fun ColumnScope.StatusText(
       SelectionContainer(enable = isSelectionAble) {
         HtmlText(
           modifier = Modifier.fillMaxWidth(),
-          htmlText = status.htmlText,
           maxLines = maxLines,
           linkResolver = { href ->
             status.resolveLink(href)
           },
           positionWrapper = it,
           openLink = openLink,
+          document = status.contentHtmlDocument,
+          layoutDirection = if (status.contentIsLeftToRight) {
+            LayoutDirection.Ltr
+          } else {
+            LayoutDirection.Rtl
+          },
         )
       }
       if (showMastodonPoll &&

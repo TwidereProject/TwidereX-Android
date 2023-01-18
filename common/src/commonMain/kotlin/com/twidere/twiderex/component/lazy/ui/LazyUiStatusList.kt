@@ -20,7 +20,12 @@
  */
 package com.twidere.twiderex.component.lazy.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,15 +49,19 @@ import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -71,6 +80,9 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.StatusNavigationData
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.mapNotNull
 
 @Stable
 class LazyUiStatusListState(
@@ -138,27 +150,27 @@ fun LazyUiStatusList(
   contentType: (item: UiStatus) -> Any? = { it.itemType },
   header: LazyListScope.() -> Unit = {},
 ) {
-  // val listState = rememberSaveable(saver = LazyUiStatusListState.Saver) {
-  //   LazyUiStatusListState()
-  // }
-  // LaunchedEffect(Unit) {
-  //   snapshotFlow { items.itemCount }
-  //     .filter { it > 0 }
-  //     .mapNotNull { items.peek(0)?.statusKey }
-  //     .distinctUntilChanged()
-  //     .collect {
-  //       listState.update(it)
-  //     }
-  // }
-  // LaunchedEffect(Unit) {
-  //   snapshotFlow { state.firstVisibleItemIndex }
-  //     .distinctUntilChanged()
-  //     .collect {
-  //       if (it == 0) {
-  //         listState.hide()
-  //       }
-  //     }
-  // }
+  val listState = rememberSaveable(saver = LazyUiStatusListState.Saver) {
+    LazyUiStatusListState()
+  }
+  LaunchedEffect(Unit) {
+    snapshotFlow { items.itemCount }
+      .filter { it > 0 }
+      .mapNotNull { items.peek(0)?.statusKey }
+      .distinctUntilChanged()
+      .collect {
+        listState.update(it)
+      }
+  }
+  LaunchedEffect(Unit) {
+    snapshotFlow { state.firstVisibleItemIndex }
+      .distinctUntilChanged()
+      .collect {
+        if (it == 0) {
+          listState.hide()
+        }
+      }
+  }
   LazyUiList(
     items = items,
     empty = { EmptyStatusList() },
@@ -202,17 +214,16 @@ fun LazyUiStatusList(
                       onLoadBetweenClicked(item.statusKey, next.statusKey)
                     }
                   }
-
-                  // if (listState.isAutoLoadMore) {
-                  //   LaunchedEffect(item.statusKey) {
-                  //     onLoadBetweenClicked()
-                  //   }
-                  // } else {
-                  //   LoadMoreButton {
-                  //     onLoadBetweenClicked()
-                  //     listState.autoLoadMore()
-                  //   }
-                  // }
+                  if (listState.isAutoLoadMore) {
+                    LaunchedEffect(item.statusKey) {
+                      onLoadBetweenClicked()
+                    }
+                  } else {
+                    LoadMoreButton {
+                      onLoadBetweenClicked()
+                      listState.autoLoadMore()
+                    }
+                  }
                 }
                 else -> {
                   StatusDivider()
@@ -225,31 +236,31 @@ fun LazyUiStatusList(
           items.retry()
         }
       }
-      // Box(
-      //   modifier = Modifier.align(Alignment.TopEnd),
-      // ) {
-      //   AnimatedVisibility(
-      //     visible = listState.showCursor,
-      //     enter = fadeIn() + slideInHorizontally(initialOffsetX = { it / 2 }),
-      //     exit = slideOutHorizontally(targetOffsetX = { it / 2 }) + fadeOut(),
-      //   ) {
-      //     Box(
-      //       modifier = Modifier.padding(16.dp)
-      //     ) {
-      //       Surface(
-      //         color = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
-      //         shape = MaterialTheme.shapes.small,
-      //         contentColor = MaterialTheme.colors.background,
-      //       ) {
-      //         Text(
-      //           modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-      //           text = state.firstVisibleItemIndex.toString(),
-      //           style = MaterialTheme.typography.caption,
-      //         )
-      //       }
-      //     }
-      //   }
-      // }
+      Box(
+        modifier = Modifier.align(Alignment.TopEnd),
+      ) {
+        AnimatedVisibility(
+          visible = listState.showCursor,
+          enter = fadeIn() + slideInHorizontally(initialOffsetX = { it / 2 }),
+          exit = slideOutHorizontally(targetOffsetX = { it / 2 }) + fadeOut(),
+        ) {
+          Box(
+            modifier = Modifier.padding(16.dp)
+          ) {
+            Surface(
+              color = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
+              shape = MaterialTheme.shapes.small,
+              contentColor = MaterialTheme.colors.background,
+            ) {
+              Text(
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                text = state.firstVisibleItemIndex.toString(),
+                style = MaterialTheme.typography.caption,
+              )
+            }
+          }
+        }
+      }
     }
   }
 }

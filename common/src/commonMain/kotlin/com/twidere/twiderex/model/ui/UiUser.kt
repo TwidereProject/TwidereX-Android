@@ -26,6 +26,8 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.mastodon.MastodonUserExtra
 import com.twidere.twiderex.model.ui.twitter.TwitterUserExtra
+import org.jsoup.Jsoup
+import java.text.Bidi
 
 @Immutable
 data class UiUser(
@@ -48,6 +50,9 @@ data class UiUser(
 ) {
   val displayName
     get() = name.takeUnless { it.isEmpty() } ?: screenName
+
+  val displayNameDocument = Jsoup.parse(displayName.replace("\n", "<br>"))
+  val displayNameIsLeftToRight = Bidi(displayName, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT).baseIsLeftToRight()
 
   fun getDisplayScreenName(host: String?): String {
     return if (host != null && host != acct.host) {

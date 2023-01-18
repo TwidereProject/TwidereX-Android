@@ -317,7 +317,7 @@ fun ShareButton(
         onClick = {
           expanded = false
           val text = buildContentAnnotatedString(
-            htmlText = data.htmlText,
+            document = data.contentHtmlDocument,
             textStyle = textStyle,
             linkStyle = linkStyle,
             linkResolver = { data.resolveLink(it) },
@@ -361,7 +361,7 @@ fun ShareButton(
           remoteNavigator.shareText(
             buildString {
               val text = buildContentAnnotatedString(
-                htmlText = data.htmlText,
+                document = data.contentHtmlDocument,
                 textStyle = textStyle,
                 linkStyle = linkStyle,
                 linkResolver = { data.resolveLink(it) },

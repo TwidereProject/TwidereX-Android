@@ -38,6 +38,8 @@ import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
+import org.jsoup.Jsoup
+import java.text.Bidi
 
 @Immutable
 data class UiStatus(
@@ -67,6 +69,8 @@ data class UiStatus(
   val extra: StatusExtra? = null,
   val language: String? = null,
 ) {
+  val contentHtmlDocument = Jsoup.parse(htmlText.replace("\n", "<br>"))
+  val contentIsLeftToRight = Bidi(htmlText, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT).baseIsLeftToRight()
   val humanizedTime = timestamp.humanizedTimestamp()
   val mastodonExtra: MastodonStatusExtra? = if (extra is MastodonStatusExtra) extra else null
   val isMediaEmptyOfContainsAudio = !media.any() || media.any { it.type == MediaType.audio }

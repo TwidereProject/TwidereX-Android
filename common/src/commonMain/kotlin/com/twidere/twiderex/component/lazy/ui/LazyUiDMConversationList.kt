@@ -37,6 +37,7 @@ import androidx.compose.material.ListItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
@@ -95,7 +96,12 @@ fun LazyUiDMConversationList(
               text = {
                 Row {
                   UserName(
-                    userName = it.conversation.conversationName,
+                    userNameDocument = it.conversation.conversationNameHtmlDocument,
+                    layoutDirection = if (it.conversation.conversationNameIsLeftToRight) {
+                      LayoutDirection.Ltr
+                    } else {
+                      LayoutDirection.Rtl
+                    },
                     onUserNameClicked = openLink,
                   )
                   Spacer(
