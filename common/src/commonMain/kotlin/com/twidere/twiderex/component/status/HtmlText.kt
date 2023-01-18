@@ -186,7 +186,6 @@ fun HtmlText(
 @OptIn(ExperimentalUnitApi::class)
 @Composable
 private fun RenderContent(
-  modifier: Modifier = Modifier,
   document: Document,
   textStyle: TextStyle,
   linkStyle: TextStyle,

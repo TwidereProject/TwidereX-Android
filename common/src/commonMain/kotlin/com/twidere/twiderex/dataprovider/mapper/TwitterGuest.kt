@@ -41,6 +41,8 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UserMetrics
 import com.twidere.twiderex.model.ui.twitter.TwitterStatusExtra
 import com.twidere.twiderex.model.ui.twitter.TwitterUserExtra
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.datetime.Instant
 
 internal fun TwitterGuestResponse.nextCursor(cursorType: String): String? =
@@ -191,7 +193,7 @@ private fun TweetValue.toUiStatus(
         type = type,
         order = index,
       )
-    },
+    }.toPersistentList(),
     liked = favorited == true,
     retweeted = retweeted == true,
     isGap = isGap,
@@ -204,12 +206,12 @@ private fun TweetValue.toUiStatus(
         description = null,
         image = null,
       )
-    } ?: emptyList(),
+    }.orEmpty().toPersistentList(),
     referenceStatus = mutableMapOf<ReferenceType, UiStatus>().apply {
       quote?.let { this[ReferenceType.Quote] = it }
       retweet?.let { this[ReferenceType.Retweet] = it }
       reply?.let { this[ReferenceType.Reply] = it }
-    },
+    }.toPersistentMap(),
     language = lang,
   )
 }
@@ -250,7 +252,7 @@ private fun User.toUiUser(): UiUser {
           description = "",
           image = null
         )
-      } ?: emptyList()
+      }.orEmpty().toPersistentList()
     )
   )
 }

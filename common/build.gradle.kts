@@ -48,7 +48,7 @@ kotlin {
                 implementation("org.jsoup:jsoup:1.15.3")
                 implementation("app.cash.turbine:turbine:0.12.1")
                 implementation("com.eygraber:uri-kmp:0.0.9")
-                api("org.jetbrains.kotlinx:kotlinx-collections-immutable:${Versions.Kotlin.immutableCollections}")
+                api("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
             }
             configurations.all {
                 // some dependencies contains it, this causes an exception to initialize the Main dispatcher in desktop
