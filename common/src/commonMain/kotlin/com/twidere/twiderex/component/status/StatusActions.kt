@@ -105,6 +105,7 @@ fun ReplyButton(
         painter = icon,
         tint = LocalContentColor.current,
         contentDescription = contentDescription,
+        modifier = Modifier.size(24.dp),
       )
     }
   }
@@ -156,6 +157,7 @@ fun LikeButton(
         painter = icon,
         tint = color,
         contentDescription = contentDescription,
+        modifier = Modifier.size(24.dp),
       )
     }
   }
@@ -241,6 +243,7 @@ fun RetweetButton(
           painter = icon,
           tint = color,
           contentDescription = contentDescription,
+          modifier = Modifier.size(24.dp),
         )
       }
     }
@@ -291,7 +294,8 @@ fun ShareButton(
         Icon(
           imageVector = icon,
           contentDescription = contentDescription,
-          tint = LocalContentColor.current.copy(LocalContentAlpha.current)
+          tint = LocalContentColor.current.copy(LocalContentAlpha.current),
+          modifier = Modifier.size(24.dp),
         )
       }
     } else {
@@ -304,6 +308,7 @@ fun ShareButton(
           imageVector = icon,
           tint = LocalContentColor.current,
           contentDescription = contentDescription,
+          modifier = Modifier.size(24.dp),
         )
       }
     }
