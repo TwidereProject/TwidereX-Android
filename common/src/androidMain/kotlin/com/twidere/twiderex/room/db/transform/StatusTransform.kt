@@ -137,7 +137,8 @@ internal fun DbStatusWithReference.toUi(
     isGap = isGap,
     url = url.toUi(),
     reaction = reaction,
-    referenceStatus = references.map {
+    referenceStatus = references.mapNotNull {
+      it.status ?: return@mapNotNull null
       it.reference.referenceType to it.status.toUi(
         accountKey = accountKey,
         isGap = isGap,
@@ -296,7 +297,8 @@ internal fun DbPagingTimelineWithStatus.toUi(
     isGap = timeline.isGap,
     url = url.toUi(),
     reaction = reaction,
-    referenceStatus = status.references.map {
+    referenceStatus = status.references.mapNotNull {
+      it.status ?: return@mapNotNull null
       it.reference.referenceType to it.status.toUi(
         accountKey = accountKey
       )
