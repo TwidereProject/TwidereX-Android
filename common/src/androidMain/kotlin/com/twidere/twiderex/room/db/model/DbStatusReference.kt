@@ -62,7 +62,7 @@ internal data class DbStatusReferenceWithStatus(
     entityColumn = "statusKey",
     entity = DbStatusV2::class
   )
-  val status: DbStatusWithMediaAndUser
+  val status: DbStatusWithMediaAndUser?
 )
 
 internal fun DbStatusWithMediaAndUser?.toDbStatusReference(
@@ -98,7 +98,7 @@ internal data class DbStatusWithReference(
 internal suspend fun List<DbStatusWithReference>.saveToDb(
   database: RoomCacheDatabase
 ) {
-  this.map { it.references.map { it.status } + it.status }
+  this.map { it.references.mapNotNull { it.status } + it.status }
     .flatten()
     .saveToDb(database = database)
   this.flatMap { it.references }.map { it.reference }.let {
