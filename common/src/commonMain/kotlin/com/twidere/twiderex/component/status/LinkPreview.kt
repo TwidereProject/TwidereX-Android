@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
@@ -131,7 +132,8 @@ private fun LinkOnlyPreview(
       Row {
         Icon(
           painter = painterResource(res = com.twidere.twiderex.MR.files.ic_planet),
-          contentDescription = null
+          contentDescription = null,
+          modifier = Modifier.size(24.dp),
         )
         Spacer(modifier = Modifier.width(LinkPreviewDefaults.TextPaddingStart))
         Text(text = link, maxLines = 1)
@@ -154,7 +156,11 @@ private fun LinkWithTitlePreview(
     CompositionLocalProvider(
       LocalContentColor provides MaterialTheme.colors.primary
     ) {
-      Icon(painter = painterResource(res = com.twidere.twiderex.MR.files.ic_planet), contentDescription = null)
+      Icon(
+        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_planet),
+        contentDescription = null,
+        modifier = Modifier.size(24.dp),
+      )
     }
     Spacer(modifier = Modifier.width(LinkPreviewDefaults.TextPaddingStart))
     Column {
