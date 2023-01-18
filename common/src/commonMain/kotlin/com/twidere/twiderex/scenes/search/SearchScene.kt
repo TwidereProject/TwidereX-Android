@@ -46,12 +46,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarDefaults
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.component.foundation.Pager
-import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.rememberPresenterState
@@ -69,6 +70,7 @@ import com.twidere.twiderex.ui.TwidereScene
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.Navigator
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun SearchScene(
   keyword: String,
@@ -94,7 +96,7 @@ fun SearchScene(
       )
     }
   }
-  val pagerState = rememberPagerState(pageCount = tabs.size)
+  val pagerState = rememberPagerState()
   val scope = rememberCoroutineScope()
   TwidereScene {
     InAppNotificationScaffold {
@@ -177,7 +179,7 @@ fun SearchScene(
                   selected = pagerState.currentPage == index,
                   onClick = {
                     scope.launch {
-                      pagerState.currentPage = index
+                      pagerState.animateScrollToPage(index)
                     }
                   },
                   content = {
@@ -195,7 +197,10 @@ fun SearchScene(
         Box(
           modifier = Modifier.weight(1F),
         ) {
-          Pager(state = pagerState) {
+          HorizontalPager(
+            count = tabs.size,
+            state = pagerState,
+          ) { page ->
             tabs[page].Content(keyword = keyword, navigator = navigator)
           }
         }

@@ -32,11 +32,13 @@ import java.net.URLDecoder
 actual fun PlatformStatusMediaScene(
   statusKey: String,
   selectedIndex: Int?,
+  userKey: String?,
   navigator: Navigator,
 ) {
   StatusMediaScene(
     statusKey = statusKey,
     selectedIndex = selectedIndex ?: 0,
+    userKey = userKey,
     navigator = navigator,
   )
 }

@@ -41,7 +41,7 @@ data class StatusNavigationData(
   val toUser: (UiUser) -> Unit = { },
   val toStatus: (UiStatus) -> Unit = { },
   val toMedia: (MicroBlogKey) -> Unit = { },
-  val toMediaWithIndex: (MicroBlogKey, Int) -> Unit = { _: MicroBlogKey, _: Int -> },
+  val toMediaWithIndex: (statusKey: MicroBlogKey, index: Int, userKey: MicroBlogKey?) -> Unit = { _, _, _ -> },
   val openLink: (String) -> Unit = { },
   val composeNavigationData: ComposeNavigationData = ComposeNavigationData(),
   val popBackStack: () -> Unit = {},
@@ -67,8 +67,8 @@ fun rememberStatusNavigationData(
         toMedia = {
           navigator.media(it)
         },
-        toMediaWithIndex = { key, index ->
-          navigator.media(key, index)
+        toMediaWithIndex = { key, index, userKey ->
+          navigator.media(key, index, userKey)
         },
         openLink = {
           navigator.openLink(it)

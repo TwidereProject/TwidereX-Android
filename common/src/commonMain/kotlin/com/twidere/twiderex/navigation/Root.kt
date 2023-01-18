@@ -161,7 +161,7 @@ object Root {
   object Media {
     object Status {
       const val route = "/Root/Media/Status/{statusKey}"
-      operator fun invoke(statusKey: MicroBlogKey, selectedIndex: Int?) = "/Root/Media/Status/$statusKey?selectedIndex=$selectedIndex"
+      operator fun invoke(statusKey: MicroBlogKey, selectedIndex: Int?, userKey: MicroBlogKey?) = "/Root/Media/Status/$statusKey?selectedIndex=$selectedIndex&userKey=$userKey"
     }
     object Raw {
       const val route = "/Root/Media/Raw/{type}/{url}"

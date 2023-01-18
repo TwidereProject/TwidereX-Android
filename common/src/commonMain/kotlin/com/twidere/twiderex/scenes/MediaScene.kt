@@ -18,6 +18,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalPagerApi::class)
+
 package com.twidere.twiderex.scenes
 
 import androidx.compose.animation.AnimatedVisibility
@@ -53,7 +55,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,18 +64,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.mxalbert.zoomable.Zoomable
 import com.twidere.twiderex.component.bottomInsetsHeight
 import com.twidere.twiderex.component.bottomInsetsPadding
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
-import com.twidere.twiderex.component.foundation.Pager
-import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.foundation.VideoPlayerState
-import com.twidere.twiderex.component.foundation.platform.HorizontalPagerIndicator
-import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.foundation.rememberVideoPlayerState
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.LikeButton
@@ -89,9 +91,9 @@ import com.twidere.twiderex.component.status.renderContentAnnotatedString
 import com.twidere.twiderex.component.status.resolveLink
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.component.topInsetsPadding
-import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.playEnable
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.kmp.LocalPlatformWindow
 import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.currentPlatform
@@ -108,20 +110,17 @@ import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.utils.video.CustomVideoControl
-import com.twidere.twiderex.viewmodel.MediaViewModel
-import kotlinx.coroutines.launch
-import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.swiper.Swiper
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
-import org.koin.core.parameter.parametersOf
 import java.net.URLDecoder
 
 @Composable
 fun StatusMediaScene(
   statusKey: String,
   selectedIndex: Int,
+  userKey: String?,
   navigator: Navigator,
 ) {
   MicroBlogKey.valueOf(statusKey).let { key ->
@@ -130,6 +129,7 @@ fun StatusMediaScene(
         StatusMediaScene(
           statusKey = key,
           selectedIndex = selectedIndex,
+          userKey = userKey?.let { MicroBlogKey.valueOf(it) },
           navigator = navigator,
         )
       }
@@ -141,59 +141,70 @@ fun StatusMediaScene(
 private fun StatusMediaScene(
   statusKey: MicroBlogKey,
   selectedIndex: Int,
+  userKey: MicroBlogKey?,
   navigator: Navigator,
 ) {
-  val viewModel = getViewModel<MediaViewModel> {
-    parametersOf(statusKey)
+  val (state, channel) = rememberPresenterState {
+    MediaPresenter(it, statusKey, userKey)
   }
-  val status by viewModel.status.observeAsState(null)
-  val loading by viewModel.loading.observeAsState(initial = false)
   TwidereDialog(
     requireDarkTheme = true,
     extendViewIntoStatusBar = true,
     extendViewIntoNavigationBar = true,
   ) {
-    if (loading && status == null) {
-      Scaffold {
-        Column(
-          modifier = Modifier
-            .fillMaxSize(),
-          verticalArrangement = Arrangement.Center,
-          horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-          LoadingProgress()
+    when (state) {
+      MediaState.Loading -> {
+        Scaffold {
+          Column(
+            modifier = Modifier
+              .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+          ) {
+            LoadingProgress()
+          }
         }
       }
-    }
-    status?.let {
-      CompositionLocalProvider(
-        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
-      ) {
-        val statusNavigationData = rememberStatusNavigationData(navigator)
-        StatusMediaScene(
-          status = it,
-          selectedIndex = selectedIndex.coerceIn(0, it.media.lastIndex),
-          viewModel = viewModel,
-          statusNavigationData = statusNavigationData,
-        )
+
+      is MediaState.Data -> {
+        CompositionLocalProvider(
+          LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
+        ) {
+          val statusNavigationData = rememberStatusNavigationData(navigator)
+          StatusMediaScene(
+            status = state.status,
+            selectedIndex = selectedIndex.coerceIn(0, state.status.media.lastIndex),
+            statusNavigationData = statusNavigationData,
+            clickable = remember {
+              StatusMediaSceneClickable(
+                onSaveMediaClicked = { currentMedia ->
+                  channel.trySend(MediaEvent.SaveMedia(currentMedia))
+                },
+                onShareMediaClicked = { currentMedia, extraText ->
+                  channel.trySend(MediaEvent.ShareMedia(currentMedia, extraText))
+                }
+              )
+            }
+          )
+        }
       }
     }
   }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
-fun StatusMediaScene(
+private fun StatusMediaScene(
   status: UiStatus,
   selectedIndex: Int,
-  viewModel: MediaViewModel,
   statusNavigationData: StatusNavigationData,
+  clickable: StatusMediaSceneClickable,
 ) {
   val window = LocalPlatformWindow.current
   var controlVisibility by remember { mutableStateOf(true) }
   val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
   val pagerState = rememberPagerState(
     initialPage = selectedIndex,
-    pageCount = status.media.size,
   )
   val currentMedia = status.media[pagerState.currentPage]
 
@@ -214,7 +225,7 @@ fun StatusMediaScene(
         controlPanelColor = controlPanelColor,
         statusNavigationData = statusNavigationData,
         videoPlayerState = videoPlayerState.value,
-        viewModel = viewModel,
+        clickable = clickable,
         currentMedia = currentMedia,
         pagerState = pagerState
       )
@@ -319,7 +330,7 @@ private fun StatusMediaBottomContent(
   visible: Boolean,
   controlPanelColor: Color,
   videoPlayerState: VideoPlayerState?,
-  viewModel: MediaViewModel,
+  clickable: StatusMediaSceneClickable,
   currentMedia: UiMedia,
   pagerState: PagerState,
   statusNavigationData: StatusNavigationData
@@ -356,7 +367,7 @@ private fun StatusMediaBottomContent(
         StatusMediaInfo(
           videoPlayerState,
           status,
-          viewModel,
+          clickable,
           currentMedia,
           statusNavigationData
         )
@@ -370,12 +381,10 @@ private fun StatusMediaBottomContent(
 private fun StatusMediaInfo(
   videoPlayerState: VideoPlayerState?,
   status: UiStatus,
-  viewModel: MediaViewModel,
+  clickable: StatusMediaSceneClickable,
   currentMedia: UiMedia,
   statusNavigationData: StatusNavigationData,
 ) {
-  val scope = rememberCoroutineScope()
-
   val text = renderContentAnnotatedString(
     htmlText = status.htmlText,
     linkResolver = { status.resolveLink(it) },
@@ -387,7 +396,7 @@ private fun StatusMediaInfo(
     if (videoPlayerState != null) {
       CustomVideoControl(state = videoPlayerState)
     }
-    StatusText(status = status, maxLines = 2, showMastodonPoll = false, openLink = statusNavigationData.openLink,)
+    StatusText(status = status, maxLines = 2, showMastodonPoll = false, openLink = statusNavigationData.openLink)
     Spacer(modifier = Modifier.height(StatusMediaInfoDefaults.TextSpacing))
     Row(
       verticalAlignment = Alignment.CenterVertically,
@@ -423,12 +432,7 @@ private fun StatusMediaInfo(
       ShareButton(status = status) { callback ->
         DropdownMenuItem(
           onClick = {
-            scope.launch {
-              callback.invoke()
-              viewModel.saveFile(currentMedia, target = {
-                FilePicker.createFile(it)?.path
-              })
-            }
+            clickable.onSaveMediaClicked(currentMedia)
           }
         ) {
           Text(
@@ -438,17 +442,12 @@ private fun StatusMediaInfo(
         DropdownMenuItem(
           onClick = {
             callback.invoke()
-            currentMedia.fileName?.let {
-              scope.launch {
-                viewModel.shareMedia(
-                  currentMedia = currentMedia,
-                  extraText = buildString {
-                    append(text)
-                    append(System.lineSeparator())
-                    append(System.lineSeparator())
-                    append(status.generateShareLink())
-                  }
-                )
+            clickable.onShareMediaClicked(currentMedia) {
+              buildString {
+                append(text)
+                append(System.lineSeparator())
+                append(System.lineSeparator())
+                append(status.generateShareLink())
               }
             }
           }
@@ -527,7 +526,6 @@ fun MediaView(
   swiperState: SwiperState = rememberSwiperState(),
   pagerState: PagerState = rememberPagerState(
     initialPage = 0,
-    pageCount = media.size,
   ),
   onVideoPlayerStateSet: (VideoPlayerState?) -> Unit = {},
   volume: Float = 1f,
@@ -537,9 +535,10 @@ fun MediaView(
     modifier = modifier,
     state = swiperState,
   ) {
-    Pager(
+    HorizontalPager(
+      count = media.size,
       state = pagerState,
-    ) {
+    ) { page ->
       val data = media[page]
       when (data.type) {
         MediaType.photo ->
@@ -595,8 +594,14 @@ fun MediaView(
               }
             )
           }
+
         MediaType.other -> Unit
       }
     }
   }
 }
+
+private data class StatusMediaSceneClickable(
+  val onSaveMediaClicked: (UiMedia) -> Unit,
+  val onShareMediaClicked: (UiMedia, () -> String) -> Unit,
+)

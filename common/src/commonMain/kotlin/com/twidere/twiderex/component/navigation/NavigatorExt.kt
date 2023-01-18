@@ -74,9 +74,10 @@ fun Navigator.status(
 fun Navigator.media(
   statusKey: MicroBlogKey,
   selectedIndex: Int = 0,
+  userKey: MicroBlogKey? = null,
   navOptions: NavOptions? = null,
 ) {
-  navigate(Root.Media.Status(statusKey, selectedIndex), navOptions)
+  navigate(Root.Media.Status(statusKey, selectedIndex, userKey), navOptions)
 }
 
 fun Navigator.searchInput(initial: String? = null) {

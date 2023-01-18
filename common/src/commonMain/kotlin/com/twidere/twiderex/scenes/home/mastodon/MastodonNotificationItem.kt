@@ -27,12 +27,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.painter.Painter
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.TextTabsComponent
-import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
@@ -104,6 +105,7 @@ fun MastodonNotificationScene(
   }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MastodonNotificationSceneContent(
   navigator: Navigator,
@@ -116,7 +118,7 @@ fun MastodonNotificationSceneContent(
       MentionItem()
     )
   }
-  val pagerState = rememberPagerState(pageCount = tabs.size)
+  val pagerState = rememberPagerState()
   LaunchedEffect(pagerState.currentPage) {
     // FIXME: 2021/5/17 A little bit dirty
     setLazyListController?.invoke(tabs[pagerState.currentPage].lazyListController)
@@ -129,15 +131,16 @@ fun MastodonNotificationSceneContent(
         selectedItem = pagerState.currentPage,
         onItemSelected = {
           scope.launch {
-            pagerState.selectPage {
-              pagerState.currentPage = it
-            }
+            pagerState.animateScrollToPage(it)
           }
         },
       )
     }
   ) {
-    Pager(state = pagerState) {
+    HorizontalPager(
+      count = tabs.size,
+      state = pagerState,
+    ) { page ->
       tabs[page].Content(navigator)
     }
   }

@@ -33,12 +33,14 @@ import moe.tlaster.precompose.navigation.Navigator
 actual fun PlatformStatusMediaScene(
   statusKey: String,
   selectedIndex: Int?,
+  userKey: String?,
   navigator: Navigator,
 ) {
   MediaScene {
     StatusMediaScene(
       statusKey = statusKey,
       selectedIndex = selectedIndex ?: 0,
+      userKey = userKey,
       navigator = navigator,
     )
   }

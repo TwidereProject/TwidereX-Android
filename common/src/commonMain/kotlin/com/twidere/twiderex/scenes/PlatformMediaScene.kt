@@ -35,6 +35,7 @@ import moe.tlaster.precompose.navigation.Navigator
 expect fun PlatformStatusMediaScene(
   @Path("statusKey") statusKey: String,
   @Query("selectedIndex") selectedIndex: Int?,
+  @Query("userKey") userKey: String?,
   navigator: Navigator,
 )
 
