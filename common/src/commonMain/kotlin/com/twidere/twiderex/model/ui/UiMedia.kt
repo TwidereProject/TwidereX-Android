@@ -25,11 +25,11 @@ import androidx.compose.runtime.Immutable
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
+import kotlinx.collections.immutable.persistentListOf
 import java.net.URI
 
 @Immutable
-data class
-UiMedia(
+data class UiMedia(
   val url: String?,
   val belongToKey: MicroBlogKey,
   val mediaUrl: String?,
@@ -71,7 +71,7 @@ UiMedia(
 
   companion object {
     @Composable
-    fun sample() = listOf(
+    fun sample() = persistentListOf(
       UiMedia(
         url = null,
         belongToKey = MicroBlogKey.Empty,

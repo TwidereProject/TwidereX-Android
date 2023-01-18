@@ -60,30 +60,32 @@ fun NetworkImage(
   } else {
     val httpConfig = LocalHttpConfig.current
     val account = LocalActiveAccount.current
-    val auth = try {
-      val url = URL(data.toString())
-      if (url.host == twitterTonApiHost) {
-        account?.let {
-          (it.credentials as OAuthCredentials).let { oauth ->
-            OAuth1Authorization(
-              consumerKey = oauth.consumer_key,
-              consumerSecret = oauth.consumer_secret,
-              accessToken = oauth.access_token,
-              accessSecret = oauth.access_token_secret,
-            )
-          }
-        } ?: EmptyAuthorization
-      } else {
+    val auth = remember(data, account) {
+      try {
+        val url = URL(data.toString())
+        if (url.host == twitterTonApiHost) {
+          account?.let {
+            (it.credentials as OAuthCredentials).let { oauth ->
+              OAuth1Authorization(
+                consumerKey = oauth.consumer_key,
+                consumerSecret = oauth.consumer_secret,
+                accessToken = oauth.access_token,
+                accessSecret = oauth.access_token_secret,
+              )
+            }
+          } ?: EmptyAuthorization
+        } else {
+          EmptyAuthorization
+        }
+      } catch (e: MalformedURLException) {
         EmptyAuthorization
       }
-    } catch (e: MalformedURLException) {
-      EmptyAuthorization
     }
     rememberNetworkImagePainter(
       data = data,
       httpConfig = httpConfig,
       authorization = auth,
-      effects = ImageEffects.Builder().apply(effects).build(),
+      effects = remember(effects) { ImageEffects.Builder().apply(effects).build() },
       onImageStateChanged = {
         if (state.value == NetworkImageState.LOADING) state.value = it
       }
@@ -94,7 +96,7 @@ fun NetworkImage(
     val size = painter.intrinsicSize
     Image(
       painter = painter,
-      modifier = if (zoomable && size != Size.Unspecified) Modifier.aspectRatio(size.width / size.height).then(modifier) else modifier,
+      modifier = if (zoomable && size != Size.Unspecified) Modifier.aspectRatio(remember(size) { size.width / size.height }).then(modifier) else modifier,
       contentScale = contentScale,
       contentDescription = stringResource(MR.strings.accessibility_common_network_image)
     )

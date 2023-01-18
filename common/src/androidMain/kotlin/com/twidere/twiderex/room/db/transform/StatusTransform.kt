@@ -55,6 +55,8 @@ import com.twidere.twiderex.room.db.model.DbStatusWithReference
 import com.twidere.twiderex.room.db.model.DbTwitterStatusExtra
 import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toPersistentMap
 import java.util.UUID
 
 internal fun DbStatusV2.toUi(
@@ -93,15 +95,15 @@ internal fun DbStatusV2.toUi(
     ),
     hasMedia = hasMedia,
     user = user,
-    media = media,
+    media = media.toPersistentList(),
     isGap = isGap,
     source = source,
-    url = url,
+    url = url.toPersistentList(),
     statusKey = statusKey,
     rawText = rawText,
     platformType = platformType,
     extra = extra,
-    referenceStatus = referenceStatus,
+    referenceStatus = referenceStatus.toPersistentMap(),
     card = previewCard?.toUi(),
     poll = poll?.toUi(),
     inReplyToStatusId = inReplyToStatusId,
@@ -313,9 +315,9 @@ internal fun DbTwitterStatusExtra.toUi() = TwitterStatusExtra(
 
 internal fun DbMastodonStatusExtra.toUi() = MastodonStatusExtra(
   type = type,
-  emoji = emoji.toUi(),
+  emoji = emoji.toUi().toPersistentList(),
   visibility = visibility,
-  mentions = mentions?.toUi()
+  mentions = mentions?.toUi()?.toPersistentList()
 )
 
 internal fun List<Mention>.toUi() = map {

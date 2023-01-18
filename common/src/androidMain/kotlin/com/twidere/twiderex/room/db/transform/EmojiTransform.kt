@@ -23,6 +23,7 @@ package com.twidere.twiderex.room.db.transform
 import com.twidere.services.mastodon.model.Emoji
 import com.twidere.twiderex.model.ui.UiEmoji
 import com.twidere.twiderex.model.ui.UiEmojiCategory
+import kotlinx.collections.immutable.toPersistentList
 
 internal fun List<Emoji>.toUi(): List<UiEmojiCategory> = groupBy({ it.category }, { it }).map {
   UiEmojiCategory(
@@ -35,6 +36,6 @@ internal fun List<Emoji>.toUi(): List<UiEmojiCategory> = groupBy({ it.category }
         visibleInPicker = emoji.visibleInPicker,
         category = emoji.category
       )
-    }
+    }.toPersistentList()
   )
 }

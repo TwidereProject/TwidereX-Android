@@ -26,6 +26,7 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UserMetrics
 import com.twidere.twiderex.model.ui.twitter.TwitterUserExtra
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Test
 import java.util.UUID
 import kotlin.test.assertEquals
@@ -56,7 +57,7 @@ internal class UserTransformTest {
       platformType = PlatformType.Twitter,
       extra = TwitterUserExtra(
         pinned_tweet_id = "pinned_tweet_id",
-        url = listOf(mockUiUrlEntity())
+        url = persistentListOf(mockUiUrlEntity())
       )
     )
     val db = ui.toDbUser()

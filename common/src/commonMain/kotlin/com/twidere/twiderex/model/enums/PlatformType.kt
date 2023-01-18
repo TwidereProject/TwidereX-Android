@@ -20,6 +20,9 @@
  */
 package com.twidere.twiderex.model.enums
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 enum class PlatformType {
   Twitter,
   StatusNet,

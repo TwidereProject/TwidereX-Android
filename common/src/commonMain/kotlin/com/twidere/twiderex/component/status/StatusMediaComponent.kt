@@ -44,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -76,12 +77,14 @@ fun StatusMediaComponent(
   statusNavigation: StatusNavigationData,
 ) {
   val media = status.media
-  if (!media.any() || media.any { it.type == MediaType.audio }) {
+  if (status.isMediaEmptyOfContainsAudio) {
     return
   }
-  val onItemClick = { it: UiMedia ->
-    val index = media.indexOf(it)
-    statusNavigation.toMediaWithIndex(status.statusKey, index)
+  val onItemClick = remember {
+    { it: UiMedia ->
+      val index = media.indexOf(it)
+      statusNavigation.toMediaWithIndex(status.statusKey, index)
+    }
   }
   val isAlwaysShowSensitiveMedia = LocalAccountPreferences.current.isAlwaysShowSensitiveMedia
   var sensitive by key(isAlwaysShowSensitiveMedia) {
@@ -96,22 +99,24 @@ fun StatusMediaComponent(
     }
   }
 
-  val aspectRatio = when (media.size) {
-    in 2..4 -> {
-      StatusMediaDefaults.DefaultAspectRatio
-    }
-    1 -> {
-      val first = media.first()
-      (first.width.toFloat() / first.height.toFloat()).let {
-        if (it.isNaN()) {
-          StatusMediaDefaults.DefaultAspectRatio
-        } else {
-          it
+  val aspectRatio = remember(media.size) {
+    when (media.size) {
+      in 2..4 -> {
+        StatusMediaDefaults.DefaultAspectRatio
+      }
+      1 -> {
+        val first = media.first()
+        (first.width.toFloat() / first.height.toFloat()).let {
+          if (it.isNaN()) {
+            StatusMediaDefaults.DefaultAspectRatio
+          } else {
+            it
+          }
         }
       }
-    }
-    else -> {
-      null
+      else -> {
+        null
+      }
     }
   }
   Box(

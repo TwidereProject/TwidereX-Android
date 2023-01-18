@@ -79,6 +79,8 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.StatusNavigationData
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapNotNull
@@ -142,10 +144,11 @@ fun LazyUiStatusList(
   statusNavigation: StatusNavigationData,
   modifier: Modifier = Modifier,
   state: LazyListState = rememberLazyListState(),
-  loadingBetween: List<MicroBlogKey> = emptyList(),
+  loadingBetween: ImmutableList<MicroBlogKey> = persistentListOf(),
   contentPadding: PaddingValues = PaddingValues(0.dp),
   onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
   key: ((index: Int, item: UiStatus) -> Any) = { _, item -> item.statusKey.hashCode() },
+  contentType: (item: UiStatus) -> Any? = { it.itemType },
   header: LazyListScope.() -> Unit = {},
 ) {
   val listState = rememberSaveable(saver = LazyUiStatusListState.Saver) {
@@ -183,7 +186,8 @@ fun LazyUiStatusList(
         header.invoke(this)
         itemsIndexed(
           items,
-          key = key
+          key = key,
+          contentType = contentType,
         ) { index, item ->
           if (item == null) {
             UiStatusPlaceholder()
@@ -211,7 +215,6 @@ fun LazyUiStatusList(
                       onLoadBetweenClicked(item.statusKey, next.statusKey)
                     }
                   }
-
                   if (listState.isAutoLoadMore) {
                     LaunchedEffect(item.statusKey) {
                       onLoadBetweenClicked()

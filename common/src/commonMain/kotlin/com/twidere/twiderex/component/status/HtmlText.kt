@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.TextUnit
 import com.twidere.twiderex.component.foundation.NetworkImage
 import kotlinx.coroutines.coroutineScope
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
@@ -72,6 +73,58 @@ data class ResolvedLink(
   val display: String? = null,
   val clickable: Boolean = true,
 )
+
+@Composable
+fun HtmlText(
+  document: Document,
+  layoutDirection: LayoutDirection,
+  modifier: Modifier = Modifier,
+  maxLines: Int = Int.MAX_VALUE,
+  color: Color = Color.Unspecified,
+  fontSize: TextUnit = TextUnit.Unspecified,
+  fontStyle: FontStyle? = null,
+  fontWeight: FontWeight? = null,
+  fontFamily: FontFamily? = null,
+  letterSpacing: TextUnit = TextUnit.Unspecified,
+  textDecoration: TextDecoration? = null,
+  textAlign: TextAlign? = null,
+  lineHeight: TextUnit = TextUnit.Unspecified,
+  overflow: TextOverflow = TextOverflow.Ellipsis,
+  softWrap: Boolean = true,
+  textStyle: TextStyle = LocalTextStyle.current.copy(color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)),
+  linkStyle: TextStyle = textStyle.copy(MaterialTheme.colors.primary),
+  linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
+  positionWrapper: PositionWrapper? = null,
+  openLink: (String) -> Unit,
+) {
+  CompositionLocalProvider(
+    LocalLayoutDirection provides layoutDirection
+  ) {
+    RenderContent(
+      modifier = modifier,
+      document = document,
+      linkResolver = linkResolver,
+      maxLines = maxLines,
+      textStyle = textStyle,
+      linkStyle = linkStyle,
+      onLinkClicked = {
+        openLink(it)
+      },
+      color = color,
+      fontSize = fontSize,
+      fontStyle = fontStyle,
+      fontWeight = fontWeight,
+      fontFamily = fontFamily,
+      letterSpacing = letterSpacing,
+      textDecoration = textDecoration,
+      textAlign = textAlign,
+      lineHeight = lineHeight,
+      overflow = overflow,
+      softWrap = softWrap,
+      positionWrapper = positionWrapper,
+    )
+  }
+}
 
 @Composable
 fun HtmlText(
@@ -93,50 +146,47 @@ fun HtmlText(
   linkStyle: TextStyle = textStyle.copy(MaterialTheme.colors.primary),
   linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
   positionWrapper: PositionWrapper? = null,
-  openLink: (String) -> Unit = {},
-  onVisibleTextParsed: ((String) -> Unit)? = null,
+  openLink: (String) -> Unit,
 ) {
   val bidi = remember(htmlText) {
     Bidi(htmlText, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT)
   }
-  CompositionLocalProvider(
-    LocalLayoutDirection provides if (bidi.baseIsLeftToRight()) {
+  val document = remember(htmlText) {
+    Jsoup.parse(htmlText.replace("\n", "<br>"))
+  }
+
+  HtmlText(
+    modifier = modifier,
+    document = document,
+    layoutDirection = if (bidi.baseIsLeftToRight()) {
       LayoutDirection.Ltr
     } else {
       LayoutDirection.Rtl
-    }
-  ) {
-    RenderContent(
-      modifier = modifier,
-      htmlText = htmlText,
-      linkResolver = linkResolver,
-      maxLines = maxLines,
-      textStyle = textStyle,
-      linkStyle = linkStyle,
-      onLinkClicked = {
-        openLink(it)
-      },
-      color = color,
-      fontSize = fontSize,
-      fontStyle = fontStyle,
-      fontWeight = fontWeight,
-      fontFamily = fontFamily,
-      letterSpacing = letterSpacing,
-      textDecoration = textDecoration,
-      textAlign = textAlign,
-      lineHeight = lineHeight,
-      overflow = overflow,
-      softWrap = softWrap,
-      positionWrapper = positionWrapper,
-      onVisibleTextParsed = onVisibleTextParsed,
-    )
-  }
+    },
+    maxLines = maxLines,
+    color = color,
+    fontSize = fontSize,
+    fontStyle = fontStyle,
+    fontWeight = fontWeight,
+    fontFamily = fontFamily,
+    letterSpacing = letterSpacing,
+    textDecoration = textDecoration,
+    textAlign = textAlign,
+    lineHeight = lineHeight,
+    overflow = overflow,
+    softWrap = softWrap,
+    textStyle = textStyle,
+    linkStyle = linkStyle,
+    linkResolver = linkResolver,
+    positionWrapper = positionWrapper,
+    openLink = openLink,
+  )
 }
 
 @OptIn(ExperimentalUnitApi::class)
 @Composable
 private fun RenderContent(
-  htmlText: String,
+  document: Document,
   textStyle: TextStyle,
   linkStyle: TextStyle,
   modifier: Modifier = Modifier,
@@ -155,16 +205,17 @@ private fun RenderContent(
   overflow: TextOverflow = TextOverflow.Clip,
   softWrap: Boolean = true,
   positionWrapper: PositionWrapper? = null,
-  onVisibleTextParsed: ((String) -> Unit)? = null,
 ) {
-  val value = renderContentAnnotatedString(
-    htmlText = htmlText,
-    linkResolver = linkResolver,
-    textStyle = textStyle,
-    linkStyle = linkStyle
-  )
+  val value = remember(document, linkResolver, textStyle, linkStyle) {
+    buildContentAnnotatedString(
+      document = document,
+      linkResolver = linkResolver,
+      textStyle = textStyle,
+      linkStyle = linkStyle,
+    )
+  }
   val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
-  DisposableEffect(htmlText) {
+  DisposableEffect(document) {
     positionWrapper?.action = { position ->
       layoutResult.value?.getOffsetForPosition(position)?.let {
         value.getStringAnnotations(start = it, end = it)
@@ -178,7 +229,6 @@ private fun RenderContent(
     }
   }
   if (value.text.isNotEmpty() && value.text.isNotBlank()) {
-    onVisibleTextParsed?.invoke(value.text)
     Text(
       modifier = modifier.pointerInput(Unit) {
         forEachGesture {
@@ -226,13 +276,13 @@ private fun RenderContent(
           Placeholder(
             width = LocalTextStyle.current.fontSize,
             height = LocalTextStyle.current.fontSize,
-            placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter
-          )
+            placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter,
+          ),
         ) { target ->
           NetworkImage(
             data = target,
           )
-        }
+        },
       ),
     )
   }
@@ -268,6 +318,26 @@ fun renderContentAnnotatedString(
   }
 }
 
+@ExperimentalUnitApi
+fun buildContentAnnotatedString(
+  document: Document,
+  textStyle: TextStyle,
+  linkStyle: TextStyle,
+  linkResolver: (href: String) -> ResolvedLink,
+): AnnotatedString {
+  val styleData = StyleData(
+    textStyle = textStyle,
+    linkStyle = linkStyle,
+  )
+  val renderContext = RenderContext(linkResolver = linkResolver)
+  // val document = Jsoup.parse(htmlText.replace("\n", "<br>"))
+  return buildAnnotatedString {
+    document.body().childNodes().forEach {
+      renderNode(it, renderContext, styleData)
+    }
+  }
+}
+
 private data class RenderContext(
   val linkResolver: (href: String) -> ResolvedLink,
 )
@@ -286,6 +356,7 @@ private fun AnnotatedString.Builder.renderNode(
     is Element -> {
       this.renderElement(node, context = context, styleData = styleData)
     }
+
     is TextNode -> {
       renderText(node.wholeText, styleData.textStyle)
     }
@@ -294,7 +365,7 @@ private fun AnnotatedString.Builder.renderNode(
 
 private fun AnnotatedString.Builder.renderText(text: String, textStyle: TextStyle) {
   pushStyle(
-    textStyle.toSpanStyle()
+    textStyle.toSpanStyle(),
   )
   append(text)
   pop()
@@ -312,14 +383,17 @@ private fun AnnotatedString.Builder.renderElement(
     "a" -> {
       renderLink(element, context, styleData)
     }
+
     "br" -> {
       renderText("\n", styleData.textStyle)
     }
+
     "span", "p" -> {
       element.childNodes().forEach {
         renderNode(node = it, context = context, styleData = styleData)
       }
     }
+
     "emoji" -> {
       renderEmoji(element)
     }
@@ -354,8 +428,10 @@ private fun AnnotatedString.Builder.renderLink(
         renderText(resolvedLink.display ?: resolvedLink.expanded, styleData.textStyle)
       }
     }
+
     resolvedLink.skip -> {
     }
+
     else -> {
       if (resolvedLink.clickable) {
         pushStringAnnotation(TAG_URL, href)
@@ -363,7 +439,7 @@ private fun AnnotatedString.Builder.renderLink(
           renderNode(
             node = it,
             context = context,
-            styleData = styleData.copy(textStyle = styleData.linkStyle)
+            styleData = styleData.copy(textStyle = styleData.linkStyle),
           )
         }
         pop()
@@ -372,7 +448,7 @@ private fun AnnotatedString.Builder.renderLink(
           renderNode(
             node = it,
             context = context,
-            styleData = styleData.copy(textStyle = styleData.textStyle)
+            styleData = styleData.copy(textStyle = styleData.textStyle),
           )
         }
       }

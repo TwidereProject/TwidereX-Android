@@ -49,6 +49,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,7 +60,6 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.component.HumanizedTime
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.icon
@@ -82,12 +82,7 @@ fun TimelineStatusComponent(
   threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
 ) {
   when {
-    data.platformType == PlatformType.Mastodon &&
-      data.mastodonExtra != null &&
-      (
-        data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
-          data.mastodonExtra.type == MastodonStatusType.NotificationFollow
-        ) -> {
+    data.isMastodonFollowStatus -> {
       MastodonFollowStatus(data, statusNavigation)
     }
     else -> NormalStatus(data, showActions, threadStyle, lineUp, lineDown, statusNavigation)
@@ -157,7 +152,7 @@ private fun NormalStatus(
       contentPadding = NormalStatusDefaults.ContentPadding,
       threadStyle = threadStyle,
       lineUp = lineUp,
-      lineDown = lineDown || (threadStyle.lineDown && data.isInThread()),
+      lineDown = remember(lineDown, threadStyle, data) { lineDown || (threadStyle.lineDown && data.isInThread()) },
       data = data,
       footer = {
         Column {
@@ -410,12 +405,12 @@ fun StatusContent(
   isSelectionAble: Boolean = true,
 ) {
   val layoutDirection = LocalLayoutDirection.current
-  val status = data.retweet ?: data
+  val status = remember(data) { data.retweet ?: data }
   Column(
     modifier = modifier
       .padding(
-        start = contentPadding.calculateLeftPadding(layoutDirection),
-        end = contentPadding.calculateRightPadding(layoutDirection)
+        start = remember(contentPadding, layoutDirection) { contentPadding.calculateLeftPadding(layoutDirection) },
+        end = remember(contentPadding, layoutDirection) { contentPadding.calculateRightPadding(layoutDirection) }
       )
       .wrapContentHeight()
       .fillMaxWidth()
@@ -426,16 +421,16 @@ fun StatusContent(
         AvatarConnectLine(
           modifier = Modifier
             .fillMaxHeight()
-            .padding(start = UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2),
+            .padding(start = remember { UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2 }),
           lineShape = RoundedCornerShape(
-            bottomStart = AvatarConnectLineDefaults.LineWidth / 2,
-            bottomEnd = AvatarConnectLineDefaults.LineWidth / 2
+            bottomStart = remember { AvatarConnectLineDefaults.LineWidth / 2 },
+            bottomEnd = remember { AvatarConnectLineDefaults.LineWidth / 2 }
           )
         )
       }
-      Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2))
+      Spacer(modifier = Modifier.width(remember { UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2 }))
       Column {
-        Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
+        Spacer(modifier = Modifier.height(remember(contentPadding) { contentPadding.calculateTopPadding() }))
         StatusHeader(
           data = data,
           statusNavigation = statusNavigation,
@@ -457,8 +452,8 @@ fun StatusContent(
             modifier = Modifier
               .weight(1f),
             lineShape = RoundedCornerShape(
-              topStart = AvatarConnectLineDefaults.LineWidth / 2,
-              topEnd = AvatarConnectLineDefaults.LineWidth / 2
+              topStart = remember { AvatarConnectLineDefaults.LineWidth / 2 },
+              topEnd = remember { AvatarConnectLineDefaults.LineWidth / 2 }
             )
           )
         }
@@ -507,7 +502,7 @@ fun StatusContent(
               Spacer(modifier = Modifier.width(StatusContentDefaults.Mastodon.VisibilitySpacing))
             }
             if (type == StatusContentType.Normal) {
-              HumanizedTime(time = status.timestamp)
+              Text(status.humanizedTime)
             }
           }
         }
@@ -537,7 +532,7 @@ fun StatusContent(
         Column {
           Spacer(modifier = Modifier.height(StatusContentDefaults.FooterSpacing))
           footer.invoke()
-          Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
+          Spacer(modifier = Modifier.height(remember(contentPadding) { contentPadding.calculateBottomPadding() }))
         }
         if (data.isInThread()) {
           StatusThread(threadStyle, data, toStatus = statusNavigation.toStatus)
@@ -682,9 +677,9 @@ private fun StatusLinkPreview(
         openLink(card.link)
       },
     link = card.displayLink ?: card.link,
-    title = card.title?.trim(),
+    title = card.title,
     image = card.image,
-    desc = card.description?.trim(),
+    desc = card.description,
     maxLines = 5,
   )
 }

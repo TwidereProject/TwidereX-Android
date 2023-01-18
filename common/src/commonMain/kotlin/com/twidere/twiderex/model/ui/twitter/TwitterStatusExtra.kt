@@ -20,10 +20,12 @@
  */
 package com.twidere.twiderex.model.ui.twitter
 
+import androidx.compose.runtime.Immutable
 import com.twidere.twiderex.model.enums.TwitterReplySettings
 import com.twidere.twiderex.model.ui.StatusExtra
 import kotlinx.serialization.Serializable
 
+@Immutable
 @Serializable
 data class TwitterStatusExtra(
   val reply_settings: TwitterReplySettings,

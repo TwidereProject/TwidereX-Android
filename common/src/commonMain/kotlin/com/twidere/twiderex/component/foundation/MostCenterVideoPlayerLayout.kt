@@ -42,7 +42,9 @@ fun MostCenterInListLayout(
   modifier: Modifier = Modifier,
   content: @Composable (isMostCenter: Boolean) -> Unit
 ) {
-  var middleLine = 0.0f
+  var middleLine by remember {
+    mutableStateOf(0.0f)
+  }
   val composableScope = rememberCoroutineScope()
 
   var isMostCenter by remember {

@@ -20,6 +20,9 @@
  */
 package com.twidere.twiderex.model.enums
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 enum class MastodonStatusType {
   Status,
   NotificationFollow,
@@ -31,6 +34,7 @@ enum class MastodonStatusType {
   NotificationStatus,
 }
 
+@Immutable
 enum class MastodonVisibility {
   Public,
   Unlisted,

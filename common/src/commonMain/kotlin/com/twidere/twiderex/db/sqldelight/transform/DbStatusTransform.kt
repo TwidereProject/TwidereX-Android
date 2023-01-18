@@ -42,6 +42,8 @@ import com.twidere.twiderex.sqldelight.table.DbStatus
 import com.twidere.twiderex.sqldelight.table.DbStatusReactions
 import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toPersistentMap
 
 internal fun UiStatus.toDbStatusWithAttachments(accountKey: MicroBlogKey): DbStatusWithAttachments = DbStatusWithAttachments(
   status = DbStatus(
@@ -108,10 +110,10 @@ internal fun DbStatusWithAttachments.toUi(): UiStatus = UiStatus(
     PlatformType.Fanfou -> TODO()
     PlatformType.Mastodon -> status.extra?.fromJson<MastodonStatusExtra>()
   },
-  referenceStatus = references.mapValues { it.value.toUi() },
+  referenceStatus = references.mapValues { it.value.toUi() }.toPersistentMap(),
   user = user.toUi(),
-  media = medias.map { it.toUi() },
-  url = urls.map { it.toUi() },
+  media = medias.map { it.toUi() }.toPersistentList(),
+  url = urls.map { it.toUi() }.toPersistentList(),
 )
 
 private fun UiPoll.toDbPoll() = DbPoll(

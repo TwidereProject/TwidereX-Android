@@ -23,7 +23,6 @@ package com.twidere.twiderex.viewmodel.user
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -57,8 +56,8 @@ fun UserPresenter(
     return UserState.NoAccount
   }
 
-  val account by remember(currentAccount) {
-    derivedStateOf { currentAccount.account }
+  val account = remember(currentAccount) {
+    currentAccount.account
   }
 
   var refreshing by remember {
@@ -81,8 +80,8 @@ fun UserPresenter(
     mutableStateOf<IRelationship?>(null)
   }
 
-  val isMe by remember(account) {
-    derivedStateOf { account.accountKey == userKey }
+  val isMe = remember(account) {
+    account.accountKey == userKey
   }
 
   LaunchedEffect(account, refreshFlow) {

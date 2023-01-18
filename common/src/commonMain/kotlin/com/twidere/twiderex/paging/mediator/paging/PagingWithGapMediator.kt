@@ -29,6 +29,8 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.model.paging.saveToDb
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -40,7 +42,7 @@ abstract class PagingWithGapMediator(
   database: CacheDatabase,
 ) : PagingMediator(accountKey = accountKey, database = database) {
 
-  private val _loadingBetween = MutableStateFlow(listOf<MicroBlogKey>())
+  private val _loadingBetween = MutableStateFlow(persistentListOf<MicroBlogKey>())
   val loadingBetween
     get() = _loadingBetween.asSharedFlow()
 
@@ -98,7 +100,7 @@ abstract class PagingWithGapMediator(
     sinceStatusKey: MicroBlogKey? = null,
   ): MediatorResult {
     if (maxStatusKey != null && sinceStatusKey != null) {
-      _loadingBetween.value = _loadingBetween.value + maxStatusKey
+      _loadingBetween.value = (_loadingBetween.value + maxStatusKey).toPersistentList()
     }
     try {
       val max_id = withContext(Dispatchers.IO) {
@@ -134,7 +136,7 @@ abstract class PagingWithGapMediator(
       return MediatorResult.Error(e)
     } finally {
       if (maxStatusKey != null && sinceStatusKey != null) {
-        _loadingBetween.value = _loadingBetween.value - maxStatusKey
+        _loadingBetween.value = (_loadingBetween.value - maxStatusKey).toPersistentList()
       }
     }
   }

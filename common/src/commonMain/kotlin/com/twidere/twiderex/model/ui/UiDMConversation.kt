@@ -21,6 +21,8 @@
 package com.twidere.twiderex.model.ui
 
 import com.twidere.twiderex.model.MicroBlogKey
+import org.jsoup.Jsoup
+import java.text.Bidi
 
 data class UiDMConversation(
   val accountKey: MicroBlogKey,
@@ -33,6 +35,8 @@ data class UiDMConversation(
   val conversationType: Type,
   val recipientKey: MicroBlogKey,
 ) {
+  val conversationNameHtmlDocument = Jsoup.parse(conversationName.replace("\n", "<br>"))
+  val conversationNameIsLeftToRight = Bidi(conversationName, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT).baseIsLeftToRight()
   enum class Type {
     ONE_TO_ONE,
     GROUP

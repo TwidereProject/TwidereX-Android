@@ -26,6 +26,7 @@ import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -35,19 +36,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.ui.LocalActiveAccount
+import org.jsoup.nodes.Document
 
 @Composable
 fun UserScreenName(user: UiUser) {
-  UserScreenName(name = user.getDisplayScreenName(LocalActiveAccount.current?.accountKey?.host))
+  val host = LocalActiveAccount.current?.accountKey?.host
+  UserScreenName(name = remember(user, host) { user.getDisplayScreenName(host) })
 }
 
 @Composable
 fun UserScreenName(name: String) {
   CompositionLocalProvider(
-    LocalContentAlpha provides ContentAlpha.medium
+    LocalContentAlpha provides ContentAlpha.medium,
   ) {
     Text(
       text = name,
@@ -77,7 +81,12 @@ fun UserName(
   onUserNameClicked: (String) -> Unit,
 ) {
   UserName(
-    userName = user.name.takeIf { it.isNotEmpty() } ?: user.screenName,
+    userNameDocument = user.displayNameDocument,
+    layoutDirection = if (user.displayNameIsLeftToRight) {
+      LayoutDirection.Ltr
+    } else {
+      LayoutDirection.Rtl
+    },
     modifier = modifier,
     color = color,
     fontSize = fontSize,
@@ -98,7 +107,8 @@ fun UserName(
 
 @Composable
 fun UserName(
-  userName: String,
+  userNameDocument: Document,
+  layoutDirection: LayoutDirection,
   modifier: Modifier = Modifier,
   color: Color = Color.Unspecified,
   fontSize: TextUnit = TextUnit.Unspecified,
@@ -116,7 +126,8 @@ fun UserName(
   onUserNameClicked: (String) -> Unit,
 ) {
   HtmlText(
-    htmlText = userName,
+    document = userNameDocument,
+    layoutDirection = layoutDirection,
     modifier = modifier,
     color = color,
     fontSize = fontSize,

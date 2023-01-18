@@ -24,12 +24,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.dataprovider.mapper.autolink
+import com.twidere.twiderex.extensions.humanizedCount
+import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MastodonStatusType
+import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.enums.ReferenceType
 import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
 import com.twidere.twiderex.model.ui.twitter.TwitterStatusExtra
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableMap
+import org.jsoup.Jsoup
+import java.text.Bidi
 
 @Immutable
 data class UiStatus(
@@ -45,21 +55,31 @@ data class UiStatus(
   val geo: UiGeo,
   val hasMedia: Boolean,
   val user: UiUser,
-  val media: List<UiMedia>,
+  val media: ImmutableList<UiMedia>,
   val source: String,
   val isGap: Boolean,
-  val url: List<UiUrlEntity>,
+  val url: ImmutableList<UiUrlEntity>,
   val platformType: PlatformType,
   val spoilerText: String? = null,
   val card: UiCard? = null,
   val poll: UiPoll? = null,
-  val referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
+  val referenceStatus: ImmutableMap<ReferenceType, UiStatus> = persistentMapOf(),
   val inReplyToUserId: String? = null,
   val inReplyToStatusId: String? = null,
   val extra: StatusExtra? = null,
   val language: String? = null,
 ) {
+  val contentHtmlDocument by lazy {
+    Jsoup.parse(htmlText.replace("\n", "<br>"))
+  }
+  val contentIsLeftToRight by lazy {
+    Bidi(htmlText, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT).baseIsLeftToRight()
+  }
+  val humanizedTime by lazy {
+    timestamp.humanizedTimestamp()
+  }
   val mastodonExtra: MastodonStatusExtra? = if (extra is MastodonStatusExtra) extra else null
+  val isMediaEmptyOfContainsAudio = !media.any() || media.any { it.type == MediaType.audio }
 
   val twitterExtra: TwitterStatusExtra? = if (extra is TwitterStatusExtra) extra else null
 
@@ -68,7 +88,7 @@ data class UiStatus(
       referenceStatus[ReferenceType.MastodonNotification]
     } else {
       referenceStatus[ReferenceType.Retweet]?.copy(
-        referenceStatus = referenceStatus.filterNot { it.key == ReferenceType.Retweet }
+        referenceStatus = referenceStatus.filterNot { it.key == ReferenceType.Retweet }.toImmutableMap()
       )
     }
   }
@@ -95,6 +115,19 @@ data class UiStatus(
     PlatformType.Mastodon -> "/web/statuses/$statusId"
   }
 
+  val isMastodonFollowStatus: Boolean = platformType == PlatformType.Mastodon &&
+    mastodonExtra != null &&
+    (
+      mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
+        mastodonExtra.type == MastodonStatusType.NotificationFollow
+      )
+
+  val itemType = when {
+    isMastodonFollowStatus -> "follow"
+    isGap -> "gap"
+    else -> "status"
+  }
+
   companion object {
     @Composable
     fun sample() = UiStatus(
@@ -114,7 +147,7 @@ data class UiStatus(
       media = UiMedia.sample(),
       source = "TwidereX",
       isGap = false,
-      url = emptyList(),
+      url = persistentListOf(),
       statusKey = MicroBlogKey.Empty,
       rawText = "",
       platformType = PlatformType.Twitter,
@@ -123,10 +156,19 @@ data class UiStatus(
   }
 }
 
+@Immutable
 interface StatusExtra
 
+@Immutable
 data class StatusMetrics(
   val like: Long,
   val reply: Long,
   val retweet: Long
-)
+) {
+  val likeString = like.humanizedCount()
+  val replyString = reply.humanizedCount()
+  val retweetString = retweet.humanizedCount()
+  val showLike = like > 0
+  val showReply = reply > 0
+  val showRetweet = retweet > 0
+}

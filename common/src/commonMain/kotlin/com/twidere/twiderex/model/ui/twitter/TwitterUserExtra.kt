@@ -20,12 +20,17 @@
  */
 package com.twidere.twiderex.model.ui.twitter
 
+import androidx.compose.runtime.Immutable
 import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.model.ui.UserExtra
+import com.twidere.twiderex.utils.ImmutableListSerializer
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.serialization.Serializable
 
+@Immutable
 @Serializable
 data class TwitterUserExtra(
   val pinned_tweet_id: String?,
-  val url: List<UiUrlEntity>,
+  @Serializable(ImmutableListSerializer::class)
+  val url: ImmutableList<UiUrlEntity>,
 ) : UserExtra

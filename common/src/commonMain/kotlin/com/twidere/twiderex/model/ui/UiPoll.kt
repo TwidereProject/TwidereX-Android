@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.model.ui
 
+import com.twidere.twiderex.extensions.humanizedTimestamp
+
 data class UiPoll(
   val id: String,
   val options: List<Option>,
@@ -30,7 +32,12 @@ data class UiPoll(
   val votesCount: Long? = null,
   val votersCount: Long? = null,
   val ownVotes: List<Int>? = null,
-)
+) {
+  val expiresAtString = expiresAt?.humanizedTimestamp().orEmpty()
+  val canVote = !voted &&
+    !expired &&
+    expiresAt?.let { it > System.currentTimeMillis() } ?: true // some instance allows expires time == null
+}
 
 data class Option(
   val text: String,

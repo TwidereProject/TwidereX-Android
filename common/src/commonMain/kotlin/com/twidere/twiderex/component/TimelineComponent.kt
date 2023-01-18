@@ -23,8 +23,6 @@ package com.twidere.twiderex.component
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
@@ -54,10 +52,8 @@ fun TimelineComponent(
     return
   }
 
-  val refreshingState by remember(state) {
-    derivedStateOf {
-      state.source.loadState.refresh is LoadState.Loading
-    }
+  val refreshingState = remember(state) {
+    state.source.loadState.refresh is LoadState.Loading
   }
 
   SwipeToRefreshLayout(

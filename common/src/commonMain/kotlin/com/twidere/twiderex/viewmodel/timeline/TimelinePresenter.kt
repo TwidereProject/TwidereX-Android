@@ -25,7 +25,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
@@ -57,6 +56,8 @@ import com.twidere.twiderex.paging.mediator.timeline.mastodon.LocalTimelineMedia
 import com.twidere.twiderex.repository.NotificationRepository
 import com.twidere.twiderex.scenes.CurrentAccountPresenter
 import com.twidere.twiderex.scenes.CurrentAccountState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -107,85 +108,79 @@ fun TimelinePresenter(
     return TimelineState.NoAccount
   }
 
-  val pagingMediator by remember(accountState) {
-    derivedStateOf {
-      when (savedStateKeyType) {
-        SavedStateKeyType.MENTIONS -> {
-          MentionTimelineMediator(
-            service = accountState.account.service as TimelineService,
-            accountKey = accountState.account.accountKey,
-            database = database,
-            addCursorIfNeed = { data, accountKey ->
-              notificationRepository.addCursorIfNeeded(
-                accountKey,
-                NotificationCursorType.Mentions,
-                data.status.statusId,
-                data.status.timestamp,
-              )
-            }
-          )
-        }
-        SavedStateKeyType.HOME -> {
-          HomeTimelineMediator(
-            accountState.account.service as TimelineService,
-            accountState.account.accountKey,
-            database,
-          )
-        }
-        SavedStateKeyType.NOTIFICATION -> {
-          NotificationTimelineMediator(
-            service = (accountState.account.service as NotificationService),
-            accountKey = accountState.account.accountKey,
-            database = database,
-            addCursorIfNeed = { data, accountKey ->
-              notificationRepository.addCursorIfNeeded(
-                accountKey,
-                NotificationCursorType.General,
-                data.status.statusId,
-                data.status.timestamp
-              )
-            }
-          )
-        }
-        SavedStateKeyType.FEDERATED -> {
-          FederatedTimelineMediator(
-            (accountState.account.service as MastodonService),
-            accountState.account.accountKey,
-            database,
-          )
-        }
-        SavedStateKeyType.LOCAL -> {
-          LocalTimelineMediator(
-            (accountState.account.service as MastodonService),
-            accountState.account.accountKey,
-            database,
-          )
-        }
+  val pagingMediator = remember(accountState) {
+    when (savedStateKeyType) {
+      SavedStateKeyType.MENTIONS -> {
+        MentionTimelineMediator(
+          service = accountState.account.service as TimelineService,
+          accountKey = accountState.account.accountKey,
+          database = database,
+          addCursorIfNeed = { data, accountKey ->
+            notificationRepository.addCursorIfNeeded(
+              accountKey,
+              NotificationCursorType.Mentions,
+              data.status.statusId,
+              data.status.timestamp,
+            )
+          }
+        )
+      }
+      SavedStateKeyType.HOME -> {
+        HomeTimelineMediator(
+          accountState.account.service as TimelineService,
+          accountState.account.accountKey,
+          database,
+        )
+      }
+      SavedStateKeyType.NOTIFICATION -> {
+        NotificationTimelineMediator(
+          service = (accountState.account.service as NotificationService),
+          accountKey = accountState.account.accountKey,
+          database = database,
+          addCursorIfNeed = { data, accountKey ->
+            notificationRepository.addCursorIfNeeded(
+              accountKey,
+              NotificationCursorType.General,
+              data.status.statusId,
+              data.status.timestamp
+            )
+          }
+        )
+      }
+      SavedStateKeyType.FEDERATED -> {
+        FederatedTimelineMediator(
+          (accountState.account.service as MastodonService),
+          accountState.account.accountKey,
+          database,
+        )
+      }
+      SavedStateKeyType.LOCAL -> {
+        LocalTimelineMediator(
+          (accountState.account.service as MastodonService),
+          accountState.account.accountKey,
+          database,
+        )
       }
     }
   }
 
-  val savedStateKey by remember(accountState) {
-    derivedStateOf {
-      "${accountState.account.accountKey}${savedStateKeyType.key}"
-    }
+  val savedStateKey = remember(accountState) {
+    "${accountState.account.accountKey}${savedStateKeyType.key}"
   }
 
-  val source by remember(pagingMediator) {
-    derivedStateOf {
-      pagingMediator.pager(
-        config = PagingConfig(
-          pageSize = timelinePageSize,
-          initialLoadSize = timelineInitialLoadSize
-        )
-      ).toUi()
-    }
+  val source = remember(pagingMediator) {
+    pagingMediator.pager(
+      config = PagingConfig(
+        pageSize = timelinePageSize,
+        initialLoadSize = timelineInitialLoadSize
+      )
+    ).toUi()
   }
 
   val loadingBetween by remember(pagingMediator) {
     pagingMediator.loadingBetween
   }.collectAsState(
-    emptyList()
+    persistentListOf()
   )
 
   val listState = key(accountState) {
@@ -220,7 +215,8 @@ fun TimelinePresenter(
       .filter { listState.layoutInfo.totalItemsCount != 0 }
       .collect {
         dataStore.edit { preferences ->
-          val firstVisibleItemIndexKey = intPreferencesKey("$savedStateKey$FIRST_VISIBLE_KEY_SUFFIX")
+          val firstVisibleItemIndexKey =
+            intPreferencesKey("$savedStateKey$FIRST_VISIBLE_KEY_SUFFIX")
           val firstVisibleItemScrollOffsetKey =
             intPreferencesKey("$savedStateKey$FIRST_OFFSET_KEY_SUFFIX")
           preferences[firstVisibleItemIndexKey] = listState.firstVisibleItemIndex
@@ -260,8 +256,9 @@ interface TimeLineEvent {
 interface TimelineState {
   data class Data(
     val source: LazyPagingItems<UiStatus>,
-    val loadingBetween: List<MicroBlogKey>,
+    val loadingBetween: ImmutableList<MicroBlogKey>,
     val listState: LazyListState
   ) : TimelineState
+
   object NoAccount : TimelineState
 }

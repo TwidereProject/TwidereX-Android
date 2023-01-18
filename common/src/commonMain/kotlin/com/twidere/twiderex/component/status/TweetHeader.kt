@@ -30,6 +30,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -39,6 +40,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 
 @Composable
@@ -55,14 +57,24 @@ fun RetweetHeader(
       )
     },
     text = {
-      HtmlText(
-        textStyle = MaterialTheme.typography.caption,
-        htmlText = stringResource(
-          res = com.twidere.twiderex.MR.strings.common_controls_status_user_retweeted,
-          data.user.displayName
-        ),
-        openLink = openLink,
-      )
+      if (data.platformType == PlatformType.Twitter) {
+        Text(
+          stringResource(
+            res = com.twidere.twiderex.MR.strings.common_controls_status_user_retweeted,
+            data.user.displayName
+          ),
+          style = MaterialTheme.typography.caption,
+        )
+      } else {
+        HtmlText(
+          textStyle = MaterialTheme.typography.caption,
+          htmlText = stringResource(
+            res = com.twidere.twiderex.MR.strings.common_controls_status_user_retweeted,
+            data.user.displayName
+          ),
+          openLink = openLink,
+        )
+      }
     },
   )
 }

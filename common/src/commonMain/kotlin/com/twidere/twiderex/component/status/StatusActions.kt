@@ -36,6 +36,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -61,7 +62,6 @@ import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.extensions.humanizedCount
 import com.twidere.twiderex.kmp.LocalRemoteNavigator
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
@@ -81,27 +81,24 @@ fun ReplyButton(
   val icon = painterResource(res = com.twidere.twiderex.MR.files.ic_corner_up_left)
   val contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_actions_reply)
 
-  val action = {
-    compose(ComposeType.Reply, status.statusKey)
-  }
-
   if (withNumber) {
-    val data = status.retweet ?: status
+    val data = remember(status) { status.retweet ?: status }
     StatusActionButtonWithNumbers(
       modifier = modifier,
       icon = icon,
       color = LocalContentColor.current,
-      count = data.metrics.reply,
+      showNumbers = data.metrics.showReply,
+      countString = data.metrics.replyString,
       contentDescription = contentDescription,
       onClick = {
-        action.invoke()
+        compose(ComposeType.Reply, status.statusKey)
       },
     )
   } else {
     IconButton(
       modifier = modifier,
       onClick = {
-        action.invoke()
+        compose(ComposeType.Reply, status.statusKey)
       },
     ) {
       Icon(
@@ -121,35 +118,38 @@ fun LikeButton(
 ) {
   val actionsViewModel = LocalStatusActions.current
   val account = LocalActiveAccount.current
-  val color = if (status.liked) {
-    Color.Red
-  } else {
-    LocalContentColor.current
+  val contentColor = LocalContentColor.current
+  val color = remember(status.liked) {
+    if (status.liked) {
+      Color.Red
+    } else {
+      contentColor
+    }
   }
   val contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_actions_like)
   val icon = painterResource(res = com.twidere.twiderex.MR.files.ic_heart)
-  val action = {
-    if (account != null) {
-      actionsViewModel.like(status, account)
-    }
-  }
-  val data = status.retweet ?: status
+  val data = remember(status) { status.retweet ?: status }
   if (withNumber) {
     StatusActionButtonWithNumbers(
       modifier = modifier,
       icon = icon,
-      count = data.metrics.like,
+      showNumbers = data.metrics.showLike,
+      countString = data.metrics.likeString,
       color = color,
       contentDescription = contentDescription,
       onClick = {
-        action.invoke()
+        if (account != null) {
+          actionsViewModel.like(status, account)
+        }
       },
     )
   } else {
     IconButton(
       modifier = modifier,
       onClick = {
-        action.invoke()
+        if (account != null) {
+          actionsViewModel.like(status, account)
+        }
       },
     ) {
       Icon(
@@ -170,10 +170,14 @@ fun RetweetButton(
 ) {
   val actionsViewModel = LocalStatusActions.current
   val account = LocalActiveAccount.current
-  val color = if (status.retweeted) {
-    MaterialTheme.colors.primary
-  } else {
-    LocalContentColor.current
+  val contentColor = LocalContentColor.current
+  val primaryColor = MaterialTheme.colors.primary
+  val color = remember(status.retweeted) {
+    if (status.retweeted) {
+      primaryColor
+    } else {
+      contentColor
+    }
   }
   val icon = painterResource(res = com.twidere.twiderex.MR.files.ic_repeat)
   val contentDescription =
@@ -219,7 +223,8 @@ fun RetweetButton(
     if (withNumber) {
       StatusActionButtonWithNumbers(
         icon = icon,
-        count = data.metrics.retweet,
+        showNumbers = data.metrics.showRetweet,
+        countString = data.metrics.retweetString,
         color = color,
         contentDescription = contentDescription,
         onClick = {
@@ -251,16 +256,14 @@ fun ShareButton(
   menus: @Composable ColumnScope.(callback: () -> Unit) -> Unit = {},
 ) {
   var expanded by remember { mutableStateOf(false) }
-  val data = status.retweet ?: status
+  val data = remember(status) { status.retweet ?: status }
   val actionsViewModel = LocalStatusActions.current
   val account = LocalActiveAccount.current
   val accountKey = account?.accountKey
   val remoteNavigator = LocalRemoteNavigator.current
   val icon = Icons.Default.MoreHoriz
-  val text = renderContentAnnotatedString(
-    htmlText = data.htmlText,
-    linkResolver = { data.resolveLink(it) },
-  )
+  val textStyle = LocalTextStyle.current.copy(color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current))
+  val linkStyle = textStyle.copy(MaterialTheme.colors.primary)
   val clipboardManager = LocalClipboardManager.current
   val contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_more)
   Box(
@@ -314,6 +317,12 @@ fun ShareButton(
       DropdownMenuItem(
         onClick = {
           expanded = false
+          val text = buildContentAnnotatedString(
+            document = data.contentHtmlDocument,
+            textStyle = textStyle,
+            linkStyle = linkStyle,
+            linkResolver = { data.resolveLink(it) },
+          )
           clipboardManager.setText(text)
         }
       ) {
@@ -352,6 +361,12 @@ fun ShareButton(
           expanded = false
           remoteNavigator.shareText(
             buildString {
+              val text = buildContentAnnotatedString(
+                document = data.contentHtmlDocument,
+                textStyle = textStyle,
+                linkStyle = linkStyle,
+                linkResolver = { data.resolveLink(it) },
+              )
               append(text)
               append(System.lineSeparator())
               append(System.lineSeparator())
@@ -385,7 +400,8 @@ fun ShareButton(
 private fun StatusActionButtonWithNumbers(
   icon: Painter,
   contentDescription: String,
-  count: Long,
+  showNumbers: Boolean,
+  countString: String,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
   enabled: Boolean = true,
@@ -424,10 +440,10 @@ private fun StatusActionButtonWithNumbers(
       painter = icon,
       contentDescription = contentDescription,
     )
-    if (count > 0) {
+    if (showNumbers) {
       Spacer(modifier = Modifier.width(4.dp))
       Text(
-        text = count.humanizedCount(),
+        text = countString,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         style = MaterialTheme.typography.body2,
