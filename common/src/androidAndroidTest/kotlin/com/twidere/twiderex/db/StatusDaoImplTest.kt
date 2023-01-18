@@ -26,6 +26,7 @@ import com.twidere.twiderex.db.base.CacheDatabaseDaoTest
 import com.twidere.twiderex.mock.model.mockIStatus
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUrlEntity
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -40,7 +41,7 @@ internal class StatusDaoImplTest : CacheDatabaseDaoTest() {
   fun insertAll_SaveBothStatusAndAttachmentsToDatabase() = runBlocking {
     val cacheDatabase = CacheDatabaseImpl(roomDatabase)
     val status = mockIStatus(hasMedia = true, hasReference = true).toUi(accountKey).copy(
-      url = listOf(
+      url = persistentListOf(
         UiUrlEntity(
           url = "test",
           expandedUrl = "",
