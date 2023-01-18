@@ -23,6 +23,7 @@ package com.twidere.twiderex.scenes.settings.misc
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +42,7 @@ import com.twidere.twiderex.scenes.CurrentAccountPresenter
 import com.twidere.twiderex.scenes.CurrentAccountState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 @Composable
 fun MiscPresenter(
@@ -399,10 +401,12 @@ fun NitterPresenter(
       nitter = TextFieldValue(it.nitterInstance, selection = TextRange(it.nitterInstance.length))
     }
   }
-  val isNitterInputValid =
-    (nitter.text.startsWith("https://") || nitter.text.startsWith("http://")) && !nitter.text.endsWith(
-      "/"
-    )
+  val isNitterInputValid by remember {
+    derivedStateOf {
+      nitter.text.isEmpty() || nitter.text.toHttpUrlOrNull() != null
+    }
+  }
+
   var nitterVerifyLoading by remember { mutableStateOf(false) }
   var nitterVerify by remember { mutableStateOf(false) }
 
@@ -414,7 +418,7 @@ fun NitterPresenter(
       NitterEvent.Confirm -> {
         showUsageDialog = false
         if (nitter.text.isEmpty()) {
-          nitterVerify = false
+          nitterVerify = true
           nitterVerifyLoading = false
         } else {
           nitterVerifyLoading = true
