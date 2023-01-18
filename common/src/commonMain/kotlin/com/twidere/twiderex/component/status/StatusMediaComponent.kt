@@ -81,7 +81,7 @@ fun StatusMediaComponent(
   }
   val onItemClick = { it: UiMedia ->
     val index = media.indexOf(it)
-    statusNavigation.toMediaWithIndex(status.statusKey, index)
+    statusNavigation.toMediaWithIndex(status.statusKey, index, null)
   }
   val isAlwaysShowSensitiveMedia = LocalAccountPreferences.current.isAlwaysShowSensitiveMedia
   var sensitive by key(isAlwaysShowSensitiveMedia) {

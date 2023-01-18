@@ -144,7 +144,9 @@ fun UserComponent(
     ) {
       UserMediaTimeline(
         state = state.userMediaTimelineState,
-        openMedia = userNavigationData.statusNavigation.toMediaWithIndex,
+        openMedia = { statusKey, index ->
+          userNavigationData.statusNavigation.toMediaWithIndex(statusKey, index, userKey)
+        },
       )
     },
   ).let {

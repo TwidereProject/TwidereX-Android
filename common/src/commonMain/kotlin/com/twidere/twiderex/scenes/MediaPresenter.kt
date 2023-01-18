@@ -38,6 +38,7 @@ import moe.tlaster.kfilepicker.FilePicker
 internal fun MediaPresenter(
   event: Flow<MediaEvent>,
   statusKey: MicroBlogKey,
+  userKey: MicroBlogKey?,
   statusRepository: StatusRepository = get(),
   mediaAction: MediaAction = get(),
 ): MediaState {

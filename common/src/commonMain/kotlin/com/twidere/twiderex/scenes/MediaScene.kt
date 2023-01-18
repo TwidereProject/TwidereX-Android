@@ -120,6 +120,7 @@ import java.net.URLDecoder
 fun StatusMediaScene(
   statusKey: String,
   selectedIndex: Int,
+  userKey: String?,
   navigator: Navigator,
 ) {
   MicroBlogKey.valueOf(statusKey).let { key ->
@@ -128,6 +129,7 @@ fun StatusMediaScene(
         StatusMediaScene(
           statusKey = key,
           selectedIndex = selectedIndex,
+          userKey = userKey?.let { MicroBlogKey.valueOf(it) },
           navigator = navigator,
         )
       }
@@ -139,10 +141,11 @@ fun StatusMediaScene(
 private fun StatusMediaScene(
   statusKey: MicroBlogKey,
   selectedIndex: Int,
+  userKey: MicroBlogKey?,
   navigator: Navigator,
 ) {
   val (state, channel) = rememberPresenterState {
-    MediaPresenter(it, statusKey)
+    MediaPresenter(it, statusKey, userKey)
   }
   TwidereDialog(
     requireDarkTheme = true,
