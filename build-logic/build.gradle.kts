@@ -16,10 +16,6 @@ dependencies {
     implementation(libs.gradlePlugin.spotless)
     implementation(libs.gradlePlugin.detekt)
     implementation(libs.gradlePlugin.versionsCheck)
-
-    implementation(libs.gradlePlugin.gms)
-    implementation(libs.gradlePlugin.firebase)
-    implementation(libs.gradlePlugin.firebaseAppdistribution)
 }
 
 gradlePlugin {
@@ -62,10 +58,6 @@ gradlePlugin {
         register("versionsCheck") {
             id = "twiderex.versionsCheck"
             implementationClass = "twiderex.tool.VersionsCheckPlugin"
-        }
-        register("firebase") {
-            id = "twiderex.firebase"
-            implementationClass = "twiderex.tool.FirebasePlugin"
         }
         register("composeMetrics") {
             id = "twiderex.composeMetrics"

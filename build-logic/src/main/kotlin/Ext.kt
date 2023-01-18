@@ -2,9 +2,6 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.DependencyHandlerScope
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
-val Project.enableGoogleVariant: Boolean
-  get() = file("google-services.json").exists()
-
 fun KotlinJvmTarget.setupJvm() {
   compilations.all {
     kotlinOptions.jvmTarget = Versions.Java.jvmTarget

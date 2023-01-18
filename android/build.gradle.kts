@@ -1,13 +1,31 @@
 import java.util.Properties
 
+buildscript {
+    repositories {
+        google()
+    }
+
+    dependencies {
+
+        if (file("google-services.json").exists()) {
+            // START Non-FOSS component
+            classpath("com.google.gms:google-services:4.3.14")
+            classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.2")
+            // END Non-FOSS component
+        }
+    }
+}
+
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     id("twiderex.android.application")
 }
 
-dependencies {
-    implementation(projects.common)
-    implementation(libs.androidx.startup)
+if (file("google-services.json").exists()) {
+    // START Non-FOSS component
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
+    // END Non-FOSS component
 }
 
 android {
@@ -16,7 +34,7 @@ android {
     }
     flavorDimensions.add("channel")
     productFlavors {
-        if (enableGoogleVariant) {
+        if (file("google-services.json").exists()) {
             // START Non-FOSS component
             create("google") {
                 dimension = "channel"
@@ -51,6 +69,8 @@ android {
         release {
             if (hasSigningProps) {
                 signingConfig = signingConfigs.getByName("twidere")
+            } else {
+                signingConfig = signingConfigs.getByName("debug")
             }
             isMinifyEnabled = true
             isShrinkResources = true
@@ -85,5 +105,19 @@ android {
                 )
             )
         }
+    }
+}
+
+dependencies {
+    implementation(projects.common)
+    implementation(libs.androidx.startup)
+    if (file("google-services.json").exists()) {
+        // START Non-FOSS component
+        val googleImplementation by configurations
+        googleImplementation(platform("com.google.firebase:firebase-bom:31.1.1"))
+        googleImplementation("com.google.firebase:firebase-analytics-ktx")
+        googleImplementation("com.google.firebase:firebase-crashlytics-ktx")
+        googleImplementation("com.google.android.play:core-ktx:1.8.1")
+        // END Non-FOSS component
     }
 }

@@ -2,7 +2,6 @@ package twiderex.plugin
 
 import Package
 import Versions
-import enableGoogleVariant
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
@@ -20,9 +19,6 @@ class AndroidApplicationPlugin : Plugin<Project> {
         apply("org.jetbrains.compose")
         apply("twiderex.spotless")
         apply("twiderex.detekt")
-        if (enableGoogleVariant) {
-          apply("twiderex.firebase")
-        }
       }
       dependencies {
         implementation(libs.findLibrary("androidx.activity.compose"))
@@ -47,14 +43,6 @@ class AndroidApplicationPlugin : Plugin<Project> {
         if (Versions.Android.min < 26) {
           compileOptions {
             isCoreLibraryDesugaringEnabled = true
-          }
-        }
-        if (!enableGoogleVariant) {
-          @Suppress("UnstableApiUsage")
-          sourceSets {
-            getByName("main") {
-              java.srcDir("src/main/debug")
-            }
           }
         }
       }
