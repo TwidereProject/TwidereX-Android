@@ -21,6 +21,7 @@
 package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Immutable
+import com.twidere.twiderex.utils.ImmutableListSerializer
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.serialization.Serializable
 
@@ -28,6 +29,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UiEmojiCategory(
   val category: String?,
+  @Serializable(ImmutableListSerializer::class)
   val emoji: ImmutableList<UiEmoji>
 )
 
