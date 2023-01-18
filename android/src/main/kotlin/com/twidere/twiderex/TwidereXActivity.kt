@@ -65,7 +65,7 @@ import com.seiko.imageloader.request.Options
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.LocalWindowInsetsController
-import com.twidere.twiderex.component.TwiderexPermissionsRequired
+import com.twidere.twiderex.component.PermissionCheck
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.di.ext.get
@@ -104,6 +104,9 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
   private val navController by lazy {
     Navigator()
   }
+  val permissions = listOfNotNull(
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS else null,
+  )
 
   private val statusActions: StatusActions by inject()
 
@@ -190,23 +193,10 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
       ProvidePreferences(
         preferencesHolder,
       ) {
-        val permissions = remember {
-          listOfNotNull(
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS else null,
-          )
-        }
-        TwiderexPermissionsRequired(
-          permissions,
-          onPermissionDenied = {
-            finish()
-          },
-          feature = "Twiderex",
-          content = {
-            Router(
-              navController = navController,
-              isDebug = moe.tlaster.kfilepicker.BuildConfig.DEBUG,
-            )
-          },
+        PermissionCheck(permissions)
+        Router(
+          navController = navController,
+          isDebug = moe.tlaster.kfilepicker.BuildConfig.DEBUG,
         )
       }
     }

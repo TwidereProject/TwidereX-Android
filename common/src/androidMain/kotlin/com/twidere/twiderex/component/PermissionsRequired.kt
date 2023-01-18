@@ -27,12 +27,26 @@ import android.provider.Settings
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.twidere.twiderex.component.foundation.AlertDialog
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun PermissionCheck(
+  permissions: List<String>,
+) {
+  val multiplePermissionsState = rememberMultiplePermissionsState(permissions)
+  if (!multiplePermissionsState.allPermissionsGranted && !multiplePermissionsState.shouldShowRationale) {
+    LaunchedEffect(Unit) {
+      multiplePermissionsState.launchMultiplePermissionRequest()
+    }
+  }
+}
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
