@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.BottomNavigation
@@ -168,18 +169,19 @@ fun HomeScene(
             HomeBottomNavigation(
               items = menus,
               selectedItem = pagerState.currentPage,
-            ) {
-              if (pagerState.currentPage == it) {
+              onItemSelected = {
+                if (pagerState.currentPage == it) {
+                  scope.launch {
+                    menus[it].item.lazyListController.scrollToTop()
+                  }
+                }
                 scope.launch {
-                  menus[it].item.lazyListController.scrollToTop()
+                  pagerState.selectPage {
+                    pagerState.currentPage = it
+                  }
                 }
               }
-              scope.launch {
-                pagerState.selectPage {
-                  pagerState.currentPage = it
-                }
-              }
-            }
+            )
           }
         },
         drawerContent = {
@@ -264,6 +266,7 @@ private fun EmptyColumnHomeContent(
       Icon(
         painter = painterResource(res = com.twidere.twiderex.MR.files.ic_empty_column),
         contentDescription = null,
+        modifier = Modifier.size(120.dp),
       )
       Spacer(modifier = Modifier.height(EmptyColumnHomeContentDefaults.VerticalPadding))
       CompositionLocalProvider(
@@ -284,12 +287,12 @@ private object EmptyColumnHomeContentDefaults {
 
 @Composable
 fun HomeAppBar(
-  modifier: Modifier = Modifier,
   tabPosition: AppearancePreferences.TabPosition,
   menus: List<HomeMenus>,
   pagerState: PagerState,
   scaffoldState: ScaffoldState,
   scope: CoroutineScope,
+  modifier: Modifier = Modifier,
 ) {
   if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
     AnimatedVisibility(
@@ -397,10 +400,10 @@ private object MenuAvatarDefaults {
 
 @Composable
 fun HomeBottomNavigation(
-  modifier: Modifier = Modifier,
   items: List<HomeMenus>,
   selectedItem: Int,
   onItemSelected: (Int) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
   val pureDark = LocalAppearancePreferences.current.isDarkModePureBlack
   val isLight = MaterialTheme.colors.isLight
@@ -419,7 +422,8 @@ fun HomeBottomNavigation(
           icon = {
             Icon(
               painter = item.item.icon(),
-              contentDescription = item.item.name()
+              contentDescription = item.item.name(),
+              modifier = Modifier.size(24.dp),
             )
           },
           selected = selectedItem == index,
@@ -589,7 +593,8 @@ private fun HomeDrawer(
           ),
           contentDescription = stringResource(
             res = com.twidere.twiderex.MR.strings.scene_settings_title
-          )
+          ),
+          modifier = Modifier.size(24.dp),
         )
       },
       text = {
@@ -623,7 +628,8 @@ private fun DrawerMenuItem(
     icon = {
       Icon(
         painter = icon,
-        contentDescription = iconDescription
+        contentDescription = iconDescription,
+        modifier = Modifier.size(24.dp),
       )
     },
   )
@@ -634,9 +640,9 @@ private fun DrawerMenuItem(
 private fun DrawerUserHeader(
   user: UiUser?,
   showAccounts: Boolean,
-  onTrailingClicked: () -> Unit = {},
   toUser: (UiUser) -> Unit,
   openLink: (String) -> Unit,
+  onTrailingClicked: () -> Unit = {},
 ) {
   ListItem(
     icon = {
@@ -676,11 +682,11 @@ private fun DrawerUserHeader(
         }
       ) {
         Icon(
-          modifier = Modifier.rotate(rotate),
+          modifier = Modifier.rotate(rotate).size(24.dp),
           imageVector = Icons.Default.ArrowDropDown,
           contentDescription = stringResource(
             res = com.twidere.twiderex.MR.strings.accessibility_scene_home_drawer_account_dropdown
-          )
+          ),
         )
       }
     }

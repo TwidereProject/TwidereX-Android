@@ -2,26 +2,28 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.twidere.twiderex
 
 import android.Manifest
+import android.content.ContentResolver.SCHEME_ANDROID_RESOURCE
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
@@ -53,18 +55,28 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.seiko.imageloader.ImageLoader
+import com.seiko.imageloader.ImageLoaderBuilder
+import com.seiko.imageloader.LocalImageLoader
+import com.seiko.imageloader.cache.disk.DiskCacheBuilder
+import com.seiko.imageloader.cache.memory.MemoryCacheBuilder
+import com.seiko.imageloader.component.keyer.Keyer
+import com.seiko.imageloader.request.Options
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.LocalWindowInsetsController
 import com.twidere.twiderex.component.TwiderexPermissionsRequired
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
 import com.twidere.twiderex.compose.LocalResLoader
+import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.kmp.LocalPlatformWindow
 import com.twidere.twiderex.kmp.LocalRemoteNavigator
 import com.twidere.twiderex.kmp.PlatformWindow
 import com.twidere.twiderex.kmp.RemoteNavigator
 import com.twidere.twiderex.kmp.ResLoader
+import com.twidere.twiderex.kmp.StorageProvider
+import com.twidere.twiderex.kmp.commonConfig
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.PreferencesHolder
@@ -72,7 +84,7 @@ import com.twidere.twiderex.preferences.ProvidePreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
-import com.twidere.twiderex.utils.CustomTabSignInChannel
+import com.twidere.twiderex.utils.BrowserLoginDeepLinksChannel
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
 import com.twidere.twiderex.utils.asIsActiveNetworkFlow
@@ -83,6 +95,7 @@ import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.precompose.lifecycle.PreComposeActivity
 import moe.tlaster.precompose.lifecycle.setContent
 import moe.tlaster.precompose.navigation.Navigator
+import okio.Path.Companion.toPath
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -172,6 +185,7 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
       LocalResLoader provides ResLoader(this),
       LocalRemoteNavigator provides remoteNavigator,
       LocalPlatformWindow provides PlatformWindow(window),
+      LocalImageLoader provides generateImageLoader(get()),
     ) {
       ProvidePreferences(
         preferencesHolder,
@@ -198,10 +212,47 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
     }
   }
 
+  private fun generateImageLoader(storageService: StorageProvider): ImageLoader {
+    return ImageLoaderBuilder(this)
+      .commonConfig()
+      .memoryCache {
+        MemoryCacheBuilder(this)
+          // Set the max size to 25% of the app's available memory.
+          .maxSizePercent(0.25)
+          .build()
+      }
+      .diskCache {
+        DiskCacheBuilder()
+          .directory(storageService.cacheDir.toPath().resolve("image_cache"))
+          .maxSizeBytes(512L * 1024 * 1024) // 512MB
+          .build()
+      }
+      .components {
+        add(
+          // TODO remove after library upgrade
+          // fix resource cache, resId will be change
+          // @return android.resource://com.twidere.twiderex/2131755047-ic_heart-16
+          object : Keyer {
+            override fun key(data: Any, options: Options): String? {
+              val androidUri = when {
+                data is String && data.startsWith(SCHEME_ANDROID_RESOURCE) -> data
+                data is com.eygraber.uri.Uri && data.scheme == SCHEME_ANDROID_RESOURCE -> data.toString()
+                else -> return null
+              }
+              val id = androidUri.substringAfterLast('/', "").toIntOrNull() ?: return null
+              val entryName = resources.getResourceEntryName(id)
+              return "$data-$entryName-${resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK}"
+            }
+          },
+        )
+      }
+      .build()
+  }
+
   private fun onDeeplink(it: Uri) {
-    if (CustomTabSignInChannel.canHandle(it.toString())) {
+    if (BrowserLoginDeepLinksChannel.canHandle(it.toString())) {
       lifecycleScope.launchWhenResumed {
-        CustomTabSignInChannel.send(it.toString())
+        BrowserLoginDeepLinksChannel.send(it.toString())
       }
     } else {
       navController.navigate(it.toString())
@@ -212,13 +263,6 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
     super.onNewIntent(intent)
     intent?.data?.let {
       onDeeplink(it)
-    }
-  }
-
-  override fun onResume() {
-    super.onResume()
-    lifecycleScope.launchWhenResumed {
-      CustomTabSignInChannel.onClose()
     }
   }
 }

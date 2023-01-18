@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -49,8 +49,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -72,16 +70,15 @@ import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
 import com.twidere.twiderex.navigation.StatusNavigationData
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.utils.PreviewResolver
 
 @Composable
 fun TimelineStatusComponent(
   data: UiStatus,
+  statusNavigation: StatusNavigationData,
   showActions: Boolean = true,
   lineUp: Boolean = false,
   lineDown: Boolean = false,
   threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
-  statusNavigation: StatusNavigationData
 ) {
   when {
     data.isMastodonFollowStatus -> {
@@ -395,16 +392,16 @@ object AvatarConnectLineDefaults {
 
 @Composable
 fun StatusContent(
+  data: UiStatus,
+  statusNavigation: StatusNavigationData,
   modifier: Modifier = Modifier,
   contentPadding: PaddingValues = PaddingValues(0.dp),
-  data: UiStatus,
   type: StatusContentType = StatusContentType.Normal,
   lineDown: Boolean = false,
   lineUp: Boolean = false,
   threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
   footer: @Composable () -> Unit = {},
   isSelectionAble: Boolean = true,
-  statusNavigation: StatusNavigationData,
 ) {
   val layoutDirection = LocalLayoutDirection.current
   val status = remember(data) { data.retweet ?: data }
@@ -608,15 +605,11 @@ fun ColumnScope.StatusBody(
 
   if (
     LocalDisplayPreferences.current.urlPreview &&
-    !status.media.any() &&
     status.card != null
   ) {
-    val card by remember {
-      PreviewResolver.parsePreview(status.card)
-    }
     Spacer(modifier = Modifier.height(StatusBodyDefaults.LinkPreviewSpacing))
     StatusLinkPreview(
-      card = card,
+      card = status.card,
       openLink = statusNavigation.openLink
     )
   }

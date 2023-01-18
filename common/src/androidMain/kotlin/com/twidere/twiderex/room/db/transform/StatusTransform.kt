@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -139,7 +139,8 @@ internal fun DbStatusWithReference.toUi(
     isGap = isGap,
     url = url.toUi(),
     reaction = reaction,
-    referenceStatus = references.map {
+    referenceStatus = references.mapNotNull {
+      it.status ?: return@mapNotNull null
       it.reference.referenceType to it.status.toUi(
         accountKey = accountKey,
         isGap = isGap,
@@ -298,7 +299,8 @@ internal fun DbPagingTimelineWithStatus.toUi(
     isGap = timeline.isGap,
     url = url.toUi(),
     reaction = reaction,
-    referenceStatus = status.references.map {
+    referenceStatus = status.references.mapNotNull {
+      it.status ?: return@mapNotNull null
       it.reference.referenceType to it.status.toUi(
         accountKey = accountKey
       )

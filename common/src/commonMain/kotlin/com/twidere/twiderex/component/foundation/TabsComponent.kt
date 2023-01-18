@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -38,13 +38,13 @@ import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 
 @Composable
 fun IconTabsComponent(
+  items: List<Pair<Painter, String>>,
+  selectedItem: Int,
+  onItemSelected: (Int) -> Unit,
   modifier: Modifier = Modifier,
   divider: @Composable () -> Unit = @Composable {
     TabRowDefaults.Divider()
   },
-  items: List<Pair<Painter, String>>,
-  selectedItem: Int,
-  onItemSelected: (Int) -> Unit,
 ) {
   TabsComponent(
     modifier = modifier,
@@ -63,10 +63,10 @@ fun IconTabsComponent(
 
 @Composable
 fun TextTabsComponent(
-  modifier: Modifier = Modifier,
   items: List<String>,
   selectedItem: Int,
   onItemSelected: (Int) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
   TabsComponent(
     modifier = modifier,
@@ -84,13 +84,13 @@ fun TextTabsComponent(
 
 @Composable
 fun TabsComponent(
-  modifier: Modifier = Modifier,
   count: Int,
   selectedItem: Int,
+  onItemSelected: (Int) -> Unit,
+  modifier: Modifier = Modifier,
   divider: @Composable () -> Unit = @Composable {
     TabRowDefaults.Divider()
   },
-  onItemSelected: (Int) -> Unit,
   tabContent: @Composable (Int) -> Unit,
 ) {
   TabRow(

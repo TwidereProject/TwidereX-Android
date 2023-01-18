@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -64,10 +64,10 @@ import java.util.Locale
 @Composable
 fun LazyUiListsList(
   listType: ListType,
-  modifier: Modifier = Modifier,
   source: LazyPagingItems<UiList>,
   ownerItems: LazyPagingItems<UiList>,
   subscribedItems: LazyPagingItems<UiList>,
+  modifier: Modifier = Modifier,
   state: LazyListState = rememberLazyListState(),
   onItemClicked: (UiList) -> Unit = {},
   header: LazyListScope.() -> Unit = {},
@@ -246,7 +246,8 @@ private fun EmptyList() {
   ) {
     Icon(
       painter = painterResource(res = com.twidere.twiderex.MR.files.ic_empty_list),
-      contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_no_tweets_found_title)
+      contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_no_tweets_found_title),
+      modifier = Modifier.size(24.dp),
     )
   }
 }

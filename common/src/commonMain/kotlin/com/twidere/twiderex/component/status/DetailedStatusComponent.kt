@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -43,6 +43,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.FormattedTime
 import com.twidere.twiderex.component.painterResource
@@ -55,10 +56,10 @@ import com.twidere.twiderex.navigation.StatusNavigationData
 @Composable
 fun DetailedStatusComponent(
   data: UiStatus,
+  statusNavigationData: StatusNavigationData,
   showInfo: Boolean = true,
   showActions: Boolean = true,
   lineUp: Boolean = false,
-  statusNavigationData: StatusNavigationData,
 ) {
   Column(
     modifier = Modifier
@@ -91,8 +92,11 @@ fun DetailedStatusComponent(
                 modifier = Modifier
                   .align(Alignment.CenterHorizontally)
               ) {
+                val iconSize = with(LocalDensity.current) {
+                  MaterialTheme.typography.body1.fontSize.toDp()
+                }
                 Icon(
-                  modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp),
+                  modifier = Modifier.size(iconSize),
                   painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
                   contentDescription = stringResource(
                     res = com.twidere.twiderex.MR.strings.accessibility_common_status_location
@@ -210,9 +214,12 @@ private fun StatusStatistics(
   icon: Painter,
   contentDescription: String?,
 ) {
+  val iconSize = with(LocalDensity.current) {
+    MaterialTheme.typography.body1.fontSize.toDp()
+  }
   Row {
     Icon(
-      modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp),
+      modifier = Modifier.size(iconSize),
       painter = icon,
       contentDescription = contentDescription,
     )

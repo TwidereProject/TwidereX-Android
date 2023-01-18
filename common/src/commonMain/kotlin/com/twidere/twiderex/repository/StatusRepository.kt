@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -38,6 +38,7 @@ import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.paging.toUi
 import com.twidere.twiderex.paging.mediator.status.MastodonStatusContextMediator
 import com.twidere.twiderex.paging.mediator.status.TwitterConversationMediator
+import com.twidere.twiderex.paging.mediator.status.TwitterGuestTweetThreadMediator
 import com.twidere.twiderex.preferences.model.MiscPreferences
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -99,19 +100,39 @@ class StatusRepository(
   ): Flow<PagingData<UiStatus>> = flow {
     // TODO: remove usage of `when`
     val remoteMediator = when (platformType) {
-      PlatformType.Twitter -> TwitterConversationMediator(
-        service = service as TwitterService,
-        nitterService = preferences?.data?.first()?.nitterInstance?.takeIf { it.isNotEmpty() }
-          ?.let {
-            NitterService(
-              it.trimEnd('/'),
-              TwidereServiceFactory.createHttpClientFactory()
+      PlatformType.Twitter -> preferences?.data?.first()
+        ?.nitterInstance
+        ?.takeIf { it.isNotEmpty() }
+        ?.let {
+          NitterService(
+            it.trimEnd('/'),
+            TwidereServiceFactory.createHttpClientFactory()
+          )
+        }.let { nitterService ->
+          // TODO nitter merge to guest
+          if (nitterService != null) {
+            TwitterConversationMediator(
+              service = service as TwitterService,
+              nitterService = preferences?.data?.first()?.nitterInstance?.takeIf { it.isNotEmpty() }
+                ?.let {
+                  NitterService(
+                    it.trimEnd('/'),
+                    TwidereServiceFactory.createHttpClientFactory()
+                  )
+                },
+              statusKey = statusKey,
+              accountKey = accountKey,
+              database = database,
             )
-          },
-        statusKey = statusKey,
-        accountKey = accountKey,
-        database = database,
-      )
+          } else {
+            TwitterGuestTweetThreadMediator(
+              statusKey = statusKey,
+              service = service as TwitterService,
+              accountKey = accountKey,
+              database = database,
+            )
+          }
+        }
       PlatformType.StatusNet -> TODO()
       PlatformType.Fanfou -> TODO()
       PlatformType.Mastodon -> MastodonStatusContextMediator(

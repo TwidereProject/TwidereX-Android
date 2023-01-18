@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -35,8 +35,6 @@ import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.image.ImageEffects
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.di.ext.get
-import com.twidere.twiderex.kmp.StorageProvider
 import com.twidere.twiderex.kmp.rememberNetworkImagePainter
 import com.twidere.twiderex.model.cred.OAuthCredentials
 import com.twidere.twiderex.preferences.LocalHttpConfig
@@ -75,12 +73,12 @@ fun NetworkImage(
                 accessSecret = oauth.access_token_secret,
               )
             }
-          } ?: EmptyAuthorization()
+          } ?: EmptyAuthorization
         } else {
-          EmptyAuthorization()
+          EmptyAuthorization
         }
       } catch (e: MalformedURLException) {
-        EmptyAuthorization()
+        EmptyAuthorization
       }
     }
     rememberNetworkImagePainter(
@@ -88,7 +86,6 @@ fun NetworkImage(
       httpConfig = httpConfig,
       authorization = auth,
       effects = remember(effects) { ImageEffects.Builder().apply(effects).build() },
-      cacheDir = get<StorageProvider>().mediaCacheDir,
       onImageStateChanged = {
         if (state.value == NetworkImageState.LOADING) state.value = it
       }

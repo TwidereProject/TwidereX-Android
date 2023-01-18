@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -52,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.ExperimentalUnitApi
@@ -72,8 +73,8 @@ private val rippleSize = 24.dp
 
 @Composable
 fun ReplyButton(
-  modifier: Modifier = Modifier,
   status: UiStatus,
+  modifier: Modifier = Modifier,
   withNumber: Boolean = true,
   compose: (ComposeType, MicroBlogKey) -> Unit,
 ) {
@@ -111,8 +112,8 @@ fun ReplyButton(
 
 @Composable
 fun LikeButton(
-  modifier: Modifier = Modifier,
   status: UiStatus,
+  modifier: Modifier = Modifier,
   withNumber: Boolean = true,
 ) {
   val actionsViewModel = LocalStatusActions.current
@@ -162,8 +163,8 @@ fun LikeButton(
 
 @Composable
 fun RetweetButton(
-  modifier: Modifier = Modifier,
   status: UiStatus,
+  modifier: Modifier = Modifier,
   withNumber: Boolean = true,
   compose: (ComposeType, MicroBlogKey) -> Unit,
 ) {
@@ -249,8 +250,8 @@ fun RetweetButton(
 @OptIn(ExperimentalUnitApi::class)
 @Composable
 fun ShareButton(
-  modifier: Modifier = Modifier,
   status: UiStatus,
+  modifier: Modifier = Modifier,
   compat: Boolean = false,
   menus: @Composable ColumnScope.(callback: () -> Unit) -> Unit = {},
 ) {
@@ -397,14 +398,14 @@ fun ShareButton(
 
 @Composable
 private fun StatusActionButtonWithNumbers(
-  modifier: Modifier = Modifier,
   icon: Painter,
   contentDescription: String,
   showNumbers: Boolean,
   countString: String,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
   enabled: Boolean = true,
   color: Color = LocalContentColor.current,
-  onClick: () -> Unit,
 ) {
   val contentColor = color.copy(LocalContentAlpha.current)
   val source = remember { MutableInteractionSource() }
@@ -422,9 +423,12 @@ private fun StatusActionButtonWithNumbers(
       .padding(StatusActionsDefaults.ContentPadding),
     verticalAlignment = Alignment.CenterVertically,
   ) {
+    val iconSize = with(LocalDensity.current) {
+      MaterialTheme.typography.body1.fontSize.toDp()
+    }
     Icon(
       modifier = Modifier
-        .size(MaterialTheme.typography.body1.fontSize.value.dp)
+        .size(iconSize)
         .indication(
           source,
           rememberRipple(

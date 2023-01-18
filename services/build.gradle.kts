@@ -1,23 +1,39 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization").version(Versions.Kotlin.lang)
+    id("twiderex.project.kmp")
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
-java {
-    sourceCompatibility = Versions.Java.java
-    targetCompatibility = Versions.Java.java
-}
+group = Package.group
+version = Package.versionName
 
-tasks.test {
-    useJUnitPlatform()
+kotlin {
+    sourceSets {
+        val commonMain by getting {
+            kotlin.srcDir("src/commonMain/ktor")
+            dependencies {
+                implementation(libs.bundles.kotlinx)
+                implementation(libs.bundles.reftrofit2)
+                implementation(libs.bundles.ktor)
+                implementation(libs.square.okhttp)
+                implementation(libs.ktor.fit.annotation)
+                implementation(libs.napier)
+                implementation("com.github.Tlaster:Hson:0.1.4")
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlinx.coroutines.test)
+            }
+        }
+    }
 }
 
 dependencies {
-    kotlinCoroutines()
-    kotlinSerialization()
-    hson()
-    retrofit()
-    okhttp()
-    junit5()
-    api("joda-time:joda-time:${Versions.jodaTime}")
+    kspAll(libs.ktor.fit.ksp)
+}
+
+android {
+    namespace = "${Package.id}.services"
 }

@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -121,9 +122,9 @@ fun DMNewConversationScene(
 
 @Composable
 fun SearchInput(
-  modifier: Modifier = Modifier,
   input: String,
-  onValueChanged: (value: String) -> Unit
+  onValueChanged: (value: String) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
   Row(
     verticalAlignment = Alignment.CenterVertically,
@@ -133,7 +134,8 @@ fun SearchInput(
       painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
       contentDescription = stringResource(
         res = com.twidere.twiderex.MR.strings.scene_search_title
-      )
+      ),
+      modifier = Modifier.size(24.dp),
     )
     Spacer(modifier = Modifier.width(SearchInputDefaults.ContentSpacing))
     TextInput(

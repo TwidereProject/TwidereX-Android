@@ -2,19 +2,19 @@
  *  Twidere X
  *
  *  Copyright (C) TwidereProject and Contributors
- * 
+ *
  *  This file is part of Twidere X.
- * 
+ *
  *  Twidere X is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Twidere X is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -83,14 +83,14 @@ import com.twidere.twiderex.ui.LocalVideoPlayback
 
 @Composable
 fun LazyUiDMEventList(
-  modifier: Modifier = Modifier,
+  dmNavigationData: DMNavigationData,
   items: LazyPagingItems<UiDMEvent>,
+  modifier: Modifier = Modifier,
   state: LazyListState = rememberLazyListState(),
   key: ((item: UiDMEvent) -> Any) = { it.messageKey.hashCode() },
   header: LazyListScope.() -> Unit = {},
   onResend: (event: UiDMEvent) -> Unit = {},
   onItemLongClick: (event: UiDMEvent) -> Unit = {},
-  dmNavigationData: DMNavigationData,
 ) {
   LazyUiList(items = items) {
     LazyColumn(
@@ -116,7 +116,7 @@ fun LazyUiDMEventList(
                 dmNavigationData = dmNavigationData,
               )
             } else {
-              DMOutComeEvent(onResend, it, onItemLongClick, dmNavigationData)
+              DMOutComeEvent(it, onItemLongClick, dmNavigationData, onResend)
             }
           }
         } ?: run {
@@ -136,10 +136,10 @@ private object LazyUiDMEventListDefaults {
 
 @Composable
 private fun DMOutComeEvent(
-  onResend: (event: UiDMEvent) -> Unit = {},
   event: UiDMEvent,
   onItemLongClick: (event: UiDMEvent) -> Unit,
   dmNavigationData: DMNavigationData,
+  onResend: (event: UiDMEvent) -> Unit = {},
 ) {
   Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
     Column(horizontalAlignment = Alignment.End) {
@@ -333,7 +333,7 @@ private fun MediaMessage(media: UiMedia?, onClick: (UiMedia) -> Unit) {
 }
 
 @Composable
-private fun ChatTime(modifier: Modifier = Modifier, time: Long) {
+private fun ChatTime(time: Long, modifier: Modifier = Modifier) {
   val timeString = remember(time) {
     TimeUtils.humanizedDateTime(time)
   }
