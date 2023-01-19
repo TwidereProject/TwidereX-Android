@@ -76,7 +76,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import com.google.accompanist.pager.ExperimentalPagerApi
 import com.twidere.services.microblog.model.IRelationship
 import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
@@ -114,7 +113,6 @@ import moe.tlaster.nestedscrollview.VerticalNestedScrollView
 import moe.tlaster.nestedscrollview.rememberNestedScrollViewState
 import moe.tlaster.placeholder.Placeholder
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun UserComponent(
   userKey: MicroBlogKey,

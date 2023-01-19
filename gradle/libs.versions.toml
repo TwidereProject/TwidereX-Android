@@ -110,8 +110,6 @@ compose-imageloader-batik = "io.github.qdsfdhvh:image-loader-batik:1.2.7"
 #compose-paging = "io.github.qdsfdhvh:paging:1.0.4"
 compose-safearea = "moe.tlaster:safearea:0.1.3"
 compose-accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
-compose-accompanist-jb-pager = { module = "ca.gosyer:accompanist-pager", version.ref = "accompanist-jb" }
-compose-accompanist-jb-pager-indicators = { module = "ca.gosyer:accompanist-pager-indicators", version.ref = "accompanist-jb" }
 
 room-rumtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
@@ -190,8 +188,6 @@ compose = [
     #    "compose-paging",
     "compose-imageloader",
     "compose-safearea",
-    "compose-accompanist-jb-pager",
-    "compose-accompanist-jb-pager-indicators"
 ]
 room = [
     "room-rumtime",
