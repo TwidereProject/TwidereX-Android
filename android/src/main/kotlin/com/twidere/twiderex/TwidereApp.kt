@@ -21,13 +21,16 @@
 package com.twidere.twiderex
 
 import android.content.Context
+import android.net.ConnectivityManager
 import androidx.startup.AppInitializer
 import com.twidere.twiderex.initializer.DirectMessageInitializer
 import com.twidere.twiderex.initializer.NotificationChannelInitializer
 import com.twidere.twiderex.initializer.NotificationInitializer
 import com.twidere.twiderex.initializer.TwidereServiceInitializer
 import com.twidere.twiderex.utils.TwiderexLogger
+import com.twidere.twiderex.utils.asIsActiveNetworkFlow
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.flow.Flow
 
 class TwidereApp : TwidereApplication() {
   override fun onCreate() {
@@ -46,9 +49,14 @@ class TwidereApp : TwidereApplication() {
         initializeComponent(DirectMessageInitializer::class.java)
         initializeComponent(TwidereServiceInitializer::class.java)
       }
+    isNetworkActiveFlow = (this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).asIsActiveNetworkFlow()
   }
 
   interface MissingSplitsChecker {
     fun requiredSplits(context: Context): Boolean
+  }
+
+  companion object {
+    lateinit var isNetworkActiveFlow: Flow<Boolean>
   }
 }

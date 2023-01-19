@@ -24,7 +24,6 @@ import android.Manifest
 import android.content.ContentResolver.SCHEME_ANDROID_RESOURCE
 import android.content.Intent
 import android.content.res.Configuration
-import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -69,6 +68,7 @@ import com.twidere.twiderex.component.PermissionCheck
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.extensions.flowWithLifecycle
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.kmp.LocalPlatformWindow
 import com.twidere.twiderex.kmp.LocalRemoteNavigator
@@ -87,10 +87,6 @@ import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.utils.BrowserLoginDeepLinksChannel
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
-import com.twidere.twiderex.utils.asIsActiveNetworkFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.precompose.lifecycle.PreComposeActivity
 import moe.tlaster.precompose.lifecycle.setContent
@@ -114,23 +110,18 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
 
   private val inAppNotification: InAppNotification by inject()
 
-  private val connectivityManager: ConnectivityManager by inject()
-
   private val platformResolver: PlatformResolver by inject()
 
   private val remoteNavigator: RemoteNavigator by inject()
 
-  private val isActiveNetworkMetered = MutableStateFlow(false)
+  private val isActiveNetworkMetered =
+    TwidereApp.isNetworkActiveFlow.flowWithLifecycle(lifecycle)
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     FilePicker.init(activityResultRegistry, this, contentResolver)
     WindowCompat.setDecorFitsSystemWindows(window, false)
     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-    connectivityManager.asIsActiveNetworkFlow()
-      .flowWithLifecycle(getLifecycle())
-      .onEach { isActiveNetworkMetered.value = it }
-      .launchIn(lifecycleScope)
     setContent {
       var showSplash by rememberSaveable { mutableStateOf(true) }
       LaunchedEffect(Unit) {
