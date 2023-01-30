@@ -4,3 +4,4 @@ echo "storeFile=key.jks
 storePassword=$KEY_STORE_PASSWORD
 keyAlias=$ALIAS
 keyPassword=$KEY_PASSWORD" >signing.properties
+echo $APIKEY > apiKey.properties
