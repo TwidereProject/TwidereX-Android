@@ -8,7 +8,7 @@ object Versions {
     }
 
     object Java {
-        const val jvmTarget = "11"
+        const val jvmTarget = "17"
         val java = JavaVersion.VERSION_17
     }
 }
