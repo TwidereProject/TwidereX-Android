@@ -73,14 +73,14 @@ kotlin {
                 implementation("com.github.android:renderscript-intrinsics-replacement-toolkit:b6363490c3")
             }
         }
-        val androidAndroidTest by getting {
+        val androidInstrumentedTest by getting {
             dependencies {
                 implementation(libs.bundles.test.android)
                 implementation(libs.sqldelight.android.driver)
                 implementation(libs.room.test)
             }
         }
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
                 implementation(libs.sqldelight.sqlite.driver)
             }
