@@ -57,7 +57,7 @@ kotlin {
             dependencies {
                 implementation(libs.koin.test)
                 implementation(libs.kotlinx.coroutines.test)
-                implementation("io.mockk:mockk:1.13.3")
+                implementation("io.mockk:mockk:1.13.4")
             }
         }
         val androidMain by getting {

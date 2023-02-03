@@ -23,7 +23,7 @@ class AndroidApplicationPlugin : Plugin<Project> {
       dependencies {
         implementation(libs.findLibrary("androidx.activity.compose"))
         if (Versions.Android.min < 26) {
-          add("coreLibraryDesugaring", "com.android.tools:desugar_jdk_libs:1.2.0")
+          add("coreLibraryDesugaring", "com.android.tools:desugar_jdk_libs:2.0.1")
         }
       }
       androidApplication {
