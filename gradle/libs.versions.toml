@@ -144,12 +144,10 @@ kotlinx = [
 ]
 # TODO remove it to use ktor
 reftrofit2 = [
-    "square-okhttp-logging-interceptor",
     "square-retforit2",
     "square-retforit2-converter-scalars",
     "square-retrofit2-kotlinx-serialization-converter",
-    "jodaTime",
-    "ktor-client-okhttp"
+    "jodaTime"
 ]
 ktor = [
     "ktor-client-core",
