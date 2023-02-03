@@ -87,8 +87,10 @@ import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.utils.BrowserLoginDeepLinksChannel
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
+import kotlinx.coroutines.launch
 import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.precompose.lifecycle.PreComposeActivity
+import moe.tlaster.precompose.lifecycle.repeatOnLifecycle
 import moe.tlaster.precompose.lifecycle.setContent
 import moe.tlaster.precompose.navigation.Navigator
 import okio.Path.Companion.toPath
@@ -232,8 +234,10 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
 
   private fun onDeeplink(it: Uri) {
     if (BrowserLoginDeepLinksChannel.canHandle(it.toString())) {
-      lifecycleScope.launchWhenResumed {
-        BrowserLoginDeepLinksChannel.send(it.toString())
+      lifecycleScope.launch {
+        repeatOnLifecycle {
+          BrowserLoginDeepLinksChannel.send(it.toString())
+        }
       }
     } else {
       navController.navigate(it.toString())
