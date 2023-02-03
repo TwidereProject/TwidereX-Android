@@ -25,14 +25,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.painter.Painter
-import com.seiko.imageloader.ImageLoaderBuilder
+import com.seiko.imageloader.ImageLoaderConfigBuilder
 import com.seiko.imageloader.ImageRequestState
-import com.seiko.imageloader.component.fetcher.Fetcher
 import com.seiko.imageloader.component.fetcher.KtorUrlFetcher
-import com.seiko.imageloader.intercept.Interceptor
+import com.seiko.imageloader.intercept.BlurInterceptor
+import com.seiko.imageloader.model.ImageRequest
+import com.seiko.imageloader.model.blur
 import com.seiko.imageloader.rememberAsyncImagePainter
-import com.seiko.imageloader.request.ImageRequestBuilder
-import com.seiko.imageloader.request.Options
 import com.twidere.services.http.authorization.Authorization
 import com.twidere.services.http.config.HttpConfig
 import com.twidere.services.http.proxy
@@ -42,7 +41,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.header
-import io.ktor.http.Url
 import okhttp3.Request
 
 @Composable
@@ -53,14 +51,16 @@ internal fun rememberNetworkImagePainter(
   effects: ImageEffects,
   onImageStateChanged: (NetworkImageState) -> Unit
 ): Painter {
-  val request = remember(data, effects) {
-    ImageRequestBuilder()
-      .data(data)
-      .addInterceptor(BlurInterceptor(effects))
-      .components {
-        add(ProxyKtorUrlFetcher.Factory(authorization, httpConfig))
+  val request = remember(data, effects.blur) {
+    ImageRequest {
+      data(data)
+      effects.blur?.let {
+        blur(it.blurRadius)
       }
-      .build()
+      components {
+        add(proxyKtorUrlFetcher(data, authorization, httpConfig))
+      }
+    }
   }
   val painter = rememberAsyncImagePainter(request)
   LaunchedEffect(painter) {
@@ -81,50 +81,38 @@ internal fun rememberNetworkImagePainter(
   return painter
 }
 
-fun ImageLoaderBuilder.commonConfig(): ImageLoaderBuilder {
-  return this
+fun ImageLoaderConfigBuilder.commonConfig() {
+  interceptor {
+    addInterceptor(BlurInterceptor())
+  }
 }
 
-expect class BlurInterceptor(effects: ImageEffects) : Interceptor
-
-private class ProxyKtorUrlFetcher(
-  httpUrl: Url,
-  httpClient: Lazy<HttpClient>
-) : KtorUrlFetcher(httpUrl, httpClient) {
-  class Factory(
-    private val authorization: Authorization,
-    private val httpConfig: HttpConfig,
-  ) : Fetcher.Factory {
-    override fun create(data: Any, options: Options): Fetcher? {
-      if (data is Url) return KtorUrlFetcher(
-        data,
-        lazy {
-          val engine = OkHttp.create {
-            config {
-              if (httpConfig.proxyConfig.enable &&
-                httpConfig.proxyConfig.server.isNotEmpty()
-              ) {
-                proxy(httpConfig.proxyConfig)
-              }
-            }
-          }
-          HttpClient(engine) {
-            defaultRequest {
-              if (authorization.hasAuthorization) {
-                header(
-                  "Authorization",
-                  authorization.getAuthorizationHeader(
-                    Request.Builder()
-                      .url(data.toString())
-                      .build()
-                  )
-                )
-              }
-            }
-          }
-        }
-      )
-      return null
+private fun proxyKtorUrlFetcher(
+  data: Any,
+  authorization: Authorization,
+  httpConfig: HttpConfig,
+) = KtorUrlFetcher.Factory {
+  val engine = OkHttp.create {
+    config {
+      if (httpConfig.proxyConfig.enable &&
+        httpConfig.proxyConfig.server.isNotEmpty()
+      ) {
+        proxy(httpConfig.proxyConfig)
+      }
+    }
+  }
+  HttpClient(engine) {
+    defaultRequest {
+      if (authorization.hasAuthorization) {
+        header(
+          "Authorization",
+          authorization.getAuthorizationHeader(
+            Request.Builder()
+              .url(data.toString())
+              .build()
+          )
+        )
+      }
     }
   }
 }

@@ -70,7 +70,7 @@ kotlin {
                 implementation(libs.koin.androidx.workmanager)
                 implementation(libs.compose.accompanist.permissions)
                 implementation(libs.androidx.work.rumtime.ktx)
-                implementation("com.github.android:renderscript-intrinsics-replacement-toolkit:b6363490c3")
+                implementation("com.github.android:renderscript-intrinsics-replacement-toolkit:9a70eae6f1")
             }
         }
         val androidInstrumentedTest by getting {

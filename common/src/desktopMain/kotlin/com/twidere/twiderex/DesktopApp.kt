@@ -30,10 +30,9 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.seiko.imageloader.ImageLoader
-import com.seiko.imageloader.ImageLoaderBuilder
 import com.seiko.imageloader.LocalImageLoader
-import com.seiko.imageloader.cache.disk.DiskCacheBuilder
-import com.seiko.imageloader.cache.memory.MemoryCacheBuilder
+import com.seiko.imageloader.cache.memory.maxSizePercent
+import com.seiko.imageloader.component.setupDefaultComponents
 import com.twidere.twiderex.component.NativeWindow
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
@@ -56,6 +55,11 @@ import com.twidere.twiderex.utils.WindowsRegistry
 import com.twidere.twiderex.utils.currentOperatingSystem
 import it.sauronsoftware.junique.AlreadyLockedException
 import it.sauronsoftware.junique.JUnique
+import java.awt.Desktop
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
+import kotlin.io.path.absolutePathString
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -66,11 +70,6 @@ import okio.Path.Companion.toPath
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.logger.Level
-import java.awt.Desktop
-import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
-import kotlin.io.path.absolutePathString
 
 private val navController = Navigator()
 private val mainScope = MainScope()
@@ -233,19 +232,19 @@ private fun onDeeplink(url: String) {
 }
 
 private fun generateImageLoader(storageService: StorageProvider): ImageLoader {
-  return ImageLoaderBuilder()
-    .commonConfig()
-    .memoryCache {
-      MemoryCacheBuilder()
-        // Set the max size to 25% of the app's available memory.
-        .maxSizePercent(0.25)
-        .build()
+  return ImageLoader {
+    commonConfig()
+    components {
+      setupDefaultComponents(imageScope)
     }
-    .diskCache {
-      DiskCacheBuilder()
-        .directory(storageService.cacheDir.toPath().resolve("image_cache"))
-        .maxSizeBytes(512L * 1024 * 1024) // 512MB
-        .build()
+    interceptor {
+      memoryCacheConfig {
+        maxSizePercent(0.25)
+      }
+      diskCacheConfig {
+        directory(storageService.cacheDir.toPath().resolve("image_cache"))
+        maxSizeBytes(512L * 1024 * 1024) // 512MB
+      }
     }
-    .build()
+  }
 }
