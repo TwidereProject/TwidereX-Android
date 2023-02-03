@@ -11,12 +11,10 @@ naming:
         active: true
         constantPattern: '[A-Z][A-Za-z0-9]*'
 
-TwitterCompose:
+Compose:
     CompositionLocalAllowlist:
         active: false
         # allowedCompositionLocals: LocalSomething,LocalSomethingElse
-    CompositionLocalNaming:
-        active: true
     ContentEmitterReturningValues:
         active: true
         # contentEmitters: MyComposable,MyOtherComposable
