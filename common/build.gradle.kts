@@ -75,6 +75,7 @@ kotlin {
             }
         }
         val androidInstrumentedTest by getting {
+            dependsOn(commonTest)
             dependencies {
                 implementation(libs.bundles.test.android)
                 implementation(libs.sqldelight.android.driver)
