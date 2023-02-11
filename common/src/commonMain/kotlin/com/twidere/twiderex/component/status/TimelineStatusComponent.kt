@@ -403,6 +403,7 @@ fun StatusContent(
   threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
   footer: @Composable () -> Unit = {},
   isSelectionAble: Boolean = true,
+  translationAble: Boolean = false,
 ) {
   val layoutDirection = LocalLayoutDirection.current
   val status = remember(data) { data.retweet ?: data }
@@ -514,6 +515,7 @@ fun StatusContent(
               type = type,
               isSelectionAble = isSelectionAble,
               statusNavigation = statusNavigation,
+              translationAble = translationAble,
             )
           }
           StatusContentType.Extend -> UserScreenName(status.user)
@@ -526,6 +528,7 @@ fun StatusContent(
               type = type,
               isSelectionAble = isSelectionAble,
               statusNavigation = statusNavigation,
+              translationAble = translationAble,
             )
           }
         }
@@ -592,11 +595,13 @@ fun ColumnScope.StatusBody(
   type: StatusContentType,
   isSelectionAble: Boolean,
   statusNavigation: StatusNavigationData,
+  translationAble: Boolean = false,
 ) {
   StatusText(
     status = status,
     isSelectionAble = isSelectionAble,
     openLink = statusNavigation.openLink,
+    translationAble = translationAble,
   )
 
   StatusBodyMedia(

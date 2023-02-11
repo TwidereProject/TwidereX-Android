@@ -80,6 +80,7 @@ fun DetailedStatusComponent(
         data = data,
         type = StatusContentType.Extend,
         statusNavigation = statusNavigationData,
+        translationAble = true,
       )
       if (showInfo) {
         Spacer(modifier = Modifier.height(DetailedStatusDefaults.InfoContentSpacing))
