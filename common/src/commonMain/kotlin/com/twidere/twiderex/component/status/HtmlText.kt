@@ -96,6 +96,7 @@ fun HtmlText(
   linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
   positionWrapper: PositionWrapper? = null,
   openLink: (String) -> Unit,
+  onTextParsed: ((String) -> Unit)? = null,
 ) {
   CompositionLocalProvider(
     LocalLayoutDirection provides layoutDirection
@@ -122,6 +123,7 @@ fun HtmlText(
       overflow = overflow,
       softWrap = softWrap,
       positionWrapper = positionWrapper,
+      onTextParsed = onTextParsed,
     )
   }
 }
@@ -147,6 +149,7 @@ fun HtmlText(
   linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
   positionWrapper: PositionWrapper? = null,
   openLink: (String) -> Unit,
+  onTextParsed: ((String) -> Unit)? = null,
 ) {
   val bidi = remember(htmlText) {
     Bidi(htmlText, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT)
@@ -180,6 +183,7 @@ fun HtmlText(
     linkResolver = linkResolver,
     positionWrapper = positionWrapper,
     openLink = openLink,
+    onTextParsed = onTextParsed,
   )
 }
 
@@ -205,6 +209,7 @@ private fun RenderContent(
   overflow: TextOverflow = TextOverflow.Clip,
   softWrap: Boolean = true,
   positionWrapper: PositionWrapper? = null,
+  onTextParsed: ((String) -> Unit)? = null,
 ) {
   val value = remember(document, linkResolver, textStyle, linkStyle) {
     buildContentAnnotatedString(
@@ -212,7 +217,9 @@ private fun RenderContent(
       linkResolver = linkResolver,
       textStyle = textStyle,
       linkStyle = linkStyle,
-    )
+    ).apply {
+      onTextParsed?.invoke(toString())
+    }
   }
   val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
   DisposableEffect(document) {

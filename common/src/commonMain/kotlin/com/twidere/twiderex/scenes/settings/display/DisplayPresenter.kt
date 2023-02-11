@@ -47,30 +47,39 @@ fun DisplayPresenter(
     }
   }
 
+  suspend fun update(update: (DisplayPreferences) -> DisplayPreferences) {
+    preferencesHolder.displayPreferences.updateData {
+      update(it)
+    }
+  }
+
   LaunchedEffect(Unit) {
     event.collect { event ->
       when (event) {
-        DisplayEvent.CommitFontScale -> preferencesHolder.displayPreferences.updateData {
+        DisplayEvent.CommitFontScale -> update {
           it.copy(fontScale = fontScale)
         }
-        is DisplayEvent.SetAutoPlayback -> preferencesHolder.displayPreferences.updateData {
+        is DisplayEvent.SetAutoPlayback -> update {
           it.copy(autoPlayback = event.value)
         }
-        is DisplayEvent.SetAvatarStyle -> preferencesHolder.displayPreferences.updateData {
+        is DisplayEvent.SetAvatarStyle -> update {
           it.copy(avatarStyle = event.avatarStyle)
         }
         is DisplayEvent.SetFontScale -> fontScale = event.fontScale
-        is DisplayEvent.SetMediaPreview -> preferencesHolder.displayPreferences.updateData {
+        is DisplayEvent.SetMediaPreview -> update {
           it.copy(mediaPreview = event.value)
         }
-        is DisplayEvent.SetMuteByDefault -> preferencesHolder.displayPreferences.updateData {
+        is DisplayEvent.SetMuteByDefault -> update {
           it.copy(muteByDefault = event.value)
         }
-        is DisplayEvent.SetUrlPreview -> preferencesHolder.displayPreferences.updateData {
+        is DisplayEvent.SetUrlPreview -> update {
           it.copy(urlPreview = event.value)
         }
-        is DisplayEvent.SetUseSystemFontSize -> preferencesHolder.displayPreferences.updateData {
+        is DisplayEvent.SetUseSystemFontSize -> update {
           it.copy(useSystemFontSize = event.useSystemFont)
+        }
+        is DisplayEvent.ShowTranslationButton -> update {
+          it.copy(showTranslationButton = event.show)
         }
       }
     }
@@ -96,4 +105,5 @@ interface DisplayEvent {
   data class SetMediaPreview(val value: Boolean) : DisplayEvent
   data class SetMuteByDefault(val value: Boolean) : DisplayEvent
   data class SetAutoPlayback(val value: DisplayPreferences.AutoPlayback) : DisplayEvent
+  data class ShowTranslationButton(val show: Boolean) : DisplayEvent
 }

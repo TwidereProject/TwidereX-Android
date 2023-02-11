@@ -23,6 +23,7 @@ package com.twidere.twiderex.component.status
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -46,9 +47,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.component.DoubleLiftContent
 import com.twidere.twiderex.component.painterResource
+import com.twidere.twiderex.icon.IcTranslate
+import com.twidere.twiderex.icon.TwidereIcons
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.preferences.LocalDisplayPreferences
+import com.twidere.twiderex.utils.TranslationParam
+import com.twidere.twiderex.utils.isDefaultLanguage
 
 @Composable
 fun ColumnScope.StatusText(
@@ -64,6 +71,14 @@ fun ColumnScope.StatusText(
   }
 
   var expanded by rememberSaveable { mutableStateOf(!expandable) }
+
+  var showTranslate by rememberSaveable {
+    mutableStateOf(false)
+  }
+
+  var visibleText by rememberSaveable {
+    mutableStateOf("")
+  }
 
   if (expandable && status.spoilerText != null) {
     Text(text = status.spoilerText)
@@ -113,6 +128,49 @@ fun ColumnScope.StatusText(
           } else {
             LayoutDirection.Rtl
           },
+          onTextParsed = { parsedText ->
+            visibleText = parsedText
+          }
+        )
+      }
+      println(visibleText.isNotBlank())
+      println(status.language?.isDefaultLanguage())
+      println(LocalDisplayPreferences.current.showTranslationButton)
+      if (
+        visibleText.isNotBlank() &&
+        status.language?.isDefaultLanguage() != true &&
+        LocalDisplayPreferences.current.showTranslationButton
+      ) {
+        val interactionSource = remember { MutableInteractionSource() }
+        DoubleLiftContent(
+          modifier = Modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null,
+          ) {
+            showTranslate = !showTranslate
+          },
+          state = showTranslate,
+          content = {
+            if (it) {
+              TranslationStatus(
+                translationParam = TranslationParam(
+                  key = status.statusId,
+                  text = visibleText,
+                  from = status.language ?: "auto",
+                )
+              )
+            } else {
+              Icon(
+                modifier = Modifier.padding(
+                  top = StatusTextDefaults.TransLateIconPadding,
+                  bottom = StatusTextDefaults.TransLateIconPadding,
+                ),
+                imageVector = TwidereIcons.IcTranslate,
+                contentDescription = "",
+                tint = MaterialTheme.colors.primary,
+              )
+            }
+          }
         )
       }
       if (showMastodonPoll &&
