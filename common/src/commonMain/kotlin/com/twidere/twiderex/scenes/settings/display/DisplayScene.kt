@@ -237,6 +237,20 @@ fun DisplayScene(
             }
           )
         }
+        ItemDivider()
+        // todo replace hard code string
+        ItemHeader {
+          Text(text = "translation")
+        }
+        switchItem(
+          value = state.display.showTranslationButton,
+          onChanged = {
+            channel.trySend(DisplayEvent.ShowTranslationButton(it))
+          },
+          title = {
+            Text(text = "show translation button")
+          }
+        )
       }
     }
   }
