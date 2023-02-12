@@ -32,6 +32,7 @@ data class DisplayPreferences(
   val urlPreview: Boolean = false,
   val muteByDefault: Boolean = false,
   val showTranslationButton: Boolean = false,
+  val dateFormat: DateFormat = DateFormat.RELATIVE,
 ) {
   @Serializable
   enum class AvatarStyle {
@@ -44,5 +45,11 @@ data class DisplayPreferences(
     Auto,
     Always,
     Off,
+  }
+
+  @Serializable
+  enum class DateFormat {
+    RELATIVE,
+    ABSOLUTE,
   }
 }

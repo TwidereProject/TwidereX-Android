@@ -70,6 +70,7 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
 import com.twidere.twiderex.navigation.StatusNavigationData
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 
 @Composable
@@ -407,6 +408,7 @@ fun StatusContent(
 ) {
   val layoutDirection = LocalLayoutDirection.current
   val status = remember(data) { data.retweet ?: data }
+  val timeFormat = LocalDisplayPreferences.current.dateFormat
   Column(
     modifier = modifier
       .padding(
@@ -503,7 +505,11 @@ fun StatusContent(
               Spacer(modifier = Modifier.width(StatusContentDefaults.Mastodon.VisibilitySpacing))
             }
             if (type == StatusContentType.Normal) {
-              Text(status.humanizedTime)
+              if (timeFormat == DisplayPreferences.DateFormat.RELATIVE) {
+                Text(status.humanizedTime)
+              } else {
+                Text(status.formattedTime)
+              }
             }
           }
         }
