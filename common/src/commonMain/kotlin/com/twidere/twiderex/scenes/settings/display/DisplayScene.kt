@@ -176,6 +176,27 @@ fun DisplayScene(
           }
         )
         ItemDivider()
+        RadioItem(
+          options = remember {
+            listOf(
+              DisplayPreferences.DateFormat.RELATIVE,
+              DisplayPreferences.DateFormat.ABSOLUTE,
+            )
+          },
+          value = state.display.dateFormat,
+          onChanged = {
+            channel.trySend(DisplayEvent.SetDateFormat(it))
+          },
+          title = {
+            Text("Date Format")
+          },
+          itemContent = {
+            Text(
+              text = "format"
+            )
+          }
+        )
+        ItemDivider()
         ItemHeader {
           Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_section_header_media))
         }

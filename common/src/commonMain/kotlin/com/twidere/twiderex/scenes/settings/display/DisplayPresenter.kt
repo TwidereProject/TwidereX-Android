@@ -81,6 +81,9 @@ fun DisplayPresenter(
         is DisplayEvent.ShowTranslationButton -> update {
           it.copy(showTranslationButton = event.show)
         }
+        is DisplayEvent.SetDateFormat -> update {
+          it.copy(dateFormat = event.timestamp)
+        }
       }
     }
   }
@@ -106,4 +109,5 @@ interface DisplayEvent {
   data class SetMuteByDefault(val value: Boolean) : DisplayEvent
   data class SetAutoPlayback(val value: DisplayPreferences.AutoPlayback) : DisplayEvent
   data class ShowTranslationButton(val show: Boolean) : DisplayEvent
+  data class SetDateFormat(val timestamp: DisplayPreferences.DateFormat) : DisplayEvent
 }
