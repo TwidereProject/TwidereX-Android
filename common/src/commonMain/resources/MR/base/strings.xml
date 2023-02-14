@@ -402,11 +402,14 @@
     <string name="scene_settings_display_media_auto_playback">Auto playback</string>
     <string name="scene_settings_display_media_off">Off</string>
     <string name="scene_settings_display_title">Display</string>
+    <string name="scene_settings_display_toolbar_icons_hide_toolbar_icons">Hide toolbar icons</string>
+    <string name="scene_settings_display_toolbar_icons_show_status_numbers">Show status numbers</string>
     <string name="scene_settings_display_section_header_preview">Preview</string>
     <string name="scene_settings_display_section_header_date_format">Date Format</string>
     <string name="scene_settings_display_section_header_text">Text</string>
     <string name="scene_settings_display_section_header_avatar">Avatar</string>
     <string name="scene_settings_display_section_header_media">Media</string>
+    <string name="scene_settings_display_section_header_toolbar_icons">Toolbar Icons</string>
     <string name="scene_settings_about_license">License</string>
     <string name="scene_settings_about_description">Next generation of Twidere for Android 5.0+. \nStill in early stage.</string>
     <string name="scene_settings_about_logo_background">About page background logo</string>

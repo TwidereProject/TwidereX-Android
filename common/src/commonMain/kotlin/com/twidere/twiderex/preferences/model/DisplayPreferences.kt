@@ -33,6 +33,8 @@ data class DisplayPreferences(
   val muteByDefault: Boolean = false,
   val showTranslationButton: Boolean = false,
   val dateFormat: DateFormat = DateFormat.RELATIVE,
+  val hideToolbarIcons: Boolean = false,
+  val showStatusNumbers: Boolean = true,
 ) {
   @Serializable
   enum class AvatarStyle {

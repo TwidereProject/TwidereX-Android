@@ -84,6 +84,12 @@ fun DisplayPresenter(
         is DisplayEvent.SetDateFormat -> update {
           it.copy(dateFormat = event.timestamp)
         }
+        is DisplayEvent.SetToolbarIcons -> update {
+          it.copy(hideToolbarIcons = event.hide)
+        }
+        is DisplayEvent.SetStatusNumbers -> update {
+          it.copy(showStatusNumbers = event.show)
+        }
       }
     }
   }
@@ -110,4 +116,6 @@ interface DisplayEvent {
   data class SetAutoPlayback(val value: DisplayPreferences.AutoPlayback) : DisplayEvent
   data class ShowTranslationButton(val show: Boolean) : DisplayEvent
   data class SetDateFormat(val timestamp: DisplayPreferences.DateFormat) : DisplayEvent
+  data class SetToolbarIcons(val hide: Boolean): DisplayEvent
+  data class SetStatusNumbers(val show: Boolean): DisplayEvent
 }
