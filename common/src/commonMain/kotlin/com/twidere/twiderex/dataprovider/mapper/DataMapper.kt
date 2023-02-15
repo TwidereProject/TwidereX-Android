@@ -50,6 +50,7 @@ private typealias MastodonNotification = com.twidere.services.mastodon.model.Not
 private typealias MastodonUser = com.twidere.services.mastodon.model.Account
 private typealias MastodonTrend = com.twidere.services.mastodon.model.Trend
 typealias GiphyGif = GifObject
+typealias Strings = com.twidere.twiderex.MR.strings
 
 fun IUser.toUi(accountKey: MicroBlogKey) = when (this) {
   is TwitterUser -> this.toUiUser()

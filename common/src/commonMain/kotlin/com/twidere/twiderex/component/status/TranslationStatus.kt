@@ -28,7 +28,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -40,9 +40,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.DoubleLiftContent
+import com.twidere.twiderex.component.foundation.dashedBorder
+import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.dataprovider.mapper.Strings
 import com.twidere.twiderex.di.ext.get
-import com.twidere.twiderex.icon.IcTranslate
-import com.twidere.twiderex.icon.TwidereIcons
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.utils.ITranslationRepo
@@ -81,14 +82,15 @@ fun TranslationWrappers(
           )
         )
       } else {
-        Icon(
-          modifier = Modifier.padding(
-            top = StatusTextDefaults.TransLateIconPadding,
-            bottom = StatusTextDefaults.TransLateIconPadding,
+        Text(
+          text = stringResource(
+            res = Strings.common_controls_status_actions_translate
           ),
-          imageVector = TwidereIcons.IcTranslate,
-          contentDescription = "",
-          tint = MaterialTheme.colors.primary,
+          modifier = Modifier.padding(
+            top = TranslationDefaults.contentPadding,
+            bottom = TranslationDefaults.contentPadding,
+            end = TranslationDefaults.contentPadding,
+          )
         )
       }
     }
@@ -122,6 +124,22 @@ fun TranslationStatus(
             HtmlText(
               htmlText = it.result,
               openLink = {},
+              textStyle = LocalTextStyle.current.copy(
+                color = MaterialTheme.colors.onBackground.copy(
+                  alpha = 0.6f,
+                )
+              ),
+              modifier = Modifier.dashedBorder(
+                width = TranslationDefaults.dashWidth,
+                color = MaterialTheme.colors.onBackground.copy(
+                  alpha = 0.2f,
+                ),
+                shape = MaterialTheme.shapes.medium,
+                on = TranslationDefaults.dashOn,
+                off = TranslationDefaults.dashOff,
+              ).padding(
+                TranslationDefaults.contentPadding
+              )
             )
           }
         }
@@ -146,6 +164,10 @@ private object TranslationDefaults {
   val gap = 16.dp
   val progressPadding = 12.dp
   val progressSize = 24.dp
+  val dashWidth = 2.dp
+  val dashOn = 4.dp
+  val dashOff = 4.dp
+  val contentPadding = 12.dp
   const val FailedTip = "translation failed"
   const val NoNeedTip = "No need translation"
 }
