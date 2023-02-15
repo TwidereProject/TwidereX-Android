@@ -157,10 +157,11 @@ private fun NormalStatus(
       data = data,
       footer = {
         Column {
-          if (showActions) {
+          if (showActions && !LocalDisplayPreferences.current.hideToolbarIcons) {
             StatusActions(
               status = data,
               statusNavigation = statusNavigation,
+              showNumber = LocalDisplayPreferences.current.showStatusNumbers
             )
           } else {
             Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
@@ -344,6 +345,7 @@ private fun MastodonStatusHeader(
 private fun StatusActions(
   status: UiStatus,
   statusNavigation: StatusNavigationData,
+  showNumber: Boolean,
 ) {
   CompositionLocalProvider(
     LocalContentAlpha provides ContentAlpha.medium,
@@ -354,13 +356,18 @@ private fun StatusActions(
     ) {
       ReplyButton(
         status = status,
-        compose = statusNavigation.composeNavigationData.compose
+        compose = statusNavigation.composeNavigationData.compose,
+        withNumber = showNumber,
       )
       RetweetButton(
         status = status,
-        compose = statusNavigation.composeNavigationData.compose
+        compose = statusNavigation.composeNavigationData.compose,
+        withNumber = showNumber,
       )
-      LikeButton(status = status)
+      LikeButton(
+        status = status,
+        withNumber = showNumber,
+      )
       ShareButton(status = status, compat = true)
     }
   }
