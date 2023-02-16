@@ -59,6 +59,7 @@ import com.twidere.twiderex.component.settings.RadioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.dataprovider.mapper.Strings
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.preferences.model.AppearancePreferences
@@ -153,6 +154,32 @@ fun AppearanceScene(
                 arrayOf(
                   com.twidere.twiderex.MR.strings.scene_settings_appearance_tab_position_top,
                   com.twidere.twiderex.MR.strings.scene_settings_appearance_tab_position_bottom
+                )[it.ordinal]
+              )
+            )
+          }
+        )
+        ItemDivider()
+        RadioItem(
+          options = remember {
+            listOf(
+              AppearancePreferences.TabToTop.SingleTap,
+              AppearancePreferences.TabToTop.DoubleTap,
+            )
+          },
+          value = state.appearance.tabToTop,
+          onChanged = {
+            channel.trySend(AppearanceEvent.SetTabToTop(it))
+          },
+          title = {
+            Text(text = stringResource(res = Strings.scene_settings_behaviors_timeline_refreshing_section_reset_to_top))
+          },
+          itemContent = {
+            Text(
+              text = stringResource(
+                arrayOf(
+                  Strings.scene_settings_behaviors_timeline_refreshing_section_reset_to_top_option_single_tap,
+                  Strings.scene_settings_behaviors_timeline_refreshing_section_reset_to_top_option_double_tap
                 )[it.ordinal]
               )
             )

@@ -166,13 +166,14 @@ fun HomeScene(
         enableBottomBarNestedScroll = hideTab,
         bottomBar = {
           if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
+            val tabToTop = LocalAppearancePreferences.current.tabToTop
             HomeBottomNavigation(
               items = menus,
               selectedItem = pagerState.currentPage,
               onItemSelected = {
                 if (pagerState.currentPage == it) {
                   scope.launch {
-                    menus[it].item.lazyListController.scrollToTop()
+                    menus[it].item.lazyListController.scrollToTop(tabToTop)
                   }
                 }
                 scope.launch {
@@ -339,6 +340,7 @@ fun HomeAppBar(
         MenuAvatar(
           scaffoldState,
         )
+        val tabToTop = LocalAppearancePreferences.current.tabToTop
         IconTabsComponent(
           modifier = Modifier.weight(1f),
           items = menus.map { it.item.icon() to it.item.name() },
@@ -349,7 +351,7 @@ fun HomeAppBar(
           onItemSelected = {
             if (pagerState.currentPage == it) {
               scope.launch {
-                menus[it].item.lazyListController.scrollToTop()
+                menus[it].item.lazyListController.scrollToTop(tabToTop)
               }
             }
             scope.launch {

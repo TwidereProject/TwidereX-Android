@@ -32,6 +32,7 @@ data class AppearancePreferences(
   val hideAppBarWhenScroll: Boolean = false,
   val isDarkModePureBlack: Boolean = false,
   val windowInfo: WindowInfo = WindowInfo(),
+  val tabToTop: TabToTop = TabToTop.SingleTap
 ) {
 
   @Serializable
@@ -46,6 +47,12 @@ data class AppearancePreferences(
   enum class TabPosition {
     Top,
     Bottom,
+  }
+
+  @Serializable
+  enum class TabToTop {
+    SingleTap,
+    DoubleTap,
   }
 
   @Serializable

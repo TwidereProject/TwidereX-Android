@@ -42,31 +42,42 @@ fun AppearancePresenter(
     AppearancePreferences()
   )
 
+  suspend fun update(
+    block: (AppearancePreferences) -> AppearancePreferences
+  ) {
+    preferencesHolder.appearancePreferences.updateData {
+      block(it)
+    }
+  }
+
   LaunchedEffect(Unit) {
     event.collect { event ->
       when (event) {
         AppearanceEvent.HidePrimaryColorDialog -> showPrimaryColorDialog = false
         AppearanceEvent.ShowPrimaryColorDialog -> showPrimaryColorDialog = true
-        is AppearanceEvent.SelectPrimaryColor -> preferencesHolder.appearancePreferences.updateData {
+        is AppearanceEvent.SelectPrimaryColor -> update {
           it.copy(primaryColorIndex = event.color)
         }
-        is AppearanceEvent.SetHideAppBarWhenScrolling -> preferencesHolder.appearancePreferences.updateData {
+        is AppearanceEvent.SetHideAppBarWhenScrolling -> update {
           it.copy(hideAppBarWhenScroll = event.hide)
         }
-        is AppearanceEvent.SetHideFabWhenScrolling -> preferencesHolder.appearancePreferences.updateData {
+        is AppearanceEvent.SetHideFabWhenScrolling -> update {
           it.copy(hideFabWhenScroll = event.hide)
         }
-        is AppearanceEvent.SetHideTabBarWhenScrolling -> preferencesHolder.appearancePreferences.updateData {
+        is AppearanceEvent.SetHideTabBarWhenScrolling -> update {
           it.copy(hideTabBarWhenScroll = event.hide)
         }
-        is AppearanceEvent.SetIsDarkModePureBlack -> preferencesHolder.appearancePreferences.updateData {
+        is AppearanceEvent.SetIsDarkModePureBlack -> update {
           it.copy(isDarkModePureBlack = event.isDarkModePureBlack)
         }
-        is AppearanceEvent.SetTabPosition -> preferencesHolder.appearancePreferences.updateData {
+        is AppearanceEvent.SetTabPosition -> update {
           it.copy(tabPosition = event.position)
         }
-        is AppearanceEvent.SetTheme -> preferencesHolder.appearancePreferences.updateData {
+        is AppearanceEvent.SetTheme -> update {
           it.copy(theme = event.theme)
+        }
+        is AppearanceEvent.SetTabToTop -> update {
+          it.copy(tabToTop = event.value)
         }
       }
     }
@@ -93,4 +104,5 @@ interface AppearanceEvent {
   data class SetHideFabWhenScrolling(val hide: Boolean) : AppearanceEvent
   data class SetHideAppBarWhenScrolling(val hide: Boolean) : AppearanceEvent
   data class SetIsDarkModePureBlack(val isDarkModePureBlack: Boolean) : AppearanceEvent
+  data class SetTabToTop(val value: AppearancePreferences.TabToTop) : AppearanceEvent
 }
