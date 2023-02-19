@@ -20,6 +20,9 @@
  */
 package com.twidere.twiderex.preferences.model
 
+import androidx.compose.runtime.Composable
+import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.dataprovider.mapper.Strings
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -32,7 +35,10 @@ data class AppearancePreferences(
   val hideAppBarWhenScroll: Boolean = false,
   val isDarkModePureBlack: Boolean = false,
   val windowInfo: WindowInfo = WindowInfo(),
-  val tabToTop: TabToTop = TabToTop.SingleTap
+  val tabToTop: TabToTop = TabToTop.SingleTap,
+  val autoRefresh: Boolean = false,
+  val autoRefreshInterval: RefreshInterval = RefreshInterval.OneMinute,
+  val resetToTop: Boolean = false,
 ) {
 
   @Serializable
@@ -60,5 +66,33 @@ data class AppearancePreferences(
     Auto,
     Light,
     Dark,
+  }
+
+  @Serializable
+  enum class RefreshInterval(
+    val seconds: Int,
+  ) {
+    HalfMinute(30),
+    OneMinute(60),
+    TwoMinute(120),
+    FiveMinute(500),
+  }
+}
+
+@Composable
+fun AppearancePreferences.RefreshInterval.toUi(): String {
+  return when (this) {
+    AppearancePreferences.RefreshInterval.HalfMinute -> {
+      stringResource(res = Strings.scene_settings_behaviors_timeline_refreshing_section_refresh_interval_option_30_seconds)
+    }
+    AppearancePreferences.RefreshInterval.OneMinute -> {
+      stringResource(res = Strings.scene_settings_behaviors_timeline_refreshing_section_refresh_interval_option_60_seconds)
+    }
+    AppearancePreferences.RefreshInterval.TwoMinute -> {
+      stringResource(res = Strings.scene_settings_behaviors_timeline_refreshing_section_refresh_interval_option_120_seconds)
+    }
+    AppearancePreferences.RefreshInterval.FiveMinute -> {
+      stringResource(res = Strings.scene_settings_behaviors_timeline_refreshing_section_refresh_interval_option_300_seconds)
+    }
   }
 }

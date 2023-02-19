@@ -79,6 +79,15 @@ fun AppearancePresenter(
         is AppearanceEvent.SetTabToTop -> update {
           it.copy(tabToTop = event.value)
         }
+        is AppearanceEvent.SetAutoRefresh -> update {
+          it.copy(autoRefresh = event.value)
+        }
+        is AppearanceEvent.SetAutoRefreshInterval -> update {
+          it.copy(autoRefreshInterval = event.value)
+        }
+        is AppearanceEvent.SetRestToTp -> update {
+          it.copy(resetToTop = event.value)
+        }
       }
     }
   }
@@ -105,4 +114,7 @@ interface AppearanceEvent {
   data class SetHideAppBarWhenScrolling(val hide: Boolean) : AppearanceEvent
   data class SetIsDarkModePureBlack(val isDarkModePureBlack: Boolean) : AppearanceEvent
   data class SetTabToTop(val value: AppearancePreferences.TabToTop) : AppearanceEvent
+  data class SetAutoRefresh(val value: Boolean) : AppearanceEvent
+  data class SetAutoRefreshInterval(val value: AppearancePreferences.RefreshInterval) : AppearanceEvent
+  data class SetRestToTp(val value: Boolean) : AppearanceEvent
 }

@@ -55,6 +55,7 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.ItemDivider
 import com.twidere.twiderex.component.lazy.ItemHeader
+import com.twidere.twiderex.component.settings.OptionItem
 import com.twidere.twiderex.component.settings.RadioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.UserAvatarDefaults
@@ -63,6 +64,7 @@ import com.twidere.twiderex.dataprovider.mapper.Strings
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.preferences.model.AppearancePreferences
+import com.twidere.twiderex.preferences.model.toUi
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.isDarkTheme
 import com.twidere.twiderex.ui.primaryColors
@@ -184,6 +186,56 @@ fun AppearanceScene(
               )
             )
           }
+        )
+        ItemDivider()
+        // refresh setting
+        ItemHeader() {
+          Text(
+            text = stringResource(
+              res = Strings.scene_settings_behaviors_timeline_refreshing_section_timeline_refreshing
+            )
+          )
+        }
+        switchItem(
+          value = state.appearance.autoRefresh,
+          onChanged = {
+            channel.trySend(AppearanceEvent.SetAutoRefresh(it))
+          },
+          title = {
+            Text(text = stringResource(res = Strings.scene_settings_behaviors_timeline_refreshing_section_automatically_refresh_timeline))
+          },
+        )
+        OptionItem(
+          options = remember {
+            listOf(
+              AppearancePreferences.RefreshInterval.HalfMinute,
+              AppearancePreferences.RefreshInterval.OneMinute,
+              AppearancePreferences.RefreshInterval.TwoMinute,
+              AppearancePreferences.RefreshInterval.FiveMinute,
+            )
+          },
+          onChanged = {
+            channel.trySend(AppearanceEvent.SetAutoRefreshInterval(it))
+          },
+          resultContent = { v ->
+            Text(text = v.toUi())
+          },
+          selectItemContent = {
+            Text(it.toUi())
+          },
+          title = {
+            Text(text = stringResource(res = Strings.scene_settings_behaviors_timeline_refreshing_section_refresh_interval))
+          },
+          value = state.appearance.autoRefreshInterval,
+        )
+        switchItem(
+          value = state.appearance.resetToTop,
+          onChanged = {
+            channel.trySend(AppearanceEvent.SetRestToTp(it))
+          },
+          title = {
+            Text(text = stringResource(res = Strings.scene_settings_behaviors_timeline_refreshing_section_reset_to_top))
+          },
         )
         ItemDivider()
         // Scrolling Timeline
