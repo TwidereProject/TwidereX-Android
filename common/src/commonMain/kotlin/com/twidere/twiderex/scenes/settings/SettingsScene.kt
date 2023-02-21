@@ -31,6 +31,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.AppBar
@@ -38,6 +42,8 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.icon.switcher.IconSelectorDialog
+import com.twidere.twiderex.icon.switcher.IconSwitcher
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.ui.TwidereScene
 import dev.icerock.moko.resources.FileResource
@@ -109,6 +115,10 @@ private val settings =
 fun SettingsScene(
   navigator: Navigator,
 ) {
+  var showIconSelector by remember {
+    mutableStateOf(false)
+  }
+
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -124,6 +134,8 @@ fun SettingsScene(
             Text(text = stringResource(com.twidere.twiderex.MR.strings.scene_settings_title))
           }
         )
+      },
+      bottomBar = {
       }
     ) {
       LazyColumn(
@@ -161,7 +173,18 @@ fun SettingsScene(
             )
           }
         }
+        item {
+          IconSwitcher {
+            showIconSelector = true
+          }
+        }
       }
     }
+    IconSelectorDialog(
+      show = showIconSelector,
+      onDismissRequest = {
+        showIconSelector = false
+      }
+    )
   }
 }
