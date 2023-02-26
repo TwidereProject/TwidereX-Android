@@ -53,8 +53,8 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.dataprovider.mapper.Strings
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.kmp.AppIcon
-import com.twidere.twiderex.kmp.launchIcons
 import com.twidere.twiderex.kmp.IconModifier
+import com.twidere.twiderex.kmp.launchIcons
 @Composable
 fun IconSelectorDialog(
   show: Boolean,
@@ -64,8 +64,8 @@ fun IconSelectorDialog(
   if (!show) return
   BottomSheet(
     onDismissRequest = onDismissRequest,
-    paddingValues = PaddingValues(20.dp),
-    shape = RoundedCornerShape(16.dp),
+    paddingValues = PaddingValues(IconSelectorDefault.outPadding),
+    shape = RoundedCornerShape(IconSelectorDefault.dialogRadius),
     content = {
       Column {
         AppBar(
@@ -83,16 +83,17 @@ fun IconSelectorDialog(
           }
         )
         LazyRow(
-          contentPadding = PaddingValues(16.dp),
-          horizontalArrangement = Arrangement.spacedBy(12.dp),
+          contentPadding = PaddingValues(IconSelectorDefault.rowPadding),
+          horizontalArrangement = Arrangement.spacedBy(IconSelectorDefault.itemGap),
         ) {
           itemsIndexed(launchIcons) { index, icon ->
             Image(
               imageVector = icon,
               contentDescription = "app icon",
-              modifier = Modifier.size(64.dp).clickable {
+              modifier = Modifier.size(IconSelectorDefault.iconSize).clickable {
                 iconModifier.changeIcon(AppIcon.fromIndex(index))
-              }.clip(RoundedCornerShape(8.dp))
+                onDismissRequest.invoke()
+              }.clip(RoundedCornerShape(IconSelectorDefault.iconRadius))
             )
           }
         }
@@ -133,4 +134,13 @@ fun BottomSheet(
       content()
     }
   }
+}
+
+private object IconSelectorDefault {
+  val outPadding = 20.dp
+  val dialogRadius = 16.dp
+  val rowPadding = 16.dp
+  val itemGap = 12.dp
+  val iconSize = 64.dp
+  val iconRadius = 8.dp
 }

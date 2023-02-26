@@ -20,25 +20,17 @@
  */
 package com.twidere.twiderex
 
-import android.app.Application
-import com.twidere.twiderex.di.setupModules
-import com.twidere.twiderex.kmp.IAppShortcutCreator
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.androidx.workmanager.koin.workManagerFactory
-import org.koin.core.context.startKoin
-import org.koin.core.logger.Level
+import android.content.Intent
+import android.os.Bundle
+import android.view.WindowManager
+import androidx.activity.ComponentActivity
+import androidx.core.view.WindowCompat
 
-abstract class TwidereApplication : Application() {
-
-  var appShortcutCreator: IAppShortcutCreator? = null
-  override fun onCreate() {
-    super.onCreate()
-    startKoin {
-      androidLogger(Level.NONE)
-      androidContext(this@TwidereApplication)
-      workManagerFactory()
-      setupModules()
-    }
+class LauncherActivity : ComponentActivity() {
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    WindowCompat.setDecorFitsSystemWindows(window, false)
+    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+    startActivity(Intent(this, TwidereXActivity::class.java))
   }
 }

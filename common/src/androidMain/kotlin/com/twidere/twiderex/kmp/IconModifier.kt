@@ -23,6 +23,7 @@ package com.twidere.twiderex.kmp
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
+import com.twidere.twiderex.TwidereApplication
 
 actual class IconModifier constructor(
   private val context: Context,
@@ -32,6 +33,7 @@ actual class IconModifier constructor(
   ) {
     disable(context, newIcon)
     enable(context, newIcon)
+    (context.applicationContext as? TwidereApplication)?.appShortcutCreator?.configureAppShortcuts()
   }
 
   private fun enable(
@@ -61,4 +63,8 @@ actual class IconModifier constructor(
       PackageManager.DONT_KILL_APP,
     )
   }
+}
+
+interface IAppShortcutCreator {
+  fun configureAppShortcuts()
 }

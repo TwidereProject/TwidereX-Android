@@ -27,12 +27,16 @@ import com.twidere.twiderex.initializer.DirectMessageInitializer
 import com.twidere.twiderex.initializer.NotificationChannelInitializer
 import com.twidere.twiderex.initializer.NotificationInitializer
 import com.twidere.twiderex.initializer.TwidereServiceInitializer
+import com.twidere.twiderex.utils.AppShortcutCreator
 import com.twidere.twiderex.utils.asIsActiveNetworkFlow
 import kotlinx.coroutines.flow.Flow
 
 class TwidereApp : TwidereApplication() {
   override fun onCreate() {
     super.onCreate()
+    appShortcutCreator = AppShortcutCreator(this).apply {
+      configureAppShortcuts()
+    }
     // Note:Installs with missing splits are now blocked on devices which have Play Protect active or run on Android 10.
     // But there are still some custom roms allows missing splits which causes resources not found exception
     if (MissingSplitsCheckerImpl().requiredSplits(this)) {
