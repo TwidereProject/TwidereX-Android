@@ -146,36 +146,20 @@ fun SettingsScene(
       LazyColumn(
         contentPadding = it
       ) {
-        settings.forEach {
+        settings.forEach { items ->
           item {
             ListItem(
               text = {
                 ProvideTextStyle(value = MaterialTheme.typography.button) {
-                  Text(text = stringResource(it.key))
+                  Text(text = stringResource(items.key))
                 }
               },
             )
           }
-          items(it.value) {
-            ListItem(
-              modifier = Modifier.clickable(
-                onClick = {
-                  if (it.route.isNotEmpty()) {
-                    navigator.navigate(it.route)
-                  }
-                }
-              ),
-              icon = {
-                Icon(
-                  painter = painterResource(it.icon),
-                  contentDescription = stringResource(it.name),
-                  modifier = Modifier.size(24.dp),
-                )
-              },
-              text = {
-                Text(text = stringResource(it.name))
-              },
-            )
+          items(items.value) { item ->
+            SettingItem(item) {
+              navigator.navigate(item.route)
+            }
           }
         }
         item {
@@ -195,4 +179,32 @@ fun SettingsScene(
       }
     )
   }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun SettingItem(
+  item: SettingItem,
+  onClick: () -> Unit,
+) {
+  ListItem(
+    modifier = Modifier.clickable(
+      onClick = {
+        if (item.route.isNotEmpty()) {
+          onClick.invoke()
+        }
+      }
+    ),
+    icon = {
+      Icon(
+        painter = painterResource(item.icon),
+        contentDescription = stringResource(item.name),
+        modifier = Modifier.size(24.dp),
+      )
+    },
+    text = {
+      Text(text = stringResource(item.name))
+    },
+  )
+
 }
