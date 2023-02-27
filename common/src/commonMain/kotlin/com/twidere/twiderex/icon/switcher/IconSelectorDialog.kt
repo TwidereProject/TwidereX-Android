@@ -59,6 +59,7 @@ import com.twidere.twiderex.kmp.launchIcons
 fun IconSelectorDialog(
   show: Boolean,
   onDismissRequest: () -> Unit,
+  onIconSelect: (AppIcon) -> Unit,
   iconModifier: IconModifier = get(),
 ) {
   if (!show) return
@@ -91,7 +92,9 @@ fun IconSelectorDialog(
               imageVector = icon,
               contentDescription = "app icon",
               modifier = Modifier.size(IconSelectorDefault.iconSize).clickable {
-                iconModifier.changeIcon(AppIcon.fromIndex(index))
+                val appIcon = AppIcon.fromIndex(index)
+                iconModifier.changeIcon(appIcon)
+                onIconSelect.invoke(appIcon)
                 onDismissRequest.invoke()
               }.clip(RoundedCornerShape(IconSelectorDefault.iconRadius))
             )

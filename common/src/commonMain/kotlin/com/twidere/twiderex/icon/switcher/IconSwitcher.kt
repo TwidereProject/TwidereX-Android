@@ -37,19 +37,21 @@ import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.dataprovider.mapper.Strings
 import com.twidere.twiderex.icon.TwidereIcons
-import com.twidere.twiderex.icon.twidereicons.AppIcon1
 import com.twidere.twiderex.icon.twidereicons.ChooseToUse
+import com.twidere.twiderex.kmp.AppIcon
 
 // import com.twidere.twiderex.kmp.Platform
 // import com.twidere.twiderex.kmp.currentPlatform
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun IconSwitcher(onclick: () -> Unit) {
+fun IconSwitcher(
+  appIcon: AppIcon,
+  onclick: () -> Unit,
+) {
   // if (currentPlatform != Platform.Android) {
   //   return
   // }
-
   ListItem(
     modifier = Modifier.clickable {
       onclick.invoke()
@@ -63,7 +65,7 @@ fun IconSwitcher(onclick: () -> Unit) {
     },
     trailing = {
       Image(
-        painter = rememberVectorPainter(TwidereIcons.AppIcon1),
+        painter = rememberVectorPainter(appIcon.toImageVector()),
         contentDescription = stringResource(Strings.scene_settings_appearance_app_icon),
         modifier = Modifier.size(32.dp).clip(MaterialTheme.shapes.small).clipToBounds(),
       )

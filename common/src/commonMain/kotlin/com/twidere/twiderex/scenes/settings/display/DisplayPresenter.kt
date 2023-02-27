@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.kmp.AppIcon
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import kotlinx.coroutines.flow.Flow
@@ -90,6 +91,9 @@ fun DisplayPresenter(
         is DisplayEvent.SetStatusNumbers -> update {
           it.copy(showStatusNumbers = event.show)
         }
+        is DisplayEvent.SetAppIcon -> update {
+          it.copy(appIcon = event.appIcon)
+        }
       }
     }
   }
@@ -118,4 +122,5 @@ interface DisplayEvent {
   data class SetDateFormat(val timestamp: DisplayPreferences.DateFormat) : DisplayEvent
   data class SetToolbarIcons(val hide: Boolean) : DisplayEvent
   data class SetStatusNumbers(val show: Boolean) : DisplayEvent
+  data class SetAppIcon(val appIcon: AppIcon) : DisplayEvent
 }

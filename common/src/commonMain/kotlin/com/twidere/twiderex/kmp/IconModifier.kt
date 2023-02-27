@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.kmp
 
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.twidere.twiderex.icon.TwidereIcons
 import com.twidere.twiderex.icon.twidereicons.AppIcon1
 import com.twidere.twiderex.icon.twidereicons.AppIcon10
@@ -35,6 +36,7 @@ import com.twidere.twiderex.icon.twidereicons.AppIcon6
 import com.twidere.twiderex.icon.twidereicons.AppIcon7
 import com.twidere.twiderex.icon.twidereicons.AppIcon8
 import com.twidere.twiderex.icon.twidereicons.AppIcon9
+import kotlinx.serialization.Serializable
 
 const val QUALIFIER = "com.twidere.twiderex"
 
@@ -61,6 +63,7 @@ val launchIcons = listOf(
   TwidereIcons.AppIcon14,
 )
 
+@Serializable
 enum class AppIcon(
   val componentName: String, // Must correspond to the <activity-alias> `android:name`s in AndroidManifest
 ) {
@@ -108,12 +111,16 @@ enum class AppIcon(
   ),
   ;
 
+  fun toImageVector(): ImageVector {
+    return launchIcons[values().indexOf(this)]
+  }
+
   companion object {
     fun fromValue(componentName: String): AppIcon {
       return values().first { it.componentName == componentName }
     }
     fun fromIndex(index: Int): AppIcon {
-      return values()[index]
+      return values().getOrElse(index, defaultValue = { DEFAULT })
     }
   }
 }

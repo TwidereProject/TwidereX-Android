@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.preferences.model
 
+import com.twidere.twiderex.kmp.AppIcon
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -35,6 +36,7 @@ data class DisplayPreferences(
   val dateFormat: DateFormat = DateFormat.RELATIVE,
   val hideToolbarIcons: Boolean = false,
   val showStatusNumbers: Boolean = true,
+  val appIcon: AppIcon = AppIcon.DEFAULT,
 ) {
   @Serializable
   enum class AvatarStyle {

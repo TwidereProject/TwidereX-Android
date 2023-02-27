@@ -42,9 +42,12 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.icon.switcher.IconSelectorDialog
 import com.twidere.twiderex.icon.switcher.IconSwitcher
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.scenes.settings.display.DisplayEvent
+import com.twidere.twiderex.scenes.settings.display.DisplayPresenter
 import com.twidere.twiderex.ui.TwidereScene
 import dev.icerock.moko.resources.FileResource
 import dev.icerock.moko.resources.StringResource
@@ -119,6 +122,8 @@ fun SettingsScene(
     mutableStateOf(false)
   }
 
+  val (state, channel) = rememberPresenterState { DisplayPresenter(it) }
+
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -174,7 +179,7 @@ fun SettingsScene(
           }
         }
         item {
-          IconSwitcher {
+          IconSwitcher(appIcon = state.display.appIcon) {
             showIconSelector = true
           }
         }
@@ -184,6 +189,9 @@ fun SettingsScene(
       show = showIconSelector,
       onDismissRequest = {
         showIconSelector = false
+      },
+      onIconSelect = {
+        channel.trySend(DisplayEvent.SetAppIcon(it))
       }
     )
   }
