@@ -42,6 +42,7 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.dataprovider.mapper.Strings
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.icon.switcher.IconSelectorDialog
 import com.twidere.twiderex.icon.switcher.IconSwitcher
@@ -79,6 +80,11 @@ private val settings =
         com.twidere.twiderex.MR.strings.scene_settings_display_title,
         com.twidere.twiderex.MR.files.ic_template,
         route = Root.Settings.Display,
+      ),
+      SettingItem(
+        Strings.scene_settings_swipe_gestures_tittle,
+        com.twidere.twiderex.MR.files.ic_swipe,
+        route = Root.Settings.Swipe,
       ),
       SettingItem(
         com.twidere.twiderex.MR.strings.scene_settings_layout_title,
@@ -206,5 +212,4 @@ private fun SettingItem(
       Text(text = stringResource(item.name))
     },
   )
-
 }

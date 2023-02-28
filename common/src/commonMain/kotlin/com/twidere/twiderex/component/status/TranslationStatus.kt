@@ -38,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.DoubleLiftContent
 import com.twidere.twiderex.component.foundation.dashedBorder
@@ -90,6 +91,9 @@ fun TranslationWrappers(
             top = TranslationDefaults.contentPadding,
             bottom = TranslationDefaults.contentPadding,
             end = TranslationDefaults.contentPadding,
+          ),
+          style = TextStyle(
+            color = MaterialTheme.colors.primary
           )
         )
       }
