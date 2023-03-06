@@ -119,7 +119,7 @@ fun SearchSceneContent(
   navigator: Navigator
 ) {
   val account = LocalActiveAccount.current ?: return
-  val (state, channel) = rememberPresenterState { TrendingPresenter(it) }
+  val (state, channel) = rememberPresenterState(useImmediateClock = true) { TrendingPresenter(it) }
   if (state !is SearchItemState.Data) {
     return
   }

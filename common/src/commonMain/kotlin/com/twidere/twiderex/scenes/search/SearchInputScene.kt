@@ -67,7 +67,7 @@ fun SearchInputScene(
   navigator: Navigator,
   initial: String? = null,
 ) {
-  val (state, channel) = rememberPresenterState<SearchInputState, SearchInputEvent> {
+  val (state, channel) = rememberPresenterState(useImmediateClock = true) {
     SearchInputPresenter(it, keyword = initial ?: "")
   }
   if (state !is SearchInputState.Data) {

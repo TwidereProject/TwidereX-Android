@@ -42,10 +42,11 @@ import kotlin.coroutines.CoroutineContext
 internal expect fun providePlatformDispatcher(): CoroutineContext
 
 private class PresenterViewModel<T>(
+  useImmediateClock: Boolean = false,
   body: @Composable () -> T,
 ) : ViewModel() {
   private val dispatcher = providePlatformDispatcher()
-  private val clock = if (dispatcher[MonotonicFrameClock] == null) {
+  private val clock = if (dispatcher[MonotonicFrameClock] == null || useImmediateClock) {
     RecompositionClock.Immediate
   } else {
     RecompositionClock.ContextClock
@@ -59,14 +60,17 @@ private class PresenterViewModel<T>(
 }
 
 @Composable
-fun <T> rememberPresenter(body: @Composable () -> T): StateFlow<T> {
+fun <T> rememberPresenter(
+  useImmediateClock: Boolean = false,
+  body: @Composable () -> T,
+): StateFlow<T> {
   @Suppress("UNCHECKED_CAST")
   val viewModel = viewModel(
     modelClass = PresenterViewModel::class,
     keys = listOf(
       currentCompositeKeyHash.toString(36),
     ),
-    creator = { PresenterViewModel(body) }
+    creator = { PresenterViewModel(useImmediateClock, body) },
   ) as PresenterViewModel<T>
   return viewModel.state
 }
@@ -84,17 +88,18 @@ fun <E> rememberEvent(): Pair<Channel<E>, Flow<E>> {
     keys = listOf(
       currentCompositeKeyHash.toString(36),
     ),
-    creator = { EventViewModel<E>() }
+    creator = { EventViewModel<E>() },
   ) as EventViewModel<E>
   return viewModel.pair
 }
 
 @Composable
-fun <T, E> rememberPresenterState(
-  body: @Composable (flow: Flow<E>) -> T
-): Pair<T, Channel<E>> {
+fun <S, E> rememberPresenterState(
+  useImmediateClock: Boolean = false,
+  body: @Composable (flow: Flow<E>) -> S,
+): Pair<S, Channel<E>> {
   val (channel, event) = rememberEvent<E>()
-  val presenter = rememberPresenter { body(event) }
+  val presenter = rememberPresenter(useImmediateClock) { body(event) }
   val state by presenter.collectAsState()
   return state to channel
 }
