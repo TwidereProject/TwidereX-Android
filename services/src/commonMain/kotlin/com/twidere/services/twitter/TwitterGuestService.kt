@@ -20,41 +20,39 @@
  */
 package com.twidere.services.twitter
 
+import com.twidere.services.http.HttpClientFactory
 import com.twidere.services.http.authorization.BearerAuthorization
-import com.twidere.services.http.httpClient
-import com.twidere.services.twitter.api.GuestApi
+import com.twidere.services.twitter.api.GuestResources
 import com.twidere.services.twitter.model.guest.ActivateResponse
+import com.twidere.services.twitter.model.guest.TwitterGuestResponse
 import com.twidere.services.twitter.model.guest.User
-import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.request.header
 
 class TwitterGuestService(
-  guestToken: String,
+  private val httpClientFactory: HttpClientFactory,
 ) {
-  private val guestApi by lazy {
-    GuestApi(
-      httpClient(
-        TWITTER_BASE_URL,
-        BearerAuthorization(GUEST_TOKEN_AUTHORIZATION),
-      ) {
-        defaultRequest {
-          header("x-guest-token", guestToken)
-        }
-      }
-    )
+  private val guestResources by lazy {
+    httpClientFactory.createResources(GuestResources::class.java, TWITTER_BASE_URL, BearerAuthorization(GUEST_TOKEN_AUTHORIZATION), useCache = true)
   }
 
   suspend fun userTimeline(
     userId: String,
     count: Int,
     cursor: String? = null,
-  ) = guestApi.userTimeline(userId, cursor, count)
+  ): TwitterGuestResponse {
+    val token = getGuestToken()
+    require(token.guestToken != null)
+    return guestResources.userTimeline(token.guestToken, userId, cursor, count)
+  }
 
   suspend fun conversation(
     tweetId: String,
     count: Int,
     cursor: String? = null,
-  ) = guestApi.conversation(tweetId, cursor, count)
+  ): TwitterGuestResponse {
+    val token = getGuestToken()
+    require(token.guestToken != null)
+    return guestResources.conversation(token.guestToken, tweetId, cursor, count)
+  }
 
   suspend fun user(
     userId: String? = null,
@@ -63,18 +61,13 @@ class TwitterGuestService(
     require(userId != null || screenName != null) {
       "userId or screenName must be not null"
     }
-    return guestApi.user(userId = userId, screenName = screenName)
+    val token = getGuestToken()
+    require(token.guestToken != null)
+    return guestResources.user(token.guestToken, userId = userId, screenName = screenName)
   }
 
-  companion object {
-    suspend fun getGuestToken(): ActivateResponse {
-      return GuestApi(
-        httpClient(
-          TWITTER_BASE_URL,
-          BearerAuthorization(GUEST_TOKEN_AUTHORIZATION),
-        )
-      ).activate()
-    }
+  suspend fun getGuestToken(): ActivateResponse {
+    return guestResources.activate()
   }
 }
 

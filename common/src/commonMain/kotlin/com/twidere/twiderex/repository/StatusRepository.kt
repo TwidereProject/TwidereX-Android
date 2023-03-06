@@ -21,12 +21,12 @@
 package com.twidere.twiderex.repository
 
 import androidx.datastore.core.DataStore
-import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingData
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.nitter.NitterService
+import com.twidere.services.twitter.TwitterGuestService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
@@ -91,7 +91,7 @@ class StatusRepository(
     )
   }
 
-  @OptIn(ExperimentalPagingApi::class, FlowPreview::class)
+  @OptIn(FlowPreview::class)
   fun conversation(
     statusKey: MicroBlogKey,
     platformType: PlatformType,
@@ -130,6 +130,7 @@ class StatusRepository(
               service = service as TwitterService,
               accountKey = accountKey,
               database = database,
+              twitterGuestService = TwitterGuestService(TwidereServiceFactory.createHttpClientFactory())
             )
           }
         }

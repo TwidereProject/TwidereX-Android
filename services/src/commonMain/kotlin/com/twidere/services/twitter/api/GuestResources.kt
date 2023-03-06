@@ -23,21 +23,19 @@ package com.twidere.services.twitter.api
 import com.twidere.services.twitter.model.guest.ActivateResponse
 import com.twidere.services.twitter.model.guest.TwitterGuestResponse
 import com.twidere.services.twitter.model.guest.User
-import io.github.seiko.ktorfit.annotation.generator.GenerateApi
-import io.github.seiko.ktorfit.annotation.http.GET
-import io.github.seiko.ktorfit.annotation.http.POST
-import io.github.seiko.ktorfit.annotation.http.Path
-import io.github.seiko.ktorfit.annotation.http.Query
-import io.ktor.client.HttpClient
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.POST
+import retrofit2.http.Path
+import retrofit2.http.Query
 
-@Suppress("NO_ACTUAL_FOR_EXPECT")
-@GenerateApi
-internal expect class GuestApi(client: HttpClient) {
+interface GuestResources {
   @POST("1.1/guest/activate.json")
   suspend fun activate(): ActivateResponse
 
   @GET("2/timeline/profile/{userId}.json")
   suspend fun userTimeline(
+    @Header("x-guest-token") guestToken: String,
     @Path("userId") userId: String,
     @Query("cursor") cursor: String? = null,
     @Query("include_profile_interstitial_type") includeProfileInterstitialType: Int = 1,
@@ -68,6 +66,7 @@ internal expect class GuestApi(client: HttpClient) {
 
   @GET("2/timeline/conversation/{tweetId}.json")
   suspend fun conversation(
+    @Header("x-guest-token") guestToken: String,
     @Path("tweetId") tweetId: String,
     @Query("cursor") cursor: String? = null,
     @Query("include_profile_interstitial_type") includeProfileInterstitialType: Int = 1,
@@ -97,6 +96,7 @@ internal expect class GuestApi(client: HttpClient) {
 
   @GET("1.1/users/show.json")
   suspend fun user(
+    @Header("x-guest-token") guestToken: String,
     @Query("screen_name") screenName: String? = null,
     @Query("user_id") userId: String? = null,
     @Query("include_profile_interstitial_type") includeProfileInterstitialType: Int = 1,

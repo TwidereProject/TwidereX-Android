@@ -27,9 +27,7 @@ import com.twidere.twiderex.initializer.DirectMessageInitializer
 import com.twidere.twiderex.initializer.NotificationChannelInitializer
 import com.twidere.twiderex.initializer.NotificationInitializer
 import com.twidere.twiderex.initializer.TwidereServiceInitializer
-import com.twidere.twiderex.utils.TwiderexLogger
 import com.twidere.twiderex.utils.asIsActiveNetworkFlow
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.Flow
 
 class TwidereApp : TwidereApplication() {
@@ -40,7 +38,6 @@ class TwidereApp : TwidereApplication() {
     if (MissingSplitsCheckerImpl().requiredSplits(this)) {
       return
     }
-    Napier.base(TwiderexLogger())
     // manually setup NotificationInitializer since it require HiltWorkerFactory
     AppInitializer.getInstance(this)
       .apply {
