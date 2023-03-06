@@ -198,7 +198,7 @@ private fun ComposeBody(
   statusKey: MicroBlogKey? = null,
   composeType: ComposeType? = null,
 ) {
-  val (state, channel) = rememberPresenterState<ComposeState, ComposeEvent> {
+  val (state, channel) = rememberPresenterState(useImmediateClock = true) {
     ComposePresenter(
       it,
       id = draftId,
