@@ -24,14 +24,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -51,8 +52,6 @@ import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.AlertDialog
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
-import com.twidere.twiderex.component.foundation.DropdownMenu
-import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.settings.RadioItem
@@ -62,6 +61,7 @@ import com.twidere.twiderex.dataprovider.mapper.Strings
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.navigation.Root
 import com.twidere.twiderex.preferences.model.SwipeAction
+import com.twidere.twiderex.preferences.model.tittle
 import com.twidere.twiderex.preferences.model.toUi
 import com.twidere.twiderex.ui.TwidereScene
 import io.github.seiko.precompose.annotation.NavGraphDestination
@@ -98,6 +98,7 @@ fun SwipeScene(
         switchItem(
           value = state.swipePreferences.useSwipeGestures,
           onChanged = {
+            channel.trySend(SwipeEvent.SetUseSwipe(value = it))
           },
           describe = {
             Text(
@@ -109,101 +110,130 @@ fun SwipeScene(
             text = stringResource(Strings.scene_settings_swipe_gestures_desc_title)
           )
         }
-        SwipeGestureItem(
-          leftIcon = {
-            ActionIcon(
-              icon = rememberVectorPainter(
-                image = Icons.TwoTone.ArrowForward
-              ),
-            )
-          },
-          rightIcon = {
-            val action = state.swipePreferences.leftShort.action.toUi()
-            action.icon?.let {
+        state.swipePreferences.leftShort.let {
+          val ui = it.action.toUi()
+          SwipeGestureItem(
+            currentAction = it.action,
+            leftIcon = {
               ActionIcon(
-                icon = painterResource(it),
+                icon = rememberVectorPainter(
+                  image = Icons.TwoTone.ArrowForward
+                ),
+              )
+            },
+            tittle = {
+              Text(text = it.tittle())
+            },
+            subTittle = {
+              Text(text = ui.tittle)
+            },
+            rightIcon = {
+              ActionIcon(
+                icon = ui.icon?.let { painterResource(it) },
                 isLargeIcon = true,
                 hasPadding = true,
                 backgroundColor = MaterialTheme.colors.surface,
                 iconColor = MaterialTheme.colors.primary,
               )
             }
+          ) { action ->
+            channel.trySend(SwipeEvent.SetLeftShortSwipeAction(action))
           }
-        ) {
         }
-        SwipeGestureItem(
-          backgroundColor = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
-          leftIcon = {
-            ActionIcon(
-              icon = rememberVectorPainter(
-                image = Icons.TwoTone.ArrowForward
-              ),
-              isLargeIcon = true,
-            )
-          },
-          rightIcon = {
-            val action = state.swipePreferences.leftLong.action.toUi()
-            action.icon?.let {
+
+        state.swipePreferences.leftLong.let {
+          val ui = it.action.toUi()
+          SwipeGestureItem(
+            backgroundColor = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
+            currentAction = it.action,
+            leftIcon = {
               ActionIcon(
-                icon = painterResource(
-                  res = it
+                icon = rememberVectorPainter(
+                  image = Icons.TwoTone.ArrowForward
                 ),
+                isLargeIcon = true,
+              )
+            },
+            tittle = {
+              Text(text = it.tittle())
+            },
+            subTittle = {
+              Text(text = ui.tittle)
+            },
+            rightIcon = {
+              ActionIcon(
+                icon = ui.icon?.let { painterResource(res = it) },
                 hasPadding = true,
                 backgroundColor = MaterialTheme.colors.surface,
                 iconColor = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
               )
             }
+          ) { action ->
+            channel.trySend(SwipeEvent.SetLeftLongSwipeAction(action))
           }
-        ) {
         }
-        SwipeGestureItem(
-          leftIcon = {
-            val action = state.swipePreferences.rightShort.action.toUi()
-            action.icon?.let {
+
+        state.swipePreferences.rightShort.let {
+          val ui = it.action.toUi()
+          SwipeGestureItem(
+            currentAction = it.action,
+            leftIcon = {
               ActionIcon(
-                icon = painterResource(
-                  res = it
-                ),
+                icon = ui.icon?.let { painterResource(res = it) },
                 isLargeIcon = true,
                 hasPadding = true,
                 backgroundColor = MaterialTheme.colors.surface,
                 iconColor = MaterialTheme.colors.primary,
               )
-            }
-          },
-          rightIcon = {
-            ActionIcon(
-              icon = rememberVectorPainter(
-                image = Icons.TwoTone.ArrowBack
-              ),
-            )
-          }
-        ) {
-        }
-        SwipeGestureItem(
-          backgroundColor = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
-          leftIcon = {
-            val action = state.swipePreferences.rightLong.action.toUi()
-            action.icon?.let {
+            },
+            tittle = {
+              Text(text = it.tittle())
+            },
+            subTittle = {
+              Text(text = ui.tittle)
+            },
+            rightIcon = {
               ActionIcon(
-                icon = painterResource(
-                  res = it,
+                icon = rememberVectorPainter(
+                  image = Icons.TwoTone.ArrowBack
                 ),
+              )
+            }
+          ) { action ->
+            channel.trySend(SwipeEvent.SetRightShortSwipeAction(action))
+          }
+        }
+
+        state.swipePreferences.rightLong.let {
+          val ui = it.action.toUi()
+          SwipeGestureItem(
+            backgroundColor = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
+            currentAction = it.action,
+            leftIcon = {
+              ActionIcon(
+                icon = ui.icon?.let { painterResource(res = it) },
                 hasPadding = true,
                 backgroundColor = MaterialTheme.colors.surface,
                 iconColor = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
               )
+            },
+            tittle = {
+              Text(text = it.tittle())
+            },
+            subTittle = {
+              Text(text = ui.tittle)
+            },
+            rightIcon = {
+              ActionIcon(
+                icon = rememberVectorPainter(
+                  image = Icons.TwoTone.ArrowBack,
+                ),
+                isLargeIcon = true,
+              )
             }
-          },
-          rightIcon = {
-            ActionIcon(
-              icon = rememberVectorPainter(
-                image = Icons.TwoTone.ArrowBack,
-              ),
-              isLargeIcon = true,
-            )
+          ) { action ->
+            channel.trySend(SwipeEvent.SetRightLongSwipeAction(action))
           }
-        ) {
         }
       }
     }
@@ -212,7 +242,7 @@ fun SwipeScene(
 
 @Composable
 private fun RowScope.ActionIcon(
-  icon: Painter,
+  icon: Painter?,
   isLargeIcon: Boolean = false,
   hasPadding: Boolean = false,
   backgroundColor: Color = Color.Transparent,
@@ -225,44 +255,69 @@ private fun RowScope.ActionIcon(
       .background(backgroundColor)
       .align(Alignment.CenterVertically),
   ) {
-    Icon(
-      painter = icon,
-      contentDescription = null,
-      modifier = Modifier.height(
-        16.dp
-      ).wrapContentWidth()
-        .align(Alignment.Center),
-      tint = iconColor,
-    )
+    icon?.let {
+      Icon(
+        painter = it,
+        contentDescription = null,
+        modifier = Modifier.height(
+          16.dp
+        ).wrapContentWidth()
+          .align(Alignment.Center),
+        tint = iconColor,
+      )
+    }
   }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun SwipeGestureItem(
   backgroundColor: Color = MaterialTheme.colors.primary,
   leftIcon: @Composable RowScope.() -> Unit,
   rightIcon: @Composable RowScope.() -> Unit,
+  tittle: @Composable () -> Unit,
+  subTittle: @Composable () -> Unit,
   currentAction: SwipeAction = SwipeAction.None,
   onActionSelect: (SwipeAction) -> Unit,
 ) {
-  Row(
+  var show by remember {
+    mutableStateOf(false)
+  }
+  ListItem(
     modifier = Modifier.padding(
       vertical = 18.dp,
       horizontal = 16.dp
     ).clickable {
-      // onActionSelect.invoke()
+      show = !show
+    },
+    icon = {
+      Row(
+        modifier = Modifier
+          .width(86.dp)
+          .height(36.dp)
+          .background(
+            backgroundColor
+          )
+      ) {
+        leftIcon()
+        rightIcon()
+      }
+    },
+    secondaryText = {
+      subTittle()
     }
   ) {
-    Row(
-      modifier = Modifier
-        .width(86.dp)
-        .height(36.dp)
-        .background(
-          backgroundColor
-        )
+    tittle()
+  }
+  if (show) {
+    ActionSelectMenu(
+      currentAction = currentAction,
+      onActionSelect = {
+        show = false
+        onActionSelect(it)
+      },
     ) {
-      leftIcon()
-      rightIcon()
+      show = false
     }
   }
 }
@@ -271,24 +326,27 @@ private fun SwipeGestureItem(
 private fun ActionSelectMenu(
   currentAction: SwipeAction = SwipeAction.None,
   onActionSelect: (SwipeAction) -> Unit,
+  onDismissRequest: () -> Unit,
 ) {
-  var show by remember {
-    mutableStateOf(false)
-  }
   AlertDialog(
     text = {
-      // SwipeAction.values().forEach {
-      //
-      // }
-      // Column {
-      //   RadioItem()
-      // }
+      Column {
+        RadioItem(
+          options = SwipeAction.values().toList(),
+          value = currentAction,
+          itemContent = {
+            Text(text = it.toUi().tittle)
+          },
+          onChanged = {
+            onActionSelect(it)
+          },
+          title = {}
+        )
+      }
     },
     onDismissRequest = {
-
+      onDismissRequest()
     },
-    confirmButton = {
-
-    }
+    confirmButton = {}
   )
 }
