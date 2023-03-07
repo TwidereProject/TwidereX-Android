@@ -32,5 +32,6 @@ class LauncherActivity : ComponentActivity() {
     WindowCompat.setDecorFitsSystemWindows(window, false)
     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
     startActivity(Intent(this, TwidereXActivity::class.java))
+    finish()
   }
 }
