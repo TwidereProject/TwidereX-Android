@@ -60,7 +60,7 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.dataprovider.mapper.Strings
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.navigation.Root
-import com.twidere.twiderex.preferences.model.SwipeAction
+import com.twidere.twiderex.preferences.model.SwipeActionType
 import com.twidere.twiderex.preferences.model.tittle
 import com.twidere.twiderex.preferences.model.toUi
 import com.twidere.twiderex.ui.TwidereScene
@@ -277,8 +277,8 @@ private fun SwipeGestureItem(
   rightIcon: @Composable RowScope.() -> Unit,
   tittle: @Composable () -> Unit,
   subTittle: @Composable () -> Unit,
-  currentAction: SwipeAction = SwipeAction.None,
-  onActionSelect: (SwipeAction) -> Unit,
+  currentAction: SwipeActionType = SwipeActionType.None,
+  onActionSelect: (SwipeActionType) -> Unit,
 ) {
   var show by remember {
     mutableStateOf(false)
@@ -324,15 +324,15 @@ private fun SwipeGestureItem(
 
 @Composable
 private fun ActionSelectMenu(
-  currentAction: SwipeAction = SwipeAction.None,
-  onActionSelect: (SwipeAction) -> Unit,
+  currentAction: SwipeActionType = SwipeActionType.None,
+  onActionSelect: (SwipeActionType) -> Unit,
   onDismissRequest: () -> Unit,
 ) {
   AlertDialog(
     text = {
       Column {
         RadioItem(
-          options = SwipeAction.values().toList(),
+          options = SwipeActionType.values().toList(),
           value = currentAction,
           itemContent = {
             Text(text = it.toUi().tittle)

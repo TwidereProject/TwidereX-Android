@@ -68,6 +68,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemsIndexed
+import com.twidere.twiderex.action.SwipeActionContainer
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.painterResource
@@ -79,6 +80,7 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.StatusNavigationData
+import com.twidere.twiderex.preferences.model.SwipeActionType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -150,6 +152,7 @@ fun LazyUiStatusList(
   key: ((index: Int, item: UiStatus) -> Any) = { _, item -> item.statusKey.hashCode() },
   contentType: (item: UiStatus) -> Any? = { it.itemType },
   header: LazyListScope.() -> Unit = {},
+  onSwipe: ((SwipeActionType, UiStatus) -> Unit)? = null,
 ) {
   val listState = rememberSaveable(saver = LazyUiStatusListState.Saver) {
     LazyUiStatusListState()
@@ -194,13 +197,25 @@ fun LazyUiStatusList(
             StatusDivider()
           } else {
             Column {
-              TimelineStatusComponent(
-                item,
-                threadStyle = StatusThreadStyle.WITH_AVATAR,
-                lineUp = index > 0 && items.peek(index - 1)?.statusId == item.inReplyToStatusId,
-                lineDown = index < items.itemCount - 1 && items.peek(index + 1)?.inReplyToStatusId == item.statusId,
-                statusNavigation = statusNavigation,
-              )
+              val timelineStatusComponent = @Composable {
+                TimelineStatusComponent(
+                  item,
+                  threadStyle = StatusThreadStyle.WITH_AVATAR,
+                  lineUp = index > 0 && items.peek(index - 1)?.statusId == item.inReplyToStatusId,
+                  lineDown = index < items.itemCount - 1 && items.peek(index + 1)?.inReplyToStatusId == item.statusId,
+                  statusNavigation = statusNavigation,
+                )
+              }
+              if (onSwipe != null) {
+                SwipeActionContainer(content = {
+                  timelineStatusComponent.invoke()
+                }) {
+                  onSwipe.invoke(it, item)
+                }
+              } else {
+                timelineStatusComponent.invoke()
+              }
+
               when {
                 loadingBetween.contains(item.statusKey) -> {
                   Divider()

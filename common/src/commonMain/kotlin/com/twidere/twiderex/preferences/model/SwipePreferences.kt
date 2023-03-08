@@ -39,16 +39,16 @@ data class SwipePreferences(
 
 sealed interface SwipeGesture {
   @Serializable
-  data class RightShort(val action: SwipeAction = SwipeAction.Reply) : SwipeGesture
+  data class RightShort(val action: SwipeActionType = SwipeActionType.Reply) : SwipeGesture
 
   @Serializable
-  data class RightLong(val action: SwipeAction = SwipeAction.Repost) : SwipeGesture
+  data class RightLong(val action: SwipeActionType = SwipeActionType.Repost) : SwipeGesture
 
   @Serializable
-  data class LeftShort(val action: SwipeAction = SwipeAction.Share) : SwipeGesture
+  data class LeftShort(val action: SwipeActionType = SwipeActionType.Share) : SwipeGesture
 
   @Serializable
-  data class LeftLong(val action: SwipeAction = SwipeAction.Like) : SwipeGesture
+  data class LeftLong(val action: SwipeActionType = SwipeActionType.Like) : SwipeGesture
 }
 
 @Composable
@@ -60,7 +60,7 @@ fun SwipeGesture.tittle() = when (this) {
 }
 
 @Serializable
-enum class SwipeAction {
+enum class SwipeActionType {
   None,
   Reply,
   Repost,
@@ -76,25 +76,25 @@ data class ActionUi(
 )
 
 @Composable
-fun SwipeAction.toUi() = when (this) {
-  SwipeAction.None -> ActionUi(tittle = stringResource(res = Strings.scene_settings_swipe_gestures_actions_none))
-  SwipeAction.Reply -> ActionUi(
+fun SwipeActionType.toUi() = when (this) {
+  SwipeActionType.None -> ActionUi(tittle = stringResource(res = Strings.scene_settings_swipe_gestures_actions_none))
+  SwipeActionType.Reply -> ActionUi(
     tittle = stringResource(res = Strings.scene_settings_swipe_gestures_actions_reply),
     icon = Files.ic_corner_up_left
   )
-  SwipeAction.Repost -> ActionUi(
+  SwipeActionType.Repost -> ActionUi(
     tittle = stringResource(res = Strings.scene_settings_swipe_gestures_actions_repost),
     icon = Files.ic_repeat
   )
-  SwipeAction.Like -> ActionUi(
+  SwipeActionType.Like -> ActionUi(
     tittle = stringResource(res = Strings.scene_settings_swipe_gestures_actions_like),
     icon = Files.ic_heart,
   )
-  SwipeAction.Share -> ActionUi(
+  SwipeActionType.Share -> ActionUi(
     tittle = stringResource(res = Strings.scene_settings_swipe_gestures_actions_share),
     icon = Files.ic_share,
   )
-  SwipeAction.Detail -> ActionUi(
+  SwipeActionType.Detail -> ActionUi(
     tittle = stringResource(res = Strings.scene_settings_swipe_gestures_actions_detail),
     icon = Files.ic_template,
   )

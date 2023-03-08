@@ -28,7 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.preferences.PreferencesHolder
-import com.twidere.twiderex.preferences.model.SwipeAction
+import com.twidere.twiderex.preferences.model.SwipeActionType
 import com.twidere.twiderex.preferences.model.SwipeGesture
 import com.twidere.twiderex.preferences.model.SwipePreferences
 import kotlinx.coroutines.flow.Flow
@@ -82,8 +82,8 @@ data class SwipeState(
 
 sealed interface SwipeEvent {
   data class SetUseSwipe(val value: Boolean) : SwipeEvent
-  data class SetLeftShortSwipeAction(val action: SwipeAction) : SwipeEvent
-  data class SetLeftLongSwipeAction(val action: SwipeAction) : SwipeEvent
-  data class SetRightShortSwipeAction(val action: SwipeAction) : SwipeEvent
-  data class SetRightLongSwipeAction(val action: SwipeAction) : SwipeEvent
+  data class SetLeftShortSwipeAction(val action: SwipeActionType) : SwipeEvent
+  data class SetLeftLongSwipeAction(val action: SwipeActionType) : SwipeEvent
+  data class SetRightShortSwipeAction(val action: SwipeActionType) : SwipeEvent
+  data class SetRightLongSwipeAction(val action: SwipeActionType) : SwipeEvent
 }

@@ -27,13 +27,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
+import com.twidere.twiderex.action.LocalStatusActions
+import com.twidere.twiderex.action.triggerSwipe
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.rememberPresenterState
+import com.twidere.twiderex.kmp.LocalRemoteNavigator
 import com.twidere.twiderex.navigation.StatusNavigationData
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
+import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
 import com.twidere.twiderex.viewmodel.timeline.TimeLineEvent
 import com.twidere.twiderex.viewmodel.timeline.TimelinePresenter
@@ -60,6 +64,10 @@ fun TimelineComponent(
   val autoRefresh = LocalAppearancePreferences.current.autoRefresh
   val autoRefreshInterval = LocalAppearancePreferences.current.autoRefreshInterval
   val resetToTop = LocalAppearancePreferences.current.resetToTop
+  val localStatus = LocalStatusActions.current
+  val account = LocalActiveAccount.current
+  val remoteNavigator = LocalRemoteNavigator.current
+
   LaunchedEffect(
     autoRefresh,
     autoRefreshInterval,
@@ -107,6 +115,16 @@ fun TimelineComponent(
         channel.trySend(TimeLineEvent.LoadBetween(current, next))
       },
       statusNavigation = statusNavigation,
+      onSwipe = { type, status ->
+        triggerSwipe(
+          statusNavigation = statusNavigation,
+          actionsViewModel = localStatus,
+          account = account,
+          remoteNavigator = remoteNavigator,
+          status = status,
+          type = type,
+        )
+      }
     )
   }
 }
