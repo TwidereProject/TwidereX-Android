@@ -70,12 +70,12 @@ data class AppearancePreferences(
 
   @Serializable
   enum class RefreshInterval(
-    val seconds: Int,
+    val duration: Long,
   ) {
-    HalfMinute(30),
-    OneMinute(60),
-    TwoMinute(120),
-    FiveMinute(500),
+    HalfMinute(30 * 1000),
+    OneMinute(60 * 1000),
+    TwoMinute(120 * 1000),
+    FiveMinute(500 * 1000),
   }
 }
 

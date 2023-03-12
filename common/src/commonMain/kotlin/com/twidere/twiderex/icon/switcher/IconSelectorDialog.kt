@@ -58,12 +58,14 @@ import com.twidere.twiderex.kmp.launchIcons
 @Composable
 fun IconSelectorDialog(
   show: Boolean,
+  modifier: Modifier = Modifier,
   onDismissRequest: () -> Unit,
   onIconSelect: (AppIcon) -> Unit,
   iconModifier: IconModifier = get(),
 ) {
   if (!show) return
   BottomSheet(
+    modifier = modifier,
     onDismissRequest = onDismissRequest,
     paddingValues = PaddingValues(IconSelectorDefault.outPadding),
     shape = RoundedCornerShape(IconSelectorDefault.dialogRadius),

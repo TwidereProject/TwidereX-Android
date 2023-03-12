@@ -22,6 +22,7 @@ package com.twidere.twiderex.action
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -46,7 +47,7 @@ private fun SmallIcon(
   val icon = type.toUi().icon
   if (icon != null) {
     Image(
-      modifier = modifier.padding(16.dp),
+      modifier = modifier.padding(16.dp).size(24.dp),
       painter = painterResource(icon),
       contentDescription = null
     )
@@ -89,7 +90,6 @@ fun triggerSwipe(
     }
   }
 }
-
 
 @Composable
 fun SwipeActionContainer(

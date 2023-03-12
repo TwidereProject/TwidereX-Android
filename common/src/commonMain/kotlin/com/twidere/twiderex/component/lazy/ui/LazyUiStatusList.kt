@@ -207,9 +207,7 @@ fun LazyUiStatusList(
                 )
               }
               if (onSwipe != null) {
-                SwipeActionContainer(content = {
-                  timelineStatusComponent.invoke()
-                }) {
+                SwipeActionContainer(content = timelineStatusComponent) {
                   onSwipe.invoke(it, item)
                 }
               } else {

@@ -41,6 +41,7 @@ import com.twidere.twiderex.icon.twidereicons.ChooseToUse
 import com.twidere.twiderex.kmp.AppIcon
 import com.twidere.twiderex.kmp.Platform
 import com.twidere.twiderex.kmp.currentPlatform
+import com.twidere.twiderex.kmp.systemVersion
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -48,7 +49,10 @@ fun IconSwitcher(
   appIcon: AppIcon,
   onclick: () -> Unit,
 ) {
-  if (currentPlatform != Platform.Android) {
+  if (
+    currentPlatform != Platform.Android ||
+    systemVersion < 25
+  ) {
     return
   }
   ListItem(

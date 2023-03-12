@@ -34,14 +34,13 @@ import com.twidere.twiderex.TwidereXActivity
 import com.twidere.twiderex.kmp.IAppShortcutCreator
 
 class AppShortcutCreator constructor(private val context: Context) : IAppShortcutCreator {
+  @RequiresApi(Build.VERSION_CODES.N_MR1)
   override fun configureAppShortcuts() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-      val shortcutList = mutableListOf<ShortcutInfo>()
-      shortcutList.add(buildCreateCompose(context))
-      val shortcutManager = context.getSystemService(ShortcutManager::class.java)
-      runCatching {
-        shortcutManager.dynamicShortcuts = shortcutList
-      }
+    val shortcutList = mutableListOf<ShortcutInfo>()
+    shortcutList.add(buildCreateCompose(context))
+    val shortcutManager = context.getSystemService(ShortcutManager::class.java)
+    runCatching {
+      shortcutManager.dynamicShortcuts = shortcutList
     }
   }
 

@@ -76,7 +76,7 @@ fun TimelineComponent(
       return@LaunchedEffect
     }
     while (isActive) {
-      delay(autoRefreshInterval.seconds.toLong() * 1000)
+      delay(autoRefreshInterval.duration)
       state.source.refreshOrRetry()
     }
   }

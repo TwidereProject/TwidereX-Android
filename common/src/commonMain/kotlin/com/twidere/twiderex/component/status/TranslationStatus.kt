@@ -83,18 +83,10 @@ fun TranslationWrappers(
           )
         )
       } else {
-        Text(
+        TranslationStateText(
           text = stringResource(
             res = Strings.common_controls_status_actions_translate
           ),
-          modifier = Modifier.padding(
-            top = TranslationDefaults.contentPadding,
-            bottom = TranslationDefaults.contentPadding,
-            end = TranslationDefaults.contentPadding,
-          ),
-          style = TextStyle(
-            color = MaterialTheme.colors.primary
-          )
         )
       }
     }
@@ -116,7 +108,9 @@ fun TranslationStatus(
     content = {
       when (it) {
         TranslationState.NoNeed -> {
-          Text(TranslationDefaults.NoNeedTip)
+          TranslationStateText(
+            text = TranslationDefaults.NoNeedTip
+          )
         }
         is TranslationState.Success -> {
           Column {
@@ -157,10 +151,29 @@ fun TranslationStatus(
           )
         }
         is TranslationState.Failed -> {
-          Text(TranslationDefaults.FailedTip)
+          TranslationStateText(
+            text = TranslationDefaults.FailedTip
+          )
         }
       }
     }
+  )
+}
+
+@Composable
+private fun TranslationStateText(
+  text: String,
+) {
+  Text(
+    text = text,
+    modifier = Modifier.padding(
+      top = TranslationDefaults.contentPadding,
+      bottom = TranslationDefaults.contentPadding,
+      end = TranslationDefaults.contentPadding,
+    ),
+    style = TextStyle(
+      color = MaterialTheme.colors.primary
+    )
   )
 }
 

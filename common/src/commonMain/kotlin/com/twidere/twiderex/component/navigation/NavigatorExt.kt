@@ -120,11 +120,6 @@ fun Navigator.user(
   navigate(Root.User(user.userKey), navOptions)
 }
 
-private fun isTwitterDeeplink(url: String): Boolean {
-  twitterHosts.forEach {
-    if (url.startsWith(it) && url.length > it.length) {
-      return true
-    }
-  }
-  return false
+private fun isTwitterDeeplink(url: String) = twitterHosts.any {
+  url.startsWith(it) && url.length > it.length
 }
