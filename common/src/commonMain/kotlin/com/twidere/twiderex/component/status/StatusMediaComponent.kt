@@ -42,7 +42,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -62,7 +61,6 @@ import com.twidere.twiderex.component.image.ImageBlur
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.extensions.playEnable
 import com.twidere.twiderex.model.enums.MediaType
-import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.StatusNavigationData
@@ -86,17 +84,11 @@ fun StatusMediaComponent(
       statusNavigation.toMediaWithIndex(status.statusKey, index)
     }
   }
+
   val isAlwaysShowSensitiveMedia = LocalAccountPreferences.current.isAlwaysShowSensitiveMedia
-  var sensitive by key(isAlwaysShowSensitiveMedia) {
-    // TODO add key to rememberSaveable not use for display scene
-    rememberSaveable(status.statusKey.toString()) {
-      val initialSensitive = when (status.platformType) {
-        PlatformType.Twitter -> status.sensitive && !isAlwaysShowSensitiveMedia
-        PlatformType.Mastodon -> !isAlwaysShowSensitiveMedia
-        else -> status.sensitive
-      }
-      mutableStateOf(initialSensitive)
-    }
+
+  var showSensitiveMedia by rememberSaveable(isAlwaysShowSensitiveMedia) {
+    mutableStateOf(status.sensitive && !isAlwaysShowSensitiveMedia)
   }
 
   val aspectRatio = remember(media.size) {
@@ -144,7 +136,7 @@ fun StatusMediaComponent(
               modifier = Modifier
                 .weight(1f)
                 .fillMaxSize(),
-              sensitive = sensitive,
+              sensitive = showSensitiveMedia,
               onClick = onItemClick,
             )
           }
@@ -161,7 +153,7 @@ fun StatusMediaComponent(
                 modifier = Modifier
                   .weight(1f)
                   .fillMaxSize(),
-                sensitive = sensitive,
+                sensitive = showSensitiveMedia,
                 onClick = onItemClick,
               )
               if (it != media.last()) {
@@ -182,25 +174,24 @@ fun StatusMediaComponent(
             StatusMediaPreviewItem(
               media = it,
               onClick = onItemClick,
-              sensitive = sensitive
+              sensitive = showSensitiveMedia
             )
           }
         }
       }
     }
 
-    val showSensitiveButton = status.sensitive || (status.platformType == PlatformType.Mastodon && status.mastodonExtra != null)
-    if (showSensitiveButton) {
+    if (status.sensitive) {
       TwidereTheme(darkTheme = true) {
         AnimatedVisibility(
           modifier = Modifier
             .matchParentSize(),
-          visible = sensitive,
+          visible = showSensitiveMedia,
         ) {
           Box(
             modifier = Modifier
               .clickable {
-                sensitive = false
+                showSensitiveMedia = false
               },
             contentAlignment = Alignment.Center,
           ) {
@@ -224,7 +215,7 @@ fun StatusMediaComponent(
           }
         }
         AnimatedVisibility(
-          visible = !sensitive,
+          visible = !showSensitiveMedia,
           enter = fadeIn(),
           exit = fadeOut()
         ) {
@@ -240,7 +231,7 @@ fun StatusMediaComponent(
                   shape = MaterialTheme.shapes.small,
                 )
                 .align(Alignment.TopStart)
-                .clickable { sensitive = true }
+                .clickable { showSensitiveMedia = true }
                 .padding(StatusMediaDefaults.Icon.ContentPadding),
             ) {
               Icon(
