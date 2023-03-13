@@ -46,6 +46,7 @@ import com.twidere.twiderex.kmp.systemVersion
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun IconSwitcher(
+  modifier: Modifier = Modifier,
   appIcon: AppIcon,
   onclick: () -> Unit,
 ) {
@@ -56,7 +57,7 @@ fun IconSwitcher(
     return
   }
   ListItem(
-    modifier = Modifier.clickable {
+    modifier = modifier.clickable {
       onclick.invoke()
     },
     icon = {
