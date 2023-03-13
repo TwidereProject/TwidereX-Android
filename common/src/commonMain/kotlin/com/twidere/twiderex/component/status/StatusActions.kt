@@ -62,6 +62,7 @@ import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.dataprovider.mapper.Strings
 import com.twidere.twiderex.kmp.LocalRemoteNavigator
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
@@ -79,7 +80,7 @@ fun ReplyButton(
   compose: (ComposeType, MicroBlogKey) -> Unit,
 ) {
   val icon = painterResource(res = com.twidere.twiderex.MR.files.ic_corner_up_left)
-  val contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_actions_reply)
+  val contentDescription = stringResource(res = Strings.accessibility_common_status_actions_reply)
 
   if (withNumber) {
     val data = remember(status) { status.retweet ?: status }
@@ -127,7 +128,7 @@ fun LikeButton(
       contentColor
     }
   }
-  val contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_actions_like)
+  val contentDescription = stringResource(res = Strings.accessibility_common_status_actions_like)
   val icon = painterResource(res = com.twidere.twiderex.MR.files.ic_heart)
   val data = remember(status) { status.retweet ?: status }
   if (withNumber) {
@@ -183,7 +184,7 @@ fun RetweetButton(
   }
   val icon = painterResource(res = com.twidere.twiderex.MR.files.ic_repeat)
   val contentDescription =
-    stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_actions_retweet)
+    stringResource(res = Strings.accessibility_common_status_actions_retweet)
   var expanded by remember { mutableStateOf(false) }
   val retweetAction = {
     if (status.platformType == PlatformType.Twitter) {
@@ -209,7 +210,7 @@ fun RetweetButton(
           expanded = false
         }
       ) {
-        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_status_actions_retweet))
+        Text(text = stringResource(res = Strings.common_controls_status_actions_retweet))
       }
       DropdownMenuItem(
         onClick = {
@@ -217,7 +218,7 @@ fun RetweetButton(
         }
       ) {
         Text(
-          text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_status_actions_quote),
+          text = stringResource(res = Strings.common_controls_status_actions_quote),
         )
       }
     }
@@ -265,10 +266,12 @@ fun ShareButton(
   val accountKey = account?.accountKey
   val remoteNavigator = LocalRemoteNavigator.current
   val icon = Icons.Default.MoreHoriz
-  val textStyle = LocalTextStyle.current.copy(color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current))
+  val textStyle = LocalTextStyle.current.copy(
+    color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+  )
   val linkStyle = textStyle.copy(MaterialTheme.colors.primary)
   val clipboardManager = LocalClipboardManager.current
-  val contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_more)
+  val contentDescription = stringResource(res = Strings.accessibility_common_more)
   Box(
     modifier = modifier,
   ) {
@@ -332,7 +335,7 @@ fun ShareButton(
         }
       ) {
         Text(
-          text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_status_actions_copy_text),
+          text = stringResource(res = Strings.common_controls_status_actions_copy_text),
         )
       }
       DropdownMenuItem(
@@ -346,7 +349,7 @@ fun ShareButton(
         }
       ) {
         Text(
-          text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_status_actions_copy_link),
+          text = stringResource(res = Strings.common_controls_status_actions_copy_link),
         )
       }
       DropdownMenuItem(
@@ -358,7 +361,7 @@ fun ShareButton(
         }
       ) {
         Text(
-          text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_status_actions_share_link),
+          text = stringResource(res = Strings.common_controls_status_actions_share_link),
         )
       }
       DropdownMenuItem(
@@ -381,7 +384,7 @@ fun ShareButton(
         }
       ) {
         Text(
-          text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_status_actions_share_content),
+          text = stringResource(res = Strings.common_controls_status_actions_share_content),
         )
       }
       if (data.user.userKey == accountKey) {
@@ -392,7 +395,19 @@ fun ShareButton(
           }
         ) {
           Text(
-            text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_remove),
+            text = stringResource(res = Strings.common_controls_actions_remove),
+            color = Color.Red,
+          )
+        }
+      }
+      if (accountKey != null && data.user.userKey != accountKey) {
+        DropdownMenuItem(
+          onClick = {
+            actionsViewModel.report(data, account)
+          }
+        ) {
+          Text(
+            text = stringResource(res = Strings.common_controls_friendship_actions_report),
             color = Color.Red,
           )
         }

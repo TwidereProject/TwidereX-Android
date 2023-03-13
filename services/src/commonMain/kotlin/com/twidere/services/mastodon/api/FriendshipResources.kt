@@ -21,7 +21,9 @@
 package com.twidere.services.mastodon.api
 
 import com.twidere.services.mastodon.model.Account
+import com.twidere.services.mastodon.model.PostReport
 import com.twidere.services.mastodon.model.RelationshipResponse
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -50,4 +52,7 @@ interface FriendshipResources {
   suspend fun unblock(
     @Path(value = "id") id: String,
   ): RelationshipResponse
+
+  @POST("/api/v1/reports")
+  suspend fun report(@Body data: PostReport)
 }

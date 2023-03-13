@@ -32,6 +32,7 @@ import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.Poll
 import com.twidere.services.mastodon.model.PostAccounts
 import com.twidere.services.mastodon.model.PostList
+import com.twidere.services.mastodon.model.PostReport
 import com.twidere.services.mastodon.model.PostStatus
 import com.twidere.services.mastodon.model.PostVote
 import com.twidere.services.mastodon.model.RelationshipResponse
@@ -188,6 +189,12 @@ class MastodonService(
 
   override suspend fun unblock(id: String) = resources.unblock(id = id)
     .toIRelationShip()
+
+  suspend fun report(
+    data: PostReport
+  ) = resources.report(
+    data = data
+  )
 
   override suspend fun follow(user_id: String) {
     resources.follow(user_id)

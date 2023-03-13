@@ -541,6 +541,14 @@ class TwitterService(
       showRelationship(target_id = id)
     }
 
+  suspend fun report(
+    screenName: String,
+    userId: String,
+  ) = resources.reportSpam(
+    screenName = screenName,
+    userId = userId,
+  )
+
   suspend fun verifyCredentials(): User? {
     return resources.verifyCredentials()
   }

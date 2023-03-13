@@ -31,6 +31,7 @@ interface IStatusActions {
   fun retweet(status: UiStatus, account: AccountDetails) {}
   fun delete(status: UiStatus, account: AccountDetails) {}
   fun vote(status: UiStatus, account: AccountDetails, votes: List<Int>) {}
+  fun report(status: UiStatus, account: AccountDetails) {}
 }
 
 expect class StatusActions : IStatusActions {
@@ -38,6 +39,7 @@ expect class StatusActions : IStatusActions {
   override fun like(status: UiStatus, account: AccountDetails)
   override fun retweet(status: UiStatus, account: AccountDetails)
   override fun vote(status: UiStatus, account: AccountDetails, votes: List<Int>)
+  override fun report(status: UiStatus, account: AccountDetails)
 }
 
 object FakeStatusActions : IStatusActions

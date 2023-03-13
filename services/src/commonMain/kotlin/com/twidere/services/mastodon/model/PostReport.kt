@@ -18,28 +18,20 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model.ui
+package com.twidere.services.mastodon.model
 
-import com.twidere.twiderex.extensions.humanizedTimestamp
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-data class UiPoll(
-  val id: String,
-  val options: List<Option>,
-  val expiresAt: Long?, // some instance of mastodon won't expire
-  val expired: Boolean = false,
-  val multiple: Boolean = false,
-  val voted: Boolean = false,
-  val votesCount: Long? = null,
-  val votersCount: Long? = null,
-  val ownVotes: List<Int>? = null,
-) {
-  val expiresAtString = expiresAt?.humanizedTimestamp().orEmpty()
-  val canVote = !voted &&
-    !expired &&
-    expiresAt?.let { it > System.currentTimeMillis() } ?: true // some instance allows expires time == null
-}
+@Serializable
+data class PostReport(
 
-data class Option(
-  val text: String,
-  val count: Long,
+  @SerialName("account_id")
+  val accountId: String,
+
+  @SerialName("status_ids")
+  val statusIds: List<String>? = null,
+
+  val comment: String? = null,
+
 )
