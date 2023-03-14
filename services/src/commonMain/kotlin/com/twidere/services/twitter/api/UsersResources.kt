@@ -57,7 +57,7 @@ interface UsersResources {
 
   @POST("/1.1/users/report_spam.json")
   suspend fun reportSpam(
-    @Query("screen_name") screenName: String,
+    @Query("screen_name") screenName: String?,
     @Query("user_id") userId: String,
     @Query("perform_block") performBlock: Boolean = false,
   )

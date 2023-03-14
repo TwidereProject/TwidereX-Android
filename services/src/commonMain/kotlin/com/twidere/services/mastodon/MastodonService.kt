@@ -190,11 +190,14 @@ class MastodonService(
   override suspend fun unblock(id: String) = resources.unblock(id = id)
     .toIRelationShip()
 
-  suspend fun report(
-    data: PostReport
-  ) = resources.report(
-    data = data
-  )
+  override suspend fun report(id: String, scenes: List<String>?, reason: String?) =
+    resources.report(
+      PostReport(
+        accountId = id,
+        statusIds = scenes,
+        comment = reason
+      )
+    )
 
   override suspend fun follow(user_id: String) {
     resources.follow(user_id)

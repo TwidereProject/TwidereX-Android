@@ -36,6 +36,7 @@ import com.twidere.twiderex.extensions.rememberNestedPresenter
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.notification.StringNotificationEvent
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.scenes.CurrentAccountPresenter
 import com.twidere.twiderex.scenes.CurrentAccountState
@@ -172,6 +173,20 @@ fun UserPresenter(
             UserTimelineEvent.ExcludeReplies(it.exclude)
           )
         }
+        is UserEvent.Report -> {
+          consumeUserEvent { service ->
+            service.report(
+              id = userKey.id,
+              scenes = it.scenes,
+              reason = it.reason,
+            )
+            inAppNotification.show(
+              StringNotificationEvent(
+                it.successMessage
+              )
+            )
+          }
+        }
       }
     }
   }
@@ -188,7 +203,7 @@ fun UserPresenter(
   )
 }
 
-interface UserEvent {
+sealed interface UserEvent {
   object Follow : UserEvent
   object UnFollow : UserEvent
   object Block : UserEvent
@@ -196,6 +211,11 @@ interface UserEvent {
   object Refresh : UserEvent
   data class ExcludeReplies(
     val exclude: Boolean
+  ) : UserEvent
+  data class Report(
+    val scenes: List<String>? = null,
+    val reason: String? = null,
+    val successMessage: String,
   ) : UserEvent
 }
 

@@ -541,6 +541,12 @@ class TwitterService(
       showRelationship(target_id = id)
     }
 
+  override suspend fun report(id: String, scenes: List<String>?, reason: String?) =
+    resources.reportSpam(
+      screenName = scenes?.firstOrNull(),
+      userId = id,
+    )
+
   suspend fun report(
     screenName: String,
     userId: String,

@@ -31,4 +31,5 @@ interface RelationshipService {
   suspend fun following(user_id: String, nextPage: String? = null): List<IUser>
   suspend fun block(id: String): IRelationship
   suspend fun unblock(id: String): IRelationship
+  suspend fun report(id: String, scenes: List<String>? = null, reason: String? = null)
 }

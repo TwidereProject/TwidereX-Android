@@ -400,18 +400,6 @@ fun ShareButton(
           )
         }
       }
-      if (accountKey != null && data.user.userKey != accountKey) {
-        DropdownMenuItem(
-          onClick = {
-            actionsViewModel.report(data, account)
-          }
-        ) {
-          Text(
-            text = stringResource(res = Strings.common_controls_friendship_actions_report),
-            color = Color.Red,
-          )
-        }
-      }
     }
   }
 }
