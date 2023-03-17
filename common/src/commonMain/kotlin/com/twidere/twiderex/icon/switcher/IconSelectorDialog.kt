@@ -27,11 +27,13 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -48,7 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.AlertDialog
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.dataprovider.mapper.Strings
 import com.twidere.twiderex.di.ext.get
@@ -64,43 +66,44 @@ fun IconSelectorDialog(
   iconModifier: IconModifier = get(),
 ) {
   if (!show) return
-  BottomSheet(
+  AlertDialog(
     modifier = modifier,
     onDismissRequest = onDismissRequest,
-    paddingValues = PaddingValues(IconSelectorDefault.outPadding),
-    shape = RoundedCornerShape(IconSelectorDefault.dialogRadius),
-    content = {
-      Column {
-        AppBar(
-          title = {
-            Text(stringResource(res = Strings.scene_settings_appearance_app_icon))
-          },
-          navigationIcon = {
-            Icon(
-              imageVector = Icons.Default.Close,
-              contentDescription = "close",
-              modifier = Modifier.clickable {
-                onDismissRequest()
-              }
-            )
+    confirmButton = {},
+    title = {
+      Row {
+        Icon(
+          imageVector = Icons.Default.Close,
+          contentDescription = "close",
+          modifier = Modifier.clickable {
+            onDismissRequest()
           }
         )
-        LazyRow(
-          contentPadding = PaddingValues(IconSelectorDefault.rowPadding),
-          horizontalArrangement = Arrangement.spacedBy(IconSelectorDefault.itemGap),
-        ) {
-          itemsIndexed(launchIcons) { index, icon ->
-            Image(
-              imageVector = icon,
-              contentDescription = "app icon",
-              modifier = Modifier.size(IconSelectorDefault.iconSize).clickable {
-                val appIcon = AppIcon.fromIndex(index)
-                iconModifier.changeIcon(appIcon)
-                onIconSelect.invoke(appIcon)
-                onDismissRequest.invoke()
-              }.clip(RoundedCornerShape(IconSelectorDefault.iconRadius))
-            )
-          }
+        Spacer(modifier = Modifier.width(32.dp))
+        Text(
+          modifier = Modifier.align(Alignment.CenterVertically),
+          text = stringResource(
+            res = Strings.scene_settings_appearance_app_icon
+          )
+        )
+      }
+    },
+    text = {
+      LazyRow(
+        contentPadding = PaddingValues(IconSelectorDefault.rowPadding),
+        horizontalArrangement = Arrangement.spacedBy(IconSelectorDefault.itemGap),
+      ) {
+        itemsIndexed(launchIcons) { index, icon ->
+          Image(
+            imageVector = icon,
+            contentDescription = "app icon",
+            modifier = Modifier.size(IconSelectorDefault.iconSize).clickable {
+              val appIcon = AppIcon.fromIndex(index)
+              iconModifier.changeIcon(appIcon)
+              onIconSelect.invoke(appIcon)
+              onDismissRequest.invoke()
+            }.clip(RoundedCornerShape(IconSelectorDefault.iconRadius))
+          )
         }
       }
     }
@@ -142,8 +145,6 @@ fun BottomSheet(
 }
 
 private object IconSelectorDefault {
-  val outPadding = 20.dp
-  val dialogRadius = 16.dp
   val rowPadding = 16.dp
   val itemGap = 12.dp
   val iconSize = 64.dp
