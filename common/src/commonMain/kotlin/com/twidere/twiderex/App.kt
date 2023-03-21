@@ -25,6 +25,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
+import com.twidere.twiderex.component.foundation.LocalInAppNotification
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.extensions.observeAsState
@@ -42,6 +43,7 @@ fun App(navController: Navigator = Navigator()) {
     com.twidere.twiderex.di.ext.getViewModel<com.twidere.twiderex.viewmodel.ActiveAccountViewModel>()
   val account by accountViewModel.account.observeAsState(null, accountViewModel.viewModelScope.coroutineContext)
   CompositionLocalProvider(
+    LocalInAppNotification provides get(),
     LocalResLoader provides get(),
     LocalRemoteNavigator provides get(),
     LocalActiveAccount provides account,
