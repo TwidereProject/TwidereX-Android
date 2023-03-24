@@ -31,6 +31,7 @@ import com.twidere.twiderex.preferences.serializer.AppearancePreferencesSerializ
 import com.twidere.twiderex.preferences.serializer.DisplayPreferencesSerializer
 import com.twidere.twiderex.preferences.serializer.MiscPreferencesSerializer
 import com.twidere.twiderex.preferences.serializer.NotificationPreferencesSerializer
+import com.twidere.twiderex.preferences.serializer.SwipePreferencesSerializer
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import java.io.File
@@ -52,6 +53,10 @@ internal val preferencesModule = module {
         "notification.pb",
         NotificationPreferencesSerializer
       ),
+      swipePreferences = createDataStore(
+        "swipe.pb",
+        SwipePreferencesSerializer
+      )
     )
   }
   single {

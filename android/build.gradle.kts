@@ -65,6 +65,10 @@ android {
             if (hasSigningProps) {
                 signingConfig = signingConfigs.getByName("twidere")
             }
+            manifestPlaceholders.apply {
+                put("appIcon", "@mipmap/ic_launcher")
+                put("appIconRound", "@mipmap/ic_launcher_round")
+            }
         }
         release {
             if (hasSigningProps) {
@@ -76,6 +80,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            manifestPlaceholders.apply {
+                put("appIcon", "@mipmap/ic_launcher")
+                put("appIconRound", "@mipmap/ic_launcher_round")
+            }
         }
     }
     sourceSets.forEach {

@@ -22,6 +22,7 @@ package com.twidere.twiderex
 
 import android.app.Application
 import com.twidere.twiderex.di.setupModules
+import com.twidere.twiderex.kmp.IAppShortcutCreator
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.workmanager.koin.workManagerFactory
@@ -29,6 +30,8 @@ import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 
 abstract class TwidereApplication : Application() {
+
+  var appShortcutCreator: IAppShortcutCreator? = null
   override fun onCreate() {
     super.onCreate()
     startKoin {

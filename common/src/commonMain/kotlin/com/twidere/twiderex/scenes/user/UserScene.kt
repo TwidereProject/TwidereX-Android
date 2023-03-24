@@ -20,11 +20,16 @@
  */
 package com.twidere.twiderex.scenes.user
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
@@ -47,6 +52,8 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.dataprovider.mapper.Files
+import com.twidere.twiderex.dataprovider.mapper.Strings
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.rememberPresenterState
 import com.twidere.twiderex.extensions.withElevation
@@ -106,6 +113,7 @@ fun UserScene(
   val conversationViewModel: DMNewConversationViewModel = getViewModel()
   var expanded by remember { mutableStateOf(false) }
   var showBlockAlert by remember { mutableStateOf(false) }
+  var showReportAlert by remember { mutableStateOf(false) }
   val userNavigationData = rememberUserNavigationData(navigator)
   TwidereScene {
     InAppNotificationScaffold(
@@ -121,31 +129,31 @@ fun UserScene(
             )
           },
           actions = {
-            if (account.type == PlatformType.Twitter && state.user?.platformType == PlatformType.Twitter) {
-              state.user.let {
-                if (userKey != account.accountKey) {
-                  IconButton(
-                    onClick = {
-                      conversationViewModel.createNewConversation(
-                        it,
-                        onResult = { conversationKey ->
-                          conversationKey?.let {
-                            navigator.navigate(Root.Messages.Conversation(it))
-                          }
-                        }
-                      )
+            if (
+              account.type == PlatformType.Twitter &&
+              state.user?.platformType == PlatformType.Twitter &&
+              userKey != account.accountKey
+            ) {
+              IconButton(
+                onClick = {
+                  conversationViewModel.createNewConversation(
+                    state.user,
+                    onResult = { conversationKey ->
+                      conversationKey?.let {
+                        navigator.navigate(Root.Messages.Conversation(it))
+                      }
                     }
-                  ) {
-                    Icon(
-                      painter = painterResource(res = com.twidere.twiderex.MR.files.ic_mail),
-                      contentDescription = stringResource(
-                        res = com.twidere.twiderex.MR.strings.scene_messages_title
-                      ),
-                      tint = MaterialTheme.colors.onSurface,
-                      modifier = Modifier.size(24.dp),
-                    )
-                  }
+                  )
                 }
+              ) {
+                Icon(
+                  painter = painterResource(res = Files.ic_mail),
+                  contentDescription = stringResource(
+                    res = Strings.scene_messages_title
+                  ),
+                  tint = MaterialTheme.colors.onSurface,
+                  modifier = Modifier.size(24.dp),
+                )
               }
             }
             Box {
@@ -169,26 +177,40 @@ fun UserScene(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
               ) {
-                state.relationship.takeIf { !state.loadingRelationship }
-                  ?.blocking?.let { blocking ->
-                    DropdownMenuItem(
-                      onClick = {
-                        if (blocking) {
-                          channel.trySend(UserEvent.UnBlock)
-                        } else {
-                          showBlockAlert = true
-                        }
-                        expanded = false
+                state.relationship.takeIf {
+                  !state.loadingRelationship
+                }?.blocking?.let { blocking ->
+                  DropdownMenuItem(
+                    onClick = {
+                      if (blocking) {
+                        channel.trySend(UserEvent.UnBlock)
+                      } else {
+                        showBlockAlert = true
                       }
-                    ) {
-                      Text(
-                        text = stringResource(
-                          res = if (blocking) MR.strings.common_controls_friendship_actions_unblock
-                          else MR.strings.common_controls_friendship_actions_block
-                        )
-                      )
+                      expanded = false
                     }
+                  ) {
+                    Text(
+                      text = stringResource(
+                        res = if (blocking) {
+                          Strings.common_controls_friendship_actions_unblock
+                        } else {
+                          Strings.common_controls_friendship_actions_block
+                        }
+                      )
+                    )
                   }
+                }
+                DropdownMenuItem(onClick = {
+                  showReportAlert = true
+                  expanded = false
+                }) {
+                  Text(
+                    text = stringResource(
+                      res = Strings.common_controls_friendship_actions_report
+                    )
+                  )
+                }
               }
             }
           },
@@ -213,11 +235,41 @@ fun UserScene(
         )
         if (showBlockAlert) {
           state.user?.let {
-            BlockAlert(
-              screenName = it.getDisplayScreenName(it.userKey.host),
+            UserActionAlert(
+              screenName = stringResource(
+                res = Strings.common_alerts_block_user_confirm_title,
+                it.getDisplayScreenName(it.userKey.host)
+              ),
               onDismissRequest = { showBlockAlert = false },
               onConfirm = {
                 channel.trySend(UserEvent.Block)
+              }
+            )
+          }
+        }
+        if (showReportAlert) {
+          state.user?.let {
+            val screen = it.getDisplayScreenName(it.userKey.host)
+            val reportSuccessMessage = stringResource(
+              res = Strings.common_alerts_report_user_success_title,
+              screen,
+            )
+            val isMastodon = account.type == PlatformType.Mastodon
+            UserActionAlert(
+              screenName = stringResource(
+                res = Strings.common_controls_friendship_do_you_want_to_report_user,
+                screen
+              ),
+              showEdit = isMastodon,
+              onDismissRequest = { showReportAlert = false },
+              onConfirm = { reason ->
+                channel.trySend(
+                  UserEvent.Report(
+                    scenes = if (isMastodon) null else listOf(screen),
+                    reason = reason,
+                    successMessage = reportSuccessMessage,
+                  )
+                )
               }
             )
           }
@@ -228,20 +280,45 @@ fun UserScene(
 }
 
 @Composable
-fun BlockAlert(
+private fun UserActionAlert(
   screenName: String,
+  showEdit: Boolean = false,
   onDismissRequest: () -> Unit,
-  onConfirm: () -> Unit
+  onConfirm: (String?) -> Unit,
 ) {
+  var reportMessage: String? by remember {
+    mutableStateOf(null)
+  }
   AlertDialog(
     onDismissRequest = {
       onDismissRequest.invoke()
     },
     title = {
-      Text(
-        text = stringResource(res = MR.strings.common_alerts_block_user_confirm_title, screenName),
-        style = MaterialTheme.typography.subtitle1
-      )
+      Column {
+        Text(
+          text = screenName,
+          style = MaterialTheme.typography.subtitle1
+        )
+        if (showEdit) {
+          Box(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(vertical = 32.dp)
+              .background(MaterialTheme.colors.surface)
+          ) {
+            OutlinedTextField(
+              value = reportMessage ?: "",
+              onValueChange = {
+                reportMessage = it
+              },
+              label = {
+                Text(text = "Please input the report reason (Optional)")
+              },
+              modifier = Modifier.fillMaxWidth(),
+            )
+          }
+        }
+      }
     },
     dismissButton = {
       TextButton(
@@ -249,17 +326,17 @@ fun BlockAlert(
           onDismissRequest.invoke()
         }
       ) {
-        Text(text = stringResource(res = MR.strings.common_controls_actions_cancel))
+        Text(text = stringResource(res = Strings.common_controls_actions_cancel))
       }
     },
     confirmButton = {
       TextButton(
         onClick = {
-          onConfirm()
+          onConfirm(reportMessage)
           onDismissRequest.invoke()
         }
       ) {
-        Text(text = stringResource(res = MR.strings.common_controls_actions_yes))
+        Text(text = stringResource(res = Strings.common_controls_actions_yes))
       }
     },
   )

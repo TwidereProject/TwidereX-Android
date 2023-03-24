@@ -23,6 +23,10 @@ package com.twidere.twiderex
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.key
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -208,6 +212,7 @@ private fun startDesktopApp() {
         state = state,
         title = "Twidere X",
         icon = painterResource(MR.files.ic_launcher.filePath),
+        onKeyEvent = ::handleKeyEvent,
       ) {
         FilePicker.init(window)
         CompositionLocalProvider(
@@ -219,6 +224,21 @@ private fun startDesktopApp() {
         }
       }
     }
+  }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+private fun handleKeyEvent(
+  event: KeyEvent,
+): Boolean {
+  return if (
+    event.key == Key.Escape
+  ) {
+    navController.popBackStack()
+    true
+  } else {
+    // config more event later
+    false
   }
 }
 

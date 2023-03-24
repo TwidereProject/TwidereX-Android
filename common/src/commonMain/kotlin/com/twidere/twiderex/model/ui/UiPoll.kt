@@ -26,9 +26,9 @@ data class UiPoll(
   val id: String,
   val options: List<Option>,
   val expiresAt: Long?, // some instance of mastodon won't expire
-  val expired: Boolean,
-  val multiple: Boolean,
-  val voted: Boolean,
+  val expired: Boolean = false,
+  val multiple: Boolean = false,
+  val voted: Boolean = false,
   val votesCount: Long? = null,
   val votersCount: Long? = null,
   val ownVotes: List<Int>? = null,

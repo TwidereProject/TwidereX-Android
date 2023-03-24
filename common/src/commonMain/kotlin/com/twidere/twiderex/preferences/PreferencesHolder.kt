@@ -26,6 +26,7 @@ import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.preferences.model.MiscPreferences
 import com.twidere.twiderex.preferences.model.NotificationPreferences
+import com.twidere.twiderex.preferences.model.SwipePreferences
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -37,6 +38,7 @@ data class PreferencesHolder(
   val displayPreferences: DataStore<DisplayPreferences>,
   val miscPreferences: DataStore<MiscPreferences>,
   val notificationPreferences: DataStore<NotificationPreferences>,
+  val swipePreferences: DataStore<SwipePreferences>,
 ) {
   suspend fun warmup() = coroutineScope {
     awaitAll(
@@ -45,6 +47,7 @@ data class PreferencesHolder(
       async { displayPreferences.data.firstOrNull() },
       async { miscPreferences.data.firstOrNull() },
       async { notificationPreferences.data.firstOrNull() },
+      async { swipePreferences.data.firstOrNull() },
     )
   }
 }

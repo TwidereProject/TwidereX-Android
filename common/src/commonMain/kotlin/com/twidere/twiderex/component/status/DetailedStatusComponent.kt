@@ -60,6 +60,7 @@ fun DetailedStatusComponent(
   showInfo: Boolean = true,
   showActions: Boolean = true,
   lineUp: Boolean = false,
+  translationAble: Boolean = false,
 ) {
   Column(
     modifier = Modifier
@@ -80,6 +81,7 @@ fun DetailedStatusComponent(
         data = data,
         type = StatusContentType.Extend,
         statusNavigation = statusNavigationData,
+        translationAble = translationAble,
       )
       if (showInfo) {
         Spacer(modifier = Modifier.height(DetailedStatusDefaults.InfoContentSpacing))

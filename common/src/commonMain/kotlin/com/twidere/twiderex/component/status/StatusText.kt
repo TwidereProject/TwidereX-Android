@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.utils.isDefaultLanguage
 
 @Composable
 fun ColumnScope.StatusText(
@@ -56,6 +57,7 @@ fun ColumnScope.StatusText(
   maxLines: Int = Int.MAX_VALUE,
   showMastodonPoll: Boolean = true,
   isSelectionAble: Boolean = true,
+  translationAble: Boolean = false,
   openLink: (String) -> Unit,
 ) {
   val expandable = remember(status.platformType, status.spoilerText) {
@@ -64,6 +66,10 @@ fun ColumnScope.StatusText(
   }
 
   var expanded by rememberSaveable { mutableStateOf(!expandable) }
+
+  var visibleText by rememberSaveable {
+    mutableStateOf("")
+  }
 
   if (expandable && status.spoilerText != null) {
     Text(text = status.spoilerText)
@@ -113,6 +119,19 @@ fun ColumnScope.StatusText(
           } else {
             LayoutDirection.Rtl
           },
+          onTextParsed = { parsedText ->
+            visibleText = parsedText
+          }
+        )
+      }
+      if (
+        translationAble &&
+        visibleText.isNotBlank() &&
+        status.language?.isDefaultLanguage() != true
+      ) {
+        TranslationWrappers(
+          status = status,
+          visibleText = visibleText,
         )
       }
       if (showMastodonPoll &&

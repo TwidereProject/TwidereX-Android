@@ -21,6 +21,8 @@
 package com.twidere.twiderex.component.lazy
 
 import androidx.compose.foundation.lazy.LazyListState
+import com.twidere.twiderex.preferences.model.AppearancePreferences
+import kotlinx.coroutines.delay
 
 class LazyListController {
   var listState: LazyListState? = null
@@ -29,7 +31,26 @@ class LazyListController {
     const val SMOOTH_THRESHOLD = 5
   }
 
-  suspend fun scrollToTop() {
+  private var singleTaped = false
+
+  suspend fun scrollToTop(tabToTop: AppearancePreferences.TabToTop) {
+    when (tabToTop) {
+      AppearancePreferences.TabToTop.SingleTap -> {
+        scrollToTop()
+      }
+      AppearancePreferences.TabToTop.DoubleTap -> {
+        if (singleTaped) {
+          scrollToTop()
+        } else {
+          singleTaped = true
+          delay(200)
+          singleTaped = false
+        }
+      }
+    }
+  }
+
+  private suspend fun scrollToTop() {
     listState?.run {
       if (firstVisibleItemIndex > SMOOTH_THRESHOLD) {
         scrollToItem(SMOOTH_THRESHOLD)

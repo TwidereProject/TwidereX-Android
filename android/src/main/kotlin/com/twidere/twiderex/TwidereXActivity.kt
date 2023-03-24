@@ -100,7 +100,7 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
   private val navController by lazy {
     Navigator()
   }
-  val permissions = listOfNotNull(
+  private val permissions = listOfNotNull(
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS else null,
   )
 

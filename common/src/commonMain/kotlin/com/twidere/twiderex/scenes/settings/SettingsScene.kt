@@ -31,6 +31,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.AppBar
@@ -38,7 +42,13 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.dataprovider.mapper.Strings
+import com.twidere.twiderex.extensions.rememberPresenterState
+import com.twidere.twiderex.icon.switcher.IconSelectorDialog
+import com.twidere.twiderex.icon.switcher.IconSwitcher
 import com.twidere.twiderex.navigation.Root
+import com.twidere.twiderex.scenes.settings.display.DisplayEvent
+import com.twidere.twiderex.scenes.settings.display.DisplayPresenter
 import com.twidere.twiderex.ui.TwidereScene
 import dev.icerock.moko.resources.FileResource
 import dev.icerock.moko.resources.StringResource
@@ -70,6 +80,11 @@ private val settings =
         com.twidere.twiderex.MR.strings.scene_settings_display_title,
         com.twidere.twiderex.MR.files.ic_template,
         route = Root.Settings.Display,
+      ),
+      SettingItem(
+        Strings.scene_settings_swipe_gestures_tittle,
+        com.twidere.twiderex.MR.files.ic_swipe,
+        route = Root.Settings.Swipe,
       ),
       SettingItem(
         com.twidere.twiderex.MR.strings.scene_settings_layout_title,
@@ -109,6 +124,12 @@ private val settings =
 fun SettingsScene(
   navigator: Navigator,
 ) {
+  var showIconSelector by remember {
+    mutableStateOf(false)
+  }
+
+  val (state, channel) = rememberPresenterState { DisplayPresenter(it) }
+
   TwidereScene {
     InAppNotificationScaffold(
       topBar = {
@@ -124,44 +145,71 @@ fun SettingsScene(
             Text(text = stringResource(com.twidere.twiderex.MR.strings.scene_settings_title))
           }
         )
+      },
+      bottomBar = {
       }
     ) {
       LazyColumn(
         contentPadding = it
       ) {
-        settings.forEach {
+        settings.forEach { items ->
           item {
             ListItem(
               text = {
                 ProvideTextStyle(value = MaterialTheme.typography.button) {
-                  Text(text = stringResource(it.key))
+                  Text(text = stringResource(items.key))
                 }
               },
             )
           }
-          items(it.value) {
-            ListItem(
-              modifier = Modifier.clickable(
-                onClick = {
-                  if (it.route.isNotEmpty()) {
-                    navigator.navigate(it.route)
-                  }
-                }
-              ),
-              icon = {
-                Icon(
-                  painter = painterResource(it.icon),
-                  contentDescription = stringResource(it.name),
-                  modifier = Modifier.size(24.dp),
-                )
-              },
-              text = {
-                Text(text = stringResource(it.name))
-              },
-            )
+          items(items.value) { item ->
+            SettingItem(item) {
+              navigator.navigate(item.route)
+            }
+          }
+        }
+        item {
+          IconSwitcher(appIcon = state.display.appIcon) {
+            showIconSelector = true
           }
         }
       }
     }
+    IconSelectorDialog(
+      show = showIconSelector,
+      onDismissRequest = {
+        showIconSelector = false
+      },
+      onIconSelect = {
+        channel.trySend(DisplayEvent.SetAppIcon(it))
+      }
+    )
   }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun SettingItem(
+  item: SettingItem,
+  onClick: () -> Unit,
+) {
+  ListItem(
+    modifier = Modifier.clickable(
+      onClick = {
+        if (item.route.isNotEmpty()) {
+          onClick.invoke()
+        }
+      }
+    ),
+    icon = {
+      Icon(
+        painter = painterResource(item.icon),
+        contentDescription = stringResource(item.name),
+        modifier = Modifier.size(24.dp),
+      )
+    },
+    text = {
+      Text(text = stringResource(item.name))
+    },
+  )
 }

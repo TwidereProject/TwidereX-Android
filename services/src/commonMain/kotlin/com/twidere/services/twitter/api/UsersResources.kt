@@ -54,4 +54,11 @@ interface UsersResources {
     @Path(value = "sourceId") sourceId: String,
     @Path(value = "targetId") targetId: String,
   ): TwitterResponseV2<BlockV2>
+
+  @POST("/1.1/users/report_spam.json")
+  suspend fun reportSpam(
+    @Query("screen_name") screenName: String?,
+    @Query("user_id") userId: String,
+    @Query("perform_block") performBlock: Boolean = false,
+  )
 }
