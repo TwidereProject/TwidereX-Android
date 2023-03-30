@@ -76,6 +76,9 @@ internal class MockRelationshipService @TestOnly constructor() : MicroBlogServic
   override suspend fun unblock(id: String): IRelationship {
     TODO("Not yet implemented")
   }
+  override suspend fun report(id: String, scenes: List<String>?, reason: String?) {
+    TODO("Not yet implemented")
+  }
 
   override suspend fun unfollow(user_id: String) {
     checkError()

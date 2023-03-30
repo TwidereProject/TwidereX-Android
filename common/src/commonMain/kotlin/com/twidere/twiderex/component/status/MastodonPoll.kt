@@ -212,7 +212,7 @@ fun MastodonPollOption(
       modifier = Modifier
         .height(IntrinsicSize.Min)
         .clip(
-          if (poll.multiple == true) {
+          if (poll.multiple) {
             RoundedCornerShape(4.dp)
           } else {
             RoundedCornerShape(percent = 50)
@@ -232,7 +232,7 @@ fun MastodonPollOption(
           .fillMaxSize()
           .background(
             remember(poll.expired, color) {
-              if (poll.expired == true) {
+              if (poll.expired) {
                 color.copy(alpha = 0.0304f)
               } else {
                 color.copy(alpha = 0.08f)
@@ -245,7 +245,7 @@ fun MastodonPollOption(
           .fillMaxHeight()
           .fillMaxWidth(progress)
           .clip(
-            if (poll.multiple == true) {
+            if (poll.multiple) {
               RoundedCornerShape(4.dp)
             } else {
               RoundedCornerShape(percent = 50)
@@ -256,7 +256,7 @@ fun MastodonPollOption(
               remember(poll.ownVotes, poll.expired) {
                 // foreGroundAlpha =1 - (1 - wantedAlpha)/(1 - backgroundAlpha)
                 if (poll.ownVotes?.contains(index) == true) {
-                  if (poll.expired == true) {
+                  if (poll.expired) {
                     // wanted alpha is 0.75f * 0.38f, but still a little bit heaver, so down to 0.185f
                     it.copy(alpha = 0.185f)
                   } else {
@@ -264,7 +264,7 @@ fun MastodonPollOption(
                     it.copy(alpha = 0.62f)
                   }
                 } else {
-                  if (poll.expired == true) {
+                  if (poll.expired) {
                     // wanted alpha is 0.2f * 0.38f
                     it.copy(alpha = 0.076f)
                   } else {
@@ -286,7 +286,7 @@ fun MastodonPollOption(
           modifier = Modifier.width(MastodonPollOptionDefaults.iconSize())
         ) {
           if (poll.canVote) {
-            if (poll.multiple == true) {
+            if (poll.multiple) {
               Checkbox(
                 modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
                 checked = voted,

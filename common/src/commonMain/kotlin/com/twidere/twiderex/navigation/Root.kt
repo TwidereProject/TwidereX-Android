@@ -204,6 +204,7 @@ object Root {
     const val Home = "/Root/Settings/Home"
     const val Appearance = "/Root/Settings/Appearance"
     const val Display = "/Root/Settings/Display"
+    const val Swipe = "/Root/Settings/Swipe"
     const val Storage = "/Root/Settings/Storage"
     const val About = "/Root/Settings/About"
     const val AccountManagement = "/Root/Settings/AccountManagement"

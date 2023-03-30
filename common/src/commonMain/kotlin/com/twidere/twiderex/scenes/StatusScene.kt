@@ -132,6 +132,7 @@ fun StatusScene(
             DetailedStatusComponent(
               data = it,
               statusNavigationData = statusNavigationData,
+              translationAble = false,
             )
           }
           Divider()
@@ -189,6 +190,7 @@ fun StatusScene(
                 DetailedStatusComponent(
                   data = it,
                   statusNavigationData = statusNavigationData,
+                  translationAble = true,
                 )
               }
             }
@@ -208,6 +210,7 @@ fun StatusScene(
                           data = item,
                           lineUp = firstVisibleIndex > 0,
                           statusNavigationData = statusNavigationData,
+                          translationAble = true,
                         )
                       } else {
                         val lineUp = index > 0 && source.peek(index - 1)

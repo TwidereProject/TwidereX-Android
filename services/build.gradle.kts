@@ -11,15 +11,11 @@ version = Package.versionName
 kotlin {
     sourceSets {
         val commonMain by getting {
-            kotlin.srcDir("src/commonMain/ktor")
             dependencies {
                 implementation(libs.bundles.kotlinx)
                 implementation(libs.bundles.reftrofit2)
                 implementation(libs.bundles.ktor)
                 implementation(libs.square.okhttp)
-                implementation(libs.square.okhttp.logging.interceptor)
-                implementation(libs.ktor.fit.annotation)
-                implementation(libs.napier)
                 implementation("com.github.Tlaster:Hson:0.1.4")
             }
         }
@@ -29,10 +25,6 @@ kotlin {
             }
         }
     }
-}
-
-dependencies {
-    kspAll(libs.ktor.fit.ksp)
 }
 
 android {

@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.dataprovider.mapper.autolink
+import com.twidere.twiderex.extensions.formattedTimestamp
 import com.twidere.twiderex.extensions.humanizedCount
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.model.MicroBlogKey
@@ -77,6 +78,9 @@ data class UiStatus(
   }
   val humanizedTime by lazy {
     timestamp.humanizedTimestamp()
+  }
+  val formattedTime by lazy {
+    timestamp.formattedTimestamp()
   }
   val mastodonExtra: MastodonStatusExtra? = if (extra is MastodonStatusExtra) extra else null
   val isMediaEmptyOfContainsAudio = !media.any() || media.any { it.type == MediaType.audio }

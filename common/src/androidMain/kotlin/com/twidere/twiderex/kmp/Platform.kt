@@ -22,6 +22,10 @@ package com.twidere.twiderex.kmp
 
 import android.os.Build
 
-actual val currentPlatform: Platform = Platform.Android
+actual val currentPlatform: Platform
+  get() = Platform.Android
 
-actual val isAndroidLessOreo: Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.O
+actual val isAndroidLessOreo: Boolean
+  get() = Build.VERSION.SDK_INT < Build.VERSION_CODES.O
+actual val systemVersion: Int
+  get() = Build.VERSION.SDK_INT

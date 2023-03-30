@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.kmp.AppIcon
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import kotlinx.coroutines.flow.Flow
@@ -47,30 +48,51 @@ fun DisplayPresenter(
     }
   }
 
+  suspend fun update(update: (DisplayPreferences) -> DisplayPreferences) {
+    preferencesHolder.displayPreferences.updateData {
+      update(it)
+    }
+  }
+
   LaunchedEffect(Unit) {
     event.collect { event ->
       when (event) {
-        DisplayEvent.CommitFontScale -> preferencesHolder.displayPreferences.updateData {
+        DisplayEvent.CommitFontScale -> update {
           it.copy(fontScale = fontScale)
         }
-        is DisplayEvent.SetAutoPlayback -> preferencesHolder.displayPreferences.updateData {
+        is DisplayEvent.SetAutoPlayback -> update {
           it.copy(autoPlayback = event.value)
         }
-        is DisplayEvent.SetAvatarStyle -> preferencesHolder.displayPreferences.updateData {
+        is DisplayEvent.SetAvatarStyle -> update {
           it.copy(avatarStyle = event.avatarStyle)
         }
         is DisplayEvent.SetFontScale -> fontScale = event.fontScale
-        is DisplayEvent.SetMediaPreview -> preferencesHolder.displayPreferences.updateData {
+        is DisplayEvent.SetMediaPreview -> update {
           it.copy(mediaPreview = event.value)
         }
-        is DisplayEvent.SetMuteByDefault -> preferencesHolder.displayPreferences.updateData {
+        is DisplayEvent.SetMuteByDefault -> update {
           it.copy(muteByDefault = event.value)
         }
-        is DisplayEvent.SetUrlPreview -> preferencesHolder.displayPreferences.updateData {
+        is DisplayEvent.SetUrlPreview -> update {
           it.copy(urlPreview = event.value)
         }
-        is DisplayEvent.SetUseSystemFontSize -> preferencesHolder.displayPreferences.updateData {
+        is DisplayEvent.SetUseSystemFontSize -> update {
           it.copy(useSystemFontSize = event.useSystemFont)
+        }
+        is DisplayEvent.ShowTranslationButton -> update {
+          it.copy(showTranslationButton = event.show)
+        }
+        is DisplayEvent.SetDateFormat -> update {
+          it.copy(dateFormat = event.timestamp)
+        }
+        is DisplayEvent.SetToolbarIcons -> update {
+          it.copy(hideToolbarIcons = event.hide)
+        }
+        is DisplayEvent.SetStatusNumbers -> update {
+          it.copy(showStatusNumbers = event.show)
+        }
+        is DisplayEvent.SetAppIcon -> update {
+          it.copy(appIcon = event.appIcon)
         }
       }
     }
@@ -96,4 +118,9 @@ interface DisplayEvent {
   data class SetMediaPreview(val value: Boolean) : DisplayEvent
   data class SetMuteByDefault(val value: Boolean) : DisplayEvent
   data class SetAutoPlayback(val value: DisplayPreferences.AutoPlayback) : DisplayEvent
+  data class ShowTranslationButton(val show: Boolean) : DisplayEvent
+  data class SetDateFormat(val timestamp: DisplayPreferences.DateFormat) : DisplayEvent
+  data class SetToolbarIcons(val hide: Boolean) : DisplayEvent
+  data class SetStatusNumbers(val show: Boolean) : DisplayEvent
+  data class SetAppIcon(val appIcon: AppIcon) : DisplayEvent
 }

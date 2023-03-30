@@ -176,6 +176,34 @@ fun DisplayScene(
           }
         )
         ItemDivider()
+        RadioItem(
+          options = remember {
+            listOf(
+              DisplayPreferences.DateFormat.RELATIVE,
+              DisplayPreferences.DateFormat.ABSOLUTE,
+            )
+          },
+          value = state.display.dateFormat,
+          onChanged = {
+            channel.trySend(DisplayEvent.SetDateFormat(it))
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_section_header_date_format))
+          },
+          itemContent = {
+            Text(
+              text = stringResource(
+                remember {
+                  arrayOf(
+                    com.twidere.twiderex.MR.strings.scene_settings_display_date_format_relative,
+                    com.twidere.twiderex.MR.strings.scene_settings_display_date_format_absolute,
+                  )
+                }[it.ordinal]
+              )
+            )
+          }
+        )
+        ItemDivider()
         ItemHeader {
           Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_section_header_media))
         }
@@ -237,6 +265,44 @@ fun DisplayScene(
             }
           )
         }
+        ItemDivider()
+        ItemHeader {
+          Text(text = stringResource(com.twidere.twiderex.MR.strings.scene_settings_display_section_header_toolbar_icons))
+        }
+
+        switchItem(
+          value = state.display.hideToolbarIcons,
+          onChanged = {
+            channel.trySend(DisplayEvent.SetToolbarIcons(it))
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_toolbar_icons_hide_toolbar_icons))
+          }
+        )
+
+        switchItem(
+          value = state.display.showStatusNumbers,
+          onChanged = {
+            channel.trySend(DisplayEvent.SetStatusNumbers(it))
+          },
+          title = {
+            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_toolbar_icons_show_status_numbers))
+          }
+        )
+
+        ItemDivider()
+        ItemHeader {
+          Text(text = stringResource(com.twidere.twiderex.MR.strings.scene_settings_appearance_section_header_translation))
+        }
+        switchItem(
+          value = state.display.showTranslationButton,
+          onChanged = {
+            channel.trySend(DisplayEvent.ShowTranslationButton(it))
+          },
+          title = {
+            Text(text = stringResource(com.twidere.twiderex.MR.strings.scene_settings_appearance_translation_translate_button))
+          }
+        )
       }
     }
   }

@@ -25,6 +25,11 @@ import org.jsoup.nodes.Element
 
 class StatsSerializer : HtmlSerializer<Int> {
   override fun decode(element: Element, wholeText: String): Int {
-    return element.parent().wholeText().trim().replace(",", "").toInt()
+    return element.parent().wholeText().trim().replace(
+      oldValue = ",",
+      newValue = ""
+    ).takeIf {
+      it.isNotBlank()
+    }?.toInt() ?: 0
   }
 }

@@ -68,8 +68,6 @@ ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "k
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 #ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
-ktor-fit-annotation = "io.github.qdsfdhvh:ktor-fit-annotation:1.0.5.2"
-ktor-fit-ksp = "io.github.qdsfdhvh:ktor-fit-ksp:1.0.5.2"
 
 square-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 square-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
@@ -123,7 +121,6 @@ exoplayer-extension-okhttp = { module = "com.google.android.exoplayer:extension-
 jetbrains-markdown = "org.jetbrains:markdown:0.3.3"
 
 mokoResources = { module = "dev.icerock.moko:resources", version.ref = "moko" }
-napier = "io.github.aakira:napier:2.6.1"
 #bignum = "com.ionspin.kotlin:bignum:0.3.7"
 kfilepicker = "moe.tlaster:KFilePicker:1.0.5"
 twitterParser = "moe.tlaster:twitter-parser:0.1.3"

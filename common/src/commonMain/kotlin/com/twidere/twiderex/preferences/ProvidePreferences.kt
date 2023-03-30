@@ -32,6 +32,7 @@ import com.twidere.twiderex.preferences.model.AccountPreferences
 import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.preferences.model.MiscPreferences
+import com.twidere.twiderex.preferences.model.SwipePreferences
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import kotlinx.coroutines.flow.map
 val LocalAccountPreferences =
@@ -41,6 +42,7 @@ val LocalAppearancePreferences =
 val LocalDisplayPreferences =
   compositionLocalOf<DisplayPreferences> { error("No DisplayPreferences") }
 val LocalHttpConfig = compositionLocalOf<HttpConfig> { error("No Http config preferences") }
+val LocalSwipePreferences = compositionLocalOf<SwipePreferences> { error("No SwipePreferences") }
 
 @Composable
 fun ProvidePreferences(
@@ -50,6 +52,9 @@ fun ProvidePreferences(
   val accountConfig by holder.accountPreferences
     .data
     .collectAsState(initial = AccountPreferences())
+  val swipeConfig by holder.swipePreferences
+    .data
+    .collectAsState(initial = SwipePreferences())
   val appearances by holder.appearancePreferences
     .data
     .collectAsState(initial = AppearancePreferences())
@@ -84,6 +89,7 @@ fun ProvidePreferences(
     LocalDisplayPreferences provides display,
     LocalHttpConfig provides proxyConfig,
     LocalVideoPlayback provides display.autoPlayback,
+    LocalSwipePreferences provides swipeConfig,
   ) {
     content.invoke()
   }

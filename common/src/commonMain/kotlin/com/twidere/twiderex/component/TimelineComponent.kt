@@ -24,18 +24,27 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
+import com.twidere.twiderex.action.LocalStatusActions
+import com.twidere.twiderex.action.triggerSwipe
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.rememberPresenterState
+import com.twidere.twiderex.kmp.LocalRemoteNavigator
 import com.twidere.twiderex.navigation.StatusNavigationData
+import com.twidere.twiderex.preferences.LocalAppearancePreferences
+import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.viewmodel.timeline.SavedStateKeyType
 import com.twidere.twiderex.viewmodel.timeline.TimeLineEvent
 import com.twidere.twiderex.viewmodel.timeline.TimelinePresenter
 import com.twidere.twiderex.viewmodel.timeline.TimelineState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 @Composable
 fun TimelineComponent(
@@ -52,8 +61,36 @@ fun TimelineComponent(
     return
   }
 
+  val autoRefresh = LocalAppearancePreferences.current.autoRefresh
+  val autoRefreshInterval = LocalAppearancePreferences.current.autoRefreshInterval
+  val resetToTop = LocalAppearancePreferences.current.resetToTop
+  val localStatus = LocalStatusActions.current
+  val account = LocalActiveAccount.current
+  val remoteNavigator = LocalRemoteNavigator.current
+
+  LaunchedEffect(
+    autoRefresh,
+    autoRefreshInterval,
+  ) {
+    if (!autoRefresh) {
+      return@LaunchedEffect
+    }
+    while (isActive) {
+      delay(autoRefreshInterval.duration)
+      state.source.refreshOrRetry()
+    }
+  }
+
+  val scope = rememberCoroutineScope()
+
   val refreshingState = remember(state.source.loadState.refresh) {
-    state.source.loadState.refresh is LoadState.Loading
+    (state.source.loadState.refresh is LoadState.Loading).apply {
+      if (!this && resetToTop) {
+        scope.launch {
+          lazyListController?.listState?.scrollToItem(0)
+        }
+      }
+    }
   }
 
   SwipeToRefreshLayout(
@@ -78,6 +115,16 @@ fun TimelineComponent(
         channel.trySend(TimeLineEvent.LoadBetween(current, next))
       },
       statusNavigation = statusNavigation,
+      onSwipe = { type, status ->
+        triggerSwipe(
+          statusNavigation = statusNavigation,
+          actionsViewModel = localStatus,
+          account = account,
+          remoteNavigator = remoteNavigator,
+          status = status,
+          type = type,
+        )
+      }
     )
   }
 }

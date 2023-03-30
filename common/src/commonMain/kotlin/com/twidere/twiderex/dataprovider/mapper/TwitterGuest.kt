@@ -52,21 +52,15 @@ internal fun TwitterGuestResponse.nextCursor(cursorType: String): String? =
 internal fun TwitterGuestResponse.toPagingTimeline(
   pagingKey: String,
   accountKey: MicroBlogKey,
-  orderKey: Long?,
 ): List<PagingTimeLineWithStatus> {
   val result = arrayListOf<PagingTimeLineWithStatus>()
-  var order = orderKey
   timeline?.instructions?.firstOrNull { it.addEntries != null }?.addEntries?.entries?.forEach {
     it.toDbTimelineWithStatus(
       this,
       pagingKey = pagingKey,
       accountKey = accountKey,
-      orderKey = if (order == null) null else -order,
     ).apply {
       result.addAll(this)
-      if (order != null) {
-        order += this.size
-      }
     }
   }
   return result
@@ -76,27 +70,27 @@ internal fun Entry.toDbTimelineWithStatus(
   response: TwitterGuestResponse,
   pagingKey: String,
   accountKey: MicroBlogKey,
-  orderKey: Long?,
 ): List<PagingTimeLineWithStatus> {
   if (/*content?.item?.content?.tweet?.displayType == "Tweet" && */!content?.item?.content?.tweet?.id.isNullOrEmpty()) {
     return listOfNotNull(
       response.globalObjects
         ?.tweets
         ?.get(content?.item?.content?.tweet?.id)
-        ?.toDbTimelineWithStatus(response, pagingKey, accountKey, orderKey)
+        ?.toDbTimelineWithStatus(response, pagingKey, accountKey, sortIndex?.toLongOrNull()),
     )
   }
-  if (!content?.item?.content?.conversationThread?.conversationComponents.isNullOrEmpty()) {
-    return content?.item?.content?.conversationThread?.conversationComponents?.mapIndexedNotNull { index, conversationComponent ->
+  val conversationComponents = content?.item?.content?.conversationThread?.conversationComponents
+  if (!conversationComponents.isNullOrEmpty()) {
+    return conversationComponents.asReversed().mapIndexedNotNull { index, conversationComponent ->
       if (/*conversationComponent.conversationTweetComponent?.tweet?.displayType == "Tweet" && */!conversationComponent.conversationTweetComponent?.tweet?.id.isNullOrEmpty()) {
         response.globalObjects
           ?.tweets
           ?.get(conversationComponent.conversationTweetComponent?.tweet?.id)
-          ?.toDbTimelineWithStatus(response, pagingKey, accountKey, if (orderKey != null) orderKey - index else null)
+          ?.toDbTimelineWithStatus(response, pagingKey, accountKey, sortIndex?.toLongOrNull()?.let { it + index })
       } else {
         null
       }
-    } ?: emptyList()
+    }
   }
   return emptyList()
 }
