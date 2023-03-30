@@ -105,7 +105,7 @@ fun DMConversationScene(
 }
 
 @Composable
-fun DMConversationScene(
+private fun DMConversationScene(
   conversationKey: MicroBlogKey,
   navigator: Navigator,
 ) {

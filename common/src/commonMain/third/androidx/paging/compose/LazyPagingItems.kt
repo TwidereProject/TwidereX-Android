@@ -41,6 +41,7 @@ import androidx.paging.PagingDataDiffer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
 
 /**
  * The class responsible for accessing the data from a [Flow] of [PagingData].
@@ -174,17 +175,18 @@ class LazyPagingItems<T : Any> internal constructor(
    * A [CombinedLoadStates] object which represents the current loading state.
    */
   public var loadState: CombinedLoadStates by mutableStateOf(
-    CombinedLoadStates(
-      refresh = InitialLoadStates.refresh,
-      prepend = InitialLoadStates.prepend,
-      append = InitialLoadStates.append,
-      source = InitialLoadStates
-    )
+    pagingDataDiffer.loadStateFlow.value
+      ?: CombinedLoadStates(
+        refresh = InitialLoadStates.refresh,
+        prepend = InitialLoadStates.prepend,
+        append = InitialLoadStates.append,
+        source = InitialLoadStates
+      )
   )
     private set
 
   internal suspend fun collectLoadState() {
-    pagingDataDiffer.loadStateFlow.collect {
+    pagingDataDiffer.loadStateFlow.filterNotNull().collect {
       loadState = it
     }
   }

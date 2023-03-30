@@ -65,7 +65,7 @@ fun TwitterListsEditScene(
 }
 
 @Composable
-fun TwitterListsEditScene(
+private fun TwitterListsEditScene(
   listKey: MicroBlogKey,
   navigator: Navigator,
 ) {

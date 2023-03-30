@@ -96,7 +96,7 @@ fun RouteBuilder.complexRoute(navigator: Navigator) {
         }
       ) {
         StatusScene(
-          statusKey = MicroBlogKey.twitter(statusId),
+          statusKey = statusId,
           navigator = navigator,
         )
       }
@@ -180,7 +180,8 @@ object Root {
     }
     object Input {
       const val route = "/Root/Search/Input"
-      operator fun invoke(keyword: String?) = "/Root/Search/Input?keyword=${java.net.URLEncoder.encode(if (keyword == null) "" else keyword, "UTF-8")}"
+      operator fun invoke(keyword: String?) = "/Root/Search/Input?keyword=${java.net.URLEncoder.encode(
+        keyword ?: "", "UTF-8")}"
     }
   }
   object Compose {

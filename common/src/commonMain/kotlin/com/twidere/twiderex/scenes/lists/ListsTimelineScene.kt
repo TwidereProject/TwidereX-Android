@@ -90,7 +90,7 @@ fun ListTimeLineScene(
 }
 
 @Composable
-fun ListTimeLineScene(
+private fun ListTimeLineScene(
   listKey: MicroBlogKey,
   navigator: Navigator,
 ) {
