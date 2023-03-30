@@ -16,6 +16,7 @@ kotlin {
                 implementation(libs.bundles.reftrofit2)
                 implementation(libs.bundles.ktor)
                 implementation(libs.square.okhttp)
+                implementation(libs.square.okhttp.logging.interceptor)
                 implementation("com.github.Tlaster:Hson:0.1.4")
             }
         }
