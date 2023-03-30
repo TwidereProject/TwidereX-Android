@@ -33,10 +33,11 @@ kotlin {
                 implementation(projects.services)
                 api(libs.bundles.compose)
                 implementation(libs.bundles.kotlinx)
-                implementation(libs.bundles.reftrofit2)
+                implementation(libs.bundles.ktor)
                 implementation(libs.bundles.androidx.common)
                 implementation(libs.sqldelight.coroutines.extensions)
                 implementation(libs.square.okhttp)
+                implementation(libs.jodaTime)
                 api(libs.square.okio)
                 api(libs.koin.core)
                 api(libs.mokoResources)
@@ -56,7 +57,7 @@ kotlin {
             dependencies {
                 implementation(libs.koin.test)
                 implementation(libs.kotlinx.coroutines.test)
-                implementation("io.mockk:mockk:1.13.3")
+                implementation("io.mockk:mockk:1.13.4")
             }
         }
         val androidMain by getting {
@@ -69,17 +70,18 @@ kotlin {
                 implementation(libs.koin.androidx.workmanager)
                 implementation(libs.compose.accompanist.permissions)
                 implementation(libs.androidx.work.rumtime.ktx)
-                implementation("com.github.android:renderscript-intrinsics-replacement-toolkit:b6363490c3")
+                implementation("com.github.android:renderscript-intrinsics-replacement-toolkit:9a70eae6f1")
             }
         }
-        val androidAndroidTest by getting {
+        val androidInstrumentedTest by getting {
+            dependsOn(commonTest)
             dependencies {
                 implementation(libs.bundles.test.android)
                 implementation(libs.sqldelight.android.driver)
                 implementation(libs.room.test)
             }
         }
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
                 implementation(libs.sqldelight.sqlite.driver)
             }

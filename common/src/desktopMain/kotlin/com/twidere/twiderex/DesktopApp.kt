@@ -34,10 +34,9 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.seiko.imageloader.ImageLoader
-import com.seiko.imageloader.ImageLoaderBuilder
 import com.seiko.imageloader.LocalImageLoader
-import com.seiko.imageloader.cache.disk.DiskCacheBuilder
-import com.seiko.imageloader.cache.memory.MemoryCacheBuilder
+import com.seiko.imageloader.cache.memory.maxSizePercent
+import com.seiko.imageloader.component.setupDefaultComponents
 import com.twidere.twiderex.component.NativeWindow
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
@@ -253,19 +252,19 @@ private fun onDeeplink(url: String) {
 }
 
 private fun generateImageLoader(storageService: StorageProvider): ImageLoader {
-  return ImageLoaderBuilder()
-    .commonConfig()
-    .memoryCache {
-      MemoryCacheBuilder()
-        // Set the max size to 25% of the app's available memory.
-        .maxSizePercent(0.25)
-        .build()
+  return ImageLoader {
+    commonConfig()
+    components {
+      setupDefaultComponents(imageScope)
     }
-    .diskCache {
-      DiskCacheBuilder()
-        .directory(storageService.cacheDir.toPath().resolve("image_cache"))
-        .maxSizeBytes(512L * 1024 * 1024) // 512MB
-        .build()
+    interceptor {
+      memoryCacheConfig {
+        maxSizePercent(0.25)
+      }
+      diskCacheConfig {
+        directory(storageService.cacheDir.toPath().resolve("image_cache"))
+        maxSizeBytes(512L * 1024 * 1024) // 512MB
+      }
     }
-    .build()
+  }
 }

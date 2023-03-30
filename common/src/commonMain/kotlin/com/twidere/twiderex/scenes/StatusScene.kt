@@ -95,7 +95,7 @@ fun StatusScene(
 }
 
 @Composable
-fun StatusScene(
+private fun StatusScene(
   statusKey: MicroBlogKey,
   navigator: Navigator,
 ) {

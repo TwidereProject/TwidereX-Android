@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.initializer
 
+import android.app.NotificationChannel
 import android.content.Context
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationChannelGroupCompat
@@ -56,7 +57,7 @@ class NotificationChannelInitializer : Initializer<NotificationChannelInitialize
     }
 
     notificationManagerCompat.notificationChannelsCompat.forEach {
-      if (it.id !in addedChannels && it.group == null) {
+      if (it.id !in addedChannels && it.group == null && it.id != NotificationChannel.DEFAULT_CHANNEL_ID) {
         notificationManagerCompat.deleteNotificationChannel(it.id)
       }
     }
@@ -105,7 +106,7 @@ class NotificationChannelInitializer : Initializer<NotificationChannelInitialize
 
     // Delete all channels and groups of non-existing accounts
     notificationManagerCompat.notificationChannelsCompat.forEach {
-      if (it.id !in addedChannels && it.group != null) {
+      if (it.id !in addedChannels && it.group != null && it.id != NotificationChannel.DEFAULT_CHANNEL_ID) {
         notificationManagerCompat.deleteNotificationChannel(it.id)
       }
     }

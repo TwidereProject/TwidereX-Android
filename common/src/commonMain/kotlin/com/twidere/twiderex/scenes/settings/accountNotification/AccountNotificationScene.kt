@@ -61,7 +61,7 @@ fun AccountNotificationScene(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun AccountNotificationScene(
+private fun AccountNotificationScene(
   accountKey: MicroBlogKey,
   navigator: Navigator,
 ) {

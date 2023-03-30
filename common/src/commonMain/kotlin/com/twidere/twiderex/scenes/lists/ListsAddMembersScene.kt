@@ -88,7 +88,7 @@ fun ListsAddMembersScene(
 }
 
 @Composable
-fun ListsAddMembersScene(
+private fun ListsAddMembersScene(
   listKey: MicroBlogKey,
   navigator: Navigator,
 ) {

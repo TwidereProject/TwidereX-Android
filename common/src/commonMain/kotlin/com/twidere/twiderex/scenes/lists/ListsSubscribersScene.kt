@@ -55,7 +55,7 @@ fun ListsSubscribersScene(
 }
 
 @Composable
-fun ListsSubscribersScene(
+private fun ListsSubscribersScene(
   listKey: MicroBlogKey,
   navigator: Navigator,
 ) {

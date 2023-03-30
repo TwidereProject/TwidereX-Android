@@ -55,7 +55,7 @@ fun FollowersScene(
 }
 
 @Composable
-fun FollowersScene(
+private fun FollowersScene(
   userKey: MicroBlogKey,
   navigator: Navigator,
 ) {

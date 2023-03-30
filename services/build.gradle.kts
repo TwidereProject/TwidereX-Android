@@ -16,7 +16,8 @@ kotlin {
                 implementation(libs.bundles.reftrofit2)
                 implementation(libs.bundles.ktor)
                 implementation(libs.square.okhttp)
-                implementation("com.github.Tlaster:Hson:0.1.4")
+                implementation(libs.square.okhttp.logging.interceptor)
+                implementation(libs.hson)
             }
         }
         val commonTest by getting {
