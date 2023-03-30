@@ -5,23 +5,24 @@ kotlin = "1.8.10"
 ksp = "1.8.10-1.0.9"
 kotlinx-coroutines = "1.6.4"
 kotlinx-serialization = "1.5.0"
-koin = "3.3.2"
+koin = "3.3.3"
 koin-annotations = "1.0.3.11"
-ktor = "2.2.3"
+ktor = "2.2.4"
 okio = "3.3.0"
 okhttp = "4.10.0"
 retrofit2 = "2.9.0"
 sqldelight = "1.5.5"
-spotless = "6.11.0"
+spotless = "6.17.0"
 ktlint = "0.46.1"
-detekt = "1.22.0-RC2"
-datastore = "1.1.0-alpha01"
-moko = "0.20.1"
+detekt = "1.22.0"
+datastore = "1.1.0-alpha03"
+moko = "0.21.1"
 accompanist = "0.28.0"
 accompanist-jb = "0.25.2"
-pagging = "3.2.0-alpha03"
-room = "2.5.0"
-exoplayer = "2.18.2"
+pagging = "3.2.0-alpha04"
+room = "2.5.1"
+exoplayer = "2.18.5"
+hson = "0.1.4"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -42,9 +43,9 @@ gradlePlugin-compose = { module = "org.jetbrains.compose:compose-gradle-plugin",
 gradlePlugin-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 gradlePlugin-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 gradlePlugin-versionsCheck = { module = "com.github.ben-manes:gradle-versions-plugin", version = "0.43.0" }
-gradlePlugin-gms = { module = "com.google.gms:google-services", version = "4.3.14" }
-gradlePlugin-firebase = { module = "com.google.firebase:firebase-crashlytics-gradle", version = "2.9.2" }
-gradlePlugin-firebaseAppdistribution = { module = "com.google.firebase:firebase-appdistribution-gradle", version = "3.1.0" }
+gradlePlugin-gms = { module = "com.google.gms:google-services", version = "4.3.15" }
+gradlePlugin-firebase = { module = "com.google.firebase:firebase-crashlytics-gradle", version = "2.9.4" }
+gradlePlugin-firebaseAppdistribution = { module = "com.google.firebase:firebase-appdistribution-gradle", version = "4.0.0" }
 
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
@@ -86,24 +87,24 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-pagging = { module = "androidx.paging:paging-common", version.ref = "pagging" }
 
 androidx-core-ktx = "androidx.core:core-ktx:1.9.0"
-androidx-activity-ktx = "androidx.activity:activity-ktx:1.7.0-alpha04"
-androidx-activity-compose = "androidx.activity:activity-compose:1.6.1"
-androidx-work-rumtime-ktx = "androidx.work:work-runtime-ktx:2.8.0-rc01"
-androidx-exifinterface = "androidx.exifinterface:exifinterface:1.3.5"
+androidx-activity-ktx = "androidx.activity:activity-ktx:1.7.0"
+androidx-activity-compose = "androidx.activity:activity-compose:1.7.0"
+androidx-work-rumtime-ktx = "androidx.work:work-runtime-ktx:2.8.1"
+androidx-exifinterface = "androidx.exifinterface:exifinterface:1.3.6"
 androidx-startup = "androidx.startup:startup-runtime:1.2.0-alpha02"
-androidx-browser = "androidx.browser:browser:1.5.0-rc01"
+androidx-browser = "androidx.browser:browser:1.5.0"
 androidx-vectordrawable = "androidx.vectordrawable:vectordrawable:1.2.0-beta01"
 
-androidx-test-arch-core = "androidx.arch.core:core-testing:2.1.0"
+androidx-test-arch-core = "androidx.arch.core:core-testing:2.2.0"
 androidx-test-core = "androidx.test:core:1.5.0"
 androidx-test-runner = "androidx.test:runner:1.5.2"
 androidx-test-ext = "androidx.test.ext:junit-ktx:1.1.5"
 androidx-test-espresso-core = "androidx.test.espresso:espresso-core:3.5.1"
 
-compose-precompose = "moe.tlaster:precompose:1.3.13"
+compose-precompose = "moe.tlaster:precompose:1.3.14"
 compose-precompose-annotation = "io.github.qdsfdhvh:precompose-annotation:1.0.2"
 compose-precompose-ksp = "io.github.qdsfdhvh:precompose-ksp:1.0.2"
-compose-imageloader = "io.github.qdsfdhvh:image-loader:1.2.8"
+compose-imageloader = "io.github.qdsfdhvh:image-loader:1.2.10"
 compose-imageloader-extension-blur = "io.github.qdsfdhvh:image-loader-extension-blur:1.2.8"
 #compose-paging = "io.github.qdsfdhvh:paging:1.0.4"
 compose-safearea = "moe.tlaster:safearea:0.1.3"
@@ -118,18 +119,19 @@ room-ksp = { module = "androidx.room:room-compiler", version.ref = "room" }
 exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayer" }
 exoplayer-extension-okhttp = { module = "com.google.android.exoplayer:extension-okhttp", version.ref = "exoplayer" }
 
-jetbrains-markdown = "org.jetbrains:markdown:0.3.3"
+jetbrains-markdown = "org.jetbrains:markdown:0.4.1"
 
 mokoResources = { module = "dev.icerock.moko:resources", version.ref = "moko" }
 #bignum = "com.ionspin.kotlin:bignum:0.3.7"
 kfilepicker = "moe.tlaster:KFilePicker:1.0.5"
-twitterParser = "moe.tlaster:twitter-parser:0.1.3"
+twitterParser = "moe.tlaster:twitter-parser:0.2.8"
 #kWalletConnect = "io.github.joesteven:kwalletconnect:1.0.3-dev"
 twitterComposeRulesDetekt = "io.nlopez.compose.rules:detekt:0.1.1"
 #krypto = "com.soywiz.korlibs.krypto:krypto:3.4.0"
 #kVideoplayer = "io.github.joesteven:kvideoplayer:1.0.1-dev03"
 cache4k = "io.github.reactivecircus.cache4k:cache4k:0.9.0"
 jodaTime = "joda-time:joda-time:2.12.2"
+hson = { module = "com.github.Tlaster:Hson", version.ref = "hson" }
 
 [bundles]
 kotlinx = [
